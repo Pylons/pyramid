@@ -15,11 +15,12 @@ from pyramid.tweens import (
     EXCVIEW,
     )
 
-from pyramid.config.util import (
-    action_method,
+from pyramid.util import (
+    is_string_or_iterable,
     TopologicalSorter,
     )
-from pyramid.util import is_string_or_iterable
+
+from pyramid.config.util import action_method
 
 class TweensConfiguratorMixin(object):
     def add_tween(self, tween_factory, under=None, over=None):

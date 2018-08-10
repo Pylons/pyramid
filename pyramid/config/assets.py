@@ -12,7 +12,7 @@ from pyramid.interfaces import (
 from pyramid.exceptions import ConfigurationError
 from pyramid.threadlocal import get_current_registry
 
-from pyramid.util import action_method
+from pyramid.config.util import action_method
 
 class OverrideProvider(pkg_resources.DefaultProvider):
     def __init__(self, module):

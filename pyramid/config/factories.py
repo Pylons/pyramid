@@ -15,11 +15,11 @@ from pyramid.router import default_execution_policy
 from pyramid.traversal import DefaultRootFactory
 
 from pyramid.util import (
-    action_method,
     get_callable_name,
     InstancePropertyHelper,
     )
 
+from pyramid.config.util import action_method
 
 class FactoriesConfiguratorMixin(object):
     @action_method

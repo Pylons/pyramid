@@ -58,11 +58,16 @@ from pyramid.settings import aslist
 from pyramid.threadlocal import manager
 
 from pyramid.util import (
-    ActionInfo,
     WeakOrderedSet,
-    action_method,
     object_description,
     )
+
+from pyramid.config.util import (
+    ActionInfo,
+    PredicateList,
+    action_method,
+    not_,
+)
 
 from pyramid.config.adapters import AdaptersConfiguratorMixin
 from pyramid.config.assets import AssetsConfiguratorMixin
@@ -74,7 +79,6 @@ from pyramid.config.security import SecurityConfiguratorMixin
 from pyramid.config.settings import SettingsConfiguratorMixin
 from pyramid.config.testing import TestingConfiguratorMixin
 from pyramid.config.tweens import TweensConfiguratorMixin
-from pyramid.config.util import PredicateList, not_
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
 
@@ -83,9 +87,7 @@ from pyramid.path import DottedNameResolver
 empty = text_('')
 _marker = object()
 
-ConfigurationError = ConfigurationError # pyflakes
-
-not_ = not_ # pyflakes, this is an API
+not_ = not_  # api
 
 PHASE0_CONFIG = PHASE0_CONFIG  # api
 PHASE1_CONFIG = PHASE1_CONFIG  # api

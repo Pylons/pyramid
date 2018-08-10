@@ -19,7 +19,7 @@ Models
 ======
 
 We'll be using an SQLite database to hold our wiki data, and we'll be using
-:term:`SQLAlchemy` to access the data in this database.
+:term:`SQLAlchemy` to access the data in this database. We will also use :term:`Alembic` for database migrations, including initialization of the SQLite database.
 
 Within the database, we will define two tables:
 

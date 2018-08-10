@@ -12,8 +12,10 @@ from pyramid.traversal import (
     )
 
 from pyramid.urldispatch import _compile_route
-from pyramid.util import object_description
-from pyramid.util import as_sorted_tuple
+from pyramid.util import (
+    as_sorted_tuple,
+    object_description,
+)
 
 _marker = object()
 
@@ -298,3 +300,27 @@ class EffectivePrincipalsPredicate(object):
                 return True
         return False
 
+class Notted(object):
+    def __init__(self, predicate):
+        self.predicate = predicate
+
+    def _notted_text(self, val):
+        # if the underlying predicate doesnt return a value, it's not really
+        # a predicate, it's just something pretending to be a predicate,
+        # so dont update the hash
+        if val:
+            val = '!' + val
+        return val
+
+    def text(self):
+        return self._notted_text(self.predicate.text())
+
+    def phash(self):
+        return self._notted_text(self.predicate.phash())
+
+    def __call__(self, context, request):
+        result = self.predicate(context, request)
+        phash = self.phash()
+        if phash:
+            result = not result
+        return result

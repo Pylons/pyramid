@@ -28,18 +28,14 @@ from pyramid.compat import (
     is_unbound_method,
     )
 
-from pyramid.config.util import (
-    DEFAULT_PHASH,
-    MAX_ORDER,
-    takes_one_arg,
-    )
-
 from pyramid.exceptions import (
     ConfigurationError,
-    PredicateMismatch,
     )
 from pyramid.httpexceptions import HTTPForbidden
-from pyramid.util import object_description
+from pyramid.util import (
+    object_description,
+    takes_one_arg,
+)
 from pyramid.view import render_view_to_response
 from pyramid import renderers
 
@@ -352,49 +348,6 @@ def _authdebug_view(view, info):
         wrapped_view = authdebug_view
 
     return wrapped_view
-
-def predicated_view(view, info):
-    preds = info.predicates
-    if not preds:
-        return view
-    def predicate_wrapper(context, request):
-        for predicate in preds:
-            if not predicate(context, request):
-                view_name = getattr(view, '__name__', view)
-                raise PredicateMismatch(
-                    'predicate mismatch for view %s (%s)' % (
-                        view_name, predicate.text()))
-        return view(context, request)
-    def checker(context, request):
-        return all((predicate(context, request) for predicate in
-                    preds))
-    predicate_wrapper.__predicated__ = checker
-    predicate_wrapper.__predicates__ = preds
-    return predicate_wrapper
-
-def attr_wrapped_view(view, info):
-    accept, order, phash = (info.options.get('accept', None),
-                            getattr(info, 'order', MAX_ORDER),
-                            getattr(info, 'phash', DEFAULT_PHASH))
-    # this is a little silly but we don't want to decorate the original
-    # function with attributes that indicate accept, order, and phash,
-    # so we use a wrapper
-    if (
-        (accept is None) and
-        (order == MAX_ORDER) and
-        (phash == DEFAULT_PHASH)
-    ):
-        return view # defaults
-    def attr_view(context, request):
-        return view(context, request)
-    attr_view.__accept__ = accept
-    attr_view.__order__ = order
-    attr_view.__phash__ = phash
-    attr_view.__view_attr__ = info.options.get('attr')
-    attr_view.__permission__ = info.options.get('permission')
-    return attr_view
-
-attr_wrapped_view.options = ('accept', 'attr', 'permission')
 
 def rendered_view(view, info):
     # one way or another this wrapper must produce a Response (unless

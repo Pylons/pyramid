@@ -30,8 +30,8 @@ Features
   route_prefix for ``include`` and ``add_route`` calls inside the context.
   See https://github.com/Pylons/pyramid/pull/3279
 
-- Modify the builtin session implementations to support SameSite options on
-  cookies and set the default to ``'Lax'``. This affects
+- Modify the builtin session implementations to support ``SameSite`` options
+  on cookies and set the default to ``'Lax'``. This affects
   ``pyramid.session.BaseCookieSessionFactory``,
   ``pyramid.session.SignedCookieSessionFactory``, and
   ``pyramid.session.UnencryptedCookieSessionFactoryConfig``.
@@ -45,6 +45,14 @@ Features
 - Added new ``pyramid.httpexceptions.HTTPPermanentRedirect``
   exception/response object for a HTTP 308 redirect.
   See https://github.com/Pylons/pyramid/pull/3302
+
+- Within ``pshell``, allow the user-defined ``setup`` function to be a
+  generator, in which case it may wrap the command's lifecycle.
+  See https://github.com/Pylons/pyramid/pull/3318
+
+- Within ``pshell``, variables defined by the ``[pshell]`` settings are
+  available within the user-defined ``setup`` function.
+  See https://github.com/Pylons/pyramid/pull/3318
 
 Bug Fixes
 ---------
@@ -81,8 +89,17 @@ Backward Incompatibilities
   ``pyramid.session.UnencryptedCookieSessionFactoryConfig``.
   See https://github.com/Pylons/pyramid/pull/3300
 
+- Variables defined in the ``[pshell]`` section of the settings will no
+  longer override those set by the ``setup`` function.
+  See https://github.com/Pylons/pyramid/pull/3318
+
 Documentation Changes
 ---------------------
+
+- Add support for alembic to the pyramid-cookiecutter-alchemy cookiecutter
+  and update the wiki2 tutorial to explain how it works.
+  See https://github.com/Pylons/pyramid/pull/3307 and
+  https://github.com/Pylons/pyramid-cookiecutter-alchemy/pull/7
 
 - Bump Sphinx to >= 1.7.4 in setup.py to support ``emphasize-lines`` in PDFs
   and to pave the way for xelatex support.  See

@@ -10,10 +10,9 @@ from pyramid.interfaces import (
     IResourceURL,
     )
 
-from pyramid.config.util import (
-    action_method,
-    takes_one_arg,
-    )
+from pyramid.util import takes_one_arg
+
+from pyramid.config.util import action_method
 
 
 class AdaptersConfiguratorMixin(object):

@@ -3,8 +3,8 @@ from pyramid.interfaces import (
     PHASE1_CONFIG,
     )
 
-from pyramid.util import action_method
 from pyramid import renderers
+from pyramid.config.util import action_method
 
 DEFAULT_RENDERERS = (
     ('json', renderers.json_renderer_factory),

@@ -9,8 +9,9 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
     CHANGES = f.read()
 
 requires = [
+    'alembic',
     'plaster_pastedeploy',
-    'pyramid >= 1.9a',
+    'pyramid >= 1.9',
     'pyramid_debugtoolbar',
     'pyramid_jinja2',
     'pyramid_retry',
@@ -54,7 +55,7 @@ setup(
             'main = tutorial:main',
         ],
         'console_scripts': [
-            'initialize_tutorial_db = tutorial.scripts.initializedb:main',
+            'initialize_tutorial_db = tutorial.scripts.initialize_db:main',
         ],
     },
 )

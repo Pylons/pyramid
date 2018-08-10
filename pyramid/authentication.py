@@ -34,6 +34,7 @@ from pyramid.security import (
     )
 
 from pyramid.util import strings_differ
+from pyramid.util import SimpleSerializer
 
 VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
 
@@ -827,7 +828,7 @@ class AuthTktCookieHelper(object):
                  samesite='Lax',
                  ):
 
-        serializer = _SimpleSerializer()
+        serializer = SimpleSerializer()
 
         self.cookie_profile = CookieProfile(
             cookie_name=cookie_name,
@@ -1154,14 +1155,6 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
         if credentials:
             username, password = credentials
             return self.check(username, password, request)
-
-
-class _SimpleSerializer(object):
-    def loads(self, bstruct):
-        return native_(bstruct)
-
-    def dumps(self, appstruct):
-        return bytes_(appstruct)
 
 
 HTTPBasicCredentials = namedtuple(

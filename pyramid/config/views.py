@@ -1,3 +1,4 @@
+import functools
 import inspect
 import posixpath
 import operator
@@ -54,10 +55,7 @@ from pyramid.httpexceptions import (
     default_exceptionresponse_view,
     )
 
-from pyramid.registry import (
-    predvalseq,
-    Deferred,
-    )
+from pyramid.registry import Deferred
 
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
@@ -66,10 +64,7 @@ from pyramid.url import parse_url_overrides
 
 from pyramid.view import AppendSlashNotFoundViewFactory
 
-import pyramid.util
 from pyramid.util import (
-    viewdefaults,
-    action_method,
     as_sorted_tuple,
     TopologicalSorter,
     )
@@ -88,8 +83,10 @@ from pyramid.viewderivers import (
 )
 
 from pyramid.config.util import (
+    action_method,
     DEFAULT_PHASH,
     MAX_ORDER,
+    predvalseq,
     )
 
 urljoin = urlparse.urljoin
@@ -182,6 +179,68 @@ class MultiView(object):
             except PredicateMismatch:
                 continue
         raise PredicateMismatch(self.name)
+
+def attr_wrapped_view(view, info):
+    accept, order, phash = (info.options.get('accept', None),
+                            getattr(info, 'order', MAX_ORDER),
+                            getattr(info, 'phash', DEFAULT_PHASH))
+    # this is a little silly but we don't want to decorate the original
+    # function with attributes that indicate accept, order, and phash,
+    # so we use a wrapper
+    if (
+        (accept is None) and
+        (order == MAX_ORDER) and
+        (phash == DEFAULT_PHASH)
+    ):
+        return view # defaults
+    def attr_view(context, request):
+        return view(context, request)
+    attr_view.__accept__ = accept
+    attr_view.__order__ = order
+    attr_view.__phash__ = phash
+    attr_view.__view_attr__ = info.options.get('attr')
+    attr_view.__permission__ = info.options.get('permission')
+    return attr_view
+
+attr_wrapped_view.options = ('accept', 'attr', 'permission')
+
+def predicated_view(view, info):
+    preds = info.predicates
+    if not preds:
+        return view
+    def predicate_wrapper(context, request):
+        for predicate in preds:
+            if not predicate(context, request):
+                view_name = getattr(view, '__name__', view)
+                raise PredicateMismatch(
+                    'predicate mismatch for view %s (%s)' % (
+                        view_name, predicate.text()))
+        return view(context, request)
+    def checker(context, request):
+        return all((predicate(context, request) for predicate in
+                    preds))
+    predicate_wrapper.__predicated__ = checker
+    predicate_wrapper.__predicates__ = preds
+    return predicate_wrapper
+
+def viewdefaults(wrapped):
+    """ Decorator for add_view-like methods which takes into account
+    __view_defaults__ attached to view it is passed.  Not a documented API but
+    used by some external systems."""
+    def wrapper(self, *arg, **kw):
+        defaults = {}
+        if arg:
+            view = arg[0]
+        else:
+            view = kw.get('view')
+        view = self.maybe_dotted(view)
+        if inspect.isclass(view):
+            defaults = getattr(view, '__view_defaults__', {}).copy()
+        if '_backframes' not in kw:
+            kw['_backframes'] = 1 # for action_method
+        defaults.update(kw)
+        return wrapped(self, *arg, **defaults)
+    return functools.wraps(wrapped)(wrapper)
 
 class ViewsConfiguratorMixin(object):
     @viewdefaults
@@ -1106,11 +1165,9 @@ class ViewsConfiguratorMixin(object):
             raise ConfigurationError('Unknown view options: %s' % (kw,))
 
     def _apply_view_derivers(self, info):
-        d = pyramid.viewderivers
-
         # These derivers are not really derivers and so have fixed order
-        outer_derivers = [('attr_wrapped_view', d.attr_wrapped_view),
-                          ('predicated_view', d.predicated_view)]
+        outer_derivers = [('attr_wrapped_view', attr_wrapped_view),
+                          ('predicated_view', predicated_view)]
 
         view = info.original_view
         derivers = self.registry.getUtility(IViewDerivers)

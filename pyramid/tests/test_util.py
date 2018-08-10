@@ -1,5 +1,9 @@
 import unittest
-from pyramid.compat import PY2
+from pyramid.compat import (
+    PY2,
+    text_,
+    bytes_,
+    )
 
 
 class Test_InstancePropertyHelper(unittest.TestCase):
@@ -747,36 +751,6 @@ class TestSentinel(unittest.TestCase):
         r = repr(Sentinel('ABC'))
         self.assertEqual(r, 'ABC')
 
-class TestActionInfo(unittest.TestCase):
-    def _getTargetClass(self):
-        from pyramid.util import ActionInfo
-        return ActionInfo
-
-    def _makeOne(self, filename, lineno, function, linerepr):
-        return self._getTargetClass()(filename, lineno, function, linerepr)
-
-    def test_class_conforms(self):
-        from zope.interface.verify import verifyClass
-        from pyramid.interfaces import IActionInfo
-        verifyClass(IActionInfo, self._getTargetClass())
-
-    def test_instance_conforms(self):
-        from zope.interface.verify import verifyObject
-        from pyramid.interfaces import IActionInfo
-        verifyObject(IActionInfo, self._makeOne('f', 0, 'f', 'f'))
-
-    def test_ctor(self):
-        inst = self._makeOne('filename', 10, 'function', 'src')
-        self.assertEqual(inst.file, 'filename')
-        self.assertEqual(inst.line, 10)
-        self.assertEqual(inst.function, 'function')
-        self.assertEqual(inst.src, 'src')
-
-    def test___str__(self):
-        inst = self._makeOne('filename', 0, 'function', '   linerepr  ')
-        self.assertEqual(str(inst),
-                         "Line 0 of file filename:\n       linerepr  ")
-
 
 class TestCallableName(unittest.TestCase):
     def test_valid_ascii(self):
@@ -889,3 +863,249 @@ class Test_is_same_domain(unittest.TestCase):
         self.assertTrue(self._callFUT("example.com:8080", "example.com:8080"))
         self.assertFalse(self._callFUT("example.com:8080", "example.com"))
         self.assertFalse(self._callFUT("example.com", "example.com:8080"))
+
+
+class Test_make_contextmanager(unittest.TestCase):
+    def _callFUT(self, *args, **kw):
+        from pyramid.util import make_contextmanager
+        return make_contextmanager(*args, **kw)
+
+    def test_with_None(self):
+        mgr = self._callFUT(None)
+        with mgr() as ctx:
+            self.assertIsNone(ctx)
+
+    def test_with_generator(self):
+        def mygen(ctx):
+            yield ctx
+        mgr = self._callFUT(mygen)
+        with mgr('a') as ctx:
+            self.assertEqual(ctx, 'a')
+
+    def test_with_multiple_yield_generator(self):
+        def mygen():
+            yield 'a'
+            yield 'b'
+        mgr = self._callFUT(mygen)
+        try:
+            with mgr() as ctx:
+                self.assertEqual(ctx, 'a')
+        except RuntimeError:
+            pass
+        else:  # pragma: no cover
+            raise AssertionError('expected raise from multiple yields')
+
+    def test_with_regular_fn(self):
+        def mygen():
+            return 'a'
+        mgr = self._callFUT(mygen)
+        with mgr() as ctx:
+            self.assertEqual(ctx, 'a')
+
+
+class Test_takes_one_arg(unittest.TestCase):
+    def _callFUT(self, view, attr=None, argname=None):
+        from pyramid.util import takes_one_arg
+        return takes_one_arg(view, attr=attr, argname=argname)
+
+    def test_requestonly_newstyle_class_no_init(self):
+        class foo(object):
+            """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_requestonly_newstyle_class_init_toomanyargs(self):
+        class foo(object):
+            def __init__(self, context, request):
+                """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_requestonly_newstyle_class_init_onearg_named_request(self):
+        class foo(object):
+            def __init__(self, request):
+                """ """
+        self.assertTrue(self._callFUT(foo))
+
+    def test_newstyle_class_init_onearg_named_somethingelse(self):
+        class foo(object):
+            def __init__(self, req):
+                """ """
+        self.assertTrue(self._callFUT(foo))
+
+    def test_newstyle_class_init_defaultargs_firstname_not_request(self):
+        class foo(object):
+            def __init__(self, context, request=None):
+                """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_newstyle_class_init_defaultargs_firstname_request(self):
+        class foo(object):
+            def __init__(self, request, foo=1, bar=2):
+                """ """
+        self.assertTrue(self._callFUT(foo, argname='request'))
+
+    def test_newstyle_class_init_firstname_request_with_secondname(self):
+        class foo(object):
+            def __init__(self, request, two):
+                """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_newstyle_class_init_noargs(self):
+        class foo(object):
+            def __init__():
+                """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_oldstyle_class_no_init(self):
+        class foo:
+            """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_oldstyle_class_init_toomanyargs(self):
+        class foo:
+            def __init__(self, context, request):
+                """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_oldstyle_class_init_onearg_named_request(self):
+        class foo:
+            def __init__(self, request):
+                """ """
+        self.assertTrue(self._callFUT(foo))
+
+    def test_oldstyle_class_init_onearg_named_somethingelse(self):
+        class foo:
+            def __init__(self, req):
+                """ """
+        self.assertTrue(self._callFUT(foo))
+
+    def test_oldstyle_class_init_defaultargs_firstname_not_request(self):
+        class foo:
+            def __init__(self, context, request=None):
+                """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_oldstyle_class_init_defaultargs_firstname_request(self):
+        class foo:
+            def __init__(self, request, foo=1, bar=2):
+                """ """
+        self.assertTrue(self._callFUT(foo, argname='request'), True)
+
+    def test_oldstyle_class_init_noargs(self):
+        class foo:
+            def __init__():
+                """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_function_toomanyargs(self):
+        def foo(context, request):
+            """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_function_with_attr_false(self):
+        def bar(context, request):
+            """ """
+        def foo(context, request):
+            """ """
+        foo.bar = bar
+        self.assertFalse(self._callFUT(foo, 'bar'))
+
+    def test_function_with_attr_true(self):
+        def bar(context, request):
+            """ """
+        def foo(request):
+            """ """
+        foo.bar = bar
+        self.assertTrue(self._callFUT(foo, 'bar'))
+
+    def test_function_onearg_named_request(self):
+        def foo(request):
+            """ """
+        self.assertTrue(self._callFUT(foo))
+
+    def test_function_onearg_named_somethingelse(self):
+        def foo(req):
+            """ """
+        self.assertTrue(self._callFUT(foo))
+
+    def test_function_defaultargs_firstname_not_request(self):
+        def foo(context, request=None):
+            """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_function_defaultargs_firstname_request(self):
+        def foo(request, foo=1, bar=2):
+            """ """
+        self.assertTrue(self._callFUT(foo, argname='request'))
+
+    def test_function_noargs(self):
+        def foo():
+            """ """
+        self.assertFalse(self._callFUT(foo))
+
+    def test_instance_toomanyargs(self):
+        class Foo:
+            def __call__(self, context, request):
+                """ """
+        foo = Foo()
+        self.assertFalse(self._callFUT(foo))
+
+    def test_instance_defaultargs_onearg_named_request(self):
+        class Foo:
+            def __call__(self, request):
+                """ """
+        foo = Foo()
+        self.assertTrue(self._callFUT(foo))
+
+    def test_instance_defaultargs_onearg_named_somethingelse(self):
+        class Foo:
+            def __call__(self, req):
+                """ """
+        foo = Foo()
+        self.assertTrue(self._callFUT(foo))
+
+    def test_instance_defaultargs_firstname_not_request(self):
+        class Foo:
+            def __call__(self, context, request=None):
+                """ """
+        foo = Foo()
+        self.assertFalse(self._callFUT(foo))
+
+    def test_instance_defaultargs_firstname_request(self):
+        class Foo:
+            def __call__(self, request, foo=1, bar=2):
+                """ """
+        foo = Foo()
+        self.assertTrue(self._callFUT(foo, argname='request'), True)
+
+    def test_instance_nocall(self):
+        class Foo: pass
+        foo = Foo()
+        self.assertFalse(self._callFUT(foo))
+
+    def test_method_onearg_named_request(self):
+        class Foo:
+            def method(self, request):
+                """ """
+        foo = Foo()
+        self.assertTrue(self._callFUT(foo.method))
+
+    def test_function_annotations(self):
+        def foo(bar):
+            """ """
+        # avoid SyntaxErrors in python2, this if effectively nop
+        getattr(foo, '__annotations__', {}).update({'bar': 'baz'})
+        self.assertTrue(self._callFUT(foo))
+
+
+class TestSimpleSerializer(unittest.TestCase):
+    def _makeOne(self):
+        from pyramid.util import SimpleSerializer
+        return SimpleSerializer()
+
+    def test_loads(self):
+        inst = self._makeOne()
+        self.assertEqual(inst.loads(b'abc'), text_('abc'))
+
+    def test_dumps(self):
+        inst = self._makeOne()
+        self.assertEqual(inst.dumps('abc'), bytes_('abc'))

@@ -5,7 +5,7 @@ from docutils.core import publish_parts
 from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
 
-from ..models import Page
+from .. import models
 
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
@@ -22,7 +22,7 @@ def view_page(request):
 
     def add_link(match):
         word = match.group(1)
-        exists = request.dbsession.query(Page).filter_by(name=word).all()
+        exists = request.dbsession.query(models.Page).filter_by(name=word).all()
         if exists:
             view_url = request.route_url('view_page', pagename=word)
             return '<a href="%s">%s</a>' % (view_url, escape(word))
@@ -55,7 +55,7 @@ def add_page(request):
     pagename = request.context.pagename
     if 'form.submitted' in request.params:
         body = request.params['body']
-        page = Page(name=pagename, data=body)
+        page = models.Page(name=pagename, data=body)
         page.creator = request.user
         request.dbsession.add(page)
         next_url = request.route_url('view_page', pagename=pagename)

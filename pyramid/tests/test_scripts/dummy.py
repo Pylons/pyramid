@@ -22,11 +22,13 @@ class DummyShell(object):
     env = {}
     help = ''
     called = False
+    dummy_attr = 1
 
     def __call__(self, env, help):
         self.env = env
         self.help = help
         self.called = True
+        self.env['request'].dummy_attr = self.dummy_attr
 
 class DummyInteractor:
     def __call__(self, banner, local):
