@@ -216,6 +216,7 @@ Typographical Conventions and Style Guide
 .. toctree::
    :maxdepth: 1
 
+   documentation-style-guide
    typographical-conventions
 
 
