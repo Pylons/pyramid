@@ -31,14 +31,14 @@ application, you can render the template from within the body of a view
 callable like so:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.renderers import render_to_response
+    from pyramid.renderers import render_to_response
 
-   def sample_view(request):
-       return render_to_response('templates/foo.pt',
-                                 {'foo':1, 'bar':2},
-                                 request=request)
+    def sample_view(request):
+        return render_to_response('templates/foo.pt',
+                                  {'foo':1, 'bar':2},
+                                  request=request)
 
 The ``sample_view`` :term:`view callable` function above returns a
 :term:`response` object which contains the body of the ``templates/foo.pt``
@@ -58,14 +58,14 @@ be an :term:`asset specification` in the form
 template assets which live in another package.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.renderers import render_to_response
+    from pyramid.renderers import render_to_response
 
-   def sample_view(request):
-       return render_to_response('mypackage:templates/foo.pt',
-                                 {'foo':1, 'bar':2},
-                                 request=request)
+    def sample_view(request):
+        return render_to_response('mypackage:templates/foo.pt',
+                                  {'foo':1, 'bar':2},
+                                  request=request)
 
 An asset specification points at a file within a Python *package*. In this
 case, it points at a file named ``foo.pt`` within the ``templates`` directory
@@ -99,17 +99,17 @@ manufacture a :term:`response` object directly, and use that string as the body
 of the response:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.renderers import render
-   from pyramid.response import Response
+    from pyramid.renderers import render
+    from pyramid.response import Response
 
-   def sample_view(request):
-       result = render('mypackage:templates/foo.pt',
-                       {'foo':1, 'bar':2},
-                       request=request)
-       response = Response(result)
-       return response
+    def sample_view(request):
+        result = render('mypackage:templates/foo.pt',
+                        {'foo':1, 'bar':2},
+                        request=request)
+        response = Response(result)
+        return response
 
 Because :term:`view callable` functions are typically the only code in
 :app:`Pyramid` that need to know anything about templates, and because view
@@ -123,16 +123,16 @@ For example, here's an example of using "raw" Mako_ from within a
 :app:`Pyramid` :term:`view`:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from mako.template import Template
-   from pyramid.response import Response
+    from mako.template import Template
+    from pyramid.response import Response
 
-   def make_view(request):
-       template = Template(filename='/templates/template.mak')
-       result = template.render(name=request.params['name'])
-       response = Response(result)
-       return response
+    def make_view(request):
+        template = Template(filename='/templates/template.mak')
+        result = template.render(name=request.params['name'])
+        response = Response(result)
+        return response
 
 You probably wouldn't use this particular snippet in a project, because it's
 easier to use the supported :ref:`Mako bindings
@@ -163,34 +163,34 @@ Here's an example of changing the content-type and status of the response
 object returned by :func:`~pyramid.renderers.render_to_response`:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.renderers import render_to_response
+    from pyramid.renderers import render_to_response
 
-   def sample_view(request):
-       response = render_to_response('templates/foo.pt',
-                                     {'foo':1, 'bar':2},
-                                     request=request)
-       response.content_type = 'text/plain'
-       response.status_int = 204
-       return response
+    def sample_view(request):
+        response = render_to_response('templates/foo.pt',
+                                      {'foo':1, 'bar':2},
+                                      request=request)
+        response.content_type = 'text/plain'
+        response.status_int = 204
+        return response
 
 Here's an example of manufacturing a response object using the result of
 :func:`~pyramid.renderers.render` (a string):
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.renderers import render
-   from pyramid.response import Response
+    from pyramid.renderers import render
+    from pyramid.response import Response
 
-   def sample_view(request):
-       result = render('mypackage:templates/foo.pt',
-                       {'foo':1, 'bar':2},
-                       request=request)
-       response = Response(result)
-       response.content_type = 'text/plain'
-       return response
+    def sample_view(request):
+        result = render('mypackage:templates/foo.pt',
+                        {'foo':1, 'bar':2},
+                        request=request)
+        response = Response(result)
+        response.content_type = 'text/plain'
+        return response
 
 .. index::
    single: templates used as renderers
@@ -284,13 +284,13 @@ Here's an example of using a :class:`~pyramid.view.view_config` decorator to
 specify a :term:`view configuration` that names a template renderer:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
+    from pyramid.view import view_config
 
-   @view_config(renderer='templates/foo.pt')
-   def my_view(request):
-       return {'foo':1, 'bar':2}
+    @view_config(renderer='templates/foo.pt')
+    def my_view(request):
+        return {'foo':1, 'bar':2}
 
 .. note::
 
@@ -409,20 +409,20 @@ To use an environment variable, start your application under a shell using the
 ``PYRAMID_RELOAD_TEMPLATES`` operating system environment variable set to
 ``1``, For example:
 
-.. code-block:: text
+.. code-block:: bash
 
-   $ PYRAMID_RELOAD_TEMPLATES=1 $VENV/bin/pserve myproject.ini
+    PYRAMID_RELOAD_TEMPLATES=1 $VENV/bin/pserve myproject.ini
 
 To use a setting in the application ``.ini`` file for the same purpose, set the
 ``pyramid.reload_templates`` key to ``true`` within the application's
 configuration section, e.g.:
 
 .. code-block:: ini
-   :linenos:
+    :linenos:
 
-   [app:main]
-   use = egg:MyProject
-   pyramid.reload_templates = true
+    [app:main]
+    use = egg:MyProject
+    pyramid.reload_templates = true
 
 .. index::
    single: template system bindings
