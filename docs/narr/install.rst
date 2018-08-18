@@ -56,10 +56,10 @@ You can install the latest version of Python for Mac OS X from the binaries on
 
 Alternatively, you can use the `homebrew <https://brew.sh/>`_ package manager.
 
-.. code-block:: text
+.. code-block:: bash
 
     # for python 3.x
-    $ brew install python3
+    brew install python3
 
 If you use an installer for your Python, then you can skip to the section
 :ref:`installing_unix`.
@@ -193,7 +193,7 @@ After installing Python as described previously in :ref:`for-mac-os-x-users` or
 
    .. parsed-literal::
 
-      $ $VENV/bin/pip install "pyramid==\ |release|\ "
+       $VENV/bin/pip install "pyramid==\ |release|\ "
 
 .. index::
    single: $VENV/bin/pip vs. source bin/activate
