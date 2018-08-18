@@ -38,8 +38,8 @@ specific path information for commands and files.
 
     .. code-block:: bash
 
-       $ cd ~
-       $ cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
+        cd ~
+        cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
 
     If prompted for the first item, accept the default ``yes`` by hitting return.
 
@@ -63,24 +63,24 @@ specific path information for commands and files.
 
     .. code-block:: bash
 
-       $ cd myproject
-       $ python3 -m venv env
+        cd myproject
+        python3 -m venv env
 
 #.  Install your :app:`Pyramid` application and its dependencies.
 
     .. code-block:: bash
 
-       $ env/bin/pip install -e .
+        env/bin/pip install -e .
 
 #.  Within the project directory (``~/myproject``), create a script
     named ``pyramid.wsgi``.  Give it these contents:
 
     .. code-block:: python
 
-       from pyramid.paster import get_app, setup_logging
-       ini_path = '/Users/chrism/myproject/production.ini'
-       setup_logging(ini_path)
-       application = get_app(ini_path, 'main')
+        from pyramid.paster import get_app, setup_logging
+        ini_path = '/Users/chrism/myproject/production.ini'
+        setup_logging(ini_path)
+        application = get_app(ini_path, 'main')
 
     The first argument to :func:`pyramid.paster.get_app` is the project
     configuration file name.  It's best to use the ``production.ini`` file
@@ -106,25 +106,25 @@ specific path information for commands and files.
 
     .. code-block:: apache
 
-       # Use only 1 Python sub-interpreter.  Multiple sub-interpreters
-       # play badly with C extensions.  See
-       # http://stackoverflow.com/a/10558360/209039
-       WSGIApplicationGroup %{GLOBAL}
-       WSGIPassAuthorization On
-       WSGIDaemonProcess pyramid user=chrism group=staff threads=4 \
+        # Use only 1 Python sub-interpreter.  Multiple sub-interpreters
+        # play badly with C extensions.  See
+        # http://stackoverflow.com/a/10558360/209039
+        WSGIApplicationGroup %{GLOBAL}
+        WSGIPassAuthorization On
+        WSGIDaemonProcess pyramid user=chrism group=staff threads=4 \
           python-path=/Users/chrism/myproject/env/lib/python3.5/site-packages
-       WSGIScriptAlias /myapp /Users/chrism/myproject/pyramid.wsgi
+        WSGIScriptAlias /myapp /Users/chrism/myproject/pyramid.wsgi
 
-       <Directory /Users/chrism/myproject>
+        <Directory /Users/chrism/myproject>
          WSGIProcessGroup pyramid
          Require all granted
-       </Directory>
+        </Directory>
  
 #.  Restart Apache
 
     .. code-block:: bash
 
-       $ sudo /usr/sbin/apachectl restart
+        sudo /usr/sbin/apachectl restart
 
 #.  Visit ``http://localhost/myapp`` in a browser.  You should see the
     sample application rendered in your browser.
