@@ -321,25 +321,25 @@
        from the name of the ``callable``.
 
        .. code-block:: python
-          :linenos:
+           :linenos:
 
-          def _connect(request):
-              conn = request.registry.dbsession()
-              def cleanup(request):
-                  # since version 1.5, request.exception is no
-                  # longer eagerly cleared
-                  if request.exception is not None:
-                      conn.rollback()
-                  else:
-                      conn.commit()
-                  conn.close()
-              request.add_finished_callback(cleanup)
-              return conn
+           def _connect(request):
+               conn = request.registry.dbsession()
+               def cleanup(request):
+                   # since version 1.5, request.exception is no
+                   # longer eagerly cleared
+                   if request.exception is not None:
+                       conn.rollback()
+                   else:
+                       conn.commit()
+                   conn.close()
+               request.add_finished_callback(cleanup)
+               return conn
 
-          @subscriber(NewRequest)
-          def new_request(event):
-              request = event.request
-              request.set_property(_connect, 'db', reify=True)
+           @subscriber(NewRequest)
+           def new_request(event):
+               request = event.request
+               request.set_property(_connect, 'db', reify=True)
 
        The subscriber doesn't actually connect to the database, it just
        provides the API which, when accessed via ``request.db``, will
