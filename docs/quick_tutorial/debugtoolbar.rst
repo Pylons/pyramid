@@ -37,22 +37,22 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r ini debugtoolbar; cd debugtoolbar
-    $ $VENV/bin/pip install -e .
-    $ $VENV/bin/pip install pyramid_debugtoolbar
+       cd ..; cp -r ini debugtoolbar; cd debugtoolbar
+       $VENV/bin/pip install -e .
+       $VENV/bin/pip install pyramid_debugtoolbar
 
 #. Our ``debugtoolbar/development.ini`` gets a configuration entry for
    ``pyramid.includes``:
 
    .. literalinclude:: debugtoolbar/development.ini
-    :language: ini
-    :linenos:
+       :language: ini
+       :linenos:
 
 #. Run the WSGI application with:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini --reload
+       $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ in your browser. See the handy
    toolbar on the right.
@@ -100,15 +100,15 @@ Extra credit
 
    .. code-block:: python
 
-     def hello_world(request):
-         return Response('<body><h1>Hello World!</h1></body>')
+       def hello_world(request):
+           return Response('<body><h1>Hello World!</h1></body>')
 
    to:
 
    .. code-block:: python
 
-    def hello_world(request):
-        return xResponse('<body><h1>Hello World!</h1></body>')
+       def hello_world(request):
+           return xResponse('<body><h1>Hello World!</h1></body>')
 
    Save, and visit http://localhost:6543/ again. Notice the nice traceback
    display. On the lowest line, click the "screen" icon to the right, and try
