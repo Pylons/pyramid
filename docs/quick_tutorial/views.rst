@@ -44,39 +44,39 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r functional_testing views; cd views
-    $ $VENV/bin/pip install -e .
+       cd ..; cp -r functional_testing views; cd views
+       $VENV/bin/pip install -e .
 
 #. Our ``views/tutorial/__init__.py`` gets a lot shorter:
 
    .. literalinclude:: views/tutorial/__init__.py
-    :linenos:
+       :linenos:
 
 #. Let's add a module ``views/tutorial/views.py`` that is focused on
    handling requests and responses:
 
    .. literalinclude:: views/tutorial/views.py
-    :linenos:
+       :linenos:
 
 #. Update the tests to cover the two new views:
 
    .. literalinclude:: views/tutorial/tests.py
-    :linenos:
+       :linenos:
 
 #. Now run the tests:
 
    .. code-block:: bash
 
 
-    $ $VENV/bin/py.test tutorial/tests.py -q
-    ....
-    4 passed in 0.28 seconds
+       $VENV/bin/py.test tutorial/tests.py -q
+       ....
+       4 passed in 0.28 seconds
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini --reload
+       $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ and http://localhost:6543/howdy
    in your browser.
