@@ -24,72 +24,72 @@ Here's a familiar example of one of the simplest :app:`Pyramid` applications,
 configured imperatively:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from wsgiref.simple_server import make_server
-   from pyramid.config import Configurator
-   from pyramid.response import Response
+    from wsgiref.simple_server import make_server
+    from pyramid.config import Configurator
+    from pyramid.response import Response
 
-   def hello_world(request):
-       return Response('Hello world!')
+    def hello_world(request):
+        return Response('Hello world!')
 
-   if __name__ == '__main__':
-       config = Configurator()
-       config.add_view(hello_world)
-       app = config.make_wsgi_app()
-       server = make_server('0.0.0.0', 8080, app)
-       server.serve_forever()
+    if __name__ == '__main__':
+        config = Configurator()
+        config.add_view(hello_world)
+        app = config.make_wsgi_app()
+        server = make_server('0.0.0.0', 8080, app)
+        server.serve_forever()
 
 When you start this application, all will be OK.  However, what happens if we
 try to add another view to the configuration with the same set of
 :term:`predicate` arguments as one we've already added?
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from wsgiref.simple_server import make_server
-   from pyramid.config import Configurator
-   from pyramid.response import Response
+    from wsgiref.simple_server import make_server
+    from pyramid.config import Configurator
+    from pyramid.response import Response
 
-   def hello_world(request):
-       return Response('Hello world!')
+    def hello_world(request):
+        return Response('Hello world!')
 
-   def goodbye_world(request):
-       return Response('Goodbye world!')
+    def goodbye_world(request):
+        return Response('Goodbye world!')
 
-   if __name__ == '__main__':
-       config = Configurator()
+    if __name__ == '__main__':
+        config = Configurator()
 
-       config.add_view(hello_world, name='hello')
+        config.add_view(hello_world, name='hello')
 
-       # conflicting view configuration
-       config.add_view(goodbye_world, name='hello')
+        # conflicting view configuration
+        config.add_view(goodbye_world, name='hello')
 
-       app = config.make_wsgi_app()
-       server = make_server('0.0.0.0', 8080, app)
-       server.serve_forever()
+        app = config.make_wsgi_app()
+        server = make_server('0.0.0.0', 8080, app)
+        server.serve_forever()
 
 The application now has two conflicting view configuration statements.  When we
 try to start it again, it won't start.  Instead we'll receive a traceback that
 ends something like this:
 
 .. code-block:: text
-   :linenos:
+    :linenos:
 
-   Traceback (most recent call last):
-     File "app.py", line 12, in <module>
-       app = config.make_wsgi_app()
-     File "pyramid/config.py", line 839, in make_wsgi_app
-       self.commit()
-     File "pyramid/pyramid/config.py", line 473, in commit
-       self._ctx.execute_actions()
-     ... more code ...
-   pyramid.exceptions.ConfigurationConflictError:
-           Conflicting configuration actions
-     For: ('view', None, '', None, <InterfaceClass pyramid.interfaces.IView>,
-           None, None, None, None, None, False, None, None, None)
-     Line 14 of file app.py in <module>: 'config.add_view(hello_world)'
-     Line 17 of file app.py in <module>: 'config.add_view(goodbye_world)'
+    Traceback (most recent call last):
+      File "app.py", line 12, in <module>
+        app = config.make_wsgi_app()
+      File "pyramid/config.py", line 839, in make_wsgi_app
+        self.commit()
+      File "pyramid/pyramid/config.py", line 473, in commit
+        self._ctx.execute_actions()
+      ... more code ...
+    pyramid.exceptions.ConfigurationConflictError:
+            Conflicting configuration actions
+      For: ('view', None, '', None, <InterfaceClass pyramid.interfaces.IView>,
+            None, None, None, None, None, False, None, None, None)
+      Line 14 of file app.py in <module>: 'config.add_view(hello_world)'
+      Line 17 of file app.py in <module>: 'config.add_view(goodbye_world)'
 
 This traceback is trying to tell us:
 
@@ -140,18 +140,18 @@ If you're getting a conflict while trying to extend an existing application,
 and that application has a function which performs configuration like this one:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def add_routes(config):
-       config.add_route(...)
+    def add_routes(config):
+        config.add_route(...)
 
 Don't call this function directly with ``config`` as an argument.  Instead, use
 :meth:`pyramid.config.Configurator.include`:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.include(add_routes)
+    config.include(add_routes)
 
 Using :meth:`~pyramid.config.Configurator.include` instead of calling the
 function directly provides a modicum of automated conflict resolution, with the
@@ -173,60 +173,60 @@ previously as the result of adding a ``commit``.  Here's the application that
 generates conflicts:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from wsgiref.simple_server import make_server
-   from pyramid.config import Configurator
-   from pyramid.response import Response
+    from wsgiref.simple_server import make_server
+    from pyramid.config import Configurator
+    from pyramid.response import Response
 
-   def hello_world(request):
-       return Response('Hello world!')
+    def hello_world(request):
+        return Response('Hello world!')
 
-   def goodbye_world(request):
-       return Response('Goodbye world!')
+    def goodbye_world(request):
+        return Response('Goodbye world!')
 
-   if __name__ == '__main__':
-       config = Configurator()
+    if __name__ == '__main__':
+        config = Configurator()
 
-       config.add_view(hello_world, name='hello')
+        config.add_view(hello_world, name='hello')
 
-       # conflicting view configuration
-       config.add_view(goodbye_world, name='hello')
+        # conflicting view configuration
+        config.add_view(goodbye_world, name='hello')
 
-       app = config.make_wsgi_app()
-       server = make_server('0.0.0.0', 8080, app)
-       server.serve_forever()
+        app = config.make_wsgi_app()
+        server = make_server('0.0.0.0', 8080, app)
+        server.serve_forever()
 
 We can prevent the two ``add_view`` calls from conflicting by issuing a call to
 :meth:`~pyramid.config.Configurator.commit` between them:
 
 .. code-block:: python
-   :linenos:
-   :emphasize-lines: 16
+    :linenos:
+    :emphasize-lines: 16
 
-   from wsgiref.simple_server import make_server
-   from pyramid.config import Configurator
-   from pyramid.response import Response
+    from wsgiref.simple_server import make_server
+    from pyramid.config import Configurator
+    from pyramid.response import Response
 
-   def hello_world(request):
-       return Response('Hello world!')
+    def hello_world(request):
+        return Response('Hello world!')
 
-   def goodbye_world(request):
-       return Response('Goodbye world!')
+    def goodbye_world(request):
+        return Response('Goodbye world!')
 
-   if __name__ == '__main__':
-       config = Configurator()
+    if __name__ == '__main__':
+        config = Configurator()
 
-       config.add_view(hello_world, name='hello')
+        config.add_view(hello_world, name='hello')
 
-       config.commit() # commit any pending configuration actions
+        config.commit() # commit any pending configuration actions
 
-       # no-longer-conflicting view configuration
-       config.add_view(goodbye_world, name='hello')
+        # no-longer-conflicting view configuration
+        config.add_view(goodbye_world, name='hello')
 
-       app = config.make_wsgi_app()
-       server = make_server('0.0.0.0', 8080, app)
-       server.serve_forever()
+        app = config.make_wsgi_app()
+        server = make_server('0.0.0.0', 8080, app)
+        server.serve_forever()
 
 In the above example we've issued a call to
 :meth:`~pyramid.config.Configurator.commit` between the two ``add_view`` calls.
@@ -249,12 +249,12 @@ You can also use a heavy hammer to circumvent conflict detection by using a
 configurator constructor parameter: ``autocommit=True``.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   if __name__ == '__main__':
-       config = Configurator(autocommit=True)
+    if __name__ == '__main__':
+        config = Configurator(autocommit=True)
 
 When the ``autocommit`` parameter passed to the Configurator is ``True``,
 conflict detection (and :ref:`twophase_config`) is disabled.  Configuration
@@ -328,18 +328,18 @@ such a developer might factor out a function used to add routes to their
 application:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def add_routes(config):
-       config.add_route(...)
+    def add_routes(config):
+        config.add_route(...)
 
 Rather than calling this function directly with ``config`` as an argument,
 instead use :meth:`pyramid.config.Configurator.include`:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.include(add_routes)
+    config.include(add_routes)
 
 Using ``include`` rather than calling the function directly will allow
 :ref:`automatic_conflict_resolution` to work.
@@ -348,11 +348,11 @@ Using ``include`` rather than calling the function directly will allow
 as an argument:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   import myapp
+    import myapp
 
-   config.include(myapp)
+    config.include(myapp)
 
 For this to work properly, the ``myapp`` module must contain a callable with
 the special name ``includeme``, which should perform configuration (like the
@@ -385,18 +385,18 @@ For example, the relative ordering of
 non-autocommitting configurator is used.  This code snippet:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_view('some.view', renderer='path_to_custom/renderer.rn')
-   config.add_renderer('.rn', SomeCustomRendererFactory)
+    config.add_view('some.view', renderer='path_to_custom/renderer.rn')
+    config.add_renderer('.rn', SomeCustomRendererFactory)
 
 Has the same result as:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_renderer('.rn', SomeCustomRendererFactory)
-   config.add_view('some.view', renderer='path_to_custom/renderer.rn')
+    config.add_renderer('.rn', SomeCustomRendererFactory)
+    config.add_view('some.view', renderer='path_to_custom/renderer.rn')
 
 Even though the view statement depends on the registration of a custom
 renderer, due to two-phase configuration, the order in which the configuration
