@@ -116,19 +116,19 @@ is typically used as an application's root factory. Here's an example of a
 simple root factory class:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   class Root(dict):
-       def __init__(self, request):
-           pass
+    class Root(dict):
+        def __init__(self, request):
+            pass
 
 Here's an example of using this root factory within startup configuration, by
 passing it to an instance of a :term:`Configurator` named ``config``:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config = Configurator(root_factory=Root)
+    config = Configurator(root_factory=Root)
 
 The ``root_factory`` argument to the :class:`~pyramid.config.Configurator`
 constructor registers this root factory to be called to generate a root
@@ -320,11 +320,11 @@ following resource tree:
 
 .. code-block:: text
 
-  /--
-     |
-     |-- foo
-          |
-          ----bar
+    /--
+       |
+       |-- foo
+            |
+            ----bar
 
 Here's what happens:
 
@@ -366,15 +366,15 @@ However, for this tree:
 
 .. code-block:: text
 
-  /--
-     |
-     |-- foo
-          |
-          ----bar
-               |
-               ----baz
-                      |
-                      biz
+    /--
+       |
+       |-- foo
+            |
+            ----bar
+                 |
+                 ----baz
+                        |
+                        biz
 
 The user asks for ``http://example.com/foo/bar/baz/biz/buz.txt``
 
@@ -461,17 +461,17 @@ the :func:`zope.interface.implementer` class decorator to associate the
 interface with the class.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from zope.interface import Interface
-   from zope.interface import implementer
+    from zope.interface import Interface
+    from zope.interface import implementer
 
-   class IHello(Interface):
-       """ A marker interface """
+    class IHello(Interface):
+        """ A marker interface """
 
-   @implementer(IHello)
-   class Hello(object):
-       pass
+    @implementer(IHello)
+    class Hello(object):
+        pass
 
 To attach an interface to a resource *instance*, you define the interface and
 use the :func:`zope.interface.alsoProvides` function to associate the interface
@@ -479,21 +479,21 @@ with the instance.  This function mutates the instance in such a way that the
 interface is attached to it.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from zope.interface import Interface
-   from zope.interface import alsoProvides
+    from zope.interface import Interface
+    from zope.interface import alsoProvides
 
-   class IHello(Interface):
-       """ A marker interface """
+    class IHello(Interface):
+        """ A marker interface """
 
-   class Hello(object):
-       pass
+    class Hello(object):
+        pass
 
-   def make_hello():
-       hello = Hello()
-       alsoProvides(hello, IHello)
-       return hello
+    def make_hello():
+        hello = Hello()
+        alsoProvides(hello, IHello)
+        return hello
 
 Regardless of how you associate an interface—with either a resource instance
 or a resource class—the resulting code to associate that interface with a view
@@ -504,12 +504,12 @@ interface lives in the root of your application, and its module is named
 this interface.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   # config is an instance of pyramid.config.Configurator
+    # config is an instance of pyramid.config.Configurator
 
-   config.add_view('mypackage.views.hello_world', name='hello.html',
-                   context='mypackage.resources.IHello')
+    config.add_view('mypackage.views.hello_world', name='hello.html',
+                    context='mypackage.resources.IHello')
 
 Any time a resource that is determined to be the :term:`context` provides this
 interface, and a view named ``hello.html`` is looked up against it as per the
