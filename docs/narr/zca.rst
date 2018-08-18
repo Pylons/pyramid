@@ -21,11 +21,11 @@ lookup using the :func:`zope.component.getUtility` global API as it might
 appear in a traditional Zope application:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.interfaces import ISettings
-   from zope.component import getUtility
-   settings = getUtility(ISettings)
+    from pyramid.interfaces import ISettings
+    from zope.component import getUtility
+    settings = getUtility(ISettings)
 
 After this code runs, ``settings`` will be a Python dictionary.  But it's
 unlikely that any "civilian" will be able to figure this out just by reading
@@ -106,7 +106,7 @@ equivalent to ``zope.component.getUtility(IFoo)``:
 
 .. code-block:: python
 
-   registry.getUtility(IFoo)
+    registry.getUtility(IFoo)
 
 The full method API is documented in the ``zope.component`` package, but it
 largely mirrors the "global" API almost exactly.
@@ -139,14 +139,14 @@ Enabling the ZCA global API by using ``hook_zca``
 Consider the following bit of idiomatic :app:`Pyramid` startup code:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   def app(global_settings, **settings):
-       config = Configurator(settings=settings)
-       config.include('some.other.package')
-       return config.make_wsgi_app()
+    def app(global_settings, **settings):
+        config = Configurator(settings=settings)
+        config.include('some.other.package')
+        return config.make_wsgi_app()
 
 When the ``app`` function above is run, a :term:`Configurator` is constructed.
 When the configurator is created, it creates a *new* :term:`application
@@ -171,27 +171,27 @@ registry, you need to call :meth:`~pyramid.config.Configurator.hook_zca` within
 your setup code. For example:
 
 .. code-block:: python
-   :linenos:
-   :emphasize-lines: 5
+    :linenos:
+    :emphasize-lines: 5
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   def app(global_settings, **settings):
-       config = Configurator(settings=settings)
-       config.hook_zca()
-       config.include('some.other.application')
-       return config.make_wsgi_app()
+    def app(global_settings, **settings):
+        config = Configurator(settings=settings)
+        config.hook_zca()
+        config.include('some.other.application')
+        return config.make_wsgi_app()
 
 We've added a line to our original startup code, line number 5, which calls
 ``config.hook_zca()``.  The effect of this line under the hood is that an
 analogue of the following code is executed:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from zope.component import getSiteManager
-   from pyramid.threadlocal import get_current_registry
-   getSiteManager.sethook(get_current_registry)
+    from zope.component import getSiteManager
+    from pyramid.threadlocal import get_current_registry
+    getSiteManager.sethook(get_current_registry)
 
 This causes the ZCA global API to start using the :app:`Pyramid` application
 registry in threads which are running a :app:`Pyramid` request.
@@ -217,18 +217,18 @@ You can tell your :app:`Pyramid` application to use the ZCA global registry at
 startup time instead of constructing a new one:
 
 .. code-block:: python
-   :linenos:
-   :emphasize-lines: 5-7
+    :linenos:
+    :emphasize-lines: 5-7
 
-   from zope.component import getGlobalSiteManager
-   from pyramid.config import Configurator
+    from zope.component import getGlobalSiteManager
+    from pyramid.config import Configurator
 
-   def app(global_settings, **settings):
-       globalreg = getGlobalSiteManager()
-       config = Configurator(registry=globalreg)
-       config.setup_registry(settings=settings)
-       config.include('some.other.application')
-       return config.make_wsgi_app()
+    def app(global_settings, **settings):
+        globalreg = getGlobalSiteManager()
+        config = Configurator(registry=globalreg)
+        config.setup_registry(settings=settings)
+        config.include('some.other.application')
+        return config.make_wsgi_app()
 
 Lines 5, 6, and 7 above are the interesting ones.  Line 5 retrieves the global
 ZCA component registry.  Line 6 creates a :term:`Configurator`, passing the
