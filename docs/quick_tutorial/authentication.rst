@@ -33,7 +33,7 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r view_classes authentication; cd authentication
+       cd ..; cp -r view_classes authentication; cd authentication
 
 #. Add ``bcrypt`` as a dependency in ``authentication/setup.py``:
 
@@ -46,7 +46,7 @@ Steps
 
    .. code-block:: bash
 
-    $ $VENV/bin/pip install -e .
+       $VENV/bin/pip install -e .
 
 #. Put the security hash in the ``authentication/development.ini``
    configuration file as ``tutorial.secret`` instead of putting it in the code:
@@ -88,7 +88,7 @@ Steps
 
    .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini --reload
+       $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ in a browser.
 
