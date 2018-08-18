@@ -124,7 +124,7 @@ you can see DeprecationWarnings printed to the console when the tests run.
 
 .. code-block:: bash
 
-   $ python -Wd setup.py test -q
+    python -Wd setup.py test -q
 
 The ``-Wd`` argument tells Python to print deprecation warnings to the console.
 See `the Python -W flag documentation
@@ -137,19 +137,19 @@ deprecation warning from being issued.  For example:
 
 .. code-block:: bash
 
-   $ python -Wd setup.py test -q
-   # .. elided ...
-   running build_ext
-   /home/chrism/projects/pyramid/env27/myproj/myproj/views.py:3:
-   DeprecationWarning: static: The "pyramid.view.static" class is deprecated
-   as of Pyramid 1.1; use the "pyramid.static.static_view" class instead with
-   the "use_subpath" argument set to True.
-     from pyramid.view import static
-   .
-   ----------------------------------------------------------------------
-   Ran 1 test in 0.014s
-   
-   OK
+    python -Wd setup.py test -q
+    # .. elided ...
+    running build_ext
+    /home/chrism/projects/pyramid/env27/myproj/myproj/views.py:3:
+    DeprecationWarning: static: The "pyramid.view.static" class is deprecated
+    as of Pyramid 1.1; use the "pyramid.static.static_view" class instead with
+    the "use_subpath" argument set to True.
+      from pyramid.view import static
+    .
+    ----------------------------------------------------------------------
+    Ran 1 test in 0.014s
+
+    OK
 
 In the above case, it's line #3 in the ``myproj.views`` module (``from
 pyramid.view import static``) that is causing the problem:
@@ -178,14 +178,14 @@ console:
 
 .. code-block:: bash
 
-   $ python -Wd setup.py test -q
-   # .. elided ...
-   running build_ext
-   .
-   ----------------------------------------------------------------------
-   Ran 1 test in 0.014s
-   
-   OK
+    python -Wd setup.py test -q
+    # .. elided ...
+    running build_ext
+    .
+    ----------------------------------------------------------------------
+    Ran 1 test in 0.014s
+
+    OK
 
 
 My application doesn't have any tests or has few tests
@@ -201,14 +201,14 @@ On UNIX, you can do that via:
 
 .. code-block:: bash
 
-   $ PYTHONWARNINGS=default $VENV/bin/pserve development.ini
+    PYTHONWARNINGS=default $VENV/bin/pserve development.ini
 
 On Windows, you need to issue two commands:
 
 .. code-block:: doscon
 
-   c:\> set PYTHONWARNINGS=default
-   c:\> Scripts\pserve development.ini
+    set PYTHONWARNINGS=default
+    Scripts\pserve development.ini
 
 At this point, it's ensured that deprecation warnings will be printed to the
 console whenever a codepath is hit that generates one.  You can then click
