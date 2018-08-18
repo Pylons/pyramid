@@ -40,7 +40,7 @@ For most steps you will copy the previous step's directory to a new directory, a
 
 .. code-block:: bash
 
-    $ cd ..; cp -r package ini; cd ini
-    $ $VENV/bin/pip install -e .
+    cd ..; cp -r package ini; cd ini
+    $VENV/bin/pip install -e .
 
 For a few steps, you won't copy the previous step's directory, but you will still need to install your project with ``$VENV/bin/pip install -e .``.
