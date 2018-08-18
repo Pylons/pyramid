@@ -23,10 +23,10 @@ only become useful when you register a *subscriber*.  A subscriber is a
 function that accepts a single argument named `event`:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def mysubscriber(event):
-       print(event)
+    def mysubscriber(event):
+        print(event)
 
 The above is a subscriber that simply prints the event to the console when it's
 called.
@@ -44,16 +44,16 @@ You can imperatively configure a subscriber function to be called for some
 event type via the :meth:`~pyramid.config.Configurator.add_subscriber` method:
 
 .. code-block:: python
-  :linenos:
+    :linenos:
 
-  from pyramid.events import NewRequest
+    from pyramid.events import NewRequest
 
-  from subscribers import mysubscriber
+    from subscribers import mysubscriber
 
-  # "config" below is assumed to be an instance of a
-  # pyramid.config.Configurator object
+    # "config" below is assumed to be an instance of a
+    # pyramid.config.Configurator object
 
-  config.add_subscriber(mysubscriber, NewRequest)
+    config.add_subscriber(mysubscriber, NewRequest)
 
 The first argument to :meth:`~pyramid.config.Configurator.add_subscriber` is
 the subscriber function (or a :term:`dotted Python name` which refers to a
@@ -70,14 +70,14 @@ You can configure a subscriber function to be called for some event type via
 the :func:`pyramid.events.subscriber` function.
 
 .. code-block:: python
-  :linenos:
+    :linenos:
 
-  from pyramid.events import NewRequest
-  from pyramid.events import subscriber
+    from pyramid.events import NewRequest
+    from pyramid.events import subscriber
 
-  @subscriber(NewRequest)
-  def mysubscriber(event):
-      event.request.foo = 1
+    @subscriber(NewRequest)
+    def mysubscriber(event):
+        event.request.foo = 1
 
 When the :func:`~pyramid.events.subscriber` decorator is used, a :term:`scan`
 must be performed against the package containing the decorated function for the
@@ -109,26 +109,26 @@ If you create event listener functions in a ``subscribers.py`` file in your
 application like so:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def handle_new_request(event):
-       print('request', event.request)
+    def handle_new_request(event):
+        print('request', event.request)
 
-   def handle_new_response(event):
-       print('response', event.response)
+    def handle_new_response(event):
+        print('response', event.response)
 
 You may configure these functions to be called at the appropriate times by
 adding the following code to your application's configuration startup:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   # config is an instance of pyramid.config.Configurator
+    # config is an instance of pyramid.config.Configurator
 
-   config.add_subscriber('myproject.subscribers.handle_new_request',
-                         'pyramid.events.NewRequest')
-   config.add_subscriber('myproject.subscribers.handle_new_response',
-                         'pyramid.events.NewResponse')
+    config.add_subscriber('myproject.subscribers.handle_new_request',
+                          'pyramid.events.NewRequest')
+    config.add_subscriber('myproject.subscribers.handle_new_response',
+                          'pyramid.events.NewResponse')
 
 Either mechanism causes the functions in ``subscribers.py`` to be registered as
 event subscribers.  Under this configuration, when the application is run, each
