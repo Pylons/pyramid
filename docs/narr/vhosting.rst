@@ -42,14 +42,14 @@ Here's an example of a PasteDeploy configuration snippet that includes a
 ``rutter`` composite.
 
 .. code-block:: ini
-  :linenos:
+    :linenos:
 
-  [app:mypyramidapp]
-  use = egg:mypyramidapp
+    [app:mypyramidapp]
+    use = egg:mypyramidapp
 
-  [composite:main]
-  use = egg:rutter#urlmap
-  /pyramidapp = mypyramidapp
+    [composite:main]
+    use = egg:rutter#urlmap
+    /pyramidapp = mypyramidapp
 
 This "roots" the :app:`Pyramid` application at the prefix ``/pyramidapp`` and
 serves up the composite as the "main" application in the file.
@@ -68,9 +68,9 @@ in your ``.ini`` file.  The ``WSGIScriptAlias`` configuration setting in a
 :term:`mod_wsgi` configuration does the work for you:
 
 .. code-block:: apache
-   :linenos:
+    :linenos:
 
-   WSGIScriptAlias /pyramidapp /Users/chrism/projects/modwsgi/env/pyramid.wsgi
+    WSGIScriptAlias /pyramidapp /Users/chrism/projects/modwsgi/env/pyramid.wsgi
 
 In the above configuration, we root a :app:`Pyramid` application at
 ``/pyramidapp`` within the Apache configuration.
