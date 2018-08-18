@@ -94,18 +94,18 @@ For Linux, the commands to do so are as follows:
 .. code-block:: bash
 
     # Mac and Linux
-    $ cd ~
-    $ mkdir -p projects/quick_tutorial
-    $ cd projects/quick_tutorial
+    cd ~
+    mkdir -p projects/quick_tutorial
+    cd projects/quick_tutorial
 
 For Windows:
 
 .. code-block:: doscon
 
     # Windows
-    c:\> cd \
-    c:\> mkdir projects\quick_tutorial
-    c:\> cd projects\quick_tutorial
+    cd \
+    mkdir projects\quick_tutorial
+    cd projects\quick_tutorial
 
 In the above figure, your user home directory is represented by ``~``. In your
 home directory, all of your projects are in the ``projects`` directory. This is
@@ -130,12 +130,12 @@ environment`. We set an environment variable to save typing later.
 .. code-block:: bash
 
     # Mac and Linux
-    $ export VENV=~/projects/quick_tutorial/env
+    export VENV=~/projects/quick_tutorial/env
 
 .. code-block:: doscon
 
     # Windows
-    c:\> set VENV=c:\projects\quick_tutorial\env
+    set VENV=c:\projects\quick_tutorial\env
 
 
 .. _create-a-virtual-environment:
@@ -151,12 +151,12 @@ environment variable.
 .. code-block:: bash
 
     # Mac and Linux
-    $ python3 -m venv $VENV
+    python3 -m venv $VENV
 
 .. code-block:: doscon
 
     # Windows
-    c:\> python -m venv %VENV%
+    python -m venv %VENV%
 
 .. seealso:: See also Python 3's :mod:`venv module <python:venv>` and Python
    2's `virtualenv <https://virtualenv.pypa.io/en/latest/>`_ package.
@@ -172,12 +172,12 @@ time of its release.
 .. code-block:: bash
 
     # Mac and Linux
-    $ $VENV/bin/pip install --upgrade pip setuptools
+    $VENV/bin/pip install --upgrade pip setuptools
 
 .. code-block:: doscon
 
     # Windows
-    c:\> %VENV%\Scripts\pip install --upgrade pip setuptools
+    %VENV%\Scripts\pip install --upgrade pip setuptools
 
 .. seealso:: See also :ref:`Why use $VENV/bin/pip instead of source
    bin/activate, then pip <venv-bin-pip-vs-source-bin-activate>`.
@@ -194,10 +194,10 @@ part is pretty easy. We'll also install a WSGI server, Waitress.
 .. parsed-literal::
 
     # Mac and Linux
-    $ $VENV/bin/pip install "pyramid==\ |release|\ " waitress
+    $VENV/bin/pip install "pyramid==\ |release|\ " waitress
 
     # Windows
-    c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ " waitress
+    %VENV%\\Scripts\\pip install "pyramid==\ |release|\ " waitress
 
 Our Python virtual environment now has the Pyramid software available
 as well as the ``waitress`` package.
