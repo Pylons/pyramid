@@ -46,9 +46,9 @@ parameter in the ``setup()`` function.
 Open ``setup.py`` and edit it to look like the following:
 
 .. literalinclude:: src/views/setup.py
-   :linenos:
-   :emphasize-lines: 22
-   :language: python
+    :linenos:
+    :emphasize-lines: 22
+    :language: python
 
 Only the highlighted line needs to be added.
 
@@ -68,22 +68,22 @@ On UNIX:
 
 .. code-block:: bash
 
-   $ cd tutorial
-   $ $VENV/bin/pip install -e .
+    cd tutorial
+    $VENV/bin/pip install -e .
 
 On Windows:
 
 .. code-block:: doscon
 
-   c:\> cd tutorial
-   c:\tutorial> %VENV%\Scripts\pip install -e .
+    cd tutorial
+    %VENV%\Scripts\pip install -e .
 
 Success executing this command will end with a line to the console something
 like:
 
 .. code-block:: text
 
-   Successfully installed docutils-0.13.1 tutorial
+    Successfully installed docutils-0.13.1 tutorial
 
 
 Adding view functions in ``views.py``
@@ -93,8 +93,8 @@ It's time for a major change.  Open ``tutorial/views.py`` and edit it to look
 like the following:
 
 .. literalinclude:: src/views/tutorial/views.py
-   :linenos:
-   :language: python
+    :linenos:
+    :language: python
 
 We added some imports and created a regular expression to find "WikiWords".
 
@@ -126,9 +126,9 @@ The ``view_wiki`` view function
 Following is the code for the ``view_wiki`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views.py
-   :lines: 12-14
-   :lineno-match:
-   :language: python
+    :lines: 12-14
+    :lineno-match:
+    :language: python
 
 .. note:: In our code, we use an *import* that is *relative* to our package
     named ``tutorial``, meaning we can omit the name of the package in the
@@ -164,9 +164,9 @@ The ``view_page`` view function
 Here is the code for the ``view_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views.py
-   :lines: 16-33
-   :lineno-match:
-   :language: python
+    :lines: 16-33
+    :lineno-match:
+    :language: python
 
 The ``view_page`` function is configured to respond as the default view
 of a Page resource.  We provide it with a ``@view_config`` decorator which
@@ -217,9 +217,9 @@ The ``add_page`` view function
 Here is the code for the ``add_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views.py
-   :lines: 35-50
-   :lineno-match:
-   :language: python
+    :lines: 35-50
+    :lineno-match:
+    :language: python
 
 The ``add_page`` function is configured to respond when the context resource
 is a Wiki and the :term:`view name` is ``add_page``.  We provide it with a
@@ -271,9 +271,9 @@ The ``edit_page`` view function
 Here is the code for the ``edit_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views.py
-   :lines: 52-60
-   :lineno-match:
-   :language: python
+    :lines: 52-60
+    :lineno-match:
+    :language: python
 
 The ``edit_page`` function is configured to respond when the context is
 a Page resource and the :term:`view name` is ``edit_page``.  We provide it
@@ -316,9 +316,9 @@ The ``view.pt`` template
 Rename ``tutorial/templates/mytemplate.pt`` to ``tutorial/templates/view.pt`` and edit the emphasized lines to look like the following:
 
 .. literalinclude:: src/views/tutorial/templates/view.pt
-   :linenos:
-   :language: html
-   :emphasize-lines: 11-12,37-52
+    :linenos:
+    :language: html
+    :emphasize-lines: 11-12,37-52
 
 This template is used by ``view_page()`` for displaying a single
 wiki page. It includes:
@@ -335,8 +335,8 @@ The ``edit.pt`` template
 Copy ``tutorial/templates/view.pt`` to ``tutorial/templates/edit.pt`` and edit the emphasized lines to look like the following:
 
 .. literalinclude:: src/views/tutorial/templates/edit.pt
-   :linenos:
-   :language: html
+    :linenos:
+    :language: html
 
 This template is used by ``add_page()`` and ``edit_page()`` for adding and
 editing a wiki page.  It displays a page containing a form that includes:
