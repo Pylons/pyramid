@@ -33,30 +33,30 @@ argument and accepts other arbitrary positional and keyword arguments. For
 example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.events import NewRequest
-   from pyramid.config import Configurator
+    from pyramid.events import NewRequest
+    from pyramid.config import Configurator
 
-   def add_newrequest_subscriber(config, subscriber):
-       config.add_subscriber(subscriber, NewRequest)
+    def add_newrequest_subscriber(config, subscriber):
+        config.add_subscriber(subscriber, NewRequest)
 
-   if __name__ == '__main__':
-       config = Configurator()
-       config.add_directive('add_newrequest_subscriber',
-                            add_newrequest_subscriber)
+    if __name__ == '__main__':
+        config = Configurator()
+        config.add_directive('add_newrequest_subscriber',
+                             add_newrequest_subscriber)
 
 Once :meth:`~pyramid.config.Configurator.add_directive` is called, a user can
 then call the added directive by its given name as if it were a built-in method
 of the Configurator:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def mysubscriber(event):
-       print(event.request)
+    def mysubscriber(event):
+        print(event.request)
 
-   config.add_newrequest_subscriber(mysubscriber)
+    config.add_newrequest_subscriber(mysubscriber)
 
 A call to :meth:`~pyramid.config.Configurator.add_directive` is often "hidden"
 within an ``includeme`` function within a "frameworky" package meant to be
@@ -65,25 +65,25 @@ included as per :ref:`including_configuration` via
 code in a package named ``pyramid_subscriberhelpers``:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def includeme(config):
-       config.add_directive('add_newrequest_subscriber',
-                            add_newrequest_subscriber)
+    def includeme(config):
+        config.add_directive('add_newrequest_subscriber',
+                             add_newrequest_subscriber)
 
 The user of the add-on package ``pyramid_subscriberhelpers`` would then be able
 to install it and subsequently do:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def mysubscriber(event):
-       print(event.request)
+    def mysubscriber(event):
+        print(event.request)
 
-   from pyramid.config import Configurator
-   config = Configurator()
-   config.include('pyramid_subscriberhelpers')
-   config.add_newrequest_subscriber(mysubscriber)
+    from pyramid.config import Configurator
+    config = Configurator()
+    config.include('pyramid_subscriberhelpers')
+    config.add_newrequest_subscriber(mysubscriber)
 
 Using ``config.action`` in a Directive
 --------------------------------------
@@ -100,16 +100,16 @@ function, and possibly other metadata used by Pyramid's action system.
 Here's an example directive which uses the "action" method:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def add_jammyjam(config, jammyjam):
-       def register():
-           config.registry.jammyjam = jammyjam
-       config.action('jammyjam', register)
+    def add_jammyjam(config, jammyjam):
+        def register():
+            config.registry.jammyjam = jammyjam
+        config.action('jammyjam', register)
 
-   if __name__ == '__main__':
-       config = Configurator()
-       config.add_directive('add_jammyjam', add_jammyjam)
+    if __name__ == '__main__':
+        config = Configurator()
+        config.add_directive('add_jammyjam', add_jammyjam)
 
 Fancy, but what does it do?  The action method accepts a number of arguments.
 In the above directive named ``add_jammyjam``, we call
@@ -135,8 +135,8 @@ directive did this:
 
 .. code-block:: python
 
-   config.add_jammyjam('first')
-   config.add_jammyjam('second')
+    config.add_jammyjam('first')
+    config.add_jammyjam('second')
 
 When the action list was committed resulting from the set of calls above, our
 user's application would not start, because the discriminators of the actions
@@ -160,7 +160,7 @@ that no configuration conflicts are generated.
 
 .. code-block:: python
 
-   config.add_jammyjam('first')
+    config.add_jammyjam('first')
 
 What happens now?  When the ``add_jammyjam`` method is called, an action is
 appended to the pending actions list.  When the pending configuration actions
@@ -183,14 +183,14 @@ to the ``callable`` function when it is called back.  For example, our
 directive might use them like so:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def add_jammyjam(config, jammyjam):
-       def register(*arg, **kw):
-           config.registry.jammyjam_args = arg
-           config.registry.jammyjam_kw = kw
-           config.registry.jammyjam = jammyjam
-       config.action('jammyjam', register, args=('one',), kw={'two':'two'})
+    def add_jammyjam(config, jammyjam):
+        def register(*arg, **kw):
+            config.registry.jammyjam_args = arg
+            config.registry.jammyjam_kw = kw
+            config.registry.jammyjam = jammyjam
+        config.action('jammyjam', register, args=('one',), kw={'two':'two'})
 
 In the above example, when this directive is used to generate an action, and
 that action is committed, ``config.registry.jammyjam_args`` will be set to
@@ -291,18 +291,18 @@ For example, let's make an addon that invokes ``add_route`` and ``add_view``,
 but we want it to conflict with any other call to our addon:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import PHASE0_CONFIG
+    from pyramid.config import PHASE0_CONFIG
 
-   def includeme(config):
-       config.add_directive('add_auto_route', add_auto_route)
+    def includeme(config):
+        config.add_directive('add_auto_route', add_auto_route)
 
-   def add_auto_route(config, name, view):
-       def register():
-           config.add_view(route_name=name, view=view)
-           config.add_route(name, '/' + name)
-       config.action(('auto route', name), register, order=PHASE0_CONFIG)
+    def add_auto_route(config, name, view):
+        def register():
+            config.add_view(route_name=name, view=view)
+            config.add_route(name, '/' + name)
+        config.action(('auto route', name), register, order=PHASE0_CONFIG)
 
 Now someone else can use your addon and be informed if there is a conflict
 between this route and another, or two calls to ``add_auto_route``. Notice how
@@ -313,17 +313,17 @@ executed, and the configurator cannot go back in time to add more views during
 that commit-cycle.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   def main(global_config, **settings):
-       config = Configurator()
-       config.include('auto_route_addon')
-       config.add_auto_route('foo', my_view)
+    def main(global_config, **settings):
+        config = Configurator()
+        config.include('auto_route_addon')
+        config.add_auto_route('foo', my_view)
 
-   def my_view(request):
-       return request.response
+    def my_view(request):
+        return request.response
 
 .. _introspection:
 
@@ -354,21 +354,21 @@ is passed to the :meth:`~pyramid.config.Configurator.action` method. Here's an
 example of a directive which uses introspectables:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def add_jammyjam(config, value):
-       def register():
-           config.registry.jammyjam = value
-       intr = config.introspectable(category_name='jammyjams', 
-                                    discriminator='jammyjam',
-                                    title='a jammyjam',
-                                    type_name=None)
-       intr['value'] = value
-       config.action('jammyjam', register, introspectables=(intr,))
+    def add_jammyjam(config, value):
+        def register():
+            config.registry.jammyjam = value
+        intr = config.introspectable(category_name='jammyjams',
+                                     discriminator='jammyjam',
+                                     title='a jammyjam',
+                                     type_name=None)
+        intr['value'] = value
+        config.action('jammyjam', register, introspectables=(intr,))
 
-   if __name__ == '__main__':
-       config = Configurator()
-       config.add_directive('add_jammyjam', add_jammyjam)
+    if __name__ == '__main__':
+        config = Configurator()
+        config.add_directive('add_jammyjam', add_jammyjam)
 
 If you notice, the above directive uses the ``introspectable`` attribute of a
 Configurator (:attr:`pyramid.config.Configurator.introspectable`) to create an
@@ -413,27 +413,27 @@ Introspectable Relationships
 Two introspectables may have relationships between each other.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def add_jammyjam(config, value, template):
-       def register():
-           config.registry.jammyjam = (value, template)
-       intr = config.introspectable(category_name='jammyjams', 
-                                    discriminator='jammyjam',
-                                    title='a jammyjam',
-                                    type_name=None)
-       intr['value'] = value
-       tmpl_intr = config.introspectable(category_name='jammyjam templates',
-                                         discriminator=template,
-                                         title=template,
-                                         type_name=None)
-       tmpl_intr['value'] = template
-       intr.relate('jammyjam templates', template)
-       config.action('jammyjam', register, introspectables=(intr, tmpl_intr))
+    def add_jammyjam(config, value, template):
+        def register():
+            config.registry.jammyjam = (value, template)
+        intr = config.introspectable(category_name='jammyjams',
+                                     discriminator='jammyjam',
+                                     title='a jammyjam',
+                                     type_name=None)
+        intr['value'] = value
+        tmpl_intr = config.introspectable(category_name='jammyjam templates',
+                                          discriminator=template,
+                                          title=template,
+                                          type_name=None)
+        tmpl_intr['value'] = template
+        intr.relate('jammyjam templates', template)
+        config.action('jammyjam', register, introspectables=(intr, tmpl_intr))
 
-   if __name__ == '__main__':
-       config = Configurator()
-       config.add_directive('add_jammyjam', add_jammyjam)
+    if __name__ == '__main__':
+        config = Configurator()
+        config.add_directive('add_jammyjam', add_jammyjam)
 
 In the above example, the ``add_jammyjam`` directive registers two
 introspectables: the first is related to the ``value`` passed to the directive,
