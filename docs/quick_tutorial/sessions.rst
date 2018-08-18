@@ -36,39 +36,39 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r view_classes sessions; cd sessions
-    $ $VENV/bin/pip install -e .
+       cd ..; cp -r view_classes sessions; cd sessions
+       $VENV/bin/pip install -e .
 
 #. Our ``sessions/tutorial/__init__.py`` needs a choice of session factory to
    get registered with the :term:`configurator`:
 
    .. literalinclude:: sessions/tutorial/__init__.py
-    :linenos:
+       :linenos:
 
 #. Our views in ``sessions/tutorial/views.py`` can now use ``request.session``:
 
    .. literalinclude:: sessions/tutorial/views.py
-    :linenos:
+       :linenos:
 
 #. The template at ``sessions/tutorial/home.pt`` can display the value:
 
    .. literalinclude:: sessions/tutorial/home.pt
-    :language: html
-    :linenos:
+       :language: html
+       :linenos:
 
 #. Make sure the tests still pass:
 
    .. code-block:: bash
 
-    $ $VENV/bin/py.test tutorial/tests.py -q
-    ....
-    4 passed in 0.42 seconds
+       $VENV/bin/py.test tutorial/tests.py -q
+       ....
+       4 passed in 0.42 seconds
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini --reload
+       $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ and http://localhost:6543/howdy in your browser.
    As you reload and switch between those URLs, note that the counter increases
