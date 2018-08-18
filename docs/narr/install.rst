@@ -58,8 +58,8 @@ Alternatively, you can use the `homebrew <https://brew.sh/>`_ package manager.
 
 .. code-block:: text
 
-   # for python 3.x
-   $ brew install python3
+    # for python 3.x
+    $ brew install python3
 
 If you use an installer for your Python, then you can skip to the section
 :ref:`installing_unix`.
@@ -178,8 +178,8 @@ After installing Python as described previously in :ref:`for-mac-os-x-users` or
 
    .. code-block:: bash
 
-      $ export VENV=~/env
-      $ python3 -m venv $VENV
+       export VENV=~/env
+       python3 -m venv $VENV
 
    You can either follow the use of the environment variable ``$VENV``, or
    replace it with the root directory of the virtual environment. If you choose
@@ -233,10 +233,10 @@ After installing Python as described previously in
 
    .. code-block:: doscon
 
-      c:\> cd \
-      c:\> set VENV=c:\env
-      c:\> python -m venv %VENV%
-      c:\> cd %VENV%
+       cd \
+       set VENV=c:\env
+       python -m venv %VENV%
+       cd %VENV%
 
    You can either follow the use of the environment variable ``%VENV%``, or
    replace it with the root directory of the virtual environment. If you choose
@@ -250,7 +250,7 @@ After installing Python as described previously in
 
    .. parsed-literal::
 
-      c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ "
+       %VENV%\\Scripts\\pip install "pyramid==\ |release|\ "
 
 .. note:: See the note above for :ref:`Why use $VENV/bin/pip instead of source
    bin/activate, then pip <venv-bin-pip-vs-source-bin-activate>`.
