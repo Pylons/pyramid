@@ -258,23 +258,23 @@ file in your application:
 
 .. code-block:: ini
 
-   [app:main]
-   pyramid.includes = pyramid_debugtoolbar
-                      pyramid_tm
+    [app:main]
+    pyramid.includes = pyramid_debugtoolbar
+                       pyramid_tm
 
 Is equivalent to using the following statements in your configuration code:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   def main(global_config, **settings):
-       config = Configurator(settings=settings)
-       # ...
-       config.include('pyramid_debugtoolbar')
-       config.include('pyramid_tm')
-       # ...
+    def main(global_config, **settings):
+        config = Configurator(settings=settings)
+        # ...
+        config.include('pyramid_debugtoolbar')
+        config.include('pyramid_tm')
+        # ...
 
 It is fine to use both or either form.
 
@@ -285,26 +285,26 @@ Using the following ``pyramid.includes`` setting in your plain-Python Pyramid
 application:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   if __name__ == '__main__':
-       settings = {'pyramid.includes':'pyramid_debugtoolbar pyramid_tm'}
-       config = Configurator(settings=settings)
+    if __name__ == '__main__':
+        settings = {'pyramid.includes':'pyramid_debugtoolbar pyramid_tm'}
+        config = Configurator(settings=settings)
 
 Is equivalent to using the following statements in your configuration code:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   if __name__ == '__main__':
-       settings = {}
-       config = Configurator(settings=settings)
-       config.include('pyramid_debugtoolbar')
-       config.include('pyramid_tm')
+    if __name__ == '__main__':
+        settings = {}
+        config = Configurator(settings=settings)
+        config.include('pyramid_debugtoolbar')
+        config.include('pyramid_tm')
 
 It is fine to use both or either form.
 
@@ -367,25 +367,25 @@ in your application:
 
 .. code-block:: ini
 
-   [app:main]
-   pyramid.tweens = pyramid_debugtoolbar.toolbar.tween_factory
-                    pyramid.tweens.excview_tween_factory
-                    pyramid_tm.tm_tween_factory
+    [app:main]
+    pyramid.tweens = pyramid_debugtoolbar.toolbar.tween_factory
+                     pyramid.tweens.excview_tween_factory
+                     pyramid_tm.tm_tween_factory
 
 Is equivalent to using the following statements in your configuration code:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
  
-   def main(global_config, **settings):
-       settings['pyramid.tweens'] = [
-               'pyramid_debugtoolbar.toolbar.tween_factory',
-               'pyramid.tweebs.excview_tween_factory',
-               'pyramid_tm.tm_tween_factory',
-                ]
-       config = Configurator(settings=settings)
+    def main(global_config, **settings):
+        settings['pyramid.tweens'] = [
+            'pyramid_debugtoolbar.toolbar.tween_factory',
+            'pyramid.tweebs.excview_tween_factory',
+            'pyramid_tm.tm_tween_factory',
+        ]
+        config = Configurator(settings=settings)
 
 It is fine to use both or either form.
 
@@ -399,12 +399,12 @@ settings documented in the above "Config File Setting Name" column would go in
 the ``[app:main]`` section.  Here's an example of such a section:
 
 .. code-block:: ini
-  :linenos:
+    :linenos:
 
-  [app:main]
-  use = egg:MyProject
-  pyramid.reload_templates = true
-  pyramid.debug_authorization = true
+    [app:main]
+    use = egg:MyProject
+    pyramid.reload_templates = true
+    pyramid.debug_authorization = true
 
 You can also use environment variables to accomplish the same purpose for
 settings documented as such.  For example, you might start your :app:`Pyramid`
@@ -412,8 +412,8 @@ application using the following command line:
 
 .. code-block:: text
 
-  $ PYRAMID_DEBUG_AUTHORIZATION=1 PYRAMID_RELOAD_TEMPLATES=1 \
-         $VENV/bin/pserve MyProject.ini
+    PYRAMID_DEBUG_AUTHORIZATION=1 PYRAMID_RELOAD_TEMPLATES=1 \
+        $VENV/bin/pserve MyProject.ini
 
 If you started your application this way, your :app:`Pyramid` application would
 behave in the same manner as if you had placed the respective settings in the
@@ -494,9 +494,9 @@ Here's how:
 
   .. code-block:: ini
 
-    [app:main]
-    # .. other settings
-    debug_frobnosticator = True
+      [app:main]
+      # .. other settings
+      debug_frobnosticator = True
 
 - In the ``main()`` function that represents the place that your Pyramid WSGI
   application is created, anticipate that you'll be getting this key/value pair
@@ -508,13 +508,13 @@ Here's how:
 
   .. code-block:: python
 
-     def main(global_config, **settings):
-         # ...
-         from pyramid.settings import asbool
-         debug_frobnosticator = asbool(settings.get(
-                    'debug_frobnosticator', 'false'))
-         settings['debug_frobnosticator'] = debug_frobnosticator
-         config = Configurator(settings=settings)
+      def main(global_config, **settings):
+          # ...
+          from pyramid.settings import asbool
+          debug_frobnosticator = asbool(settings.get(
+              'debug_frobnosticator', 'false'))
+          settings['debug_frobnosticator'] = debug_frobnosticator
+          config = Configurator(settings=settings)
 
   .. note::
      It's especially important that you mutate the ``settings`` dictionary with
@@ -529,9 +529,9 @@ Here's how:
 
   .. code-block:: python
      
-     def includeme(config):
-         settings = config.registry.settings
-         debug_frobnosticator = settings['debug_frobnosticator']
+      def includeme(config):
+          settings = config.registry.settings
+          debug_frobnosticator = settings['debug_frobnosticator']
 
 - In the runtime code from where you need to access the new settings value,
   find the value in the ``registry.settings`` dictionary and use it.  In
@@ -540,8 +540,8 @@ Here's how:
 
   .. code-block:: python
 
-     settings = request.registry.settings
-     debug_frobnosticator = settings['debug_frobnosticator']
+      settings = request.registry.settings
+      debug_frobnosticator = settings['debug_frobnosticator']
 
   If you wish to use the value in code that does not have access to the request
   and you wish to use the value, you'll need to use the
@@ -550,6 +550,6 @@ Here's how:
 
   .. code-block:: python
 
-     registry = pyramid.threadlocal.get_current_registry()
-     settings = registry.settings
-     debug_frobnosticator = settings['debug_frobnosticator']
+      registry = pyramid.threadlocal.get_current_registry()
+      settings = registry.settings
+      debug_frobnosticator = settings['debug_frobnosticator']
