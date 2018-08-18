@@ -252,8 +252,8 @@ Using ``request.json_body`` is equivalent to:
 
 .. code-block:: python
 
-   from json import loads
-   loads(request.body, encoding=request.charset)
+    from json import loads
+    loads(request.body, encoding=request.charset)
 
 Here's how to construct an AJAX request in JavaScript using :term:`jQuery` that
 allows you to use the ``request.json_body`` attribute when the request is sent
@@ -321,19 +321,19 @@ session to be removed after each request.  Put the following in the
 ``mypackage.__init__`` module:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from mypackage.models import DBSession
+    from mypackage.models import DBSession
 
-   from pyramid.events import subscriber
-   from pyramid.events import NewRequest
+    from pyramid.events import subscriber
+    from pyramid.events import NewRequest
 
-   def cleanup_callback(request):
-       DBSession.remove()
+    def cleanup_callback(request):
+        DBSession.remove()
 
-   @subscriber(NewRequest)
-   def add_cleanup_callback(event):
-       event.request.add_finished_callback(cleanup_callback)
+    @subscriber(NewRequest)
+    def add_cleanup_callback(event):
+        event.request.add_finished_callback(cleanup_callback)
 
 Registering the ``cleanup_callback`` finished callback at the start of a
 request (by causing the ``add_cleanup_callback`` to receive a
@@ -450,10 +450,10 @@ attribute of the response can be passed in as a keyword argument to the class,
 e.g.:
 
 .. code-block:: python
-  :linenos:
+    :linenos:
 
-  from pyramid.response import Response
-  response = Response(body='hello world!', content_type='text/plain')
+    from pyramid.response import Response
+    response = Response(body='hello world!', content_type='text/plain')
 
 The status defaults to ``'200 OK'``.
 
