@@ -47,60 +47,60 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r views templating; cd templating
+       cd ..; cp -r views templating; cd templating
 
 #. This step depends on ``pyramid_chameleon``, so add it as a dependency in
    ``templating/setup.py``:
 
    .. literalinclude:: templating/setup.py
-    :linenos:
+       :linenos:
 
 #. Now we can activate the development-mode distribution:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pip install -e .
+       $VENV/bin/pip install -e .
 
 #. We need to connect ``pyramid_chameleon`` as a renderer by making a call in
    the setup of ``templating/tutorial/__init__.py``:
 
    .. literalinclude:: templating/tutorial/__init__.py
-    :linenos:
+       :linenos:
 
 #. Our ``templating/tutorial/views.py`` no longer has HTML in it:
 
    .. literalinclude:: templating/tutorial/views.py
-    :linenos:
+       :linenos:
 
 #. Instead we have ``templating/tutorial/home.pt`` as a template:
 
    .. literalinclude:: templating/tutorial/home.pt
-    :language: html
+       :language: html
 
 #. For convenience, change ``templating/development.ini`` to reload templates
    automatically with ``pyramid.reload_templates``:
 
    .. literalinclude:: templating/development.ini
-    :language: ini
+       :language: ini
 
 #. Our unit tests in ``templating/tutorial/tests.py`` can focus on data:
 
    .. literalinclude:: templating/tutorial/tests.py
-    :linenos:
+       :linenos:
 
 #. Now run the tests:
 
    .. code-block:: bash
 
-    $ $VENV/bin/py.test tutorial/tests.py -q
-    ....
-    4 passed in 0.46 seconds
+       $VENV/bin/py.test tutorial/tests.py -q
+       ....
+       4 passed in 0.46 seconds
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini --reload
+       $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ and http://localhost:6543/howdy in your browser.
 
