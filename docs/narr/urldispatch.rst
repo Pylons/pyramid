@@ -57,12 +57,12 @@ example:
 
 .. code-block:: python
 
-   # "config" below is presumed to be an instance of the
-   # pyramid.config.Configurator class; "myview" is assumed
-   # to be a "view callable" function
-   from views import myview
-   config.add_route('myroute', '/prefix/{one}/{two}')
-   config.add_view(myview, route_name='myroute')
+    # "config" below is presumed to be an instance of the
+    # pyramid.config.Configurator class; "myview" is assumed
+    # to be a "view callable" function
+    from views import myview
+    config.add_route('myroute', '/prefix/{one}/{two}')
+    config.add_view(myview, route_name='myroute')
 
 When a :term:`view callable` added to the configuration by way of
 :meth:`~pyramid.config.Configurator.add_view` becomes associated with a route
@@ -76,8 +76,8 @@ a portion of your project's ``__init__.py``:
 
 .. code-block:: python
 
-   config.add_route('myroute', '/prefix/{one}/{two}')
-   config.scan('mypackage')
+    config.add_route('myroute', '/prefix/{one}/{two}')
+    config.scan('mypackage')
 
 Note that we don't call :meth:`~pyramid.config.Configurator.add_view` in this
 setup code.  However, the above :term:`scan` execution
@@ -90,12 +90,12 @@ references ``myroute`` as a ``route_name`` parameter:
 
 .. code-block:: python
 
-   from pyramid.view import view_config
-   from pyramid.response import Response
+    from pyramid.view import view_config
+    from pyramid.response import Response
 
-   @view_config(route_name='myroute')
-   def myview(request):
-       return Response('OK')
+    @view_config(route_name='myroute')
+    def myview(request):
+        return Response('OK')
 
 The above combination of ``add_route`` and ``scan`` is completely equivalent to
 using the previous combination of ``add_route`` and ``add_view``.
@@ -120,13 +120,13 @@ equivalent:
 
 .. code-block:: text
 
-   {foo}/bar/baz
+    {foo}/bar/baz
 
 and:
 
 .. code-block:: text
 
-   /{foo}/bar/baz
+    /{foo}/bar/baz
 
 If a pattern is a valid URL it won't be matched against an incoming request.
 Instead it can be useful for generating external URLs. See :ref:`External
@@ -159,21 +159,21 @@ two replacement markers (``baz``, and ``bar``):
 
 .. code-block:: text
 
-   foo/{baz}/{bar}
+    foo/{baz}/{bar}
 
 The above pattern will match these URLs, generating the following matchdicts:
 
 .. code-block:: text
 
-   foo/1/2        -> {'baz':u'1', 'bar':u'2'}
-   foo/abc/def    -> {'baz':u'abc', 'bar':u'def'}
+    foo/1/2        -> {'baz':u'1', 'bar':u'2'}
+    foo/abc/def    -> {'baz':u'abc', 'bar':u'def'}
 
 It will not match the following patterns however:
 
 .. code-block:: text
 
-   foo/1/2/        -> No match (trailing slash)
-   bar/abc/def     -> First segment literal mismatch
+    foo/1/2/        -> No match (trailing slash)
+    bar/abc/def     -> First segment literal mismatch
 
 The match for a segment replacement marker in a segment will be done only up to
 the first non-alphanumeric character in the segment in the pattern.  So, for
@@ -181,7 +181,7 @@ instance, if this route pattern was used:
 
 .. code-block:: text
 
-   foo/{name}.html
+    foo/{name}.html
 
 The literal path ``/foo/biz.html`` will match the above route pattern, and the
 match result will be ``{'name':u'biz'}``.  However, the literal path
@@ -230,19 +230,19 @@ following pattern:
 
 .. code-block:: text
 
-   foo/{bar}
+    foo/{bar}
 
 When matching the following URL:
 
 .. code-block:: text
 
-   http://example.com/foo/La%20Pe%C3%B1a
+    http://example.com/foo/La%20Pe%C3%B1a
 
 The matchdict will look like so (the value is URL-decoded / UTF-8 decoded):
 
 .. code-block:: text
 
-   {'bar':u'La Pe\xf1a'}
+    {'bar':u'La Pe\xf1a'}
 
 Literal strings in the path segment should represent the *decoded* value of the
 ``PATH_INFO`` provided to Pyramid.  You don't want to use a URL-encoded value
@@ -251,13 +251,13 @@ example, rather than this:
 
 .. code-block:: text
 
-   /Foo%20Bar/{baz}
+    /Foo%20Bar/{baz}
 
 You'll want to use something like this:
 
 .. code-block:: text
 
-   /Foo Bar/{baz}
+    /Foo Bar/{baz}
 
 For patterns that contain "high-order" characters in its literals, you'll want
 to use a Unicode value as the pattern as opposed to any URL-encoded or
@@ -266,7 +266,7 @@ pattern like this:
 
 .. code-block:: text
 
-   /La Pe\xc3\xb1a/{x}
+    /La Pe\xc3\xb1a/{x}
 
 But this will either cause an error at startup time or it won't match properly.
 You'll want to use a Unicode value as the pattern instead rather than raw
@@ -277,14 +277,14 @@ Unicode pattern in the source, like so:
 
 .. code-block:: text
 
-   /La Peña/{x}
+    /La Peña/{x}
 
 Or you can ignore source file encoding and use equivalent Unicode escape
 characters in the pattern.
 
 .. code-block:: text
 
-   /La Pe\xf1a/{x}
+    /La Pe\xf1a/{x}
 
 Dynamic segment names cannot contain high-order characters, so this applies
 only to literals in the pattern.
@@ -296,17 +296,17 @@ For example:
 
 .. code-block:: text
 
-   foo/{baz}/{bar}*fizzle
+    foo/{baz}/{bar}*fizzle
 
 The above pattern will match these URLs, generating the following matchdicts:
 
 .. code-block:: text
 
-   foo/1/2/           ->
-            {'baz':u'1', 'bar':u'2', 'fizzle':()}
+    foo/1/2/           ->
+             {'baz':u'1', 'bar':u'2', 'fizzle':()}
 
-   foo/abc/def/a/b/c  ->
-            {'baz':u'abc', 'bar':u'def', 'fizzle':(u'a', u'b', u'c')}
+    foo/abc/def/a/b/c  ->
+             {'baz':u'abc', 'bar':u'def', 'fizzle':(u'a', u'b', u'c')}
 
 Note that when a ``*stararg`` remainder match is matched, the value put into
 the matchdict is turned into a tuple of path segments representing the
@@ -315,19 +315,19 @@ UTF-8 into Unicode.  For example, for the following pattern:
 
 .. code-block:: text
 
-   foo/*fizzle
+    foo/*fizzle
 
 When matching the following path:
 
 .. code-block:: text
 
-   /foo/La%20Pe%C3%B1a/a/b/c
+    /foo/La%20Pe%C3%B1a/a/b/c
 
 Will generate the following matchdict:
 
 .. code-block:: text
 
-   {'fizzle':(u'La Pe\xf1a', u'a', u'b', u'c')}
+    {'fizzle':(u'La Pe\xf1a', u'a', u'b', u'c')}
 
 By default, the ``*stararg`` will parse the remainder sections into a tuple
 split by segment. Changing the regular expression used to match a marker can
@@ -341,8 +341,8 @@ The above pattern will match these URLs, generating the following matchdicts:
 
 .. code-block:: text
 
-   foo/1/2/           -> {'baz':u'1', 'bar':u'2', 'fizzle':u''}
-   foo/abc/def/a/b/c  -> {'baz':u'abc', 'bar':u'def', 'fizzle': u'a/b/c'}
+    foo/1/2/           -> {'baz':u'1', 'bar':u'2', 'fizzle':u''}
+    foo/abc/def/a/b/c  -> {'baz':u'abc', 'bar':u'def', 'fizzle': u'a/b/c'}
 
 This occurs because the default regular expression for a marker is ``[^/]+``
 which will match everything up to the first ``/``, while ``{fizzle:.*}`` will
@@ -372,8 +372,8 @@ be added in the following order:
 
 .. code-block:: text
 
-   members/{def}
-   members/abc
+    members/{def}
+    members/abc
 
 In such a configuration, the ``members/abc`` pattern would *never* be matched.
 This is because the match ordering will always match ``members/{def}`` first;
@@ -518,14 +518,14 @@ will be the string ``'1'``, ex.: ``{'id':'1'}``.
 The ``mypackage.views`` module referred to above might look like so:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
-   from pyramid.response import Response
+    from pyramid.view import view_config
+    from pyramid.response import Response
 
-   @view_config(route_name='idea')
-   def site_view(request):
-       return Response(request.matchdict['id'])
+    @view_config(route_name='idea')
+    def site_view(request):
+        return Response(request.matchdict['id'])
 
 The view has access to the matchdict directly via the request, and can access
 variables within it that match keys present as a result of the route pattern.
@@ -540,43 +540,43 @@ Below is an example of a more complicated set of route statements you might add
 to your application:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_route('idea', 'ideas/{idea}')
-   config.add_route('user', 'users/{user}')
-   config.add_route('tag', 'tags/{tag}')
-   config.scan()
+    config.add_route('idea', 'ideas/{idea}')
+    config.add_route('user', 'users/{user}')
+    config.add_route('tag', 'tags/{tag}')
+    config.scan()
 
 Here is an example of a corresponding ``mypackage.views`` module:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
-   from pyramid.response import Response
+    from pyramid.view import view_config
+    from pyramid.response import Response
 
-   @view_config(route_name='idea')
-   def idea_view(request):
-       return Response(request.matchdict['idea'])
+    @view_config(route_name='idea')
+    def idea_view(request):
+        return Response(request.matchdict['idea'])
    
-   @view_config(route_name='user')
-   def user_view(request):
-       user = request.matchdict['user']
-       return Response(u'The user is {}.'.format(user))
+    @view_config(route_name='user')
+    def user_view(request):
+        user = request.matchdict['user']
+        return Response(u'The user is {}.'.format(user))
 
-   @view_config(route_name='tag')
-   def tag_view(request):
-       tag = request.matchdict['tag']
-       return Response(u'The tag is {}.'.format(tag))
+    @view_config(route_name='tag')
+    def tag_view(request):
+        tag = request.matchdict['tag']
+        return Response(u'The tag is {}.'.format(tag))
     
 The above configuration will allow :app:`Pyramid` to service URLs in these
 forms:
 
 .. code-block:: text
 
-   /ideas/{idea}
-   /users/{user}
-   /tags/{tag}
+    /ideas/{idea}
+    /users/{user}
+    /tags/{tag}
 
 - When a URL matches the pattern ``/ideas/{idea}``, the view callable
   available at the dotted Python pathname ``mypackage.views.idea_view`` will
@@ -614,33 +614,33 @@ an instance of a class that will be the context resource used by the view.
 An example of using a route with a factory:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_route('idea', 'ideas/{idea}', factory='myproject.resources.Idea')
-   config.scan()
+    config.add_route('idea', 'ideas/{idea}', factory='myproject.resources.Idea')
+    config.scan()
 
 The above route will manufacture an ``Idea`` resource as a :term:`context`,
 assuming that ``mypackage.resources.Idea`` resolves to a class that accepts a
 request in its ``__init__``.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   class Idea(object):
-       def __init__(self, request):
-           pass
+    class Idea(object):
+        def __init__(self, request):
+            pass
 
 In a more complicated application, this root factory might be a class
 representing a :term:`SQLAlchemy` model. The view ``mypackage.views.idea_view``
 might look like this:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   @view_config(route_name='idea')
-   def idea_view(request):
-       idea = request.context
-       return Response(idea)
+    @view_config(route_name='idea')
+    def idea_view(request):
+        idea = request.context
+        return Response(idea)
 
 Here, ``request.context`` is an instance of ``Idea``. If indeed the resource
 object is a SQLAlchemy model, you do not even have to perform a query in the
@@ -661,16 +661,16 @@ It's not entirely obvious how to use a route pattern to match the root URL
 :meth:`~pyramid.config.Configurator.add_route`:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_route('root', '')
+    config.add_route('root', '')
 
 Or provide the literal string ``/`` as the pattern:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_route('root', '/')
+    config.add_route('root', '/')
 
 .. index::
    single: generating route URLs
@@ -686,9 +686,9 @@ on route patterns.  For example, if you've configured a route with the ``name``
 "foo" and the ``pattern`` "{a}/{b}/{c}", you might do this.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   url = request.route_url('foo', a='1', b='2', c='3')
+    url = request.route_url('foo', a='1', b='2', c='3')
 
 This would return something like the string ``http://example.com/1/2/3`` (at
 least if the current protocol and hostname implied ``http://example.com``).
@@ -699,7 +699,7 @@ To generate only the *path* portion of a URL from a route, use the
 
 .. code-block:: python
 
-   url = request.route_path('foo', a='1', b='2', c='3')
+    url = request.route_path('foo', a='1', b='2', c='3')
 
 This will return the string ``/1/2/3`` rather than a full URL.
 
@@ -714,51 +714,51 @@ Therefore, if you've added a route like so:
 
 .. code-block:: python
 
-   config.add_route('la', u'/La Peña/{city}')
+    config.add_route('la', u'/La Peña/{city}')
 
 And you later generate a URL using ``route_path`` or ``route_url`` like so:
 
 .. code-block:: python
 
-   url = request.route_path('la', city=u'Québec')
+    url = request.route_path('la', city=u'Québec')
 
 You will wind up with the path encoded to UTF-8 and URL-quoted like so:
 
 .. code-block:: text
 
-   /La%20Pe%C3%B1a/Qu%C3%A9bec
+    /La%20Pe%C3%B1a/Qu%C3%A9bec
 
 If you have a ``*stararg`` remainder dynamic part of your route pattern:
 
 .. code-block:: python
 
-   config.add_route('abc', 'a/b/c/*foo')
+    config.add_route('abc', 'a/b/c/*foo')
 
 And you later generate a URL using ``route_path`` or ``route_url`` using a
 *string* as the replacement value:
 
 .. code-block:: python
 
-   url = request.route_path('abc', foo=u'Québec/biz')
+    url = request.route_path('abc', foo=u'Québec/biz')
 
 The value you pass will be URL-quoted except for embedded slashes in the
 result:
 
 .. code-block:: text
 
-   /a/b/c/Qu%C3%A9bec/biz
+    /a/b/c/Qu%C3%A9bec/biz
 
 You can get a similar result by passing a tuple composed of path elements:
 
 .. code-block:: python
 
-   url = request.route_path('abc', foo=(u'Québec', u'biz'))
+    url = request.route_path('abc', foo=(u'Québec', u'biz'))
 
 Each value in the tuple will be URL-quoted and joined by slashes in this case:
 
 .. code-block:: text
 
-   /a/b/c/Qu%C3%A9bec/biz
+    /a/b/c/Qu%C3%A9bec/biz
 
 .. index::
    single: static routes
@@ -771,10 +771,10 @@ Static Routes
 Routes may be added with a ``static`` keyword argument.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config = Configurator()
-   config.add_route('page', '/page/{action}', static=True)
+    config = Configurator()
+    config.add_route('page', '/page/{action}', static=True)
 
 Routes added with a ``True`` ``static`` keyword argument will never be
 considered for matching at request time.  Static routes are useful for URL
@@ -802,14 +802,14 @@ Route patterns that are valid URLs, are treated as external routes. Like
 :ref:`static routes <static_route_narr>` they are useful for URL generation
 purposes only and are never considered for matching at request time.
 
-.. code-block:: python
-   :linenos:
+.. code-block:: pycon
+    :linenos:
 
-   >>> config = Configurator()
-   >>> config.add_route('youtube', 'https://youtube.com/watch/{video_id}')
-   ...
-   >>> request.route_url('youtube', video_id='oHg5SJYRHA0')
-   >>> "https://youtube.com/watch/oHg5SJYRHA0"
+    >>> config = Configurator()
+    >>> config.add_route('youtube', 'https://youtube.com/watch/{video_id}')
+    ...
+    >>> request.route_url('youtube', video_id='oHg5SJYRHA0')
+    >>> "https://youtube.com/watch/oHg5SJYRHA0"
 
 Most pattern replacements and calls to
 :meth:`pyramid.request.Request.route_url` will work as expected. However, calls
@@ -845,26 +845,26 @@ Let's use an example.  If the following routes are configured in your
 application:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.httpexceptions import HTTPNotFound
+    from pyramid.httpexceptions import HTTPNotFound
 
-   def notfound(request):
-       return HTTPNotFound()
+    def notfound(request):
+        return HTTPNotFound()
 
-   def no_slash(request):
-       return Response('No slash')
+    def no_slash(request):
+        return Response('No slash')
 
-   def has_slash(request):
-       return Response('Has slash')
+    def has_slash(request):
+        return Response('Has slash')
 
-   def main(g, **settings):
-       config = Configurator()
-       config.add_route('noslash', 'no_slash')
-       config.add_route('hasslash', 'has_slash/')
-       config.add_view(no_slash, route_name='noslash')
-       config.add_view(has_slash, route_name='hasslash')
-       config.add_notfound_view(notfound, append_slash=True)
+    def main(g, **settings):
+        config = Configurator()
+        config.add_route('noslash', 'no_slash')
+        config.add_route('hasslash', 'has_slash/')
+        config.add_view(no_slash, route_name='noslash')
+        config.add_view(has_slash, route_name='hasslash')
+        config.add_notfound_view(notfound, append_slash=True)
 
 If a request enters the application with the ``PATH_INFO`` value of
 ``/no_slash``, the first route will match and the browser will show "No slash".
@@ -885,28 +885,28 @@ and :class:`pyramid.view.view_config` decorators and a :term:`scan` to do
 exactly the same job:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.httpexceptions import HTTPNotFound
-   from pyramid.view import notfound_view_config, view_config
+    from pyramid.httpexceptions import HTTPNotFound
+    from pyramid.view import notfound_view_config, view_config
 
-   @notfound_view_config(append_slash=True)
-   def notfound(request):
-       return HTTPNotFound()
+    @notfound_view_config(append_slash=True)
+    def notfound(request):
+        return HTTPNotFound()
 
-   @view_config(route_name='noslash')
-   def no_slash(request):
-       return Response('No slash')
+    @view_config(route_name='noslash')
+    def no_slash(request):
+        return Response('No slash')
 
-   @view_config(route_name='hasslash')
-   def has_slash(request):
-       return Response('Has slash')
+    @view_config(route_name='hasslash')
+    def has_slash(request):
+        return Response('Has slash')
 
-   def main(g, **settings):
-       config = Configurator()
-       config.add_route('noslash', 'no_slash')
-       config.add_route('hasslash', 'has_slash/')
-       config.scan()
+    def main(g, **settings):
+        config = Configurator()
+        config.add_route('noslash', 'no_slash')
+        config.add_route('hasslash', 'has_slash/')
+        config.scan()
 
 .. warning::
 
@@ -937,7 +937,7 @@ which you started the application from.  For example:
 .. code-block:: text
     :linenos:
 
-    $ PYRAMID_DEBUG_ROUTEMATCH=true $VENV/bin/pserve development.ini
+    PYRAMID_DEBUG_ROUTEMATCH=true $VENV/bin/pserve development.ini
     Starting server in PID 13586.
     serving on 0.0.0.0:6543 view at http://127.0.0.1:6543
     2010-12-16 14:45:19,956 no route matched for url \
@@ -980,16 +980,16 @@ callable's author intended while still maintaining the same route names.  For
 example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   def users_include(config):
-       config.add_route('show_users', '/show')
+    def users_include(config):
+        config.add_route('show_users', '/show')
 
-   def main(global_config, **settings):
-       config = Configurator()
-       config.include(users_include, route_prefix='/users')
+    def main(global_config, **settings):
+        config = Configurator()
+        config.include(users_include, route_prefix='/users')
 
 In the above configuration, the ``show_users`` route will have an effective
 route pattern of ``/users/show`` instead of ``/show`` because the
@@ -1003,20 +1003,20 @@ turns around and includes another callable, the second-level route prefix will
 be prepended with the first:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   def timing_include(config):
-       config.add_route('show_times', '/times')
+    def timing_include(config):
+        config.add_route('show_times', '/times')
 
-   def users_include(config):
-       config.add_route('show_users', '/show')
-       config.include(timing_include, route_prefix='/timing')
+    def users_include(config):
+        config.add_route('show_users', '/show')
+        config.include(timing_include, route_prefix='/timing')
 
-   def main(global_config, **settings):
-       config = Configurator()
-       config.include(users_include, route_prefix='/users')
+    def main(global_config, **settings):
+        config = Configurator()
+        config.include(users_include, route_prefix='/users')
 
 In the above configuration, the ``show_users`` route will still have an
 effective route pattern of ``/users/show``.  The ``show_times`` route, however,
@@ -1030,38 +1030,38 @@ your route names so they'll be unlikely to conflict with other packages that
 may be added in the future.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   def timing_include(config):
-       config.add_route('timing.show_times', '/times')
+    def timing_include(config):
+        config.add_route('timing.show_times', '/times')
 
-   def users_include(config):
-       config.add_route('users.show_users', '/show')
-       config.include(timing_include, route_prefix='/timing')
+    def users_include(config):
+        config.add_route('users.show_users', '/show')
+        config.include(timing_include, route_prefix='/timing')
 
-   def main(global_config, **settings):
-       config = Configurator()
-       config.include(users_include, route_prefix='/users')
+    def main(global_config, **settings):
+        config = Configurator()
+        config.include(users_include, route_prefix='/users')
 
 A convenience context manager exists to set the route prefix for any
 :meth:`pyramid.config.Configurator.add_route` or
 :meth:`pyramid.config.Configurator.include` calls within the context.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   def timing_include(config):
-      config.add_route('timing.show_times', '/times')
+    def timing_include(config):
+        config.add_route('timing.show_times', '/times')
 
-   def main(global_config, **settings)
-      config = Configurator()
-      with config.route_prefix_context('/timing'):
-         config.include(timing_include)
-         config.add_route('timing.average', '/average')
+    def main(global_config, **settings)
+        config = Configurator()
+        with config.route_prefix_context('/timing'):
+            config.include(timing_include)
+            config.add_route('timing.average', '/average')
 
 .. index::
    single: route predicates (custom)
@@ -1087,18 +1087,18 @@ object).
 For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def any_of(segment_name, *allowed):
-       def predicate(info, request):
-           if info['match'][segment_name] in allowed:
-               return True
-       return predicate
+    def any_of(segment_name, *allowed):
+        def predicate(info, request):
+            if info['match'][segment_name] in allowed:
+                return True
+        return predicate
 
-   num_one_two_or_three = any_of('num', 'one', 'two', 'three')
+    num_one_two_or_three = any_of('num', 'one', 'two', 'three')
 
-   config.add_route('route_to_num', '/{num}',
-                    custom_predicates=(num_one_two_or_three,))
+    config.add_route('route_to_num', '/{num}',
+                     custom_predicates=(num_one_two_or_three,))
 
 The above ``any_of`` function generates a predicate which ensures that the
 match value named ``segment_name`` is in the set of allowable values
@@ -1113,23 +1113,23 @@ A custom route predicate may also *modify* the ``match`` dictionary.  For
 instance, a predicate might do some type conversion of values:
 
 .. code-block:: python
-    :linenos:
+     :linenos:
 
-    def integers(*segment_names):
-        def predicate(info, request):
-            match = info['match']
-            for segment_name in segment_names:
-                try:
-                    match[segment_name] = int(match[segment_name])
-                except (TypeError, ValueError):
-                    pass
-            return True
-        return predicate
+     def integers(*segment_names):
+         def predicate(info, request):
+             match = info['match']
+             for segment_name in segment_names:
+                 try:
+                     match[segment_name] = int(match[segment_name])
+                 except (TypeError, ValueError):
+                     pass
+             return True
+         return predicate
 
-    ymd_to_int = integers('year', 'month', 'day')
+     ymd_to_int = integers('year', 'month', 'day')
 
-    config.add_route('ymd', '/{year}/{month}/{day}',
-                     custom_predicates=(ymd_to_int,))
+     config.add_route('ymd', '/{year}/{month}/{day}',
+                      custom_predicates=(ymd_to_int,))
 
 Note that a conversion predicate is still a predicate, so it must return
 ``True`` or ``False``. A predicate that does *only* conversion, such as the one
@@ -1203,35 +1203,35 @@ will help you with the ``pviews`` command (see
 If a predicate is a class, just add ``__text__`` property in a standard manner.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   class DummyCustomPredicate1(object):
-       def __init__(self):
-           self.__text__ = 'my custom class predicate'
+    class DummyCustomPredicate1(object):
+        def __init__(self):
+            self.__text__ = 'my custom class predicate'
 
-   class DummyCustomPredicate2(object):
-       __text__ = 'my custom class predicate'
+    class DummyCustomPredicate2(object):
+        __text__ = 'my custom class predicate'
 
 If a predicate is a method, you'll need to assign it after method declaration
 (see `PEP 232 <https://www.python.org/dev/peps/pep-0232/>`_).
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def custom_predicate():
-       pass
-   custom_predicate.__text__ = 'my custom method predicate'
+    def custom_predicate():
+        pass
+    custom_predicate.__text__ = 'my custom method predicate'
 
 If a predicate is a classmethod, using ``@classmethod`` will not work, but you
 can still easily do it by wrapping it in a classmethod call.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def classmethod_predicate():
-       pass
-   classmethod_predicate.__text__ = 'my classmethod predicate'
-   classmethod_predicate = classmethod(classmethod_predicate)
+    def classmethod_predicate():
+        pass
+    classmethod_predicate.__text__ = 'my classmethod predicate'
+    classmethod_predicate = classmethod(classmethod_predicate)
 
 The same will work with ``staticmethod``, using ``staticmethod`` instead of
 ``classmethod``.
@@ -1258,11 +1258,11 @@ This object will usually be used as the :term:`context` resource of the view
 callable ultimately found via :term:`view lookup`.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_route('abc', '/abc',
-                    factory='myproject.resources.root_factory')
-   config.add_view('myproject.views.theview', route_name='abc')
+    config.add_route('abc', '/abc',
+                     factory='myproject.resources.root_factory')
+    config.add_view('myproject.views.theview', route_name='abc')
 
 The factory can either be a Python object or a :term:`dotted Python name` (a
 string) which points to such a Python object, as it is above.
@@ -1275,11 +1275,11 @@ A factory must be a callable which accepts a request and returns an arbitrary
 Python object.  For example, the below class can be used as a factory:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   class Mine(object):
-       def __init__(self, request):
-           pass
+    class Mine(object):
+        def __init__(self, request):
+            pass
 
 A route factory is actually conceptually identical to the :term:`root factory`
 described at :ref:`the_resource_tree`.
@@ -1310,14 +1310,14 @@ factory which attaches a custom ``__acl__`` to an object at its creation time.
 Such a ``factory`` might look like so:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   class Article(object):
-       def __init__(self, request):
-          matchdict = request.matchdict
-          article = matchdict.get('article', None)
-          if article == '1':
-              self.__acl__ = [ (Allow, 'editor', 'view') ]
+    class Article(object):
+        def __init__(self, request):
+            matchdict = request.matchdict
+            article = matchdict.get('article', None)
+            if article == '1':
+                self.__acl__ = [ (Allow, 'editor', 'view') ]
 
 If the route ``archives/{article}`` is matched, and the article number is
 ``1``, :app:`Pyramid` will generate an ``Article`` :term:`context` resource
