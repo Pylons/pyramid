@@ -43,8 +43,8 @@ Edit ``models.py``
 Open ``tutorial/models.py`` file and edit it to look like the following:
 
 .. literalinclude:: src/models/tutorial/models.py
-   :linenos:
-   :language: python
+    :linenos:
+    :language: python
 
 The first thing we want to do is remove the ``MyModel`` class from the
 generated ``models.py`` file.  The ``MyModel`` class is only a sample and
@@ -91,6 +91,6 @@ up with a Python traceback on your console that ends with this exception:
 
 .. code-block:: text
 
-   ImportError: cannot import name MyModel
+    ImportError: cannot import name MyModel
 
 This will also happen if you attempt to run the tests.
