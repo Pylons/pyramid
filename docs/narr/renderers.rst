@@ -9,13 +9,13 @@ interface, :app:`Pyramid` will attempt to use a :term:`renderer` to construct a
 response.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
+    from pyramid.view import view_config
 
-   @view_config(renderer='json')
-   def hello_world(request):
-       return {'content':'Hello!'}
+    @view_config(renderer='json')
+    def hello_world(request):
+        return {'content':'Hello!'}
 
 The above example returns a *dictionary* from the view callable.  A dictionary
 does not implement the Pyramid response interface, so you might believe that
@@ -64,7 +64,7 @@ with a view callable:
 
 .. code-block:: python
 
-   config.add_view('myproject.views.my_view', renderer='json')
+    config.add_view('myproject.views.my_view', renderer='json')
 
 When this configuration is added to an application, the
 ``myproject.views.my_view`` view callable will now use a ``json`` renderer,
@@ -85,39 +85,39 @@ renderer associated with the view configuration is ignored, and the response is
 passed back to :app:`Pyramid` unchanged.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
-   from pyramid.view import view_config
+    from pyramid.response import Response
+    from pyramid.view import view_config
 
-   @view_config(renderer='json')
-   def view(request):
-       return Response('OK') # json renderer avoided
+    @view_config(renderer='json')
+    def view(request):
+        return Response('OK') # json renderer avoided
 
 Likewise for an :term:`HTTP exception` response:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.httpexceptions import HTTPFound
-   from pyramid.view import view_config
+    from pyramid.httpexceptions import HTTPFound
+    from pyramid.view import view_config
 
-   @view_config(renderer='json')
-   def view(request):
-       return HTTPFound(location='http://example.com') # json renderer avoided
+    @view_config(renderer='json')
+    def view(request):
+        return HTTPFound(location='http://example.com') # json renderer avoided
 
 You can of course also return the ``request.response`` attribute instead to
 avoid rendering:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
+    from pyramid.view import view_config
 
-   @view_config(renderer='json')
-   def view(request):
-       request.response.body = 'OK'
-       return request.response # json renderer avoided
+    @view_config(renderer='json')
+    def view(request):
+        request.response.body = 'OK'
+        return request.response # json renderer avoided
 
 .. index::
    single: renderers (built-in)
@@ -153,20 +153,20 @@ renderer is specified in the configuration for this view, the view will render
 the returned dictionary to the ``str()`` representation of the dictionary:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
+    from pyramid.view import view_config
 
-   @view_config(renderer='string')
-   def hello_world(request):
-       return {'content':'Hello!'}
+    @view_config(renderer='string')
+    def hello_world(request):
+        return {'content':'Hello!'}
 
 The body of the response returned by such a view will be a string representing
 the ``str()`` serialization of the return value:
 
 .. code-block:: python
 
-   {'content': 'Hello!'}
+    {'content': 'Hello!'}
 
 Views which use the string renderer can vary non-body response attributes by
 using the API of the ``request.response`` attribute.  See
@@ -190,20 +190,20 @@ renderer is specified in the configuration for this view, the view will render
 the returned dictionary to a JSON serialization:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
+    from pyramid.view import view_config
 
-   @view_config(renderer='json')
-   def hello_world(request):
-       return {'content':'Hello!'}
+    @view_config(renderer='json')
+    def hello_world(request):
+        return {'content':'Hello!'}
 
 The body of the response returned by such a view will be a string representing
 the JSON serialization of the return value:
 
 .. code-block:: python
 
-   {"content": "Hello!"}
+    {"content": "Hello!"}
 
 The return value needn't be a dictionary, but the return value must contain
 values serializable by the configured serializer (by default ``json.dumps``).
@@ -213,12 +213,12 @@ You can configure a view to use the JSON renderer by naming ``json`` as the
 :meth:`~pyramid.config.Configurator.add_view`:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_view('myproject.views.hello_world',
-                   name='hello',
-                   context='myproject.resources.Hello',
-                   renderer='json')
+    config.add_view('myproject.views.hello_world',
+                    name='hello',
+                    context='myproject.resources.Hello',
+                    renderer='json')
 
 Views which use the JSON renderer can vary non-body response attributes by
 using the API of the ``request.response`` attribute.  See
@@ -248,23 +248,23 @@ forth).  It should accept a single additional argument, ``request``, which will
 be the active request object at render time.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
+    from pyramid.view import view_config
 
-   class MyObject(object):
-       def __init__(self, x):
-           self.x = x
+    class MyObject(object):
+        def __init__(self, x):
+            self.x = x
 
-       def __json__(self, request):
-           return {'x':self.x}
+        def __json__(self, request):
+            return {'x':self.x}
 
-   @view_config(renderer='json')
-   def objects(request):
-       return [MyObject(1), MyObject(2)]
+    @view_config(renderer='json')
+    def objects(request):
+        return [MyObject(1), MyObject(2)]
 
-   # the JSON value returned by ``objects`` will be:
-   #    [{"x": 1}, {"x": 2}]
+    # the JSON value returned by ``objects`` will be:
+    #    [{"x": 1}, {"x": 2}]
 
 Using the ``add_adapter`` Method of a Custom JSON Renderer
 **********************************************************
@@ -279,17 +279,17 @@ custom types. The renderer will attempt to adapt non-serializable objects using
 the registered adapters. A short example follows:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.renderers import JSON
+    from pyramid.renderers import JSON
 
-   if __name__ == '__main__':
-       config = Configurator()
-       json_renderer = JSON()
-       def datetime_adapter(obj, request):
-           return obj.isoformat()
-       json_renderer.add_adapter(datetime.datetime, datetime_adapter)
-       config.add_renderer('json', json_renderer)
+    if __name__ == '__main__':
+        config = Configurator()
+        json_renderer = JSON()
+        def datetime_adapter(obj, request):
+            return obj.isoformat()
+        json_renderer.add_adapter(datetime.datetime, datetime_adapter)
+        config.add_renderer('json', json_renderer)
 
 The ``add_adapter`` method should accept two arguments: the *class* of the
 object that you want this adapter to run for (in the example above,
@@ -327,11 +327,11 @@ Unlike other renderers, a JSONP renderer needs to be configured at startup time
 
 .. code-block:: python
 
-   from pyramid.config import Configurator
-   from pyramid.renderers import JSONP
+    from pyramid.config import Configurator
+    from pyramid.renderers import JSONP
 
-   config = Configurator()
-   config.add_renderer('jsonp', JSONP(param_name='callback'))
+    config = Configurator()
+    config.add_renderer('jsonp', JSONP(param_name='callback'))
 
 Once this renderer is registered via
 :meth:`~pyramid.config.Configurator.add_renderer` as above, you can use
@@ -340,11 +340,11 @@ Once this renderer is registered via
 
 .. code-block:: python
 
-   from pyramid.view import view_config
+    from pyramid.view import view_config
 
-   @view_config(renderer='jsonp')
-   def myview(request):
-       return {'greeting':'Hello world'}
+    @view_config(renderer='jsonp')
+    def myview(request):
+        return {'greeting':'Hello world'}
 
 When a view is called that uses a JSONP renderer:
 
@@ -366,12 +366,12 @@ For example (JavaScript):
 
 .. code-block:: javascript
 
-   var api_url = 'http://api.geonames.org/timezoneJSON' +
-                 '?lat=38.301733840000004' +
-                 '&lng=-77.45869621' +
-                 '&username=fred' +
-                 '&callback=?';
-   jqhxr = $.getJSON(api_url);
+    var api_url = 'http://api.geonames.org/timezoneJSON' +
+                  '?lat=38.301733840000004' +
+                  '&lng=-77.45869621' +
+                  '&username=fred' +
+                  '&callback=?';
+    jqhxr = $.getJSON(api_url);
 
 The string ``callback=?`` above in the ``url`` param to the JQuery ``getJSON``
 function indicates to jQuery that the query should be made as a JSONP request;
@@ -403,14 +403,14 @@ callable that uses a renderer, assign the ``status`` attribute to the
 ``response`` attribute of the request before returning a result:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
+    from pyramid.view import view_config
 
-   @view_config(name='gone', renderer='templates/gone.pt')
-   def myview(request):
-       request.response.status = '404 Not Found'
-       return {'URL':request.URL}
+    @view_config(name='gone', renderer='templates/gone.pt')
+    def myview(request):
+        request.response.status = '404 Not Found'
+        return {'URL':request.URL}
 
 Note that mutations of ``request.response`` in views which return a Response
 object directly will have no effect unless the response object returned *is*
@@ -419,23 +419,23 @@ object directly will have no effect unless the response object returned *is*
 different Response object is returned.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
+    from pyramid.response import Response
 
-   def view(request):
-       request.response.set_cookie('abc', '123') # this has no effect
-       return Response('OK') # because we're returning a different response
+    def view(request):
+        request.response.set_cookie('abc', '123') # this has no effect
+        return Response('OK') # because we're returning a different response
 
 If you mutate ``request.response`` and you'd like the mutations to have an
 effect, you must return ``request.response``:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def view(request):
-       request.response.set_cookie('abc', '123')
-       return request.response
+    def view(request):
+        request.response.set_cookie('abc', '123')
+        return request.response
 
 For more information on attributes of the request, see the API documentation in
 :ref:`request_module`.  For more information on the API of
@@ -459,7 +459,7 @@ For example, to add a renderer which renders views which have a
 
 .. code-block:: python
 
-   config.add_renderer('.jinja2', 'mypackage.MyJinja2Renderer')
+    config.add_renderer('.jinja2', 'mypackage.MyJinja2Renderer')
 
 The first argument is the renderer name.  The second argument is a reference
 to an implementation of a :term:`renderer factory` or a :term:`dotted Python
@@ -482,24 +482,24 @@ creating an object that conforms to the :class:`pyramid.interfaces.IRenderer`
 interface. A typical class that follows this setup is as follows:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   class RendererFactory:
-       def __init__(self, info):
-           """ Constructor: info will be an object having the
-           following attributes: name (the renderer name), package
-           (the package that was 'current' at the time the
-           renderer was registered), type (the renderer type
-           name), registry (the current application registry) and
-           settings (the deployment settings dictionary). """
+    class RendererFactory:
+        def __init__(self, info):
+            """ Constructor: info will be an object having the
+            following attributes: name (the renderer name), package
+            (the package that was 'current' at the time the
+            renderer was registered), type (the renderer type
+            name), registry (the current application registry) and
+            settings (the deployment settings dictionary). """
 
-       def __call__(self, value, system):
-           """ Call the renderer implementation with the value
-           and the system value passed in as arguments and return
-           the result (a string or unicode object).  The value is
-           the return value of a view.  The system value is a
-           dictionary containing available system values
-           (e.g., view, context, and request). """
+        def __call__(self, value, system):
+            """ Call the renderer implementation with the value
+            and the system value passed in as arguments and return
+            the result (a string or unicode object).  The value is
+            the return value of a view.  The system value is a
+            dictionary containing available system values
+            (e.g., view, context, and request). """
 
 The formal interface definition of the ``info`` object passed to a renderer
 factory constructor is available as :class:`pyramid.interfaces.IRendererInfo`.
@@ -532,7 +532,7 @@ instance of :meth:`pyramid.config.Configurator`:
 
 .. code-block:: python
 
-   config.add_renderer(name='amf', factory='my.package.MyAMFRenderer')
+    config.add_renderer(name='amf', factory='my.package.MyAMFRenderer')
 
 Adding the above code to your application startup configuration will
 allow you to use the ``my.package.MyAMFRenderer`` renderer factory
@@ -541,13 +541,13 @@ renderer by specifying ``amf`` in the ``renderer`` attribute of a
 :term:`view configuration`:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
+    from pyramid.view import view_config
 
-   @view_config(renderer='amf')
-   def myview(request):
-       return {'Hello':'world'}
+    @view_config(renderer='amf')
+    def myview(request):
+        return {'Hello':'world'}
 
 At startup time, when a :term:`view configuration` is encountered which has a
 ``name`` attribute that does not contain a dot, the full ``name`` value is used
@@ -561,7 +561,7 @@ which expects to be passed a filesystem path:
 
 .. code-block:: python
 
-   config.add_renderer(name='.jinja2', factory='my.package.MyJinja2Renderer')
+    config.add_renderer(name='.jinja2', factory='my.package.MyJinja2Renderer')
 
 Adding the above code to your application startup will allow you to use the
 ``my.package.MyJinja2Renderer`` renderer factory implementation in view
@@ -569,13 +569,13 @@ configurations by referring to any ``renderer`` which *ends in* ``.jinja2`` in
 the ``renderer`` attribute of a :term:`view configuration`:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
+    from pyramid.view import view_config
 
-   @view_config(renderer='templates/mytemplate.jinja2')
-   def myview(request):
-       return {'Hello':'world'}
+    @view_config(renderer='templates/mytemplate.jinja2')
+    def myview(request):
+        return {'Hello':'world'}
 
 When a :term:`view configuration` is encountered at startup time which has a
 ``name`` attribute that does contain a dot, the value of the name attribute is
@@ -597,7 +597,7 @@ attribute to the renderer tag:
 
 .. code-block:: python
 
-   config.add_renderer(None, 'mypackage.json_renderer_factory')
+    config.add_renderer(None, 'mypackage.json_renderer_factory')
 
 .. index::
    pair: renderer; changing
@@ -614,8 +614,8 @@ renderer to specify a new renderer, you could do the following:
 
 .. code-block:: python
 
-   json_renderer = pyramid.renderers.JSON()
-   config.add_renderer('json', json_renderer)
+    json_renderer = pyramid.renderers.JSON()
+    config.add_renderer('json', json_renderer)
 
 After doing this, any views registered with the ``json`` renderer will use the
 new renderer.
@@ -643,23 +643,23 @@ sets an ``override_renderer`` attribute on the request itself, which in turn is
 the *name* of a registered renderer.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.events import subscriber
-   from pyramid.events import NewRequest
+    from pyramid.events import subscriber
+    from pyramid.events import NewRequest
 
-   @subscriber(NewRequest)
-   def set_xmlrpc_params(event):
-       request = event.request
-       if (request.content_type == 'text/xml'
-               and request.method == 'POST'
-               and not 'soapaction' in request.headers
-               and not 'x-pyramid-avoid-xmlrpc' in request.headers):
-           params, method = parse_xmlrpc_request(request)
-           request.xmlrpc_params, request.xmlrpc_method = params, method
-           request.is_xmlrpc = True
-           request.override_renderer = 'xmlrpc'
-           return True
+    @subscriber(NewRequest)
+    def set_xmlrpc_params(event):
+        request = event.request
+        if (request.content_type == 'text/xml'
+                and request.method == 'POST'
+                and not 'soapaction' in request.headers
+                and not 'x-pyramid-avoid-xmlrpc' in request.headers):
+            params, method = parse_xmlrpc_request(request)
+            request.xmlrpc_params, request.xmlrpc_method = params, method
+            request.is_xmlrpc = True
+            request.override_renderer = 'xmlrpc'
+            return True
 
 The result of such a subscriber will be to replace any existing static renderer
 configured by the developer with a (notional, nonexistent) XML-RPC renderer, if
