@@ -41,31 +41,31 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r authentication authorization; cd authorization
-    $ $VENV/bin/pip install -e .
+       cd ..; cp -r authentication authorization; cd authorization
+       $VENV/bin/pip install -e .
 
 #. Start by changing ``authorization/tutorial/__init__.py`` to specify a root
    factory to the :term:`configurator`:
 
    .. literalinclude:: authorization/tutorial/__init__.py
-    :linenos:
+       :linenos:
 
 #. That means we need to implement ``authorization/tutorial/resources.py``:
 
    .. literalinclude:: authorization/tutorial/resources.py
-    :linenos:
+       :linenos:
 
 #. Change ``authorization/tutorial/views.py`` to require the ``edit``
    permission on the ``hello`` view and implement the forbidden view:
 
    .. literalinclude:: authorization/tutorial/views.py
-    :linenos:
+       :linenos:
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini --reload
+       $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ in a browser.
 
