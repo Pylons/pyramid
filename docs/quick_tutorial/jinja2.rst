@@ -27,38 +27,38 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r view_classes jinja2; cd jinja2
-    $ $VENV/bin/pip install -e .
-    $ $VENV/bin/pip install pyramid_jinja2
+       cd ..; cp -r view_classes jinja2; cd jinja2
+       $VENV/bin/pip install -e .
+       $VENV/bin/pip install pyramid_jinja2
 
 #. We need to include ``pyramid_jinja2`` in ``jinja2/tutorial/__init__.py``:
 
    .. literalinclude:: jinja2/tutorial/__init__.py
-    :linenos:
+       :linenos:
 
 #. Our ``jinja2/tutorial/views.py`` simply changes its ``renderer``:
 
    .. literalinclude:: jinja2/tutorial/views.py
-    :linenos:
+       :linenos:
 
 #. Add ``jinja2/tutorial/home.jinja2`` as a template:
 
    .. literalinclude:: jinja2/tutorial/home.jinja2
-    :language: html
+       :language: html
 
 #. Now run the tests:
 
    .. code-block:: bash
 
-    $ $VENV/bin/py.test tutorial/tests.py -q
-    ....
-    4 passed in 0.40 seconds
+       $VENV/bin/py.test tutorial/tests.py -q
+       ....
+       4 passed in 0.40 seconds
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini --reload
+       $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ in your browser.
 
