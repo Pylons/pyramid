@@ -88,16 +88,16 @@ application setup to specify the authentication policy.
 For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
-   from pyramid.authentication import AuthTktAuthenticationPolicy
-   from pyramid.authorization import ACLAuthorizationPolicy
-   authn_policy = AuthTktAuthenticationPolicy('seekrit', hashalg='sha512')
-   authz_policy = ACLAuthorizationPolicy()
-   config = Configurator()
-   config.set_authentication_policy(authn_policy)
-   config.set_authorization_policy(authz_policy)
+    from pyramid.config import Configurator
+    from pyramid.authentication import AuthTktAuthenticationPolicy
+    from pyramid.authorization import ACLAuthorizationPolicy
+    authn_policy = AuthTktAuthenticationPolicy('seekrit', hashalg='sha512')
+    authz_policy = ACLAuthorizationPolicy()
+    config = Configurator()
+    config.set_authentication_policy(authn_policy)
+    config.set_authorization_policy(authz_policy)
 
 .. note:: The ``authentication_policy`` and ``authorization_policy`` arguments
    may also be passed to their respective methods mentioned above as
@@ -141,28 +141,28 @@ For example, the following view declaration protects the view named
 ``add`` permission using the :meth:`pyramid.config.Configurator.add_view` API:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   # config is an instance of pyramid.config.Configurator
+    # config is an instance of pyramid.config.Configurator
 
-   config.add_view('mypackage.views.blog_entry_add_view',
-                   name='add_entry.html',
-                   context='mypackage.resources.Blog',
-                   permission='add')
+    config.add_view('mypackage.views.blog_entry_add_view',
+                    name='add_entry.html',
+                    context='mypackage.resources.Blog',
+                    permission='add')
 
 The equivalent view registration including the ``add`` permission name may be
 performed via the ``@view_config`` decorator:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
-   from resources import Blog
+    from pyramid.view import view_config
+    from resources import Blog
 
-   @view_config(context=Blog, name='add_entry.html', permission='add')
-   def blog_entry_add_view(request):
-       """ Add blog entry code goes here """
-       pass
+    @view_config(context=Blog, name='add_entry.html', permission='add')
+    def blog_entry_add_view(request):
+        """ Add blog entry code goes here """
+        pass
 
 As a result of any of these various view configuration statements, if an
 authorization policy is in place when the view callable is found during normal
@@ -231,37 +231,37 @@ just need type-level security.
 For example, an ACL might be attached to the resource for a blog via its class:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.security import Allow
-   from pyramid.security import Everyone
+    from pyramid.security import Allow
+    from pyramid.security import Everyone
 
-   class Blog(object):
-       __acl__ = [
-           (Allow, Everyone, 'view'),
-           (Allow, 'group:editors', 'add'),
-           (Allow, 'group:editors', 'edit'),
-           ]
+    class Blog(object):
+        __acl__ = [
+            (Allow, Everyone, 'view'),
+            (Allow, 'group:editors', 'add'),
+            (Allow, 'group:editors', 'edit'),
+            ]
 
 Or, if your resources are persistent, an ACL might be specified via the
 ``__acl__`` attribute of an *instance* of a resource:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.security import Allow
-   from pyramid.security import Everyone
+    from pyramid.security import Allow
+    from pyramid.security import Everyone
 
-   class Blog(object):
-       pass
+    class Blog(object):
+        pass
 
-   blog = Blog()
+    blog = Blog()
 
-   blog.__acl__ = [
-           (Allow, Everyone, 'view'),
-           (Allow, 'group:editors', 'add'),
-           (Allow, 'group:editors', 'edit'),
-           ]
+    blog.__acl__ = [
+            (Allow, Everyone, 'view'),
+            (Allow, 'group:editors', 'add'),
+            (Allow, 'group:editors', 'edit'),
+            ]
 
 Whether an ACL is attached to a resource's class or an instance of the resource
 itself, the effect is the same.  It is useful to decorate individual resource
@@ -274,21 +274,21 @@ resource. This may allow the ACL to dynamically generate rules based on
 properties of the instance.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.security import Allow
-   from pyramid.security import Everyone
+    from pyramid.security import Allow
+    from pyramid.security import Everyone
 
-   class Blog(object):
-       def __acl__(self):
-           return [
-               (Allow, Everyone, 'view'),
-               (Allow, self.owner, 'edit'),
-               (Allow, 'group:editors', 'edit'),
-           ]
+    class Blog(object):
+        def __acl__(self):
+            return [
+                (Allow, Everyone, 'view'),
+                (Allow, self.owner, 'edit'),
+                (Allow, 'group:editors', 'edit'),
+            ]
 
-       def __init__(self, owner):
-           self.owner = owner
+        def __init__(self, owner):
+            self.owner = owner
 
 .. warning::
 
@@ -308,16 +308,16 @@ Elements of an ACL
 Here's an example ACL:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.security import Allow
-   from pyramid.security import Everyone
+    from pyramid.security import Allow
+    from pyramid.security import Everyone
 
-   __acl__ = [
-           (Allow, Everyone, 'view'),
-           (Allow, 'group:editors', 'add'),
-           (Allow, 'group:editors', 'edit'),
-           ]
+    __acl__ = [
+            (Allow, Everyone, 'view'),
+            (Allow, 'group:editors', 'add'),
+            (Allow, 'group:editors', 'edit'),
+            ]
 
 The example ACL indicates that the :data:`pyramid.security.Everyone`
 principal—a special system-defined principal indicating, literally, everyone—is
@@ -342,32 +342,32 @@ Each ACE in an ACL is processed by an authorization policy *in the order
 dictated by the ACL*.  So if you have an ACL like this:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.security import Allow
-   from pyramid.security import Deny
-   from pyramid.security import Everyone
+    from pyramid.security import Allow
+    from pyramid.security import Deny
+    from pyramid.security import Everyone
 
-   __acl__ = [
-       (Allow, Everyone, 'view'),
-       (Deny, Everyone, 'view'),
-       ]
+    __acl__ = [
+        (Allow, Everyone, 'view'),
+        (Deny, Everyone, 'view'),
+        ]
 
 The default authorization policy will *allow* everyone the view permission,
 even though later in the ACL you have an ACE that denies everyone the view
 permission.  On the other hand, if you have an ACL like this:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.security import Everyone
-   from pyramid.security import Allow
-   from pyramid.security import Deny
+    from pyramid.security import Everyone
+    from pyramid.security import Allow
+    from pyramid.security import Deny
 
-   __acl__ = [
-       (Deny, Everyone, 'view'),
-       (Allow, Everyone, 'view'),
-       ]
+    __acl__ = [
+        (Deny, Everyone, 'view'),
+        (Allow, Everyone, 'view'),
+        ]
 
 The authorization policy will deny everyone the view permission, even though
 later in the ACL, there is an ACE that allows everyone.
@@ -378,15 +378,15 @@ a number of different permission grants to a single ``group:editors`` group, we
 can collapse this into a single ACE, as below.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.security import Allow
-   from pyramid.security import Everyone
+    from pyramid.security import Allow
+    from pyramid.security import Everyone
 
-   __acl__ = [
-       (Allow, Everyone, 'view'),
-       (Allow, 'group:editors', ('add', 'edit')),
-       ]
+    __acl__ = [
+        (Allow, Everyone, 'view'),
+        (Allow, 'group:editors', ('add', 'edit')),
+        ]
 
 
 .. index::
@@ -449,21 +449,21 @@ particular resource, despite what inherited ACLs may say when the default
 authorization policy is in effect, might look like so:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.security import Allow
-   from pyramid.security import DENY_ALL
+    from pyramid.security import Allow
+    from pyramid.security import DENY_ALL
 
-   __acl__ = [ (Allow, 'fred', 'view'), DENY_ALL ]
+    __acl__ = [ (Allow, 'fred', 'view'), DENY_ALL ]
 
 Under the hood, the :data:`pyramid.security.DENY_ALL` ACE equals the
 following:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.security import ALL_PERMISSIONS
-   __acl__ = [ (Deny, Everyone, ALL_PERMISSIONS) ]
+    from pyramid.security import ALL_PERMISSIONS
+    __acl__ = [ (Deny, Everyone, ALL_PERMISSIONS) ]
 
 .. index::
    single: ACL inheritance
@@ -484,11 +484,11 @@ means two things: the root object in the resource tree must have a ``__name__``
 attribute and a ``__parent__`` attribute.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   class Blog(object):
-       __name__ = ''
-       __parent__ = None
+    class Blog(object):
+        __name__ = ''
+        __parent__ = None
 
 An object with a ``__parent__`` attribute and a ``__name__`` attribute is said
 to be *location-aware*.  Location-aware objects define a ``__parent__``
@@ -531,7 +531,7 @@ example:
 
 .. code-block:: text
 
-  $ PYRAMID_DEBUG_AUTHORIZATION=1 $VENV/bin/pserve myproject.ini
+    PYRAMID_DEBUG_AUTHORIZATION=1 $VENV/bin/pserve myproject.ini
 
 When any authorization takes place during a top-level view rendering, a message
 will be logged to the console (to stderr) about what ACE in which ACL permitted
@@ -542,11 +542,11 @@ the ``pyramid.debug_authorization`` key to ``true`` within the application's
 configuration section, e.g.:
 
 .. code-block:: ini
-  :linenos:
+    :linenos:
 
-  [app:main]
-  use = egg:MyProject
-  pyramid.debug_authorization = true
+    [app:main]
+    use = egg:MyProject
+    pyramid.debug_authorization = true
 
 With this debug flag turned on, the response sent to the browser will also
 contain security debugging information in its body.
@@ -597,23 +597,23 @@ use that :term:`userid` to augment the ``effective_principals`` with
 information about groups and other state for that user.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.authentication import AuthTktAuthenticationPolicy
+    from pyramid.authentication import AuthTktAuthenticationPolicy
 
-   class MyAuthenticationPolicy(AuthTktAuthenticationPolicy):
-       def authenticated_userid(self, request):
-           userid = self.unauthenticated_userid(request)
-           if userid:
-               if request.verify_userid_is_still_valid(userid):
-                   return userid
+    class MyAuthenticationPolicy(AuthTktAuthenticationPolicy):
+        def authenticated_userid(self, request):
+            userid = self.unauthenticated_userid(request)
+            if userid:
+                if request.verify_userid_is_still_valid(userid):
+                    return userid
 
-       def effective_principals(self, request):
-           principals = [Everyone]
-           userid = self.authenticated_userid(request)
-           if userid:
-               principals += [Authenticated, str(userid)]
-           return principals
+        def effective_principals(self, request):
+            principals = [Everyone]
+            userid = self.authenticated_userid(request)
+            if userid:
+                principals += [Authenticated, str(userid)]
+            return principals
 
 In most instances ``authenticated_userid`` and ``effective_principals`` are
 application-specific, whereas ``unauthenticated_userid``, ``remember``, and
@@ -635,59 +635,54 @@ vertical" of how your users authenticate.  Doing so is a matter of creating an
 instance of something that implements the following interface:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   class IAuthenticationPolicy(object):
-       """ An object representing a Pyramid authentication policy. """
+    class IAuthenticationPolicy(object):
+        """ An object representing a Pyramid authentication policy. """
 
-       def authenticated_userid(self, request):
-           """ Return the authenticated :term:`userid` or ``None`` if
-           no authenticated userid can be found. This method of the
-           policy should ensure that a record exists in whatever
-           persistent store is used related to the user (the user
-           should not have been deleted); if a record associated with
-           the current id does not exist in a persistent store, it
-           should return ``None``.
+        def authenticated_userid(self, request):
+            """ Return the authenticated :term:`userid` or ``None`` if
+            no authenticated userid can be found. This method of the
+            policy should ensure that a record exists in whatever
+            persistent store is used related to the user (the user
+            should not have been deleted); if a record associated with
+            the current id does not exist in a persistent store, it
+            should return ``None``.
+            """
 
-           """
+        def unauthenticated_userid(self, request):
+            """ Return the *unauthenticated* userid.  This method
+            performs the same duty as ``authenticated_userid`` but is
+            permitted to return the userid based only on data present
+            in the request; it needn't (and shouldn't) check any
+            persistent store to ensure that the user record related to
+            the request userid exists.
 
-       def unauthenticated_userid(self, request):
-           """ Return the *unauthenticated* userid.  This method
-           performs the same duty as ``authenticated_userid`` but is
-           permitted to return the userid based only on data present
-           in the request; it needn't (and shouldn't) check any
-           persistent store to ensure that the user record related to
-           the request userid exists.
+            This method is intended primarily a helper to assist the
+            ``authenticated_userid`` method in pulling credentials out
+            of the request data, abstracting away the specific headers,
+            query strings, etc that are used to authenticate the request.
+            """
 
-           This method is intended primarily a helper to assist the
-           ``authenticated_userid`` method in pulling credentials out
-           of the request data, abstracting away the specific headers,
-           query strings, etc that are used to authenticate the request.
+        def effective_principals(self, request):
+            """ Return a sequence representing the effective principals
+            typically including the :term:`userid` and any groups belonged
+            to by the current user, always including 'system' groups such
+            as ``pyramid.security.Everyone`` and
+            ``pyramid.security.Authenticated``.
+            """
 
-           """
+        def remember(self, request, userid, **kw):
+            """ Return a set of headers suitable for 'remembering' the
+            :term:`userid` named ``userid`` when set in a response.  An
+            individual authentication policy and its consumers can
+            decide on the composition and meaning of **kw.
+            """
 
-       def effective_principals(self, request):
-           """ Return a sequence representing the effective principals
-           typically including the :term:`userid` and any groups belonged
-           to by the current user, always including 'system' groups such
-           as ``pyramid.security.Everyone`` and
-           ``pyramid.security.Authenticated``.
-
-           """
-
-       def remember(self, request, userid, **kw):
-           """ Return a set of headers suitable for 'remembering' the
-           :term:`userid` named ``userid`` when set in a response.  An
-           individual authentication policy and its consumers can
-           decide on the composition and meaning of **kw.
-
-           """
-
-       def forget(self, request):
-           """ Return a set of headers suitable for 'forgetting' the
-           current user on subsequent requests.
-
-           """
+        def forget(self, request):
+            """ Return a set of headers suitable for 'forgetting' the
+            current user on subsequent requests.
+            """
 
 After you do so, you can pass an instance of such a class into the
 :class:`~pyramid.config.Configurator.set_authentication_policy` method at
@@ -798,10 +793,10 @@ For example:
 
 .. code-block:: python
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   config = Configurator()
-   config.set_csrf_storage_policy(MyCustomCSRFPolicy())
+    config = Configurator()
+    config.set_csrf_storage_policy(MyCustomCSRFPolicy())
 
 .. index::
    single: csrf.get_csrf_token
@@ -814,8 +809,8 @@ To get the current CSRF token, use the
 
 .. code-block:: python
 
-   from pyramid.csrf import get_csrf_token
-   token = get_csrf_token(request)
+    from pyramid.csrf import get_csrf_token
+    token = get_csrf_token(request)
 
 The ``get_csrf_token()`` method accepts a single argument: the request. It
 returns a CSRF *token* string. If ``get_csrf_token()`` or ``new_csrf_token()``
@@ -874,8 +869,8 @@ the user, and returns the token.
 
 .. code-block:: python
 
-   from pyramid.csrf import new_csrf_token
-   token = new_csrf_token(request)
+    from pyramid.csrf import new_csrf_token
+    token = new_csrf_token(request)
 
 .. note::
 
@@ -897,13 +892,13 @@ named ``X-CSRF-Token``.
 
 .. code-block:: python
 
-   from pyramid.csrf import check_csrf_token
+    from pyramid.csrf import check_csrf_token
 
-   def myview(request):
-       # Require CSRF Token
-       check_csrf_token(request)
+    def myview(request):
+        # Require CSRF Token
+        check_csrf_token(request)
 
-       # ...
+        # ...
 
 .. _auto_csrf_checking:
 
@@ -920,10 +915,10 @@ For example:
 
 .. code-block:: python
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   config = Configurator()
-   config.set_default_csrf_options(require_csrf=True)
+    config = Configurator()
+    config.set_default_csrf_options(require_csrf=True)
 
 CSRF checking may be explicitly enabled or disabled on a per-view basis using
 the ``require_csrf`` view option. A value of ``True`` or ``False`` will
@@ -931,9 +926,9 @@ override the default set by ``set_default_csrf_options``. For example:
 
 .. code-block:: python
 
-   @view_config(route_name='hello', require_csrf=False)
-   def myview(request):
-       # ...
+    @view_config(route_name='hello', require_csrf=False)
+    def myview(request):
+        # ...
 
 When CSRF checking is active, the token and header used to find the
 supplied CSRF token will be ``csrf_token`` and ``X-CSRF-Token``, respectively,
@@ -968,9 +963,9 @@ include ``check_csrf=True`` as a view predicate. See
 
 .. code-block:: python
 
-    @view_config(request_method='POST', check_csrf=True, ...)
-    def myview(request):
-        ...
+     @view_config(request_method='POST', check_csrf=True, ...)
+     def myview(request):
+         # ...
 
 .. note::
    A mismatch of a CSRF token is treated like any other predicate miss, and the
