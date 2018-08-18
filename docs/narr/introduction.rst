@@ -104,12 +104,12 @@ Configure applications with decorators
 
 .. code-block:: python
 
-   from pyramid.view import view_config
-   from pyramid.response import Response
+    from pyramid.view import view_config
+    from pyramid.response import Response
 
-   @view_config(route_name='fred')
-   def fred_view(request):
-       return Response('fred')
+    @view_config(route_name='fred')
+    def fred_view(request):
+        return Response('fred')
 
 However, using :app:`Pyramid` configuration decorators does not change your code. It remains easy to extend, test, or reuse. You can test your code as if the decorators were not there. You can instruct the framework to ignore some decorators. You can even use an imperative style to write your configuration, skipping decorators entirely.
 
@@ -183,34 +183,34 @@ A fundamental task for any framework is to map URLs to code. In :app:`Pyramid`, 
 Here's a view callable defined as a function:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
-   from pyramid.view import view_config
+    from pyramid.response import Response
+    from pyramid.view import view_config
 
-   @view_config(route_name='aview')
-   def aview(request):
-       return Response('one')
+    @view_config(route_name='aview')
+    def aview(request):
+        return Response('one')
 
 Here's a few views defined as methods of a class instead:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
-   from pyramid.view import view_config
+    from pyramid.response import Response
+    from pyramid.view import view_config
 
-   class AView(object):
-       def __init__(self, request):
-           self.request = request
+    class AView(object):
+        def __init__(self, request):
+            self.request = request
 
-       @view_config(route_name='view_one')
-       def view_one(self):
-           return Response('one')
+        @view_config(route_name='view_one')
+        def view_one(self):
+            return Response('one')
 
-       @view_config(route_name='view_two')
-       def view_two(self):
-           return Response('two')
+        @view_config(route_name='view_two')
+        def view_two(self):
+            return Response('two')
 
 .. seealso::
 
