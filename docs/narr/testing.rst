@@ -102,17 +102,17 @@ isolated request for the duration of a single test.  Here's an example of using
 this feature:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   import unittest
-   from pyramid import testing
+    import unittest
+    from pyramid import testing
 
-   class MyTest(unittest.TestCase):
-       def setUp(self):
-           self.config = testing.setUp()
+    class MyTest(unittest.TestCase):
+        def setUp(self):
+            self.config = testing.setUp()
 
-       def tearDown(self):
-           testing.tearDown()
+        def tearDown(self):
+            testing.tearDown()
 
 The above will make sure that :func:`~pyramid.threadlocal.get_current_registry`
 called within a test case method of ``MyTest`` will return the
@@ -131,18 +131,18 @@ can pass a :term:`request` object into the :func:`pyramid.testing.setUp` within
 the ``setUp`` method of your test:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   import unittest
-   from pyramid import testing
+    import unittest
+    from pyramid import testing
 
-   class MyTest(unittest.TestCase):
-       def setUp(self):
-           request = testing.DummyRequest()
-           self.config = testing.setUp(request=request)
+    class MyTest(unittest.TestCase):
+        def setUp(self):
+            request = testing.DummyRequest()
+            self.config = testing.setUp(request=request)
 
-       def tearDown(self):
-           testing.tearDown()
+        def tearDown(self):
+            testing.tearDown()
 
 If you pass a :term:`request` object into :func:`pyramid.testing.setUp` within
 your test case's ``setUp``, any test method attached to the ``MyTest`` test
@@ -165,17 +165,17 @@ under test and :func:`pyramid.testing.tearDown` afterwards.
 This style is useful for small self-contained tests. For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   import unittest
+    import unittest
 
-   class MyTest(unittest.TestCase):
+    class MyTest(unittest.TestCase):
 
-       def test_my_function(self):
-           from pyramid import testing
-           with testing.testConfig() as config:
-               config.add_route('bar', '/bar/{id}')
-               my_function_which_needs_route_bar()
+        def test_my_function(self):
+            from pyramid import testing
+            with testing.testConfig() as config:
+                config.add_route('bar', '/bar/{id}')
+                my_function_which_needs_route_bar()
 
 What?
 ~~~~~
@@ -208,14 +208,14 @@ For example, let's imagine you want to unit test a :app:`Pyramid` view
 function.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.httpexceptions import HTTPForbidden
+    from pyramid.httpexceptions import HTTPForbidden
 
-   def view_fn(request):
-       if request.has_permission('edit'):
-           raise HTTPForbidden
-       return {'greeting':'hello'}
+    def view_fn(request):
+        if request.has_permission('edit'):
+            raise HTTPForbidden
+        return {'greeting':'hello'}
 
 .. note::
 
@@ -243,35 +243,35 @@ without needing to invoke the actual application configuration implied by its
 :class:`unittest.TestCase` that used the testing API.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   import unittest
-   from pyramid import testing
+    import unittest
+    from pyramid import testing
 
-   class MyTest(unittest.TestCase):
-       def setUp(self):
-           self.config = testing.setUp()
+    class MyTest(unittest.TestCase):
+        def setUp(self):
+            self.config = testing.setUp()
 
-       def tearDown(self):
-           testing.tearDown()
-       
-       def test_view_fn_forbidden(self):
-           from pyramid.httpexceptions import HTTPForbidden
-           from my.package import view_fn
-           self.config.testing_securitypolicy(userid='hank', 
-                                              permissive=False)
-           request = testing.DummyRequest()
-           request.context = testing.DummyResource()
-           self.assertRaises(HTTPForbidden, view_fn, request)
+        def tearDown(self):
+            testing.tearDown()
 
-       def test_view_fn_allowed(self):
-           from my.package import view_fn
-           self.config.testing_securitypolicy(userid='hank', 
-                                              permissive=True)
-           request = testing.DummyRequest()
-           request.context = testing.DummyResource()
-           response = view_fn(request)
-           self.assertEqual(response, {'greeting':'hello'})
+        def test_view_fn_forbidden(self):
+            from pyramid.httpexceptions import HTTPForbidden
+            from my.package import view_fn
+            self.config.testing_securitypolicy(userid='hank',
+                                               permissive=False)
+            request = testing.DummyRequest()
+            request.context = testing.DummyResource()
+            self.assertRaises(HTTPForbidden, view_fn, request)
+
+        def test_view_fn_allowed(self):
+            from my.package import view_fn
+            self.config.testing_securitypolicy(userid='hank',
+                                               permissive=True)
+            request = testing.DummyRequest()
+            request.context = testing.DummyResource()
+            response = view_fn(request)
+            self.assertEqual(response, {'greeting':'hello'})
            
 In the above example, we create a ``MyTest`` test case that inherits from
 :class:`unittest.TestCase`.  If it's in our :app:`Pyramid` application, it will
