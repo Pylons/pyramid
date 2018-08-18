@@ -134,7 +134,7 @@ included in the body of the response:
 
 .. code-block:: text
 
-  URL http://localhost:6543/?name=alice with name: alice
+    URL http://localhost:6543/?name=alice with name: alice
 
 Finally we set the response's content type, and return the Response.
 
@@ -264,7 +264,7 @@ Chameleon as a :term:`renderer` in our Pyramid application:
 
 .. code-block:: bash
 
-    $ $VENV/bin/pip install pyramid_chameleon
+    $VENV/bin/pip install pyramid_chameleon
 
 With the package installed, we can include the template bindings into our
 configuration in ``app.py``:
@@ -310,7 +310,7 @@ Jinja2 as a :term:`renderer` in our Pyramid applications:
 
 .. code-block:: bash
 
-    $ $VENV/bin/pip install pyramid_jinja2
+    $VENV/bin/pip install pyramid_jinja2
 
 With the package installed, we can include the template bindings into our
 configuration:
@@ -505,13 +505,13 @@ First you'll need to install cookiecutter.
 
 .. code-block:: bash
 
-    $ $VENV/bin/pip install cookiecutter
+    $VENV/bin/pip install cookiecutter
 
 Let's use the cookiecutter ``pyramid-cookiecutter-starter`` to create a starter Pyramid project in the current directory, entering values at the prompts as shown below for the following command.
 
 .. code-block:: bash
 
-    $ $VENV/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
+    $VENV/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
 
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
@@ -532,15 +532,15 @@ We then run through the following commands.
 .. code-block:: bash
 
     # Change directory into your newly created project.
-    $ cd hello_world
+    cd hello_world
     # Create a new virtual environment...
-    $ python3 -m venv env
+    python3 -m venv env
     # ...where we upgrade packaging tools...
-    $ env/bin/pip install --upgrade pip setuptools
+    env/bin/pip install --upgrade pip setuptools
     # ...and into which we install our project and its testing requirements.
-    $ env/bin/pip install -e ".[testing]"
+    env/bin/pip install -e ".[testing]"
     # Reset our environment variable for a new virtual environment.
-    $ export VENV=~/hello_world/env
+    export VENV=~/hello_world/env
 
 We are moving in the direction of a full-featured Pyramid project, with a
 proper setup for Python standards (packaging) and Pyramid configuration. This
@@ -548,7 +548,7 @@ includes a new way of running your application:
 
 .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini
+    $VENV/bin/pserve development.ini
 
 Let's look at ``pserve`` and configuration in more depth.
 
@@ -575,7 +575,7 @@ the server when they change:
 
 .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini --reload
+    $VENV/bin/pserve development.ini --reload
 
 The ``pserve`` command has a number of other options and operations. Most of
 the work, though, comes from your project's wiring, as expressed in the
@@ -655,7 +655,7 @@ It was installed when you previously ran:
 
 .. code-block:: bash
 
-    $ $VENV/bin/pip install -e ".[testing]"
+    $VENV/bin/pip install -e ".[testing]"
 
 The ``pyramid_debugtoolbar`` package is a Pyramid add-on, which means we need
 to include its configuration into our web application. The cookiecutter already took care of this for us in its ``development.ini`` using the ``pyramid.includes`` facility:
@@ -702,7 +702,7 @@ We already installed the test requirements when we ran the command ``$VENV/bin/p
 
 .. code-block:: bash
 
-    $ $VENV/bin/py.test --cov --cov-report=term-missing
+    $VENV/bin/py.test --cov --cov-report=term-missing
 
 This yields the following output.
 
@@ -858,8 +858,8 @@ Pyramid and SQLAlchemy are great friends. That friendship includes a cookiecutte
 
 .. code-block:: bash
 
-    $ cd ~
-    $ env/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout master
+    cd ~
+    env/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout master
 
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
@@ -875,15 +875,15 @@ We then run through the following commands as before.
 .. code-block:: bash
 
     # Change directory into your newly created project.
-    $ cd sqla_demo
+    cd sqla_demo
     # Create a new virtual environment...
-    $ python3 -m venv env
+    python3 -m venv env
     # ...where we upgrade packaging tools...
-    $ env/bin/pip install --upgrade pip setuptools
+    env/bin/pip install --upgrade pip setuptools
     # ...and into which we install our project and its testing requirements.
-    $ env/bin/pip install -e ".[testing]"
+    env/bin/pip install -e ".[testing]"
     # Reset our environment variable for a new virtual environment.
-    $ export VENV=~/sqla_demo/env
+    export VENV=~/sqla_demo/env
 
 We now have a working sample SQLAlchemy application with all dependencies
 installed. The sample project provides a console script to initialize a SQLite
@@ -891,8 +891,8 @@ database with tables. Let's run it, then start the application:
 
 .. code-block:: bash
 
-  $ $VENV/bin/initialize_sqla_demo_db development.ini
-  $ $VENV/bin/pserve development.ini
+    $VENV/bin/initialize_sqla_demo_db development.ini
+    $VENV/bin/pserve development.ini
 
 The ORM eases the mapping of database structures into a programming language.
 SQLAlchemy uses "models" for this mapping. The cookiecutter generated a sample
