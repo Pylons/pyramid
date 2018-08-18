@@ -45,14 +45,14 @@ You can configure this session factory in your :app:`Pyramid` application by
 using the :meth:`pyramid.config.Configurator.set_session_factory` method.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.session import SignedCookieSessionFactory
-   my_session_factory = SignedCookieSessionFactory('itsaseekreet')
+    from pyramid.session import SignedCookieSessionFactory
+    my_session_factory = SignedCookieSessionFactory('itsaseekreet')
 
-   from pyramid.config import Configurator
-   config = Configurator()
-   config.set_session_factory(my_session_factory)
+    from pyramid.config import Configurator
+    config = Configurator()
+    config.set_session_factory(my_session_factory)
 
 .. warning::
 
@@ -81,19 +81,19 @@ session objects provided by the session factory via the ``session`` attribute
 of any :term:`request` object.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
+    from pyramid.response import Response
 
-   def myview(request):
-       session = request.session
-       if 'abc' in session:
-           session['fred'] = 'yes'
-       session['abc'] = '123'
-       if 'fred' in session:
-           return Response('Fred was in the session')
-       else:
-           return Response('Fred was not in the session')
+    def myview(request):
+        session = request.session
+        if 'abc' in session:
+            session['fred'] = 'yes'
+        session['abc'] = '123'
+        if 'fred' in session:
+            return Response('Fred was in the session')
+        else:
+            return Response('Fred was not in the session')
 
 The first time this view is invoked produces ``Fred was not in the session``.
 Subsequent invocations produce ``Fred was in the session``, assuming of course
@@ -223,7 +223,7 @@ method:
 
 .. code-block:: python
 
-   request.session.flash('mymessage')
+    request.session.flash('mymessage')
 
 The ``flash()`` method appends a message to a flash queue, creating the queue
 if necessary.
@@ -246,7 +246,7 @@ represents the default flash message queue.
 
 .. code-block:: python
 
-   request.session.flash(msg, 'myappsqueue')
+    request.session.flash(msg, 'myappsqueue')
 
 The ``allow_duplicate`` argument defaults to ``True``.  If this is ``False``,
 and you attempt to add a message value which is already present in the queue,
