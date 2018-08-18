@@ -45,8 +45,8 @@ Open the ``tutorial/tests.py`` module, and edit it such that it appears as
 follows:
 
 .. literalinclude:: src/tests/tutorial/tests.py
-   :linenos:
-   :language: python
+    :linenos:
+    :language: python
 
 Running the tests
 =================
@@ -60,13 +60,13 @@ On UNIX:
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test -q
+    $VENV/bin/py.test -q
 
 On Windows:
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\py.test -q
+    %VENV%\Scripts\py.test -q
 
 The expected result should look like the following:
 
