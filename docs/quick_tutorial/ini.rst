@@ -39,44 +39,44 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r package ini; cd ini
+       cd ..; cp -r package ini; cd ini
 
 #. Our ``ini/setup.py`` needs a setuptools "entry point" in the ``setup()``
    function:
 
    .. literalinclude:: ini/setup.py
-    :linenos:
+       :linenos:
 
 #. We can now install our project, thus generating (or re-generating) an "egg"
    at ``ini/tutorial.egg-info``:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pip install -e .
+       $VENV/bin/pip install -e .
 
 #. Let's make a file ``ini/development.ini`` for our configuration:
 
    .. literalinclude:: ini/development.ini
-    :language: ini
-    :linenos:
+       :language: ini
+       :linenos:
 
 #. We can refactor our startup code from the previous step's ``app.py`` into
    ``ini/tutorial/__init__.py``:
 
    .. literalinclude:: ini/tutorial/__init__.py
-    :linenos:
+       :linenos:
 
 #. Now that ``ini/tutorial/app.py`` isn't used, let's remove it:
 
    .. code-block:: bash
 
-    $ rm tutorial/app.py
+       rm tutorial/app.py
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini --reload
+       $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/.
 
