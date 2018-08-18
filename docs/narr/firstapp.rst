@@ -29,13 +29,13 @@ On UNIX:
 
 .. code-block:: bash
 
-   $ $VENV/bin/python helloworld.py
+    $VENV/bin/python helloworld.py
 
 On Windows:
 
 .. code-block:: doscon
 
-   c:\> %VENV%\Scripts\python helloworld.py
+    %VENV%\Scripts\python helloworld.py
 
 This command will not return and nothing will be printed to the console. When
 port 8080 is visited by a browser on the URL ``/hello/world``, the server will
