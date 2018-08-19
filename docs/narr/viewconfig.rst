@@ -134,7 +134,7 @@ Non-Predicate Arguments
   When the renderer is a path—although a path is usually just a simple relative
   pathname (e.g., ``templates/foo.pt``, implying that a template named "foo.pt"
   is in the "templates" directory relative to the directory of the current
-  :term:`package`)—the path can be absolute, starting with a slash on UNIX or a
+  :term:`package`)—the path can be absolute, starting with a slash on Unix or a
   drive letter prefix on Windows.  The path can alternatively be a :term:`asset
   specification` in the form ``some.dotted.package_name:relative/path``, making
   it possible to address template assets which live in a separate package.

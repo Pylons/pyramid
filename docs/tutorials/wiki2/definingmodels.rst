@@ -53,7 +53,7 @@ the newly added dependency distribution.
 Make sure your current working directory is the root of the project (the
 directory in which ``setup.py`` lives) and execute the following command.
 
-On UNIX:
+On Unix:
 
 .. code-block:: bash
 
@@ -165,7 +165,7 @@ Migrate the database with Alembic
 
 Now that we have written our models, we need to modify the database schema to reflect the changes to our code. Let's generate a new revision, then upgrade the database to the latest revision (head).
 
-On UNIX:
+On Unix:
 
 .. code-block:: bash
 

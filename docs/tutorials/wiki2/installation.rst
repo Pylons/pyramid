@@ -35,9 +35,9 @@ We will use a :term:`cookiecutter` to create a Python package project from a Pyt
 Generate a Pyramid project from a cookiecutter
 ----------------------------------------------
 
-We will create a Pyramid project in your home directory for UNIX or at the root for Windows. It is assumed you know the path to where you installed ``cookiecutter``. Issue the following commands and override the defaults in the prompts as follows.
+We will create a Pyramid project in your home directory for Unix or at the root for Windows. It is assumed you know the path to where you installed ``cookiecutter``. Issue the following commands and override the defaults in the prompts as follows.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
@@ -67,7 +67,7 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
 Change directory into your newly created project
 ------------------------------------------------
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
@@ -87,7 +87,7 @@ Set and use a ``VENV`` environment variable
 
 We will set the ``VENV`` environment variable to the absolute path of the virtual environment, and use it going forward.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
@@ -105,7 +105,7 @@ On Windows
 Create a virtual environment
 ----------------------------
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
@@ -133,7 +133,7 @@ Python 3.6:
 Upgrade packaging tools in the virtual environment
 --------------------------------------------------
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
@@ -155,7 +155,7 @@ Installing the project in development mode
 
 In order to do development on the project easily, you must "register" the project as a development egg in your workspace. We will install testing requirements at the same time. We do so with the following command.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
@@ -207,7 +207,7 @@ We use :term:`Alembic` to manage our database initialization and migrations.
 
 Generate your first revision.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
@@ -248,7 +248,7 @@ The output to your console should be something like this:
 
 Upgrade to that revision.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
@@ -303,7 +303,7 @@ Load default data
 
 Load default data into the database using a :term:`console script`. Type the following command, making sure you are still in the ``tutorial`` directory (the directory with a ``development.ini`` in it):
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
@@ -345,7 +345,7 @@ requirements, you may run the tests for the project. The following commands
 provide options to py.test that specify the module for which its tests shall be
 run, and to run py.test in quiet mode.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
@@ -378,7 +378,7 @@ tests.
 We've already installed the ``pytest-cov`` package into our virtual
 environment, so we can run the tests with coverage.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
@@ -434,7 +434,7 @@ These configuration files are ``pytest.ini`` and ``.coveragerc``, located at
 the root of your package. Without these defaults, we would need to specify the
 path to the module on which we want to run tests and coverage.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
@@ -465,7 +465,7 @@ Start the application
 Start the application. See :ref:`what_is_this_pserve_thing` for more
 information on ``pserve``.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash

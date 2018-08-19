@@ -1021,12 +1021,12 @@ Glossary
      A package which logs Pyramid application exception (error) information
      to a standard Python logger.  This add-on is most useful when
      used in production applications, because the logger can be configured to
-     log to a file, to UNIX syslog, to the Windows Event Log, or even to
+     log to a file, to Unix syslog, to the Windows Event Log, or even to
      email. See its `documentation
      <https://docs.pylonsproject.org/projects/pyramid_exclog/en/latest/>`_.
 
    console script
-     A script written to the ``bin`` (on UNIX, or ``Scripts`` on Windows)
+     A script written to the ``bin`` (on Unix, or ``Scripts`` on Windows)
      directory of a Python installation or :term:`virtual environment` as the
      result of running ``pip install`` or ``pip install -e .``.
 
@@ -1075,14 +1075,14 @@ Glossary
       :class:`pyramid.interfaces.IAssetDescriptor`.
 
    Waitress
-      A :term:`WSGI` server that runs on UNIX and Windows under Python 2.7+
+      A :term:`WSGI` server that runs on Unix and Windows under Python 2.7+
       and Python 3.3+.  Projects generated via Pyramid cookiecutters use
       Waitress as a WGSI server.  See
       https://docs.pylonsproject.org/projects/waitress/en/latest/ for detailed
       information.
 
    Green Unicorn
-      Aka ``gunicorn``, a fast :term:`WSGI` server that runs on UNIX under
+      Aka ``gunicorn``, a fast :term:`WSGI` server that runs on Unix under
       Python 2.6+ or Python 3.1+.  See http://gunicorn.org/ for detailed 
       information.
 
@@ -1131,7 +1131,7 @@ Glossary
       ``pyvenv`` command for `creating virtual environments on Python 3.4 and
       3.5
       <https://packaging.python.org/tutorials/installing-packages/#creating-virtual-environments>`_,
-      but it was deprecated in 3.6 in favor of ``python3 -m venv`` on UNIX or
+      but it was deprecated in 3.6 in favor of ``python3 -m venv`` on Unix or
       ``python -m venv`` on Windows, which is backward compatible on Python
       3.3 and greater.
 

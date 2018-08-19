@@ -256,10 +256,10 @@ In order for the commands related to working with ``gettext`` translation files
 to work properly, you will need to have :term:`Lingua` and :term:`Gettext`
 installed into the same environment in which :app:`Pyramid` is installed.
 
-Installation on UNIX
+Installation on Unix
 ++++++++++++++++++++
 
-Gettext is often already installed on UNIX systems. You can check if it is
+Gettext is often already installed on Unix systems. You can check if it is
 installed by testing if the ``msgfmt`` command is available. If it is not
 available you can install it through the packaging system from your OS; the
 package name is almost always ``gettext``. For example on a Debian or Ubuntu

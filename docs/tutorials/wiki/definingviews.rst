@@ -64,7 +64,7 @@ the newly added dependency distribution.
 Make sure your current working directory is the root of the project (the
 directory in which ``setup.py`` lives) and execute the following command.
 
-On UNIX:
+On Unix:
 
 .. code-block:: bash
 

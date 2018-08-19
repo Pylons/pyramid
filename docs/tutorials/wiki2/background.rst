@@ -11,7 +11,7 @@ familiar to someone with SQL database experience.  It uses
 URLs to code.  It can also be followed by people without any prior
 Python web framework experience.
 
-To code along with this tutorial, the developer will need a UNIX
+To code along with this tutorial, the developer will need a Unix
 machine with development tools (Mac OS X with XCode, any Linux or BSD
 variant, etc.) *or* a Windows system of any kind.
 

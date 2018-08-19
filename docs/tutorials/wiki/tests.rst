@@ -56,7 +56,7 @@ We can run these tests by using ``py.test`` similarly to how we did in
 already been satisfied and ``py.test`` and coverage have already been
 configured, so we can jump right to running tests.
 
-On UNIX:
+On Unix:
 
 .. code-block:: bash
 

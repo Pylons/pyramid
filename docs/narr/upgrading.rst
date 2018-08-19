@@ -197,7 +197,7 @@ deprecation warnings won't be executed.
 
 In this circumstance, you can start your application interactively under a
 server run with the ``PYTHONWARNINGS`` environment variable set to ``default``.
-On UNIX, you can do that via:
+On Unix, you can do that via:
 
 .. code-block:: bash
 

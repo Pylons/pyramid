@@ -24,8 +24,8 @@ the following sections.
     As of this writing, :app:`Pyramid` is tested against Python 2.7,
     Python 3.4, Python 3.5, Python 3.6, and PyPy.
 
-:app:`Pyramid` is known to run on all popular UNIX-like systems such as Linux,
-Mac OS X, and FreeBSD, as well as on Windows platforms.  It is also known to
+:app:`Pyramid` is known to run on all popular Unix-like systems such as Linux,
+macOS, and FreeBSD, as well as on Windows platforms.  It is also known to
 run on :term:`PyPy` (1.9+).
 
 :app:`Pyramid` installation does not require the compilation of any C code.
@@ -67,12 +67,12 @@ If you use an installer for your Python, then you can skip to the section
 
 .. _if-you-don-t-yet-have-a-python-interpreter-unix:
 
-If You Don't Yet Have a Python Interpreter (UNIX)
+If You Don't Yet Have a Python Interpreter (Unix)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If your system doesn't have a Python interpreter, and you're on UNIX, you can
+If your system doesn't have a Python interpreter, and you're on Unix, you can
 either install Python using your operating system's package manager *or* you
-can install Python from source fairly easily on any UNIX system that has
+can install Python from source fairly easily on any Unix system that has
 development tools.
 
 .. seealso:: See the official Python documentation :ref:`Using Python on Unix
@@ -162,12 +162,12 @@ application, rather than being installed system wide.
 
 
 .. index::
-   single: installing on UNIX
+   single: installing on Unix
    single: installing on Mac OS X
 
 .. _installing_unix:
 
-Installing :app:`Pyramid` on a UNIX System
+Installing :app:`Pyramid` on a Unix System
 ------------------------------------------
 
 After installing Python as described previously in :ref:`for-mac-os-x-users` or

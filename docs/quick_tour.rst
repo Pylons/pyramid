@@ -56,7 +56,7 @@ For Windows:
 Of course Pyramid runs fine on Python 2.7+, as do the examples in this *Quick
 Tour*. We're showing Python 3 for simplicity. (Pyramid had production support
 for Python 3 in October 2011.) Also for simplicity, the remaining examples will
-show only UNIX commands.
+show only Unix commands.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial section on Requirements <qtut_requirements>`,

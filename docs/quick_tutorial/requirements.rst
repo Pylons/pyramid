@@ -33,7 +33,7 @@ This *Quick Tutorial* is based on:
   projects* (a directory with packaging information and *Python packages* of
   working code.)
 
-* **Unix commands**. Commands in this tutorial use UNIX syntax and paths.
+* **Unix commands**. Commands in this tutorial use Unix syntax and paths.
   Windows users should adjust commands accordingly.
 
 .. note::
@@ -89,11 +89,11 @@ will reside as we proceed through the tutorial:
                 │   └── app.py
                 └── setup.py
 
-For Linux, the commands to do so are as follows:
+For macOS and Linux, the commands to do so are as follows:
 
 .. code-block:: bash
 
-    # Mac and Linux
+    # macOS and Linux
     cd ~
     mkdir -p projects/quick_tutorial
     cd projects/quick_tutorial
@@ -129,7 +129,7 @@ environment`. We set an environment variable to save typing later.
 
 .. code-block:: bash
 
-    # Mac and Linux
+    # macOS and Linux
     export VENV=~/projects/quick_tutorial/env
 
 .. code-block:: doscon
@@ -150,7 +150,7 @@ environment variable.
 
 .. code-block:: bash
 
-    # Mac and Linux
+    # macOS and Linux
     python3 -m venv $VENV
 
 .. code-block:: doscon
@@ -171,7 +171,7 @@ time of its release.
 
 .. code-block:: bash
 
-    # Mac and Linux
+    # macOS and Linux
     $VENV/bin/pip install --upgrade pip setuptools
 
 .. code-block:: doscon
@@ -193,7 +193,7 @@ part is pretty easy. We'll also install a WSGI server, Waitress.
 
 .. parsed-literal::
 
-    # Mac and Linux
+    # macOS and Linux
     $VENV/bin/pip install "pyramid==\ |release|\ " waitress
 
     # Windows

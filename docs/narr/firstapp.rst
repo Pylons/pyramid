@@ -25,7 +25,7 @@ When this code is inserted into a Python script named ``helloworld.py`` and
 executed by a Python interpreter which has the :app:`Pyramid` software
 installed, an HTTP server is started on TCP port 8080.
 
-On UNIX:
+On Unix:
 
 .. code-block:: bash
 

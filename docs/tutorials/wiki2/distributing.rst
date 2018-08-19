@@ -9,7 +9,7 @@ using the ``setup.py sdist`` command.  The following commands assume your
 current working directory contains the ``tutorial`` package and the
 ``setup.py`` file.
 
-On UNIX:
+On Unix:
 
 .. code-block:: bash
 

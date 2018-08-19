@@ -103,7 +103,7 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
 
 We then run through the following commands.
 
-On UNIX:
+On Unix:
 
 .. code-block:: bash
 
@@ -188,7 +188,7 @@ in the ``bin`` (or ``Scripts`` on Windows) directory of your virtual Python
 environment.  Your terminal's current working directory *must* be the newly
 created project directory.
 
-On UNIX:
+On Unix:
 
 .. code-block:: bash
 
@@ -200,7 +200,7 @@ Or on Windows:
 
     %VENV%\Scripts\pip install -e .
 
-Elided output from a run of this command on UNIX is shown below:
+Elided output from a run of this command on Unix is shown below:
 
 .. code-block:: bash
 
@@ -226,7 +226,7 @@ Running the Tests for Your Application
 To run unit tests for your application, you must first install the testing
 dependencies.
 
-On UNIX:
+On Unix:
 
 .. code-block:: bash
 
@@ -242,7 +242,7 @@ Once the testing requirements are installed, then you can run the tests using
 the ``py.test`` command that was just installed in the ``bin`` directory of
 your virtual environment.
 
-On UNIX:
+On Unix:
 
 .. code-block:: bash
 
@@ -254,7 +254,7 @@ On Windows:
 
     %VENV%\Scripts\py.test -q
 
-Here's sample output from a test run on UNIX:
+Here's sample output from a test run on Unix:
 
 .. code-block:: bash
 
@@ -307,7 +307,7 @@ Once a project is installed for development, you can run the application it
 represents using the ``pserve`` command against the generated configuration
 file.  In our case, this file is named ``development.ini``.
 
-On UNIX:
+On Unix:
 
 .. code-block:: bash
 
@@ -319,7 +319,7 @@ On Windows:
 
     %VENV%\Scripts\pserve development.ini
 
-Here's sample output from a run of ``pserve`` on UNIX:
+Here's sample output from a run of ``pserve`` on Unix:
 
 .. code-block:: bash
 
@@ -394,7 +394,7 @@ module your project uses will cause the server to restart.  This typically
 makes development easier, as changes to Python code made within a
 :app:`Pyramid` application is not put into effect until the server restarts.
 
-For example, on UNIX:
+For example, on Unix:
 
 .. code-block:: text
 

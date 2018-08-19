@@ -94,7 +94,7 @@ Running the tests
 
 We can run these tests similarly to how we did in :ref:`running_tests`, but first delete the SQLite database ``tutorial.sqlite``. If you do not delete the database, then you will see an integrity error when running the tests.
 
-On UNIX:
+On Unix:
 
 .. code-block:: bash
 

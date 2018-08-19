@@ -52,7 +52,7 @@ directory containing the file which defines the view configuration. In this
 case, this is the directory containing the file that defines the
 ``sample_view`` function.  Although a renderer path is usually just a simple
 relative pathname, a path named as a renderer can be absolute, starting with a
-slash on UNIX or a drive letter prefix on Windows. The path can alternatively
+slash on Unix or a drive letter prefix on Windows. The path can alternatively
 be an :term:`asset specification` in the form
 ``some.dotted.package_name:relative/path``. This makes it possible to address
 template assets which live in another package.  For example:
@@ -317,7 +317,7 @@ Similar renderer configuration can be done imperatively.  See
     See also :ref:`built_in_renderers`.
 
 Although a renderer path is usually just a simple relative pathname, a path
-named as a renderer can be absolute, starting with a slash on UNIX or a drive
+named as a renderer can be absolute, starting with a slash on Unix or a drive
 letter prefix on Windows.  The path can alternatively be an :term:`asset
 specification` in the form ``some.dotted.package_name:relative/path``, making
 it possible to address template assets which live in another package.
