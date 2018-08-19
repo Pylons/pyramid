@@ -407,7 +407,7 @@ various other clients.  In :app:`Pyramid`, form submission handling logic is
 always part of a :term:`view`.  For a general overview of how to handle form
 submission data using the :term:`WebOb` API, see :ref:`webob_chapter` and
 `"Query and POST variables" within the WebOb documentation
-<http://docs.webob.org/en/latest/reference.html#query-post-variables>`_.
+<https://docs.pylonsproject.org/projects/webob/en/latest/reference.html#query-post-variables>`_.
 :app:`Pyramid` defers to WebOb for its request and response implementations,
 and handling form submission data is a property of the request implementation. 
 Understanding WebOb's request API is the key to understanding how to process

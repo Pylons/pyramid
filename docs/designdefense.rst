@@ -1689,7 +1689,7 @@ some sort of monolithic thing, and a lot of its software is usable
 externally.  And while it's not really the job of this document to defend it,
 Zope has been around for over 10 years and has an incredibly large, active
 community.  If you don't believe this,
-http://pypi-ranking.info/author is an eye-opening reality
+https://pypi.org/search/?q=zope is an eye-opening reality
 check.
 
 Love Simplicity

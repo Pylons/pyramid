@@ -128,7 +128,7 @@ you can see DeprecationWarnings printed to the console when the tests run.
 
 The ``-Wd`` argument tells Python to print deprecation warnings to the console.
 See `the Python -W flag documentation
-<https://docs.python.org/2/using/cmdline.html#cmdoption-W>`_ for more
+<https://docs.python.org/2/using/cmdline.html#cmdoption-w>`_ for more
 information.
 
 As your tests run, deprecation warnings will be printed to the console
@@ -218,7 +218,7 @@ as explained in :ref:`testing_under_new_release`.
 See `the PYTHONWARNINGS environment variable documentation
 <https://docs.python.org/2/using/cmdline.html#envvar-PYTHONWARNINGS>`_ or `the
 Python -W flag documentation
-<https://docs.python.org/2/using/cmdline.html#cmdoption-W>`_ for more
+<https://docs.python.org/2/using/cmdline.html#cmdoption-w>`_ for more
 information.
 
 Upgrading to the very latest Pyramid release

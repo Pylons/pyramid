@@ -26,7 +26,7 @@ Hosting an Application Under a URL Prefix
 ``http://example.com/``).
 
 If you use a "pure Python" environment, this functionality can be provided by
-`rutter <http://rutter.readthedocs.io/en/latest/>`_, forming a "composite"
+`rutter <https://rutter.readthedocs.io/en/latest/>`_, forming a "composite"
 WSGI application.  Alternatively, you can use :term:`mod_wsgi` to serve your
 application, which handles this virtual hosting translation for you "under the
 hood".

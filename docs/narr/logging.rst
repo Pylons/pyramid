@@ -235,7 +235,7 @@ Request Logging with Paste's TransLogger
 
 The :term:`WSGI` design is modular.  Waitress logs error conditions, debugging
 output, etc., but not web traffic.  For web traffic logging, Paste provides the
-`TransLogger <http://pythonpaste.org/modules/translogger.html>`_
+`TransLogger <https://web.archive.org/web/20160707041338/http://pythonpaste.org:80/modules/translogger.html>`_
 :term:`middleware`.  TransLogger produces logs in the `Apache Combined Log
 Format <http://httpd.apache.org/docs/2.2/logs.html#combined>`_.  But
 TransLogger does not write to files; the Python logging system must be

@@ -435,3 +435,11 @@ epub_exclude_files = ['_static/opensearch.xml', '_static/doctools.js',
 epub_tocdepth = 3
 
 # For a list of all settings, visit http://sphinx-doc.org/config.html
+
+# -- Options for linkcheck builder -------------------------------------------
+
+# List of items to ignore when running linkcheck
+linkcheck_ignore = [
+    r'http://localhost:\d+',
+    r'http://localhost',
+]
