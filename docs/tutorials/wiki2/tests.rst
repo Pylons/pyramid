@@ -53,33 +53,32 @@ View the results of all our edits to ``tests`` subpackage
 Create ``tutorial/tests/test_views.py`` such that it appears as follows:
 
 .. literalinclude:: src/tests/tutorial/tests/test_views.py
-   :linenos:
-   :language: python
+    :linenos:
+    :language: python
 
 Create ``tutorial/tests/test_functional.py`` such that it appears as follows:
 
 .. literalinclude:: src/tests/tutorial/tests/test_functional.py
-   :linenos:
-   :language: python
+    :linenos:
+    :language: python
 
 Create ``tutorial/tests/test_initdb.py`` such that it appears as follows:
 
 .. literalinclude:: src/tests/tutorial/tests/test_initdb.py
-   :linenos:
-   :language: python
+    :linenos:
+    :language: python
 
 Create ``tutorial/tests/test_security.py`` such that it appears as follows:
 
 .. literalinclude:: src/tests/tutorial/tests/test_security.py
-   :linenos:
-   :language: python
+    :linenos:
+    :language: python
 
 Create ``tutorial/tests/test_user_model.py`` such that it appears as follows:
 
 .. literalinclude:: src/tests/tutorial/tests/test_user_model.py
-   :linenos:
-   :language: python
-
+    :linenos:
+    :language: python
 
 .. note::
 
@@ -99,21 +98,21 @@ On UNIX:
 
 .. code-block:: bash
 
-   $ rm tutorial.sqlite
-   $ $VENV/bin/py.test -q
+    rm tutorial.sqlite
+    $VENV/bin/py.test -q
 
 On Windows:
 
 .. code-block:: doscon
 
-   c:\tutorial> del tutorial.sqlite
-   c:\tutorial> %VENV%\Scripts\py.test -q
+    del tutorial.sqlite
+    %VENV%\Scripts\py.test -q
 
 The expected result should look like the following:
 
 .. code-block:: text
 
-   ................................
-   32 passed in 9.90 seconds
+    ................................
+    32 passed in 9.90 seconds
 
 .. _webtest: https://docs.pylonsproject.org/projects/webtest/en/latest/
