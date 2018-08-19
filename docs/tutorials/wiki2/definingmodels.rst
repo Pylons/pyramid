@@ -32,9 +32,9 @@ parameter in the ``setup()`` function.
 Open ``tutorial/setup.py`` and edit it to look like the following:
 
 .. literalinclude:: src/models/setup.py
-   :linenos:
-   :emphasize-lines: 13
-   :language: python
+    :linenos:
+    :emphasize-lines: 13
+    :language: python
 
 Only the highlighted line needs to be added.
 
@@ -57,13 +57,13 @@ On UNIX:
 
 .. code-block:: bash
 
-    $ $VENV/bin/pip install -e .
+    $VENV/bin/pip install -e .
 
 On Windows:
 
 .. code-block:: doscon
 
-    c:\tutorial> %VENV%\Scripts\pip install -e .
+    %VENV%\Scripts\pip install -e .
 
 Success executing this command will end with a line to the console something
 like the following.
@@ -86,8 +86,8 @@ Add ``user.py``
 Create a new file ``tutorial/models/user.py`` with the following contents:
 
 .. literalinclude:: src/models/tutorial/models/user.py
-   :linenos:
-   :language: py
+    :linenos:
+    :language: py
 
 This is a very basic model for a user who can authenticate with our wiki.
 
@@ -125,8 +125,8 @@ Add ``page.py``
 Create a new file ``tutorial/models/page.py`` with the following contents:
 
 .. literalinclude:: src/models/tutorial/models/page.py
-   :linenos:
-   :language: py
+    :linenos:
+    :language: py
 
 As you can see, our ``Page`` class is very similar to the ``User`` defined
 above, except with attributes focused on storing information about a wiki page,
@@ -151,9 +151,9 @@ Open the ``tutorial/models/__init__.py`` file and edit it to look like
 the following:
 
 .. literalinclude:: src/models/tutorial/models/__init__.py
-   :linenos:
-   :language: py
-   :emphasize-lines: 8,9
+    :linenos:
+    :language: py
+    :emphasize-lines: 8,9
 
 Here we align our imports with the names of the models, ``Page`` and ``User``.
 
@@ -169,17 +169,17 @@ On UNIX:
 
 .. code-block:: bash
 
-    $ $VENV/bin/alembic -c development.ini revision --autogenerate \
-          -m "use new models Page and User"
-    $ $VENV/bin/alembic -c development.ini upgrade head
+    $VENV/bin/alembic -c development.ini revision --autogenerate \
+        -m "use new models Page and User"
+    $VENV/bin/alembic -c development.ini upgrade head
 
 On Windows:
 
 .. code-block:: doscon
 
-    c:\tutorial> %VENV%\Scripts\alembic -c development.ini revision \
-         --autogenerate -m "use new models Page and User"
-    c:\tutorial> %VENV%\Scripts\alembic -c development.ini upgrade head
+    %VENV%\Scripts\alembic -c development.ini revision \
+        --autogenerate -m "use new models Page and User"
+    %VENV%\Scripts\alembic -c development.ini upgrade head
 
 Success executing these commands will generate output similar to the following.
 
@@ -308,9 +308,9 @@ Open ``tutorial/scripts/initialize_db.py`` and edit it to look like the
 following:
 
 .. literalinclude:: src/models/tutorial/scripts/initialize_db.py
-   :linenos:
-   :language: python
-   :emphasize-lines: 11-24
+    :linenos:
+    :language: python
+    :emphasize-lines: 11-24
 
 Only the highlighted lines need to be changed.
 
@@ -351,6 +351,6 @@ your console that ends with this exception:
 
 .. code-block:: text
 
-   AttributeError: module 'tutorial.models' has no attribute 'MyModel'
+    AttributeError: module 'tutorial.models' has no attribute 'MyModel'
 
 This will also happen if you attempt to run the tests.
