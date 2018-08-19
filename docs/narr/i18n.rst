@@ -682,8 +682,8 @@ The add-on `pyramid_jinja2 <https://github.com/Pylons/pyramid_jinja2>`_
 provides a scaffold with an example of how to use internationalization with
 Jinja2 in Pyramid. See the documentation sections `Internalization (i18n)
 <https://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/#internalization-i18n>`_
-and `Paster Template I18N
-<https://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/#paster-template-i18n>`_.
+and `pcreate template i18n
+<https://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/#pcreate-template-i18n>`_.
 
 
 .. index::

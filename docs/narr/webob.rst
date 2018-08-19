@@ -22,7 +22,7 @@ instance of the :class:`pyramid.request.Request` class, which is a subclass of
 
 WebOb is a project separate from :app:`Pyramid` with a separate set of authors
 and a fully separate `set of documentation
-<http://docs.webob.org/en/latest/index.html>`_.  :app:`Pyramid` adds some
+<https://docs.pylonsproject.org/projects/webob/en/latest/index.html>`_.  :app:`Pyramid` adds some
 functionality to the standard WebOb request, which is documented in the
 :ref:`request_module` API documentation.
 
@@ -35,7 +35,7 @@ requests and forming WSGI responses.  WebOb is a nice way to represent "raw"
 WSGI requests and responses.  However, we won't cover that use case in this
 document, as users of :app:`Pyramid` don't typically need to use the
 WSGI-related features of WebOb directly.  The `reference documentation
-<http://docs.webob.org/en/latest/reference.html>`_ shows many examples of
+<https://docs.pylonsproject.org/projects/webob/en/latest/reference.html>`_ shows many examples of
 creating requests and using response objects in this manner, however.
 
 .. index::
@@ -302,7 +302,7 @@ to handle this is to add an extra ``view_config`` for the same route, with
 ``request_method`` set to ``OPTIONS``, and set the desired response header
 before returning. You can find examples of response headers `Access control
 CORS, Preflighted requests
-<https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Preflighted_requests>`_.
+<https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Preflighted_requests>`_.
 
 .. index::
    single: cleaning up after request
@@ -357,7 +357,7 @@ More detail about the request object API is available as follows.
 
 - :class:`pyramid.request.Request` API documentation
 
-- `WebOb documentation <http://docs.webob.org/en/latest/index.html>`_.  All
+- `WebOb documentation <https://docs.pylonsproject.org/projects/webob/en/latest/index.html>`_.  All
   methods and attributes of a ``webob.Request`` documented within the WebOb
   documentation will work with request objects created by :app:`Pyramid`.
 
@@ -496,4 +496,4 @@ More Details
 More details about the response object API are available in the
 :mod:`pyramid.response` documentation.  More details about exception responses
 are in the :mod:`pyramid.httpexceptions` API documentation.  The `WebOb
-documentation <http://docs.webob.org/en/latest/index.html>`_ is also useful.
+documentation <https://docs.pylonsproject.org/projects/webob/en/latest/index.html>`_ is also useful.

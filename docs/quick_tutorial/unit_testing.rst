@@ -29,7 +29,7 @@ broken the code. As you're writing your code, you might find this more
 convenient than changing to your browser constantly and clicking reload.
 
 We'll also leave discussion of `pytest-cov
-<http://pytest-cov.readthedocs.io/en/latest/>`_ for another section.
+<https://pytest-cov.readthedocs.io/en/latest/>`_ for another section.
 
 
 Objectives

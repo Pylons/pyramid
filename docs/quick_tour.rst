@@ -17,11 +17,10 @@ Installation
 
 Once you have a standard Python environment setup, getting started with Pyramid
 is a breeze. Unfortunately "standard" is not so simple in Python. For this
-Quick Tour, it means `Python <https://www.python.org/downloads/>`_, `venv
-<https://packaging.python.org/en/latest/projects/#venv>`_ (or `virtualenv for
-Python 2.7 <https://packaging.python.org/en/latest/projects/#virtualenv>`_),
-`pip <https://packaging.python.org/en/latest/projects/#pip>`_, and `setuptools
-<https://packaging.python.org/en/latest/projects/#easy-install>`_.
+Quick Tour, it means `Python <https://www.python.org/downloads/>`_, :mod:`python:venv` (or `virtualenv for
+Python 2.7 <https://virtualenv.pypa.io/en/stable/>`_),
+`pip <https://pypi.org/project/pip/>`_, and `setuptools
+<https://pypi.org/project/setuptools/>`_.
 
 To save a little bit of typing and to be certain that we use the modules,
 scripts, and packages installed in our virtual environment, we'll set an

@@ -741,7 +741,7 @@ testing, as well as distributing your application.
    distribute their reusable code.  You can read more about ``setup.py`` files
    and their usage in the `Python Packaging User Guide
    <https://packaging.python.org/>`_ and `Setuptools documentation
-   <http://pythonhosted.org/setuptools/>`_.
+   <https://setuptools.readthedocs.io/en/latest/>`_.
 
 Our generated ``setup.py`` looks like this:
 
@@ -1122,7 +1122,7 @@ inotify support
 By default ``hupper`` will poll the filesystem for changes to all Python
 code. This can be pretty inefficient in larger projects. To be nicer to your
 hard drive, you should install the
-`watchdog <http://pythonhosted.org/watchdog/>`_ package in development.
+`watchdog <https://pythonhosted.org/watchdog/>`_ package in development.
 ``hupper`` will automatically use ``watchdog`` to more efficiently poll the
 filesystem.
 

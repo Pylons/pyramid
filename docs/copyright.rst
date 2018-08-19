@@ -80,8 +80,8 @@ Print Production
 ----------------
 
 The print version of this book was produced using the `Sphinx
-<http://www.sphinx-doc.org/en/stable/>`_ documentation generation system and
-the `LaTeX <http://www.latex-project.org/>`_ typesetting system.
+<http://www.sphinx-doc.org/en/master/>`_ documentation generation system and
+the `LaTeX <https://www.latex-project.org/>`_ typesetting system.
 
 Contacting The Publisher
 ------------------------

@@ -52,14 +52,14 @@ Modern
 Tested
 ~~~~~~
 
-Untested code is broken by design. The :app:`Pyramid` community has a strong testing culture and our framework reflects that. Every release of :app:`Pyramid` has 100% statement coverage (as measured by `coverage <http://coverage.readthedocs.io/en/latest/>`_) and 95% decision/condition coverage. (as measured by `instrumental <http://instrumental.readthedocs.io/en/latest/intro.html>`_) It is automatically tested using `Travis <https://travis-ci.org/Pylons/pyramid>`_ and `Jenkins <http://jenkins.pylonsproject.org/job/pyramid/>`_ on supported versions of Python after each commit to its GitHub repository. `Official Pyramid add-ons <https://trypyramid.com/resources-extending-pyramid.html>`_ are held to a similar testing standard.
+Untested code is broken by design. The :app:`Pyramid` community has a strong testing culture and our framework reflects that. Every release of :app:`Pyramid` has 100% statement coverage (as measured by `coverage <https://coverage.readthedocs.io/en/latest/>`_) and 95% decision/condition coverage. (as measured by `instrumental <https://instrumental.readthedocs.io/en/latest/intro.html>`_) It is automatically tested using `Travis <https://travis-ci.org/Pylons/pyramid>`_ and `Jenkins <http://jenkins.pylonsproject.org/job/pyramid/>`_ on supported versions of Python after each commit to its GitHub repository. `Official Pyramid add-ons <https://trypyramid.com/resources-extending-pyramid.html>`_ are held to a similar testing standard.
 
 We still find bugs in :app:`Pyramid`, but we've noticed we find a lot fewer of them while working on projects with a solid testing regime.
 
 Documented
 ~~~~~~~~~~
 
-The :app:`Pyramid` documentation is comprehensive. We strive to keep our narrative documentation both complete and friendly to newcomers. We also maintain the :ref:`Pyramid Community Cookbook <cookbook:pyramid-cookbook>` of  recipes demonstrating common scenarios you might face. Contributions in the form of improvements to our documentation are always appreciated. And we always welcome improvements to our `official tutorials <html_tutorials>`_ as well as new contributions to our `community maintained tutorials <tutorials:pyramid-tutorials>`_.
+The :app:`Pyramid` documentation is comprehensive. We strive to keep our narrative documentation both complete and friendly to newcomers. We also maintain the :ref:`Pyramid Community Cookbook <cookbook:pyramid-cookbook>` of  recipes demonstrating common scenarios you might face. Contributions in the form of improvements to our documentation are always appreciated. And we always welcome improvements to our :ref:`official tutorials <html_tutorials>` as well as new contributions to our :ref:`community maintained tutorials <tutorials:pyramid-tutorials>`.
 
 Supported
 ~~~~~~~~~

@@ -194,4 +194,4 @@ Extra credit
    ``request.route_url``?
 
 .. seealso:: :ref:`class_as_view`, `Weird Stuff You Can Do With
-   URL Dispatch <http://www.plope.com/weird_pyramid_urldispatch>`_
+   URL Dispatch <https://web.archive.org/web/20170131192830/http://www.plope.com/weird_pyramid_urldispatch>`_

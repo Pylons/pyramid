@@ -51,7 +51,7 @@ Glossary
      You can use :term:`distribute` under Python 3 instead.
 
    distribute
-     `Distribute <https://pythonhosted.org/distribute/>`_ is a fork of
+     `Distribute <https://pypi.org/project/distribute/>`_ is a fork of
      :term:`setuptools` which runs on both Python 2 and Python 3.
 
    pkg_resources
@@ -384,12 +384,12 @@ Glossary
      the box in ZPT and text flavors.
 
    ZPT
-     The `Zope Page Template <http://docs.zope.org/zope2/zope2book/ZPT.html>`_
+     The `Zope Page Template <https://zope.readthedocs.io/en/latest/zope2book/ZPT.html>`_
      templating language.
 
    METAL
      `Macro Expansion for TAL
-     <http://docs.zope.org/zope2/zope2book/AppendixC.html#metal-overview>`_, a
+     <https://zope.readthedocs.io/en/latest/zope2book/AppendixC.html#metal-overview>`_, a
      part of :term:`ZPT` which makes it possible to share common look and feel
      between templates.
 
