@@ -298,7 +298,7 @@ output to the console when we request a page:
                       (content-type: text/plain)
     00:50:53,695 INFO [wsgi] 192.168.1.111 - - [11/Aug/2011:20:09:33 -0700] "GET /hello
     HTTP/1.1" 404 - "-"
-    "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.6) Gecko/20070725
+    "Mozilla/5.0 (Macintosh; U; Intel macOS; en-US; rv:1.8.1.6) Gecko/20070725
     Firefox/2.0.0.6"
 
 To direct TransLogger to an ``access.log`` FileHandler, we need the following

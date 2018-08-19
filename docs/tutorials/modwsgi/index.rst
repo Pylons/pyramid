@@ -9,7 +9,7 @@ server.
 
 This guide will outline broad steps that can be used to get a :app:`Pyramid`
 application running under Apache via ``mod_wsgi``.  This particular tutorial
-was developed under Apple's Mac OS X platform (Snow Leopard, on a 32-bit
+was developed under Apple's macOS platform (Snow Leopard, on a 32-bit
 Mac), but the instructions should be largely the same for all systems, delta
 specific path information for commands and files.
 

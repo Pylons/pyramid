@@ -62,7 +62,7 @@ Install Python 3
 See the detailed recommendation for your operating system described under
 :ref:`installing_chapter`.
 
-- :ref:`for-mac-os-x-users`
+- :ref:`for-macos-users`
 - :ref:`if-you-don-t-yet-have-a-python-interpreter-unix`
 - :ref:`if-you-don-t-yet-have-a-python-interpreter-windows`
 

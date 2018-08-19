@@ -42,16 +42,16 @@ instead.
    compiler and the Python header files installed for your operating system.
 
 
-.. _for-mac-os-x-users:
+.. _for-macos-users:
 
-For Mac OS X Users
-~~~~~~~~~~~~~~~~~~
+For macOS Users
+~~~~~~~~~~~~~~~
 
-Python comes pre-installed on Mac OS X, but due to Apple's release cycle, it is
+Python comes pre-installed on macOS, but due to Apple's release cycle, it is
 often out of date. Unless you have a need for a specific earlier version, it is
 recommended to install the latest 3.x version of Python.
 
-You can install the latest version of Python for Mac OS X from the binaries on
+You can install the latest version of Python for macOS from the binaries on
 `python.org <https://www.python.org/downloads/mac-osx/>`_.
 
 Alternatively, you can use the `homebrew <https://brew.sh/>`_ package manager.
@@ -163,14 +163,14 @@ application, rather than being installed system wide.
 
 .. index::
    single: installing on Unix
-   single: installing on Mac OS X
+   single: installing on macOS
 
 .. _installing_unix:
 
 Installing :app:`Pyramid` on a Unix System
 ------------------------------------------
 
-After installing Python as described previously in :ref:`for-mac-os-x-users` or
+After installing Python as described previously in :ref:`for-macos-users` or
 :ref:`if-you-don-t-yet-have-a-python-interpreter-unix`, and satisfying the
 :ref:`requirements-for-installing-packages`, you can now install Pyramid.
 
