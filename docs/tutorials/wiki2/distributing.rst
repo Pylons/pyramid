@@ -13,23 +13,23 @@ On UNIX:
 
 .. code-block:: bash
 
-   $ $VENV/bin/python setup.py sdist
+    $VENV/bin/python setup.py sdist
 
 On Windows:
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\python setup.py sdist
+    %VENV%\Scripts\python setup.py sdist
 
 The output of such a command will be something like:
 
 .. code-block:: text
 
-   running sdist
-   # more output
-   creating dist
-   Creating tar archive
-   removing 'tutorial-0.0' (and everything under it)
+    running sdist
+    # more output
+    creating dist
+    Creating tar archive
+    removing 'tutorial-0.0' (and everything under it)
 
 Note that this command creates a tarball in the ``dist`` subdirectory named
 ``tutorial-0.0.tar.gz``.  You can send this file to your friends to show them
