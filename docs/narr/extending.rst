@@ -75,30 +75,30 @@ inlined as calls to methods of a :term:`Configurator` within the ``main``
 function in your application's ``__init__.py``.  For example, rather than:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   if __name__ == '__main__':
-       config = Configurator()
-       config.add_view('myapp.views.view1', name='view1')
-       config.add_view('myapp.views.view2', name='view2')
+    if __name__ == '__main__':
+        config = Configurator()
+        config.add_view('myapp.views.view1', name='view1')
+        config.add_view('myapp.views.view2', name='view2')
 
 You should move the calls to ``add_view`` outside of the (non-reusable) ``if
 __name__ == '__main__'`` block, and into a reusable function:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   if __name__ == '__main__':
-       config = Configurator()
-       config.include(add_views)
+    if __name__ == '__main__':
+        config = Configurator()
+        config.include(add_views)
 
-   def add_views(config):
-       config.add_view('myapp.views.view1', name='view1')
-       config.add_view('myapp.views.view2', name='view2')
+    def add_views(config):
+        config.add_view('myapp.views.view1', name='view1')
+        config.add_view('myapp.views.view2', name='view2')
 
 Doing this allows an integrator to maximally reuse the configuration statements
 that relate to your application by allowing them to selectively include or
@@ -145,11 +145,11 @@ against the application's package, then add additional configuration that
 registers more views or routes.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   if __name__ == '__main__':
-       config.scan('someotherpackage')
-       config.add_view('mypackage.views.myview', name='myview')
+    if __name__ == '__main__':
+        config.scan('someotherpackage')
+        config.add_view('mypackage.views.myview', name='myview')
 
 If you want to *override* configuration in the application, you *may* need to
 run :meth:`pyramid.config.Configurator.commit` after performing the scan of the
@@ -157,12 +157,12 @@ original package, then add additional configuration that registers more views
 or routes which perform overrides.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   if __name__ == '__main__':
-       config.scan('someotherpackage')
-       config.commit()
-       config.add_view('mypackage.views.myview', name='myview')
+    if __name__ == '__main__':
+        config.scan('someotherpackage')
+        config.commit()
+        config.add_view('mypackage.views.myview', name='myview')
 
 Once this is done, you should be able to extend or override the application
 like any other (see :ref:`extending_the_application`).
@@ -241,15 +241,15 @@ You can override the first view configuration statement made by
 configuration function:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
-   from originalapp import configure_views
+    from pyramid.config import Configurator
+    from originalapp import configure_views
 
-   if __name == '__main__':
-       config = Configurator()
-       config.include(configure_views)
-       config.add_view('theoverrideapp.views.theview', name='theview')
+    if __name == '__main__':
+        config = Configurator()
+        config.include(configure_views)
+        config.add_view('theoverrideapp.views.theview', name='theview')
 
 In this case, the ``theoriginalapp.views.theview`` view will never be executed.
 Instead, a new view, ``theoverrideapp.views.theview`` will be executed when

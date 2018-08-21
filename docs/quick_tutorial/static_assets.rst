@@ -23,46 +23,46 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r view_classes static_assets; cd static_assets
-    $ $VENV/bin/pip install -e .
+       cd ..; cp -r view_classes static_assets; cd static_assets
+       $VENV/bin/pip install -e .
 
 #. We add a call ``config.add_static_view`` in
    ``static_assets/tutorial/__init__.py``:
 
    .. literalinclude:: static_assets/tutorial/__init__.py
-    :linenos:
+       :linenos:
 
 #. We can add a CSS link in the ``<head>`` of our template at
    ``static_assets/tutorial/home.pt``:
 
    .. literalinclude:: static_assets/tutorial/home.pt
-    :language: html
+       :language: html
 
 #. Add a CSS file at ``static_assets/tutorial/static/app.css``:
 
    .. literalinclude:: static_assets/tutorial/static/app.css
-    :language: css
+       :language: css
 
 #. We add a functional test that asserts that the newly added static file is delivered:
 
    .. literalinclude:: static_assets/tutorial/tests.py
-    :language: python
-    :pyobject: TutorialFunctionalTests.test_css
-    :lineno-match:
+       :language: python
+       :pyobject: TutorialFunctionalTests.test_css
+       :lineno-match:
 
 #. Now run the tests:
 
    .. code-block:: bash
 
-    $ $VENV/bin/py.test tutorial/tests.py -q
-    ....
-    5 passed in 0.50 seconds
+       $VENV/bin/py.test tutorial/tests.py -q
+       ....
+       5 passed in 0.50 seconds
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini --reload
+       $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ in your browser and note the new font.
 
@@ -82,7 +82,7 @@ disk? Pyramid gives a helper that provides flexibility on URL generation:
 
 .. code-block:: html
 
-  ${request.static_url('tutorial:static/app.css')}
+    ${request.static_url('tutorial:static/app.css')}
 
 This matches the ``path='tutorial:static'`` in our ``config.add_static_view``
 registration. By using ``request.static_url`` to generate the full URL to the

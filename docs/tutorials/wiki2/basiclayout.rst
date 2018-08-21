@@ -21,24 +21,24 @@ code.
 Open ``tutorial/__init__.py``.  It should already contain the following:
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
-  :linenos:
-  :language: py
+    :linenos:
+    :language: py
 
 Let's go over this piece-by-piece. First we need some imports to support later
 code:
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
-  :end-before: main
-  :lineno-match:
-  :language: py
+    :end-before: main
+    :lineno-match:
+    :language: py
 
 ``__init__.py`` defines a function named ``main``.  Here is the entirety of
 the ``main`` function we've defined in our ``__init__.py``:
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
-  :pyobject: main
-  :lineno-match:
-  :language: py
+    :pyobject: main
+    :lineno-match:
+    :language: py
 
 When you invoke the ``pserve development.ini`` command, the ``main`` function
 above is executed.  It accepts some settings and returns a :term:`WSGI`
@@ -47,9 +47,9 @@ application.  (See :ref:`startup_chapter` for more about ``pserve``.)
 Next in ``main``, construct a :term:`Configurator` object:
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
-  :lines: 7
-  :lineno-match:
-  :language: py
+    :lines: 7
+    :lineno-match:
+    :language: py
 
 ``settings`` is passed to the ``Configurator`` as a keyword argument with the
 dictionary values passed as the ``**settings`` argument. This will be a
@@ -61,25 +61,25 @@ Next include :term:`Jinja2` templating bindings so that we can use renderers
 with the ``.jinja2`` extension within our project.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
-  :lines: 8
-  :lineno-match:
-  :language: py
+    :lines: 8
+    :lineno-match:
+    :language: py
 
 Next include the the package ``models`` using a dotted Python path. The exact
 setup of the models will be covered later.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
-  :lines: 9
-  :lineno-match:
-  :language: py
+    :lines: 9
+    :lineno-match:
+    :language: py
 
 Next include the ``routes`` module using a dotted Python path. This module will
 be explained in the next section.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
-  :lines: 10
-  :lineno-match:
-  :language: py
+    :lines: 10
+    :lineno-match:
+    :language: py
 
 .. note::
 
@@ -95,18 +95,18 @@ will be registered, allowing one of our application URLs to be mapped to some
 code.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
-  :lines: 11
-  :lineno-match:
-  :language: py
+    :lines: 11
+    :lineno-match:
+    :language: py
 
 Finally ``main`` is finished configuring things, so it uses the
 :meth:`pyramid.config.Configurator.make_wsgi_app` method to return a
 :term:`WSGI` application:
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
-  :lines: 12
-  :lineno-match:
-  :language: py
+    :lines: 12
+    :lineno-match:
+    :language: py
 
 
 Route declarations
@@ -115,8 +115,8 @@ Route declarations
 Open the ``tutorial/routes.py`` file. It should already contain the following:
 
 .. literalinclude:: src/basiclayout/tutorial/routes.py
-  :linenos:
-  :language: py
+    :linenos:
+    :language: py
 
 On line 2, we call :meth:`pyramid.config.Configurator.add_static_view` with
 three arguments: ``static`` (the name), ``static`` (the path), and
@@ -151,8 +151,8 @@ Open ``tutorial/views/default.py`` in the ``views`` package.  It should already
 contain the following:
 
 .. literalinclude:: src/basiclayout/tutorial/views/default.py
-  :linenos:
-  :language: py
+    :linenos:
+    :language: py
 
 The important part here is that the ``@view_config`` decorator associates the
 function it decorates (``my_view``) with a :term:`view configuration`,
@@ -195,17 +195,17 @@ First, open ``tutorial/models/meta.py``, which should already contain the
 following:
 
 .. literalinclude:: src/basiclayout/tutorial/models/meta.py
-  :linenos:
-  :language: py
+    :linenos:
+    :language: py
 
 ``meta.py`` contains imports and support code for defining the models. We
 create a dictionary ``NAMING_CONVENTION`` as well for consistent naming of
 support objects like indices and constraints.
 
 .. literalinclude:: src/basiclayout/tutorial/models/meta.py
-  :end-before: metadata
-  :linenos:
-  :language: py
+    :end-before: metadata
+    :linenos:
+    :language: py
 
 Next we create a ``metadata`` object from the class
 :class:`sqlalchemy.schema.MetaData`, using ``NAMING_CONVENTION`` as the value
@@ -218,25 +218,25 @@ will attach the tables to the ``metadata`` we created, and define our
 application's database schema.
 
 .. literalinclude:: src/basiclayout/tutorial/models/meta.py
-  :lines: 15-16
-  :lineno-match:
-  :language: py
+    :lines: 15-16
+    :lineno-match:
+    :language: py
 
 Next open ``tutorial/models/mymodel.py``, which should already contain the
 following:
 
 .. literalinclude:: src/basiclayout/tutorial/models/mymodel.py
-  :linenos:
-  :language: py
+    :linenos:
+    :language: py
 
 Notice we've defined the ``models`` as a package to make it straightforward for
 defining models in separate modules. To give a simple example of a model class,
 we have defined one named ``MyModel`` in ``mymodel.py``:
 
 .. literalinclude:: src/basiclayout/tutorial/models/mymodel.py
-  :pyobject: MyModel
-  :lineno-match:
-  :language: py
+    :pyobject: MyModel
+    :lineno-match:
+    :language: py
 
 Our example model does not require an ``__init__`` method because SQLAlchemy
 supplies for us a default constructor, if one is not already present, which
@@ -244,9 +244,9 @@ accepts keyword arguments of the same name as that of the mapped attributes.
 
 .. note:: Example usage of MyModel:
 
-   .. code-block:: python
+    .. code-block:: python
 
-       johnny = MyModel(name="John Doe", value=10)
+        johnny = MyModel(name="John Doe", value=10)
 
 The ``MyModel`` class has a ``__tablename__`` attribute.  This informs
 SQLAlchemy which table to use to store the data representing instances of this
@@ -256,8 +256,8 @@ Finally, open ``tutorial/models/__init__.py``, which should already
 contain the following:
 
 .. literalinclude:: src/basiclayout/tutorial/models/__init__.py
-  :linenos:
-  :language: py
+    :linenos:
+    :language: py
 
 Our ``models/__init__.py`` module defines the primary API we will use for
 configuring the database connections within our application, and it contains
@@ -286,9 +286,9 @@ database engine using :func:`sqlalchemy.engine_from_config` from the
 ``[app:main]`` section. This setting is a URI (something like ``sqlite://``).
 
 .. literalinclude:: src/basiclayout/tutorial/models/__init__.py
-  :pyobject: get_engine
-  :lineno-match:
-  :language: py
+    :pyobject: get_engine
+    :lineno-match:
+    :language: py
 
 The function ``get_session_factory`` accepts an :term:`SQLAlchemy` database
 engine, and creates a ``session_factory`` from the :term:`SQLAlchemy` class
@@ -296,9 +296,9 @@ engine, and creates a ``session_factory`` from the :term:`SQLAlchemy` class
 used for creating sessions bound to the database engine.
 
 .. literalinclude:: src/basiclayout/tutorial/models/__init__.py
-  :pyobject: get_session_factory
-  :lineno-match:
-  :language: py
+    :pyobject: get_session_factory
+    :lineno-match:
+    :language: py
 
 The function ``get_tm_session`` registers a database session with a transaction
 manager, and returns a ``dbsession`` object. With the transaction manager, our
@@ -306,9 +306,9 @@ application will automatically issue a transaction commit after every request,
 unless an exception is raised, in which case the transaction will be aborted.
 
 .. literalinclude:: src/basiclayout/tutorial/models/__init__.py
-  :pyobject: get_tm_session
-  :lineno-match:
-  :language: py
+    :pyobject: get_tm_session
+    :lineno-match:
+    :language: py
 
 Finally, we define an ``includeme`` function, which is a hook for use with
 :meth:`pyramid.config.Configurator.include` to activate code in a Pyramid
@@ -319,9 +319,9 @@ define a ``request.dbsession`` property, which we can use to do work on behalf
 of an incoming request to our application.
 
 .. literalinclude:: src/basiclayout/tutorial/models/__init__.py
-  :pyobject: includeme
-  :lineno-match:
-  :language: py
+    :pyobject: includeme
+    :lineno-match:
+    :language: py
 
 That's about all there is to it regarding models, views, and initialization
 code in our stock application.

@@ -28,7 +28,7 @@ Steps
 
     .. code-block:: bash
 
-        $ $VENV/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
+        $VENV/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
 
     If prompted for the first item, accept the default ``yes`` by hitting return.
 
@@ -49,20 +49,20 @@ Steps
     .. code-block:: bash
 
         # Change directory into your newly created project.
-        $ cd cc_starter
+        cd cc_starter
         # Create a new virtual environment...
-        $ python3 -m venv env
+        python3 -m venv env
         # ...where we upgrade packaging tools...
-        $ env/bin/pip install --upgrade pip setuptools
+        env/bin/pip install --upgrade pip setuptools
         # ...and into which we install our project.
-        $ env/bin/pip install -e .
+        env/bin/pip install -e .
 
 #.  Start up the application by pointing :app:`Pyramid`'s ``pserve`` command at the
     project's (generated) configuration file:
 
     .. code-block:: bash
 
-        $ env/bin/pserve development.ini --reload
+        env/bin/pserve development.ini --reload
 
     On start up, ``pserve`` logs some output:
 

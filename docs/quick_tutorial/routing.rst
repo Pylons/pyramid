@@ -50,44 +50,44 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r view_classes routing; cd routing
-    $ $VENV/bin/pip install -e .
+       cd ..; cp -r view_classes routing; cd routing
+       $VENV/bin/pip install -e .
 
 #. Our ``routing/tutorial/__init__.py`` needs a route with a replacement
    pattern:
 
    .. literalinclude:: routing/tutorial/__init__.py
-    :linenos:
+       :linenos:
 
 #. We just need one view in ``routing/tutorial/views.py``:
 
    .. literalinclude:: routing/tutorial/views.py
-    :linenos:
+       :linenos:
 
 #. We just need one view in ``routing/tutorial/home.pt``:
 
    .. literalinclude:: routing/tutorial/home.pt
-    :language: html
-    :linenos:
+       :language: html
+       :linenos:
 
 #. Update ``routing/tutorial/tests.py``:
 
    .. literalinclude:: routing/tutorial/tests.py
-    :linenos:
+       :linenos:
 
 #. Now run the tests:
 
    .. code-block:: bash
 
-    $ $VENV/bin/py.test tutorial/tests.py -q
-    ..
-    2 passed in 0.39 seconds
+       $VENV/bin/py.test tutorial/tests.py -q
+       ..
+       2 passed in 0.39 seconds
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini --reload
+       $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/howdy/amy/smith in your browser.
 

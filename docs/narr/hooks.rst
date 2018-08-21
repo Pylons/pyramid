@@ -23,14 +23,14 @@ Not Found View by using the
 :meth:`pyramid.config.Configurator.add_notfound_view` method:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def notfound(request):
-       return Response('Not Found', status='404 Not Found')
+    def notfound(request):
+        return Response('Not Found', status='404 Not Found')
 
-   def main(globals, **settings):
-       config = Configurator()
-       config.add_notfound_view(notfound)
+    def main(globals, **settings):
+        config = Configurator()
+        config.add_notfound_view(notfound)
 
 The :term:`Not Found View` callable is a view callable like any other.
 
@@ -39,17 +39,17 @@ and a :term:`scan`, you can replace the Not Found View by using the
 :class:`pyramid.view.notfound_view_config` decorator:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import notfound_view_config
+    from pyramid.view import notfound_view_config
 
-   @notfound_view_config()
-   def notfound(request):
-       return Response('Not Found', status='404 Not Found')
+    @notfound_view_config()
+    def notfound(request):
+        return Response('Not Found', status='404 Not Found')
 
-   def main(globals, **settings):
-       config = Configurator()
-       config.scan()
+    def main(globals, **settings):
+        config = Configurator()
+        config.scan()
 
 This does exactly what the imperative example above showed.
 
@@ -61,21 +61,21 @@ Your application can define *multiple* Not Found Views if necessary.  Both
 Views can carry predicates limiting their applicability.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import notfound_view_config
+    from pyramid.view import notfound_view_config
 
-   @notfound_view_config(request_method='GET')
-   def notfound_get(request):
-       return Response('Not Found during GET', status='404 Not Found')
+    @notfound_view_config(request_method='GET')
+    def notfound_get(request):
+        return Response('Not Found during GET', status='404 Not Found')
 
-   @notfound_view_config(request_method='POST')
-   def notfound_post(request):
-       return Response('Not Found during POST', status='404 Not Found')
+    @notfound_view_config(request_method='POST')
+    def notfound_post(request):
+        return Response('Not Found during POST', status='404 Not Found')
 
-   def main(globals, **settings):
-      config = Configurator()
-      config.scan()
+    def main(globals, **settings):
+        config = Configurator()
+        config.scan()
 
 The ``notfound_get`` view will be called when a view could not be found and the
 request method was ``GET``.  The ``notfound_post`` view will be called when a
@@ -97,12 +97,12 @@ Here's some sample code that implements a minimal :term:`Not Found View`
 callable:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.httpexceptions import HTTPNotFound
+    from pyramid.httpexceptions import HTTPNotFound
 
-   def notfound(request):
-       return HTTPNotFound()
+    def notfound(request):
+        return HTTPNotFound()
 
 .. note::
 
@@ -153,31 +153,31 @@ For example, you can add a forbidden view by using the
 forbidden view:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def forbidden(request):
-       return Response('forbidden')
+    def forbidden(request):
+        return Response('forbidden')
 
-   def main(globals, **settings):
-       config = Configurator()
-       config.add_forbidden_view(forbidden)
+    def main(globals, **settings):
+        config = Configurator()
+        config.add_forbidden_view(forbidden)
 
 If instead you prefer to use decorators and a :term:`scan`, you can use the
 :class:`pyramid.view.forbidden_view_config` decorator to mark a view callable
 as a forbidden view:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import forbidden_view_config
+    from pyramid.view import forbidden_view_config
 
-   @forbidden_view_config()
-   def forbidden(request):
-       return Response('forbidden')
+    @forbidden_view_config()
+    def forbidden(request):
+        return Response('forbidden')
 
-   def main(globals, **settings):
-      config = Configurator()
-      config.scan()
+    def main(globals, **settings):
+        config = Configurator()
+        config.scan()
 
 Like any other view, the forbidden view must accept at least a ``request``
 parameter, or both ``context`` and ``request``.  If a forbidden view callable
@@ -189,13 +189,13 @@ you normally would expect) is available as ``request.context``.  The
 Here's some sample code that implements a minimal forbidden view:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
-   from pyramid.response import Response
+    from pyramid.view import view_config
+    from pyramid.response import Response
 
-   def forbidden_view(request):
-       return Response('forbidden')
+    def forbidden_view(request):
+        return Response('forbidden')
 
 .. note::
 
@@ -235,30 +235,30 @@ constructor of the :term:`configurator`.  This argument can be either a
 callable or a :term:`dotted Python name` representing a callable.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.request import Request
+    from pyramid.request import Request
 
-   class MyRequest(Request):
-       pass
+    class MyRequest(Request):
+        pass
 
-   config = Configurator(request_factory=MyRequest)
+    config = Configurator(request_factory=MyRequest)
 
 If you're doing imperative configuration, and you'd rather do it after you've
 already constructed a :term:`configurator`, it can also be registered via the
 :meth:`pyramid.config.Configurator.set_request_factory` method:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
-   from pyramid.request import Request
+    from pyramid.config import Configurator
+    from pyramid.request import Request
 
-   class MyRequest(Request):
-       pass
+    class MyRequest(Request):
+        pass
 
-   config = Configurator()
-   config.set_request_factory(MyRequest)
+    config = Configurator()
+    config.set_request_factory(MyRequest)
 
 .. index::
    single: request method
@@ -286,20 +286,20 @@ actually execute the function until accessed.
    factory` that have the same name.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
+    from pyramid.config import Configurator
 
-   def total(request, *args):
-       return sum(args)
+    def total(request, *args):
+        return sum(args)
 
-   def prop(request):
-       print("getting the property")
-       return "the property"
+    def prop(request):
+        print("getting the property")
+        return "the property"
 
-   config = Configurator()
-   config.add_request_method(total)
-   config.add_request_method(prop, reify=True)
+    config = Configurator()
+    config.add_request_method(total)
+    config.add_request_method(prop, reify=True)
 
 In the above example, ``total`` is added as a method. However, ``prop`` is
 added as a property and its result is cached per-request by setting
@@ -345,27 +345,27 @@ To not cache the result of ``request.prop``, set ``property=True`` instead of
 Here is an example of passing a class to ``Configurator.add_request_method``:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
-   from pyramid.decorator import reify
+    from pyramid.config import Configurator
+    from pyramid.decorator import reify
 
-   class ExtraStuff(object):
+    class ExtraStuff(object):
 
-       def __init__(self, request):
-           self.request = request
+        def __init__(self, request):
+            self.request = request
 
-       def total(self, *args):
-           return sum(args)
+        def total(self, *args):
+            return sum(args)
 
-       # use @property if you don't want to cache the result
-       @reify
-       def prop(self):
-           print("getting the property")
-           return "the property"
+        # use @property if you don't want to cache the result
+        @reify
+        def prop(self):
+            print("getting the property")
+            return "the property"
 
-   config = Configurator()
-   config.add_request_method(ExtraStuff, 'extra', reify=True)
+    config = Configurator()
+    config.add_request_method(ExtraStuff, 'extra', reify=True)
 
 We attach and cache an object named ``extra`` to the ``request`` object.
 
@@ -430,30 +430,30 @@ The factory takes a single positional argument, which is a :term:`Request`
 object. The argument may be ``None``.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
+    from pyramid.response import Response
 
-   class MyResponse(Response):
-       pass
+    class MyResponse(Response):
+        pass
 
-   config = Configurator(response_factory=lambda r: MyResponse())
+    config = Configurator(response_factory=lambda r: MyResponse())
 
 If you're doing imperative configuration and you'd rather do it after you've
 already constructed a :term:`configurator`, it can also be registered via the
 :meth:`pyramid.config.Configurator.set_response_factory` method:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
-   from pyramid.response import Response
+    from pyramid.config import Configurator
+    from pyramid.response import Response
 
-   class MyResponse(Response):
-       pass
+    class MyResponse(Response):
+        pass
 
-   config = Configurator()
-   config.set_response_factory(lambda r: MyResponse())
+    config = Configurator()
+    config.set_response_factory(lambda r: MyResponse())
 
 .. index::
    single: before render event
@@ -497,27 +497,27 @@ Suppose you return ``{'mykey': 'somevalue', 'mykey2': 'somevalue2'}`` from your
 view callable, like so:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
+    from pyramid.view import view_config
 
-   @view_config(renderer='some_renderer')
-   def myview(request):
-       return {'mykey': 'somevalue', 'mykey2': 'somevalue2'}
+    @view_config(renderer='some_renderer')
+    def myview(request):
+        return {'mykey': 'somevalue', 'mykey2': 'somevalue2'}
 
 :attr:`rendering_val` can be used to access these values from the
 :class:`~pyramid.events.BeforeRender` object:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.events import subscriber
-   from pyramid.events import BeforeRender
+    from pyramid.events import subscriber
+    from pyramid.events import BeforeRender
 
-   @subscriber(BeforeRender)
-   def read_return(event):
-       # {'mykey': 'somevalue'} is returned from the view
-       print(event.rendering_val['mykey'])
+    @subscriber(BeforeRender)
+    def read_return(event):
+        # {'mykey': 'somevalue'} is returned from the view
+        print(event.rendering_val['mykey'])
 
 See the API documentation for the :class:`~pyramid.events.BeforeRender` event
 interface at :class:`pyramid.interfaces.IBeforeRender`.
@@ -542,13 +542,13 @@ A response callback is a callable which accepts two positional parameters:
 ``request`` and ``response``.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def cache_callback(request, response):
-       """Set the cache_control max_age for the response"""
-       if request.exception is not None:
-           response.cache_control.max_age = 360
-   request.add_response_callback(cache_callback)
+    def cache_callback(request, response):
+        """Set the cache_control max_age for the response"""
+        if request.exception is not None:
+            response.cache_control.max_age = 360
+    request.add_response_callback(cache_callback)
 
 No response callback is called if an unhandled exception happens in application
 code, or if the response object returned by a :term:`view callable` is invalid.
@@ -588,16 +588,16 @@ A finished callback is a callable which accepts a single positional parameter:
 ``request``.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   import logging
+    import logging
 
-   log = logging.getLogger(__name__)
+    log = logging.getLogger(__name__)
 
-   def log_callback(request):
-       """Log information at the end of request"""
-       log.debug('Request is finished.')
-   request.add_finished_callback(log_callback)
+    def log_callback(request):
+        """Log information at the end of request"""
+        log.debug('Request is finished.')
+    request.add_finished_callback(log_callback)
 
 Finished callbacks are called in the order they're added
 (first-to-most-recently-added).  Finished callbacks (unlike a :term:`response
@@ -636,46 +636,46 @@ algorithm can be swapped out selectively for a different traversal pattern via
 configuration.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import Configurator
-   from myapp.traversal import Traverser
-   config = Configurator()
-   config.add_traverser(Traverser)
+    from pyramid.config import Configurator
+    from myapp.traversal import Traverser
+    config = Configurator()
+    config.add_traverser(Traverser)
 
 In the example above, ``myapp.traversal.Traverser`` is assumed to be a class
 that implements the following interface:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   class Traverser(object):
-       def __init__(self, root):
-           """ Accept the root object returned from the root factory """
+    class Traverser(object):
+        def __init__(self, root):
+            """ Accept the root object returned from the root factory """
 
-       def __call__(self, request):
-           """ Return a dictionary with (at least) the keys ``root``,
-           ``context``, ``view_name``, ``subpath``, ``traversed``,
-           ``virtual_root``, and ``virtual_root_path``.  These values are
-           typically the result of a resource tree traversal.  ``root``
-           is the physical root object, ``context`` will be a resource
-           object, ``view_name`` will be the view name used (a Unicode
-           name), ``subpath`` will be a sequence of Unicode names that
-           followed the view name but were not traversed, ``traversed``
-           will be a sequence of Unicode names that were traversed
-           (including the virtual root path, if any) ``virtual_root``
-           will be a resource object representing the virtual root (or the
-           physical root if traversal was not performed), and
-           ``virtual_root_path`` will be a sequence representing the
-           virtual root path (a sequence of Unicode names) or None if
-           traversal was not performed.
+        def __call__(self, request):
+            """ Return a dictionary with (at least) the keys ``root``,
+            ``context``, ``view_name``, ``subpath``, ``traversed``,
+            ``virtual_root``, and ``virtual_root_path``.  These values are
+            typically the result of a resource tree traversal.  ``root``
+            is the physical root object, ``context`` will be a resource
+            object, ``view_name`` will be the view name used (a Unicode
+            name), ``subpath`` will be a sequence of Unicode names that
+            followed the view name but were not traversed, ``traversed``
+            will be a sequence of Unicode names that were traversed
+            (including the virtual root path, if any) ``virtual_root``
+            will be a resource object representing the virtual root (or the
+            physical root if traversal was not performed), and
+            ``virtual_root_path`` will be a sequence representing the
+            virtual root path (a sequence of Unicode names) or None if
+            traversal was not performed.
 
-           Extra keys for special purpose functionality can be added as
-           necessary.
+            Extra keys for special purpose functionality can be added as
+            necessary.
 
-           All values returned in the dictionary will be made available
-           as attributes of the ``request`` object.
-           """
+            All values returned in the dictionary will be made available
+            as attributes of the ``request`` object.
+            """
 
 More than one traversal algorithm can be active at the same time.  For
 instance, if your :term:`root factory` returns more than one type of object
@@ -685,13 +685,13 @@ object that implemented that class or interface, a custom traverser would be
 used.  Otherwise the default traverser would be used.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from myapp.traversal import Traverser
-   from myapp.resources import MyRoot
-   from pyramid.config import Configurator
-   config = Configurator()
-   config.add_traverser(Traverser, MyRoot)
+    from myapp.traversal import Traverser
+    from myapp.resources import MyRoot
+    from pyramid.config import Configurator
+    config = Configurator()
+    config.add_traverser(Traverser, MyRoot)
 
 If the above stanza was added to a Pyramid ``__init__.py`` file's ``main``
 function, :app:`Pyramid` would use the ``myapp.traversal.Traverser`` only when
@@ -721,12 +721,12 @@ type of resource by adding a call to
 For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from myapp.traversal import ResourceURLAdapter
-   from myapp.resources import MyRoot
+    from myapp.traversal import ResourceURLAdapter
+    from myapp.resources import MyRoot
 
-   config.add_resource_url_adapter(ResourceURLAdapter, MyRoot)
+    config.add_resource_url_adapter(ResourceURLAdapter, MyRoot)
 
 In the above example, the ``myapp.traversal.ResourceURLAdapter`` class will be
 used to provide services to :meth:`~pyramid.request.Request.resource_url` any
@@ -740,19 +740,19 @@ The API that must be implemented by a class that provides
 :class:`~pyramid.interfaces.IResourceURL` is as follows:
 
 .. code-block:: python
-  :linenos:
+    :linenos:
 
-  class MyResourceURL(object):
-      """ An adapter which provides the virtual and physical paths of a
-          resource
-      """
-      def __init__(self, resource, request):
-          """ Accept the resource and request and set self.physical_path and
-          self.virtual_path """
-          self.virtual_path =  some_function_of(resource, request)
-          self.virtual_path_tuple =  some_function_of(resource, request)
-          self.physical_path =  some_other_function_of(resource, request)
-          self.physical_path_tuple =  some_function_of(resource, request)
+    class MyResourceURL(object):
+        """ An adapter which provides the virtual and physical paths of a
+            resource
+        """
+        def __init__(self, resource, request):
+            """ Accept the resource and request and set self.physical_path and
+            self.virtual_path """
+            self.virtual_path =  some_function_of(resource, request)
+            self.virtual_path_tuple =  some_function_of(resource, request)
+            self.physical_path =  some_other_function_of(resource, request)
+            self.physical_path_tuple =  some_function_of(resource, request)
 
 The default context URL generator is available for perusal as the class
 :class:`pyramid.traversal.ResourceURL` in the `traversal module
@@ -798,38 +798,38 @@ objects (without requiring a :term:`renderer` to convert a string to a response
 object), you can register an adapter which converts the string to a Response:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
+    from pyramid.response import Response
 
-   def string_response_adapter(s):
-       response = Response(s)
-       return response
+    def string_response_adapter(s):
+        response = Response(s)
+        return response
 
-   # config is an instance of pyramid.config.Configurator
+    # config is an instance of pyramid.config.Configurator
 
-   config.add_response_adapter(string_response_adapter, str)
+    config.add_response_adapter(string_response_adapter, str)
 
 Likewise, if you want to be able to return a simplified kind of response object
 from view callables, you can use the IResponse hook to register an adapter to
 the more complex IResponse interface:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
+    from pyramid.response import Response
 
-   class SimpleResponse(object):
-       def __init__(self, body):
-           self.body = body
+    class SimpleResponse(object):
+        def __init__(self, body):
+            self.body = body
 
-   def simple_response_adapter(simple_response):
-       response = Response(simple_response.body)
-       return response
+    def simple_response_adapter(simple_response):
+        response = Response(simple_response.body)
+        return response
 
-   # config is an instance of pyramid.config.Configurator
+    # config is an instance of pyramid.config.Configurator
 
-   config.add_response_adapter(simple_response_adapter, SimpleResponse)
+    config.add_response_adapter(simple_response_adapter, SimpleResponse)
 
 If you want to implement your own Response object instead of using the
 :class:`pyramid.response.Response` object in any capacity at all, you'll have
@@ -838,15 +838,15 @@ to make sure that the object implements every attribute and method outlined in
 ``zope.interface.implementer(IResponse)`` as a class decorator.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.interfaces import IResponse
-   from zope.interface import implementer
+    from pyramid.interfaces import IResponse
+    from zope.interface import implementer
 
-   @implementer(IResponse)
-   class MyResponse(object):
-       # ... an implementation of every method and attribute
-       # documented in IResponse should follow ...
+    @implementer(IResponse)
+    class MyResponse(object):
+        # ... an implementation of every method and attribute
+        # documented in IResponse should follow ...
 
 When an alternate response object implementation is returned by a view
 callable, if that object asserts that it implements
@@ -864,21 +864,21 @@ Instead of using :meth:`pyramid.config.Configurator.add_response_adapter`, you
 can use the :class:`pyramid.response.response_adapter` decorator:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
-   from pyramid.response import response_adapter
+    from pyramid.response import Response
+    from pyramid.response import response_adapter
 
-   @response_adapter(str)
-   def string_response_adapter(s):
-       response = Response(s)
-       return response
+    @response_adapter(str)
+    def string_response_adapter(s):
+        response = Response(s)
+        return response
 
 The above example, when scanned, has the same effect as:
 
 .. code-block:: python
 
-   config.add_response_adapter(string_response_adapter, str)
+    config.add_response_adapter(string_response_adapter, str)
 
 The :class:`~pyramid.response.response_adapter` decorator will have no effect
 until activated by a :term:`scan`.
@@ -922,50 +922,50 @@ it.  This somewhat emulates the Pylons style of calling action methods with
 routing parameters pulled out of the route matching dict as keyword arguments.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   # framework
+    # framework
 
-   class PylonsControllerViewMapper(object):
-       def __init__(self, **kw):
-           self.kw = kw
+    class PylonsControllerViewMapper(object):
+        def __init__(self, **kw):
+            self.kw = kw
 
-       def __call__(self, view):
-           attr = self.kw['attr']
-           def wrapper(context, request):
-               matchdict = request.matchdict.copy()
-               matchdict.pop('action', None)
-               inst = view(request)
-               meth = getattr(inst, attr)
-               return meth(**matchdict)
-           return wrapper
+        def __call__(self, view):
+            attr = self.kw['attr']
+            def wrapper(context, request):
+                matchdict = request.matchdict.copy()
+                matchdict.pop('action', None)
+                inst = view(request)
+                meth = getattr(inst, attr)
+                return meth(**matchdict)
+            return wrapper
 
-   class BaseController(object):
-       __view_mapper__ = PylonsControllerViewMapper
+    class BaseController(object):
+        __view_mapper__ = PylonsControllerViewMapper
 
 A user might make use of these framework components like so:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   # user application
+    # user application
 
-   from pyramid.response import Response
-   from pyramid.config import Configurator
-   import pyramid_handlers
-   from wsgiref.simple_server import make_server
+    from pyramid.response import Response
+    from pyramid.config import Configurator
+    import pyramid_handlers
+    from wsgiref.simple_server import make_server
 
-   class MyController(BaseController):
-       def index(self, id):
-           return Response(id)
+    class MyController(BaseController):
+        def index(self, id):
+            return Response(id)
 
-   if __name__ == '__main__':
-       config = Configurator()
-       config.include(pyramid_handlers)
-       config.add_handler('one', '/{id}', MyController, action='index')
-       config.add_handler('two', '/{action}/{id}', MyController)
-       server.make_server('0.0.0.0', 8080, config.make_wsgi_app())
-       server.serve_forever()
+    if __name__ == '__main__':
+        config = Configurator()
+        config.include(pyramid_handlers)
+        config.add_handler('one', '/{id}', MyController, action='index')
+        config.add_handler('two', '/{action}/{id}', MyController)
+        server.make_server('0.0.0.0', 8080, config.make_wsgi_app())
+        server.serve_forever()
 
 The :meth:`pyramid.config.Configurator.set_view_mapper` method can be used to
 set a *default* view mapper (overriding the superdefault view mapper used by
@@ -1002,62 +1002,62 @@ configuration had even begun.
 However, using :term:`Venusian`, the decorator could be written as follows:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   import venusian
-   from mypackage.interfaces import IMyUtility
+    import venusian
+    from mypackage.interfaces import IMyUtility
 
-   class registerFunction(object):
+    class registerFunction(object):
 
-       def __init__(self, path):
-           self.path = path
+        def __init__(self, path):
+            self.path = path
 
-       def register(self, scanner, name, wrapped):
-           registry = scanner.config.registry
-           registry.getUtility(IMyUtility).register(
-               self.path, wrapped)
+        def register(self, scanner, name, wrapped):
+            registry = scanner.config.registry
+            registry.getUtility(IMyUtility).register(
+                self.path, wrapped)
 
-       def __call__(self, wrapped):
-           venusian.attach(wrapped, self.register)
-           return wrapped
+        def __call__(self, wrapped):
+            venusian.attach(wrapped, self.register)
+            return wrapped
 
 This decorator could then be used to register functions throughout your code:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   @registerFunction('/some/path')
-   def my_function():
-       do_stuff()
+    @registerFunction('/some/path')
+    def my_function():
+        do_stuff()
 
 However, the utility would only be looked up when a :term:`scan` was performed,
 enabling you to set up the utility in advance:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from zope.interface import implementer
+    from zope.interface import implementer
 
-   from wsgiref.simple_server import make_server
-   from pyramid.config import Configurator
-   from mypackage.interfaces import IMyUtility
+    from wsgiref.simple_server import make_server
+    from pyramid.config import Configurator
+    from mypackage.interfaces import IMyUtility
 
-   @implementer(IMyUtility)
-   class UtilityImplementation:
+    @implementer(IMyUtility)
+    class UtilityImplementation:
 
-       def __init__(self):
-           self.registrations = {}
+        def __init__(self):
+            self.registrations = {}
 
-       def register(self, path, callable_):
-           self.registrations[path] = callable_
+        def register(self, path, callable_):
+            self.registrations[path] = callable_
 
-   if __name__ == '__main__':
-       config = Configurator()
-       config.registry.registerUtility(UtilityImplementation())
-       config.scan()
-       app = config.make_wsgi_app()
-       server = make_server('0.0.0.0', 8080, app)
-       server.serve_forever()
+    if __name__ == '__main__':
+        config = Configurator()
+        config.registry.registerUtility(UtilityImplementation())
+        config.scan()
+        app = config.make_wsgi_app()
+        server = make_server('0.0.0.0', 8080, app)
+        server.serve_forever()
 
 For full details, please read the :ref:`Venusian documentation <venusian:venusian>`.
 
@@ -1246,7 +1246,9 @@ very last tween factory added) as its request handler function.  For example:
     config.add_tween('myapp.tween_factory1')
     config.add_tween('myapp.tween_factory2')
 
-The above example will generate an implicit tween chain that looks like this::
+The above example will generate an implicit tween chain that looks like this.
+
+.. code-block:: text
 
     INGRESS (implicit)
     myapp.tween_factory2
@@ -1292,13 +1294,15 @@ factory represented by ``myapp.tween_factory`` directly "above" (in ``ptweens``
 order) the main Pyramid request handler.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   import pyramid.tweens
+    import pyramid.tweens
 
-   config.add_tween('myapp.tween_factory', over=pyramid.tweens.MAIN)
+    config.add_tween('myapp.tween_factory', over=pyramid.tweens.MAIN)
 
-The above example will generate an implicit tween chain that looks like this::
+The above example will generate an implicit tween chain that looks like this.
+
+.. code-block:: text
 
     INGRESS (implicit)
     pyramid.tweens.excview_tween_factory (implicit)
@@ -1310,15 +1314,15 @@ Likewise, calling the following call to
 factory "above" the main handler but "below" a separately added tween factory:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   import pyramid.tweens
+    import pyramid.tweens
 
-   config.add_tween('myapp.tween_factory1',
-                    over=pyramid.tweens.MAIN)
-   config.add_tween('myapp.tween_factory2',
-                    over=pyramid.tweens.MAIN,
-                    under='myapp.tween_factory1')
+    config.add_tween('myapp.tween_factory1',
+                     over=pyramid.tweens.MAIN)
+    config.add_tween('myapp.tween_factory2',
+                     over=pyramid.tweens.MAIN,
+                     under='myapp.tween_factory1')
 
 The above example will generate an implicit tween chain that looks like this::
 
@@ -1357,17 +1361,17 @@ list of Python dotted names which will override the ordering (and inclusion) of
 tween factories in the implicit tween chain.  For example:
 
 .. code-block:: ini
-   :linenos:
+    :linenos:
 
-   [app:main]
-   use = egg:MyApp
-   pyramid.reload_templates = true
-   pyramid.debug_authorization = false
-   pyramid.debug_notfound = false
-   pyramid.debug_routematch = false
-   pyramid.debug_templates = true
-   pyramid.tweens = myapp.my_cool_tween_factory
-                    pyramid.tweens.excview_tween_factory
+    [app:main]
+    use = egg:MyApp
+    pyramid.reload_templates = true
+    pyramid.debug_authorization = false
+    pyramid.debug_notfound = false
+    pyramid.debug_routematch = false
+    pyramid.debug_templates = true
+    pyramid.tweens = myapp.my_cool_tween_factory
+                     pyramid.tweens.excview_tween_factory
 
 In the above configuration, calls made during configuration to
 :meth:`pyramid.config.Configurator.add_tween` are ignored, and the user is
@@ -1594,7 +1598,7 @@ registered ``request_path_startswith`` predicate in a call to
     # and at configuration time
 
     config.add_subscriber(yosubscriber, NewRequest,
-           request_path_startswith='/add_yo')
+                          request_path_startswith='/add_yo')
 
 Here's the same subscriber/predicate/event-type combination used via
 :class:`~pyramid.events.subscriber`.
@@ -1726,24 +1730,24 @@ For example, below is a callable that can provide timing information for the
 view pipeline:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   import time
+    import time
 
-   def timing_view(view, info):
-       if info.options.get('timed'):
-           def wrapper_view(context, request):
-               start = time.time()
-               response = view(context, request)
-               end = time.time()
-               response.headers['X-View-Performance'] = '%.3f' % (end - start,)
-               return response
-           return wrapper_view
-       return view
+    def timing_view(view, info):
+        if info.options.get('timed'):
+            def wrapper_view(context, request):
+                start = time.time()
+                response = view(context, request)
+                end = time.time()
+                response.headers['X-View-Performance'] = '%.3f' % (end - start,)
+                return response
+            return wrapper_view
+        return view
 
-   timing_view.options = ('timed',)
+    timing_view.options = ('timed',)
 
-   config.add_view_deriver(timing_view)
+    config.add_view_deriver(timing_view)
 
 The setting of ``timed`` on the timing_view signifies to Pyramid that ``timed``
 is a valid ``view_config`` keyword argument now.  The ``timing_view`` custom
@@ -1753,20 +1757,20 @@ a ``timed=True`` value passed as one of its ``view_config`` keywords.
 For example, this view configuration will *not* be a timed view:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   @view_config(route_name='home')
-   def home(request):
-       return Response('Home')
+    @view_config(route_name='home')
+    def home(request):
+        return Response('Home')
 
 But this view *will* have timing information added to the response headers:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   @view_config(route_name='home', timed=True)
-   def home(request):
-       return Response('Home')
+    @view_config(route_name='home', timed=True)
+    def home(request):
+        return Response('Home')
 
 View derivers are unique in that they have access to most of the options
 passed to :meth:`pyramid.config.Configurator.add_view` in order to decide what

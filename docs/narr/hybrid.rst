@@ -35,15 +35,15 @@ will often have statements like this within its application startup
 configuration:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   # config is an instance of pyramid.config.Configurator
+    # config is an instance of pyramid.config.Configurator
 
-   config.add_route('foobar', '{foo}/{bar}')
-   config.add_route('bazbuz', '{baz}/{buz}')
+    config.add_route('foobar', '{foo}/{bar}')
+    config.add_route('bazbuz', '{baz}/{buz}')
 
-   config.add_view('myproject.views.foobar', route_name='foobar')
-   config.add_view('myproject.views.bazbuz', route_name='bazbuz')
+    config.add_view('myproject.views.foobar', route_name='foobar')
+    config.add_view('myproject.views.bazbuz', route_name='bazbuz')
 
 Each :term:`route` corresponds to one or more view callables.  Each view
 callable is associated with a route by passing a ``route_name`` parameter that
@@ -181,9 +181,9 @@ A hybrid application most often implies the inclusion of a route configuration
 that contains the special token ``*traverse`` at the end of a route's pattern:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_route('home', '{foo}/{bar}/*traverse')
+    config.add_route('home', '{foo}/{bar}/*traverse')
 
 A ``*traverse`` token at the end of the pattern in a route's configuration
 implies a "remainder" *capture* value.  When it is used, it will match the
@@ -217,31 +217,31 @@ application.  To that end, let's imagine that we've created a root factory that
 looks like so in a module named ``routes.py``:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   class Resource(object):
-       def __init__(self, subobjects):
-          self.subobjects = subobjects
+    class Resource(object):
+        def __init__(self, subobjects):
+           self.subobjects = subobjects
 
-       def __getitem__(self, name):
-          return self.subobjects[name]
+        def __getitem__(self, name):
+           return self.subobjects[name]
 
-   root = Resource(
-           {'a': Resource({'b': Resource({'c': Resource({})})})}
-          )
+    root = Resource(
+               {'a': Resource({'b': Resource({'c': Resource({})})})}
+           )
 
-   def root_factory(request):
-       return root
+    def root_factory(request):
+        return root
 
 Above we've defined a (bogus) resource tree that can be traversed, and a
 ``root_factory`` function that can be used as part of a particular route
 configuration statement:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_route('home', '{foo}/{bar}/*traverse',
-                    factory='mypackage.routes.root_factory')
+    config.add_route('home', '{foo}/{bar}/*traverse',
+                     factory='mypackage.routes.root_factory')
 
 The ``factory`` above points at the function we've defined.  It will return an
 instance of the ``Resource`` class as a root object whenever this route is
@@ -286,11 +286,11 @@ configuration that will match when :term:`view lookup` is invoked after a route
 matches:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_route('home', '{foo}/{bar}/*traverse',
-                    factory='mypackage.routes.root_factory')
-   config.add_view('mypackage.views.myview', route_name='home')
+    config.add_route('home', '{foo}/{bar}/*traverse',
+                     factory='mypackage.routes.root_factory')
+    config.add_view('mypackage.views.myview', route_name='home')
 
 Note that the above call to :meth:`~pyramid.config.Configurator.add_view`
 includes a ``route_name`` argument.  View configurations that include a
@@ -316,13 +316,13 @@ It is also possible to declare alternative views that may be invoked when a
 hybrid route is matched:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_route('home', '{foo}/{bar}/*traverse',
-                    factory='mypackage.routes.root_factory')
-   config.add_view('mypackage.views.myview', route_name='home')
-   config.add_view('mypackage.views.another_view', route_name='home',
-                   name='another')
+    config.add_route('home', '{foo}/{bar}/*traverse',
+                     factory='mypackage.routes.root_factory')
+    config.add_view('mypackage.views.myview', route_name='home')
+    config.add_view('mypackage.views.another_view', route_name='home',
+                    name='another')
 
 The ``add_view`` call for ``mypackage.views.another_view`` above names a
 different view and, more importantly, a different :term:`view name`.  The above
@@ -361,10 +361,10 @@ Here's a use of the ``traverse`` pattern in a call to
 :meth:`~pyramid.config.Configurator.add_route`:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_route('abc', '/articles/{article}/edit',
-                    traverse='/{article}')
+    config.add_route('abc', '/articles/{article}/edit',
+                     traverse='/{article}')
 
 The syntax of the ``traverse`` argument is the same as it is for ``pattern``.
 
@@ -404,10 +404,10 @@ though the view configuration statement does not have the ``route_name="abc"``
 attribute.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_route('abc', '/abc/*traverse', use_global_views=True)
-   config.add_view('myproject.views.bazbuz', name='bazbuz')
+    config.add_route('abc', '/abc/*traverse', use_global_views=True)
+    config.add_view('myproject.views.bazbuz', name='bazbuz')
 
 .. index::
    pair: hybrid applications; *subpath
@@ -432,14 +432,14 @@ value of ``*subpath``.  You'll see this pattern most commonly in route
 declarations that look like this:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.static import static_view
+    from pyramid.static import static_view
 
-   www = static_view('mypackage:static', use_subpath=True)
+    www = static_view('mypackage:static', use_subpath=True)
 
-   config.add_route('static', '/static/*subpath')
-   config.add_view(www, route_name='static')
+    config.add_route('static', '/static/*subpath')
+    config.add_view(www, route_name='static')
 
 ``mypackage.views.www`` is an instance of :class:`pyramid.static.static_view`.
 This effectively tells the static helper to traverse everything in the subpath
@@ -472,7 +472,7 @@ like so:
 
 .. code-block:: python
 
-   config.add_route('mysection', '/mysection*traverse')
+    config.add_route('mysection', '/mysection*traverse')
 
 If you'd like to generate the URL ``http://example.com/mysection/a/``, you can
 use the following incantation, assuming that the variable ``a`` below points to
@@ -480,13 +480,13 @@ a resource that is a child of the root with a ``__name__`` of ``a``:
 
 .. code-block:: python
 
-   request.resource_url(a, route_name='mysection')
+    request.resource_url(a, route_name='mysection')
 
 You can generate only the path portion ``/mysection/a/`` assuming the same:
 
 .. code-block:: python
 
-   request.resource_path(a, route_name='mysection')
+    request.resource_path(a, route_name='mysection')
 
 The path is virtual host aware, so if the ``X-Vhm-Root`` environment variable
 is present in the request, and it's set to ``/a``, the above call to
@@ -501,13 +501,13 @@ the route definition is like so:
 
 .. code-block:: python
 
-   config.add_route('mysection', '/{id}/mysection*traverse')
+    config.add_route('mysection', '/{id}/mysection*traverse')
 
 You can pass ``route_kw`` in to fill in ``{id}`` above:
 
 .. code-block:: python
 
-   request.resource_url(a, route_name='mysection', route_kw={'id':'1'})
+    request.resource_url(a, route_name='mysection', route_kw={'id':'1'})
 
 If you pass ``route_kw`` but do not pass ``route_name``, ``route_kw`` will be
 ignored.
@@ -521,13 +521,13 @@ following route:
 
 .. code-block:: python
 
-   config.add_route('mysection', '/mysection*subpath')
+    config.add_route('mysection', '/mysection*subpath')
 
 You can fill in the ``*subpath`` value using ``resource_url`` by doing:
 
 .. code-block:: python
 
-   request.resource_path(a, route_name='mysection',
+    request.resource_path(a, route_name='mysection',
                          route_remainder_name='subpath')
 
 If you pass ``route_remainder_name`` but do not pass ``route_name``,

@@ -45,7 +45,7 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r forms databases; cd databases
+       cd ..; cp -r forms databases; cd databases
 
 #. We need to add some dependencies in ``databases/setup.py`` as well as an
    "entry point" for the command-line script:
@@ -62,85 +62,85 @@ Steps
    new pieces:
 
    .. literalinclude:: databases/development.ini
-    :language: ini
+       :language: ini
 
 #. This engine configuration now needs to be read into the application through
    changes in ``databases/tutorial/__init__.py``:
 
    .. literalinclude:: databases/tutorial/__init__.py
-    :linenos:
+       :linenos:
 
 #. Make a command-line script at ``databases/tutorial/initialize_db.py`` to
    initialize the database:
 
    .. literalinclude:: databases/tutorial/initialize_db.py
-    :linenos:
+       :linenos:
 
 #. Since ``setup.py`` changed, we now run it:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pip install -e .
+       $VENV/bin/pip install -e .
 
 #. The script references some models in ``databases/tutorial/models.py``:
 
    .. literalinclude:: databases/tutorial/models.py
-    :linenos:
+       :linenos:
 
 #. Let's run this console script, thus producing our database and table:
 
    .. code-block:: bash
 
-    $ $VENV/bin/initialize_tutorial_db development.ini
+       $VENV/bin/initialize_tutorial_db development.ini
 
-    2016-04-16 13:01:33,055 INFO  [sqlalchemy.engine.base.Engine][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-    2016-04-16 13:01:33,055 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-    2016-04-16 13:01:33,056 INFO  [sqlalchemy.engine.base.Engine][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-    2016-04-16 13:01:33,056 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-    2016-04-16 13:01:33,057 INFO  [sqlalchemy.engine.base.Engine][MainThread] PRAGMA table_info("wikipages")
-    2016-04-16 13:01:33,057 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-    2016-04-16 13:01:33,058 INFO  [sqlalchemy.engine.base.Engine][MainThread]
-    CREATE TABLE wikipages (
-            uid INTEGER NOT NULL,
-            title TEXT,
-            body TEXT,
-            PRIMARY KEY (uid),
-            UNIQUE (title)
-    )
+       2016-04-16 13:01:33,055 INFO  [sqlalchemy.engine.base.Engine][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+       2016-04-16 13:01:33,055 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+       2016-04-16 13:01:33,056 INFO  [sqlalchemy.engine.base.Engine][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+       2016-04-16 13:01:33,056 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+       2016-04-16 13:01:33,057 INFO  [sqlalchemy.engine.base.Engine][MainThread] PRAGMA table_info("wikipages")
+       2016-04-16 13:01:33,057 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+       2016-04-16 13:01:33,058 INFO  [sqlalchemy.engine.base.Engine][MainThread]
+       CREATE TABLE wikipages (
+               uid INTEGER NOT NULL,
+               title TEXT,
+               body TEXT,
+               PRIMARY KEY (uid),
+               UNIQUE (title)
+       )
 
 
-    2016-04-16 13:01:33,058 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-    2016-04-16 13:01:33,059 INFO  [sqlalchemy.engine.base.Engine][MainThread] COMMIT
-    2016-04-16 13:01:33,062 INFO  [sqlalchemy.engine.base.Engine][MainThread] BEGIN (implicit)
-    2016-04-16 13:01:33,062 INFO  [sqlalchemy.engine.base.Engine][MainThread] INSERT INTO wikipages (title, body) VALUES (?, ?)
-    2016-04-16 13:01:33,063 INFO  [sqlalchemy.engine.base.Engine][MainThread] ('Root', '<p>Root</p>')
-    2016-04-16 13:01:33,063 INFO  [sqlalchemy.engine.base.Engine][MainThread] COMMIT
+       2016-04-16 13:01:33,058 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+       2016-04-16 13:01:33,059 INFO  [sqlalchemy.engine.base.Engine][MainThread] COMMIT
+       2016-04-16 13:01:33,062 INFO  [sqlalchemy.engine.base.Engine][MainThread] BEGIN (implicit)
+       2016-04-16 13:01:33,062 INFO  [sqlalchemy.engine.base.Engine][MainThread] INSERT INTO wikipages (title, body) VALUES (?, ?)
+       2016-04-16 13:01:33,063 INFO  [sqlalchemy.engine.base.Engine][MainThread] ('Root', '<p>Root</p>')
+       2016-04-16 13:01:33,063 INFO  [sqlalchemy.engine.base.Engine][MainThread] COMMIT
 
 #. With our data now driven by SQLAlchemy queries, we need to update our
    ``databases/tutorial/views.py``:
 
    .. literalinclude:: databases/tutorial/views.py
-    :linenos:
+       :linenos:
 
 #. Our tests in ``databases/tutorial/tests.py`` changed to include SQLAlchemy
    bootstrapping:
 
    .. literalinclude:: databases/tutorial/tests.py
-    :linenos:
+       :linenos:
 
 #. Run the tests in your package using ``py.test``:
 
    .. code-block:: bash
 
-    $ $VENV/bin/py.test tutorial/tests.py -q
-    ..
-    2 passed in 1.41 seconds
+       $VENV/bin/py.test tutorial/tests.py -q
+       ..
+       2 passed in 1.41 seconds
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini --reload
+       $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ in a browser.
 

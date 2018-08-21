@@ -57,63 +57,63 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r templating more_view_classes; cd more_view_classes
-    $ $VENV/bin/pip install -e .
+       cd ..; cp -r templating more_view_classes; cd more_view_classes
+       $VENV/bin/pip install -e .
 
 #. Our route in ``more_view_classes/tutorial/__init__.py`` needs some
    replacement patterns:
 
    .. literalinclude:: more_view_classes/tutorial/__init__.py
-    :linenos:
+       :linenos:
 
 #. Our ``more_view_classes/tutorial/views.py`` now has a view class with
    several views:
 
    .. literalinclude:: more_view_classes/tutorial/views.py
-    :linenos:
+       :linenos:
 
 #. Our primary view needs a template at ``more_view_classes/tutorial/home.pt``:
 
    .. literalinclude:: more_view_classes/tutorial/home.pt
-    :language: html
+       :language: html
 
 #. Ditto for our other view from the previous section at
    ``more_view_classes/tutorial/hello.pt``:
 
    .. literalinclude:: more_view_classes/tutorial/hello.pt
-    :language: html
+       :language: html
 
 #. We have an edit view that also needs a template at
    ``more_view_classes/tutorial/edit.pt``:
 
    .. literalinclude:: more_view_classes/tutorial/edit.pt
-    :language: html
+       :language: html
 
 #. And finally the delete view's template at
    ``more_view_classes/tutorial/delete.pt``:
 
    .. literalinclude:: more_view_classes/tutorial/delete.pt
-    :language: html
+       :language: html
 
 #. Our tests in ``more_view_classes/tutorial/tests.py`` fail, so let's modify
    them:
 
    .. literalinclude:: more_view_classes/tutorial/tests.py
-    :linenos:
+       :linenos:
 
 #. Now run the tests:
 
    .. code-block:: bash
 
-    $ $VENV/bin/py.test tutorial/tests.py -q
-    ..
-    2 passed in 0.40 seconds
+       $VENV/bin/py.test tutorial/tests.py -q
+       ..
+       2 passed in 0.40 seconds
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini --reload
+       $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/howdy/jane/doe in your browser. Click the
    ``Save`` and ``Delete`` buttons, and watch the output in the console window.
@@ -161,13 +161,13 @@ previously hardcoded the URLs, such as:
 
 .. code-block:: html
 
-  <a href="/howdy/jane/doe">Howdy</a>
+    <a href="/howdy/jane/doe">Howdy</a>
 
 In ``home.pt`` we switched to:
 
 .. code-block:: xml
 
-  <a href="${request.route_url('hello', first='jane',
+    <a href="${request.route_url('hello', first='jane',
         last='doe')}">form</a>
 
 Pyramid has rich facilities to help generate URLs in a flexible, non-error

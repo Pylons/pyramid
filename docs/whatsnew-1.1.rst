@@ -395,7 +395,7 @@ Deprecations and Behavior Differences
    when porting your application from an older version of Pyramid.  Use the
    ``PYTHONWARNINGS`` environment variable with the value ``all`` in the
    shell you use to invoke ``paster serve`` to see these warnings, e.g. on
-   UNIX, ``PYTHONWARNINGS=all $VENV/bin/paster serve development.ini``.
+   Unix, ``PYTHONWARNINGS=all $VENV/bin/paster serve development.ini``.
    Python 2.5 and 2.6 show deprecation warnings by default,
    so this is unnecessary there.
    All deprecation warnings are emitted to the console.

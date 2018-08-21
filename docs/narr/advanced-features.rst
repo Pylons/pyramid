@@ -92,10 +92,10 @@ For example, if you want to reuse an existing application that already has a bun
     from pyramid.config import Configurator
 
     if __name__ == '__main__':
-       config = Configurator()
-       config.include('pyramid_jinja2')
-       config.include('pyramid_exclog')
-       config.include('some.other.package', route_prefix='/somethingelse')
+        config = Configurator()
+        config.include('pyramid_jinja2')
+        config.include('pyramid_exclog')
+        config.include('some.other.package', route_prefix='/somethingelse')
 
 .. seealso::
 
@@ -262,12 +262,12 @@ You can extend :app:`Pyramid`\ 's :term:`configurator` with your own directives.
 
     config = Configurator()
     config.add_route('xhr_route', '/xhr/{id}')
-    config.add_view('my.package.GET_view', route_name='xhr_route',
-                    xhr=True,  permission='view', request_method='GET')
-    config.add_view('my.package.POST_view', route_name='xhr_route',
-                    xhr=True, permission='view', request_method='POST')
-    config.add_view('my.package.HEAD_view', route_name='xhr_route',
-                    xhr=True, permission='view', request_method='HEAD')
+    config.add_view('my.package.GET_view', route_name='xhr_route', xhr=True,
+        permission='view', request_method='GET')
+    config.add_view('my.package.POST_view', route_name='xhr_route', xhr=True,
+        permission='view', request_method='POST')
+    config.add_view('my.package.HEAD_view', route_name='xhr_route', xhr=True,
+        permission='view', request_method='HEAD')
 
 Pretty tedious right? You can add a directive to the :app:`Pyramid` :term:`configurator` to automate some of the tedium away:
 

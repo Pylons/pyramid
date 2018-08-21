@@ -17,30 +17,30 @@ application.
 Here's an example application which uses a subrequest:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from wsgiref.simple_server import make_server
-   from pyramid.config import Configurator
-   from pyramid.request import Request
+    from wsgiref.simple_server import make_server
+    from pyramid.config import Configurator
+    from pyramid.request import Request
 
-   def view_one(request):
-       subreq = Request.blank('/view_two')
-       response = request.invoke_subrequest(subreq)
-       return response
+    def view_one(request):
+        subreq = Request.blank('/view_two')
+        response = request.invoke_subrequest(subreq)
+        return response
 
-   def view_two(request):
-       request.response.body = 'This came from view_two'
-       return request.response
+    def view_two(request):
+        request.response.body = 'This came from view_two'
+        return request.response
 
-   if __name__ == '__main__':
-       config = Configurator()
-       config.add_route('one', '/view_one')
-       config.add_route('two', '/view_two')
-       config.add_view(view_one, route_name='one')
-       config.add_view(view_two, route_name='two')
-       app = config.make_wsgi_app()
-       server = make_server('0.0.0.0', 8080, app)
-       server.serve_forever()
+    if __name__ == '__main__':
+        config = Configurator()
+        config.add_route('one', '/view_one')
+        config.add_route('two', '/view_two')
+        config.add_view(view_one, route_name='one')
+        config.add_view(view_two, route_name='two')
+        app = config.make_wsgi_app()
+        server = make_server('0.0.0.0', 8080, app)
+        server.serve_forever()
 
 When ``/view_one`` is visted in a browser, the text printed in the browser pane
 will be ``This came from view_two``.  The ``view_one`` view used the
@@ -61,30 +61,30 @@ adapter when found and invoked via
 object:
 
 .. code-block:: python
-   :linenos:
-   :emphasize-lines: 11,18
+    :linenos:
+    :emphasize-lines: 11,18
 
-   from wsgiref.simple_server import make_server
-   from pyramid.config import Configurator
-   from pyramid.request import Request
+    from wsgiref.simple_server import make_server
+    from pyramid.config import Configurator
+    from pyramid.request import Request
 
-   def view_one(request):
-       subreq = Request.blank('/view_two')
-       response = request.invoke_subrequest(subreq)
-       return response
+    def view_one(request):
+        subreq = Request.blank('/view_two')
+        response = request.invoke_subrequest(subreq)
+        return response
 
-   def view_two(request):
-       return 'This came from view_two'
+    def view_two(request):
+        return 'This came from view_two'
 
-   if __name__ == '__main__':
-       config = Configurator()
-       config.add_route('one', '/view_one')
-       config.add_route('two', '/view_two')
-       config.add_view(view_one, route_name='one')
-       config.add_view(view_two, route_name='two', renderer='string')
-       app = config.make_wsgi_app()
-       server = make_server('0.0.0.0', 8080, app)
-       server.serve_forever()
+    if __name__ == '__main__':
+        config = Configurator()
+        config.add_route('one', '/view_one')
+        config.add_route('two', '/view_two')
+        config.add_view(view_one, route_name='one')
+        config.add_view(view_two, route_name='two', renderer='string')
+        app = config.make_wsgi_app()
+        server = make_server('0.0.0.0', 8080, app)
+        server.serve_forever()
 
 Even though the ``view_two`` view callable returned a string, it was invoked in
 such a way that the ``string`` renderer associated with the view registration
@@ -106,36 +106,36 @@ exception, the exception will be raised to the caller of
 :term:`exception view` configured:
 
 .. code-block:: python
-   :linenos:
-   :emphasize-lines: 11-16
+    :linenos:
+    :emphasize-lines: 11-16
 
-   from wsgiref.simple_server import make_server
-   from pyramid.config import Configurator
-   from pyramid.request import Request
+    from wsgiref.simple_server import make_server
+    from pyramid.config import Configurator
+    from pyramid.request import Request
 
-   def view_one(request):
-       subreq = Request.blank('/view_two')
-       response = request.invoke_subrequest(subreq)
-       return response
+    def view_one(request):
+        subreq = Request.blank('/view_two')
+        response = request.invoke_subrequest(subreq)
+        return response
 
-   def view_two(request):
-       raise ValueError('foo')
+    def view_two(request):
+        raise ValueError('foo')
 
-   def excview(request):
-       request.response.body = b'An exception was raised'
-       request.response.status_int = 500
-       return request.response
+    def excview(request):
+        request.response.body = b'An exception was raised'
+        request.response.status_int = 500
+        return request.response
 
-   if __name__ == '__main__':
-       config = Configurator()
-       config.add_route('one', '/view_one')
-       config.add_route('two', '/view_two')
-       config.add_view(view_one, route_name='one')
-       config.add_view(view_two, route_name='two', renderer='string')
-       config.add_view(excview, context=Exception)
-       app = config.make_wsgi_app()
-       server = make_server('0.0.0.0', 8080, app)
-       server.serve_forever()
+    if __name__ == '__main__':
+        config = Configurator()
+        config.add_route('one', '/view_one')
+        config.add_route('two', '/view_two')
+        config.add_view(view_one, route_name='one')
+        config.add_view(view_two, route_name='two', renderer='string')
+        config.add_view(excview, context=Exception)
+        app = config.make_wsgi_app()
+        server = make_server('0.0.0.0', 8080, app)
+        server.serve_forever()
 
 When we run the above code and visit ``/view_one`` in a browser, the
 ``excview`` :term:`exception view` will *not* be executed.  Instead, the call
@@ -175,36 +175,36 @@ We can cause the subrequest to be run through the tween stack by passing
 :meth:`~pyramid.request.Request.invoke_subrequest`, like this:
 
 .. code-block:: python
-   :linenos:
-   :emphasize-lines: 7
+    :linenos:
+    :emphasize-lines: 7
 
-   from wsgiref.simple_server import make_server
-   from pyramid.config import Configurator
-   from pyramid.request import Request
+    from wsgiref.simple_server import make_server
+    from pyramid.config import Configurator
+    from pyramid.request import Request
 
-   def view_one(request):
-       subreq = Request.blank('/view_two')
-       response = request.invoke_subrequest(subreq, use_tweens=True)
-       return response
+    def view_one(request):
+        subreq = Request.blank('/view_two')
+        response = request.invoke_subrequest(subreq, use_tweens=True)
+        return response
 
-   def view_two(request):
-       raise ValueError('foo')
+    def view_two(request):
+        raise ValueError('foo')
 
-   def excview(request):
-       request.response.body = b'An exception was raised'
-       request.response.status_int = 500
-       return request.response
+    def excview(request):
+        request.response.body = b'An exception was raised'
+        request.response.status_int = 500
+        return request.response
 
-   if __name__ == '__main__':
-       config = Configurator()
-       config.add_route('one', '/view_one')
-       config.add_route('two', '/view_two')
-       config.add_view(view_one, route_name='one')
-       config.add_view(view_two, route_name='two', renderer='string')
-       config.add_view(excview, context=Exception)
-       app = config.make_wsgi_app()
-       server = make_server('0.0.0.0', 8080, app)
-       server.serve_forever()
+    if __name__ == '__main__':
+        config = Configurator()
+        config.add_route('one', '/view_one')
+        config.add_route('two', '/view_two')
+        config.add_view(view_one, route_name='one')
+        config.add_view(view_two, route_name='two', renderer='string')
+        config.add_view(excview, context=Exception)
+        app = config.make_wsgi_app()
+        server = make_server('0.0.0.0', 8080, app)
+        server.serve_forever()
 
 In the above case, the call to ``request.invoke_subrequest(subreq)`` will not
 raise an exception.  Instead, it will retrieve a "500" response from the
@@ -312,20 +312,20 @@ Below is an example usage of
 :meth:`pyramid.request.Request.invoke_exception_view`:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   def foo(request):
-       try:
-           some_func_that_errors()
-           return response
-       except Exception:
-           response = request.invoke_exception_view()
-           if response is not None:
-               return response
-           else:
-               # there is no exception view for this exception, simply
-               # re-raise and let someone else handle it
-               raise
+    def foo(request):
+        try:
+            some_func_that_errors()
+            return response
+        except Exception:
+            response = request.invoke_exception_view()
+            if response is not None:
+                return response
+            else:
+                # there is no exception view for this exception, simply
+                # re-raise and let someone else handle it
+                raise
 
 Please note that in most cases you do not need to write code like this, and you
 may rely on the ``EXCVIEW`` tween to handle this for you.

@@ -41,36 +41,35 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r templating view_classes; cd view_classes
-    $ $VENV/bin/pip install -e .
+       cd ..; cp -r templating view_classes; cd view_classes
+       $VENV/bin/pip install -e .
 
 #. Our ``view_classes/tutorial/views.py`` now has a view class with our two
    views:
 
    .. literalinclude:: view_classes/tutorial/views.py
-    :linenos:
+       :linenos:
 
 #. Our unit tests in ``view_classes/tutorial/tests.py`` don't run, so let's
    modify them to import the view class, and make an instance before getting a
    response:
 
    .. literalinclude:: view_classes/tutorial/tests.py
-    :linenos:
+       :linenos:
 
 #. Now run the tests:
 
    .. code-block:: bash
 
-
-    $ $VENV/bin/py.test tutorial/tests.py -q
-    ....
-    4 passed in 0.34 seconds
+       $VENV/bin/py.test tutorial/tests.py -q
+       ....
+       4 passed in 0.34 seconds
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini --reload
+       $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ and http://localhost:6543/howdy in your browser.
 

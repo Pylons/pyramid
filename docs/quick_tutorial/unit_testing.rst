@@ -48,23 +48,23 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r debugtoolbar unit_testing; cd unit_testing
-    $ $VENV/bin/pip install -e .
-    $ $VENV/bin/pip install pytest
+       cd ..; cp -r debugtoolbar unit_testing; cd unit_testing
+       $VENV/bin/pip install -e .
+       $VENV/bin/pip install pytest
 
 #. Now we write a simple unit test in ``unit_testing/tutorial/tests.py``:
 
    .. literalinclude:: unit_testing/tutorial/tests.py
-    :linenos:
+       :linenos:
 
 #. Now run the tests:
 
    .. code-block:: bash
 
 
-    $ $VENV/bin/py.test tutorial/tests.py -q
-    .
-    1 passed in 0.14 seconds
+       $VENV/bin/py.test tutorial/tests.py -q
+       .
+       1 passed in 0.14 seconds
 
 
 Analysis

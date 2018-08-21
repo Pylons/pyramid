@@ -8,7 +8,7 @@ you'll see something much like this show up on the console:
 
 .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini
+    $VENV/bin/pserve development.ini
     Starting server in PID 16305.
     Serving on http://localhost:6543
     Serving on http://localhost:6543

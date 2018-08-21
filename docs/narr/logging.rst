@@ -65,7 +65,7 @@ In this logging configuration:
 
   .. code-block:: text
 
-     2007-08-17 15:04:08,704 INFO [packagename] Loading resource, id: 86
+      2007-08-17 15:04:08,704 INFO [packagename] Loading resource, id: 86
 
 - a logger named ``myproject`` is configured that logs messages sent at a level
   above or equal to ``DEBUG`` to stderr in the same format as the root logger.
@@ -276,7 +276,7 @@ function of your project's ``__init__`` file:
 
 .. code-block:: python
 
-    ...
+    # ...
     app = config.make_wsgi_app()
     from paste.translogger import TransLogger
     app = TransLogger(app, setup_console_handler=False)
@@ -298,7 +298,7 @@ output to the console when we request a page:
                       (content-type: text/plain)
     00:50:53,695 INFO [wsgi] 192.168.1.111 - - [11/Aug/2011:20:09:33 -0700] "GET /hello
     HTTP/1.1" 404 - "-"
-    "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.6) Gecko/20070725
+    "Mozilla/5.0 (Macintosh; U; Intel macOS; en-US; rv:1.8.1.6) Gecko/20070725
     Firefox/2.0.0.6"
 
 To direct TransLogger to an ``access.log`` FileHandler, we need the following

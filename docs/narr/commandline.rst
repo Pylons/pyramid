@@ -32,19 +32,19 @@ to be ``main``.
 Here is an example for a simple view configuration using :term:`traversal`:
 
 .. code-block:: text
-   :linenos:
+    :linenos:
 
-   $ $VENV/bin/pviews development.ini#tutorial /FrontPage
+    $VENV/bin/pviews development.ini#tutorial /FrontPage
 
-   URL = /FrontPage
+    URL = /FrontPage
 
-       context: <tutorial.models.Page object at 0xa12536c>
-       view name:
+        context: <tutorial.models.Page object at 0xa12536c>
+        view name:
 
-       View:
-       -----
-       tutorial.views.view_page
-       required permission = view
+        View:
+        -----
+        tutorial.views.view_page
+        required permission = view
 
 The output always has the requested URL at the top and below that all the views
 that matched with their view configuration details. In this example only one
@@ -55,48 +55,48 @@ permissions and predicates that are part of that view configuration.
 A more complex configuration might generate something like this:
 
 .. code-block:: text
-   :linenos:
+    :linenos:
 
-   $ $VENV/bin/pviews development.ini#shootout /about
+    $VENV/bin/pviews development.ini#shootout /about
 
-   URL = /about
+    URL = /about
 
-       context: <shootout.models.RootFactory object at 0xa56668c>
-       view name: about
+        context: <shootout.models.RootFactory object at 0xa56668c>
+        view name: about
 
-       Route:
-       ------
-       route name: about
-       route pattern: /about
-       route path: /about
-       subpath:
-       route predicates (request method = GET)
+        Route:
+        ------
+        route name: about
+        route pattern: /about
+        route path: /about
+        subpath:
+        route predicates (request method = GET)
 
-           View:
-           -----
-           shootout.views.about_view
-           required permission = view
-           view predicates (request_param testing, header X/header)
+            View:
+            -----
+            shootout.views.about_view
+            required permission = view
+            view predicates (request_param testing, header X/header)
 
-       Route:
-       ------
-       route name: about_post
-       route pattern: /about
-       route path: /about
-       subpath:
-       route predicates (request method = POST)
+        Route:
+        ------
+        route name: about_post
+        route pattern: /about
+        route path: /about
+        subpath:
+        route predicates (request method = POST)
 
-           View:
-           -----
-           shootout.views.about_view_post
-           required permission = view
-           view predicates (request_param test)
+            View:
+            -----
+            shootout.views.about_view_post
+            required permission = view
+            view predicates (request_param test)
 
-           View:
-           -----
-           shootout.views.about_view_post2
-           required permission = view
-           view predicates (request_param test2)
+            View:
+            -----
+            shootout.views.about_view_post2
+            required permission = view
+            view predicates (request_param test2)
 
 In this case, we are dealing with a :term:`URL dispatch` application. This
 specific URL has two matching routes. The matching route information is
@@ -131,22 +131,22 @@ points to your application.  For example, your application ``.ini`` file might
 have an ``[app:main]`` section that looks like so:
 
 .. code-block:: ini
-   :linenos:
+    :linenos:
 
-   [app:main]
-   use = egg:MyProject
-   pyramid.reload_templates = true
-   pyramid.debug_authorization = false
-   pyramid.debug_notfound = false
-   pyramid.debug_templates = true
-   pyramid.default_locale_name = en
+    [app:main]
+    use = egg:MyProject
+    pyramid.reload_templates = true
+    pyramid.debug_authorization = false
+    pyramid.debug_notfound = false
+    pyramid.debug_templates = true
+    pyramid.default_locale_name = en
 
 If so, you can use the following command to invoke a debug shell using the name
 ``main`` as a section name:
 
 .. code-block:: text
 
-    $ $VENV/bin/pshell starter/development.ini#main
+    $VENV/bin/pshell starter/development.ini#main
     Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32)
     [GCC 4.4.3] on linux2
     Type "help" for more information.
@@ -180,7 +180,7 @@ hash after the filename:
 
 .. code-block:: text
 
-    $ $VENV/bin/pshell starter/development.ini
+    $VENV/bin/pshell starter/development.ini
 
 Press ``Ctrl-D`` to exit the interactive shell (or ``Ctrl-Z`` on Windows).
 
@@ -213,11 +213,11 @@ using ``pyramid_tm`` to configure a transaction manager on the request as
 ``request.tm``.
 
 .. code-block:: ini
-   :linenos:
+    :linenos:
 
-   [pshell]
-   setup = myapp.lib.pshell.setup
-   models = myapp.models
+    [pshell]
+    setup = myapp.lib.pshell.setup
+    models = myapp.models
 
 By defining the ``setup`` callable, we will create the module ``myapp.lib.pshell`` containing a callable named ``setup`` that will receive the global environment before it is exposed to the shell. Here we mutate the environment's request as well as add a new value containing a WebTest version of the application to which we can easily submit requests. The ``setup`` callable can also be a generator which can wrap the entire shell lifecycle, executing code when the shell exits.
 
@@ -254,7 +254,7 @@ When this ``.ini`` file is loaded, the extra variable ``models`` will be availab
 
 .. code-block:: text
 
-    $ $VENV/bin/pshell starter/development.ini
+    $VENV/bin/pshell starter/development.ini
     Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32)
     [GCC 4.4.3] on linux2
     Type "help" for more information.
@@ -298,17 +298,17 @@ used. You may also specifically invoke your choice with the ``-p choice`` or
 
 .. code-block:: text
 
-   $ $VENV/bin/pshell -p ipython development.ini#MyProject
+    $VENV/bin/pshell -p ipython development.ini#MyProject
 
 You may use the ``--list-shells`` option to see the available shells.
 
 .. code-block:: text
 
-   $ $VENV/bin/pshell --list-shells
-   Available shells:
-     bpython
-     ipython
-     python
+    $VENV/bin/pshell --list-shells
+    Available shells:
+      bpython
+      ipython
+      python
 
 If you want to use a shell that isn't supported out of the box, you can
 introduce a new shell by registering an entry point in your ``setup.py``:
@@ -318,7 +318,7 @@ introduce a new shell by registering an entry point in your ``setup.py``:
     setup(
         entry_points={
             'pyramid.pshell_runner': [
-              'myshell=my_app:ptpython_shell_factory',
+                'myshell=my_app:ptpython_shell_factory',
             ],
         },
     )
@@ -349,10 +349,10 @@ You may use the ``default_shell`` option in your ``[pshell]`` ini section to
 specify a list of preferred shells.
 
 .. code-block:: ini
-   :linenos:
+    :linenos:
 
-   [pshell]
-   default_shell = ptpython ipython bpython
+    [pshell]
+    default_shell = ptpython ipython bpython
 
 .. versionadded:: 1.6
 
@@ -379,21 +379,21 @@ the ``section_name`` is ``main`` and can be omitted.
 For example:
 
 .. code-block:: text
-   :linenos:
+    :linenos:
 
-   $ $VENV/bin/proutes development.ini
-   Name                       Pattern                     View                                          Method
-   ----                       -------                     ----                                          ------
-   debugtoolbar               /_debug_toolbar/*subpath    <wsgiapp>                                     *
-   __static/                  /static/*subpath            dummy_starter:static/                         *
-   __static2/                 /static2/*subpath           /var/www/static/                              *
-   __pdt_images/              /pdt_images/*subpath        pyramid_debugtoolbar:static/img/              *
-   a                          /                           <unknown>                                     *
-   no_view_attached           /                           <unknown>                                     *
-   route_and_view_attached    /                           app1.standard_views.route_and_view_attached   *
-   method_conflicts           /conflicts                  app1.standard_conflicts                       <route mismatch>
-   multiview                  /multiview                  app1.standard_views.multiview                 GET,PATCH
-   not_post                   /not_post                   app1.standard_views.multview                  !POST,*
+    $VENV/bin/proutes development.ini
+    Name                       Pattern                     View                                          Method
+    ----                       -------                     ----                                          ------
+    debugtoolbar               /_debug_toolbar/*subpath    <wsgiapp>                                     *
+    __static/                  /static/*subpath            dummy_starter:static/                         *
+    __static2/                 /static2/*subpath           /var/www/static/                              *
+    __pdt_images/              /pdt_images/*subpath        pyramid_debugtoolbar:static/img/              *
+    a                          /                           <unknown>                                     *
+    no_view_attached           /                           <unknown>                                     *
+    route_and_view_attached    /                           app1.standard_views.route_and_view_attached   *
+    method_conflicts           /conflicts                  app1.standard_conflicts                       <route mismatch>
+    multiview                  /multiview                  app1.standard_views.multiview                 GET,PATCH
+    not_post                   /not_post                   app1.standard_views.multview                  !POST,*
 
 ``proutes`` generates a table with four columns: *Name*, *Pattern*, *View*, and
 *Method*.  The items listed in the Name column are route names, the items
@@ -416,7 +416,7 @@ and use those as defaults.
 For example you may remove the request method and place the view first:
 
 .. code-block:: text
-  :linenos:
+    :linenos:
 
     [proutes]
     format = view
@@ -426,7 +426,7 @@ For example you may remove the request method and place the view first:
 You can also separate the formats with commas or spaces:
 
 .. code-block:: text
-  :linenos:
+    :linenos:
 
     [proutes]
     format = view name pattern
@@ -463,67 +463,67 @@ For example, here's the ``ptweens`` command run against a system configured
 without any explicit tweens:
 
 .. code-block:: text
-   :linenos:
+    :linenos:
 
-   $ $VENV/bin/ptweens development.ini
-   "pyramid.tweens" config value NOT set (implicitly ordered tweens used)
+    $VENV/bin/ptweens development.ini
+    "pyramid.tweens" config value NOT set (implicitly ordered tweens used)
 
-   Implicit Tween Chain
+    Implicit Tween Chain
 
-   Position    Name                                                Alias
-   --------    ----                                                -----
-   -           -                                                   INGRESS
-   0           pyramid_debugtoolbar.toolbar.toolbar_tween_factory  pdbt
-   1           pyramid.tweens.excview_tween_factory                excview
-   -           -                                                   MAIN
+    Position    Name                                                Alias
+    --------    ----                                                -----
+    -           -                                                   INGRESS
+    0           pyramid_debugtoolbar.toolbar.toolbar_tween_factory  pdbt
+    1           pyramid.tweens.excview_tween_factory                excview
+    -           -                                                   MAIN
 
 Here's the ``ptweens`` command run against a system configured *with* explicit
 tweens defined in its ``development.ini`` file:
 
 .. code-block:: text
-   :linenos:
+    :linenos:
 
-   $ ptweens development.ini
-   "pyramid.tweens" config value set (explicitly ordered tweens used)
+    ptweens development.ini
+    "pyramid.tweens" config value set (explicitly ordered tweens used)
 
-   Explicit Tween Chain (used)
+    Explicit Tween Chain (used)
 
-   Position    Name
-   --------    ----
-   -           INGRESS
-   0           starter.tween_factory2
-   1           starter.tween_factory1
-   2           pyramid.tweens.excview_tween_factory
-   -           MAIN
+    Position    Name
+    --------    ----
+    -           INGRESS
+    0           starter.tween_factory2
+    1           starter.tween_factory1
+    2           pyramid.tweens.excview_tween_factory
+    -           MAIN
 
-   Implicit Tween Chain (not used)
+    Implicit Tween Chain (not used)
 
-   Position    Name
-   --------    ----
-   -           INGRESS
-   0           pyramid_debugtoolbar.toolbar.toolbar_tween_factory
-   1           pyramid.tweens.excview_tween_factory
-   -           MAIN
+    Position    Name
+    --------    ----
+    -           INGRESS
+    0           pyramid_debugtoolbar.toolbar.toolbar_tween_factory
+    1           pyramid.tweens.excview_tween_factory
+    -           MAIN
 
 Here's the application configuration section of the ``development.ini`` used by
 the above ``ptweens`` command which reports that the explicit tween chain is
 used:
 
 .. code-block:: ini
-   :linenos:
+    :linenos:
 
-   [app:main]
-   use = egg:starter
-   reload_templates = true
-   debug_authorization = false
-   debug_notfound = false
-   debug_routematch = false
-   debug_templates = true
-   default_locale_name = en
-   pyramid.include = pyramid_debugtoolbar
-   pyramid.tweens = starter.tween_factory2
-                    starter.tween_factory1
-                    pyramid.tweens.excview_tween_factory
+    [app:main]
+    use = egg:starter
+    reload_templates = true
+    debug_authorization = false
+    debug_notfound = false
+    debug_routematch = false
+    debug_templates = true
+    default_locale_name = en
+    pyramid.include = pyramid_debugtoolbar
+    pyramid.tweens = starter.tween_factory2
+                     starter.tween_factory1
+                     pyramid.tweens.excview_tween_factory
 
 See :ref:`registering_tweens` for more information about tweens.
 
@@ -676,10 +676,10 @@ representing your Pyramid application's configuration as a single argument:
 
 .. code-block:: python
 
-   from pyramid.paster import bootstrap
+    from pyramid.paster import bootstrap
 
-   with bootstrap('/path/to/my/development.ini') as env:
-       print(env['request'].route_url('home'))
+    with bootstrap('/path/to/my/development.ini') as env:
+        print(env['request'].route_url('home'))
 
 :func:`pyramid.paster.bootstrap` returns a dictionary containing
 framework-related information.  This dictionary will always contain a
@@ -719,17 +719,17 @@ above looks like so:
 
 .. code-block:: ini
 
-   [pipeline:main]
-   pipeline = translogger
-              another
+    [pipeline:main]
+    pipeline = translogger
+               another
 
-   [filter:translogger]
-   filter_app_factory = egg:Paste#translogger
-   setup_console_handler = False
-   logger_name = wsgi
+    [filter:translogger]
+    filter_app_factory = egg:Paste#translogger
+    setup_console_handler = False
+    logger_name = wsgi
 
-   [app:another]
-   use = egg:MyProject
+    [app:another]
+    use = egg:MyProject
 
 The configuration loaded by the above bootstrap example will use the
 configuration implied by the ``[pipeline:main]`` section of your configuration
@@ -744,10 +744,10 @@ load instead of ``main``:
 
 .. code-block:: python
 
-   from pyramid.paster import bootstrap
+    from pyramid.paster import bootstrap
 
-   with bootstrap('/path/to/my/development.ini#another') as env:
-       print(env['request'].route_url('home'))
+    with bootstrap('/path/to/my/development.ini#another') as env:
+        print(env['request'].route_url('home'))
 
 The above example specifies the ``another`` ``app``, ``pipeline``, or
 ``composite`` section of your PasteDeploy configuration file. The ``app``
@@ -769,7 +769,7 @@ Assuming that you have a route configured in your application like so:
 
 .. code-block:: python
 
-   config.add_route('verify', '/verify/{code}')
+    config.add_route('verify', '/verify/{code}')
 
 You need to inform the Pyramid environment that the WSGI application is
 handling requests from a certain base. For example, we want to simulate
@@ -780,20 +780,20 @@ desired request and passing it into :func:`~pyramid.paster.bootstrap`:
 
 .. code-block:: python
 
-   from pyramid.paster import bootstrap
-   from pyramid.request import Request
+    from pyramid.paster import bootstrap
+    from pyramid.request import Request
 
-   request = Request.blank('/', base_url='https://example.com/prefix')
-   with bootstrap('/path/to/my/development.ini#another', request=request) as env:
-       print(env['request'].application_url)
-       # will print 'https://example.com/prefix'
+    request = Request.blank('/', base_url='https://example.com/prefix')
+    with bootstrap('/path/to/my/development.ini#another', request=request) as env:
+        print(env['request'].application_url)
+        # will print 'https://example.com/prefix'
 
 Now you can readily use Pyramid's APIs for generating URLs:
 
 .. code-block:: python
 
-   env['request'].route_url('verify', code='1337')
-   # will return 'https://example.com/prefix/verify/1337'
+    env['request'].route_url('verify', code='1337')
+    # will return 'https://example.com/prefix/verify/1337'
 
 
 Cleanup
@@ -806,12 +806,12 @@ callback:
 
 .. code-block:: python
 
-   from pyramid.paster import bootstrap
-   env = bootstrap('/path/to/my/development.ini')
+    from pyramid.paster import bootstrap
+    env = bootstrap('/path/to/my/development.ini')
 
-   # .. do stuff ...
+    # .. do stuff ...
 
-   env['closer']()
+    env['closer']()
 
 
 Setting Up Logging
@@ -824,8 +824,8 @@ use the following command:
 
 .. code-block:: python
 
-   import pyramid.paster
-   pyramid.paster.setup_logging('/path/to/my/development.ini')
+    import pyramid.paster
+    pyramid.paster.setup_logging('/path/to/my/development.ini')
 
 See :ref:`logging_chapter` for more information on logging within
 :app:`Pyramid`.
@@ -878,50 +878,50 @@ Within this package, we'll pretend you've added a ``scripts.py`` module which
 contains the following code:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   # myproject.scripts module
+    # myproject.scripts module
 
-   import optparse
-   import sys
-   import textwrap
+    import optparse
+    import sys
+    import textwrap
 
-   from pyramid.paster import bootstrap
+    from pyramid.paster import bootstrap
 
-   def settings_show():
-       description = """\
-       Print the deployment settings for a Pyramid application.  Example:
-       'show_settings deployment.ini'
-       """
-       usage = "usage: %prog config_uri"
-       parser = optparse.OptionParser(
-           usage=usage,
-           description=textwrap.dedent(description)
-           )
-       parser.add_option(
-           '-o', '--omit',
-           dest='omit',
-           metavar='PREFIX',
-           type='string',
-           action='append',
-           help=("Omit settings which start with PREFIX (you can use this "
-                 "option multiple times)")
-           )
+    def settings_show():
+        description = """\
+        Print the deployment settings for a Pyramid application.  Example:
+        'show_settings deployment.ini'
+        """
+        usage = "usage: %prog config_uri"
+        parser = optparse.OptionParser(
+            usage=usage,
+            description=textwrap.dedent(description)
+            )
+        parser.add_option(
+            '-o', '--omit',
+            dest='omit',
+            metavar='PREFIX',
+            type='string',
+            action='append',
+            help=("Omit settings which start with PREFIX (you can use this "
+                  "option multiple times)")
+            )
 
-       options, args = parser.parse_args(sys.argv[1:])
-       if not len(args) >= 1:
-           print('You must provide at least one argument')
-           return 2
-       config_uri = args[0]
-       omit = options.omit
-       if omit is None:
-           omit = []
-       with bootstrap(config_uri) as env:
-           settings = env['registry'].settings
-           for k, v in settings.items():
-               if any([k.startswith(x) for x in omit]):
-                   continue
-               print('%-40s     %-20s' % (k, v))
+        options, args = parser.parse_args(sys.argv[1:])
+        if not len(args) >= 1:
+            print('You must provide at least one argument')
+            return 2
+        config_uri = args[0]
+        omit = options.omit
+        if omit is None:
+            omit = []
+        with bootstrap(config_uri) as env:
+            settings = env['registry'].settings
+            for k, v in settings.items():
+                if any([k.startswith(x) for x in omit]):
+                    continue
+                print('%-40s     %-20s' % (k, v))
 
 This script uses the Python ``optparse`` module to allow us to make sense out
 of extra arguments passed to the script.  It uses the
@@ -934,52 +934,52 @@ distribution's ``setup.py`` about its existence.  Within your distribution's
 top-level directory, your ``setup.py`` file will look something like this:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   import os
+    import os
 
-   from setuptools import setup, find_packages
+    from setuptools import setup, find_packages
 
-   here = os.path.abspath(os.path.dirname(__file__))
-   with open(os.path.join(here, 'README.txt')) as f:
-       README = f.read()
-   with open(os.path.join(here, 'CHANGES.txt')) as f:
-       CHANGES = f.read()
+    here = os.path.abspath(os.path.dirname(__file__))
+    with open(os.path.join(here, 'README.txt')) as f:
+        README = f.read()
+    with open(os.path.join(here, 'CHANGES.txt')) as f:
+        CHANGES = f.read()
 
-   requires = ['pyramid', 'pyramid_debugtoolbar']
+    requires = ['pyramid', 'pyramid_debugtoolbar']
 
-   tests_require = [
-       'WebTest >= 1.3.1',  # py3 compat
-       'pytest',  # includes virtualenv
-       'pytest-cov',
-       ]
+    tests_require = [
+        'WebTest >= 1.3.1',  # py3 compat
+        'pytest',  # includes virtualenv
+        'pytest-cov',
+    ]
 
-   setup(name='MyProject',
-         version='0.0',
-         description='My project',
-         long_description=README + '\n\n' +  CHANGES,
-         classifiers=[
-             "Programming Language :: Python",
-             "Framework :: Pyramid",
-             "Topic :: Internet :: WWW/HTTP",
-             "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-         ],
-         author='',
-         author_email='',
-         url='',
-         keywords='web pyramid pylons',
-         packages=find_packages(),
-         include_package_data=True,
-         zip_safe=False,
-         install_requires=requires,
-         extras_require={
-             'testing': tests_require,
-         },
-         entry_points = """\
-         [paste.app_factory]
-         main = myproject:main
-         """,
-         )
+    setup(name='MyProject',
+        version='0.0',
+        description='My project',
+        long_description=README + '\n\n' +  CHANGES,
+        classifiers=[
+            "Programming Language :: Python",
+            "Framework :: Pyramid",
+            "Topic :: Internet :: WWW/HTTP",
+            "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+        ],
+        author='',
+        author_email='',
+        url='',
+        keywords='web pyramid pylons',
+        packages=find_packages(),
+        include_package_data=True,
+        zip_safe=False,
+        install_requires=requires,
+        extras_require={
+            'testing': tests_require,
+        },
+        entry_points = """\
+        [paste.app_factory]
+        main = myproject:main
+        """,
+        )
 
 We're going to change the ``setup.py`` file to add a ``[console_scripts]``
 section within the ``entry_points`` string. Within this section, you should
@@ -987,8 +987,8 @@ specify a ``scriptname = dotted.path.to:yourfunction`` line.  For example:
 
 .. code-block:: ini
 
-   [console_scripts]
-   show_settings = myproject.scripts:settings_show
+    [console_scripts]
+    show_settings = myproject.scripts:settings_show
 
 The ``show_settings`` name will be the name of the script that is installed
 into ``bin``.  The colon (``:``) between ``myproject.scripts`` and
@@ -1000,55 +1000,55 @@ script from their command line.
 The result will be something like:
 
 .. code-block:: python
-   :linenos:
-   :emphasize-lines: 43-44
+    :linenos:
+    :emphasize-lines: 43-44
 
-   import os
+    import os
 
-   from setuptools import setup, find_packages
+    from setuptools import setup, find_packages
 
-   here = os.path.abspath(os.path.dirname(__file__))
-   with open(os.path.join(here, 'README.txt')) as f:
-       README = f.read()
-   with open(os.path.join(here, 'CHANGES.txt')) as f:
-       CHANGES = f.read()
+    here = os.path.abspath(os.path.dirname(__file__))
+    with open(os.path.join(here, 'README.txt')) as f:
+        README = f.read()
+    with open(os.path.join(here, 'CHANGES.txt')) as f:
+        CHANGES = f.read()
 
-   requires = ['pyramid', 'pyramid_debugtoolbar']
+    requires = ['pyramid', 'pyramid_debugtoolbar']
 
-   tests_require = [
-       'WebTest >= 1.3.1',  # py3 compat
-       'pytest',  # includes virtualenv
-       'pytest-cov',
-       ]
+    tests_require = [
+        'WebTest >= 1.3.1',  # py3 compat
+        'pytest',  # includes virtualenv
+        'pytest-cov',
+    ]
 
-   setup(name='MyProject',
-         version='0.0',
-         description='My project',
-         long_description=README + '\n\n' +  CHANGES,
-         classifiers=[
-             "Programming Language :: Python",
-             "Framework :: Pyramid",
-             "Topic :: Internet :: WWW/HTTP",
-             "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-         ],
-         author='',
-         author_email='',
-         url='',
-         keywords='web pyramid pylons',
-         packages=find_packages(),
-         include_package_data=True,
-         zip_safe=False,
-         install_requires=requires,
-         extras_require={
-             'testing': tests_require,
-         },
-         entry_points = """\
-         [paste.app_factory]
-         main = myproject:main
-         [console_scripts]
-         show_settings = myproject.scripts:settings_show
-         """,
-         )
+    setup(name='MyProject',
+        version='0.0',
+        description='My project',
+        long_description=README + '\n\n' +  CHANGES,
+        classifiers=[
+            "Programming Language :: Python",
+            "Framework :: Pyramid",
+            "Topic :: Internet :: WWW/HTTP",
+            "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+        ],
+        author='',
+        author_email='',
+        url='',
+        keywords='web pyramid pylons',
+        packages=find_packages(),
+        include_package_data=True,
+        zip_safe=False,
+        install_requires=requires,
+        extras_require={
+            'testing': tests_require,
+        },
+        entry_points = """\
+        [paste.app_factory]
+        main = myproject:main
+        [console_scripts]
+        show_settings = myproject.scripts:settings_show
+        """,
+    )
 
 Once you've done this, invoking ``$VENV/bin/pip install -e .`` will install a
 file named ``show_settings`` into the ``$somevenv/bin`` directory with a
@@ -1062,17 +1062,17 @@ start with either ``foo`` or ``bar``:
 
 .. code-block:: bash
 
-  $ $VENV/bin/show_settings development.ini --omit=pyramid --omit=debugtoolbar
-  debug_routematch                             False
-  debug_templates                              True
-  reload_templates                             True
-  mako.directories                             []
-  debug_notfound                               False
-  default_locale_name                          en
-  reload_resources                             False
-  debug_authorization                          False
-  reload_assets                                False
-  prevent_http_cache                           False
+    $VENV/bin/show_settings development.ini --omit=pyramid --omit=debugtoolbar
+    debug_routematch                             False
+    debug_templates                              True
+    reload_templates                             True
+    mako.directories                             []
+    debug_notfound                               False
+    default_locale_name                          en
+    reload_resources                             False
+    debug_authorization                          False
+    reload_assets                                False
+    prevent_http_cache                           False
 
 Pyramid's ``pserve``, ``pcreate``, ``pshell``, ``prequest``, ``ptweens``, and
 other ``p*`` scripts are implemented as console scripts.  When you invoke one

@@ -36,15 +36,15 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r unit_testing functional_testing; cd functional_testing
-    $ $VENV/bin/pip install -e .
-    $ $VENV/bin/pip install webtest
+       cd ..; cp -r unit_testing functional_testing; cd functional_testing
+       $VENV/bin/pip install -e .
+       $VENV/bin/pip install webtest
 
 #. Let's extend ``functional_testing/tutorial/tests.py`` to include a
    functional test:
 
    .. literalinclude:: functional_testing/tutorial/tests.py
-    :linenos:
+       :linenos:
 
    Be sure this file is not executable, or ``pytest`` may not include your
    tests.
@@ -53,9 +53,9 @@ Steps
 
    .. code-block:: bash
 
-    $ $VENV/bin/py.test tutorial/tests.py -q
-    ..
-    2 passed in 0.25 seconds
+       $VENV/bin/py.test tutorial/tests.py -q
+       ..
+       2 passed in 0.25 seconds
 
 
 Analysis

@@ -31,32 +31,32 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r view_classes json; cd json
-    $ $VENV/bin/pip install -e .
+       cd ..; cp -r view_classes json; cd json
+       $VENV/bin/pip install -e .
 
 #. We add a new route for ``hello_json`` in ``json/tutorial/__init__.py``:
 
    .. literalinclude:: json/tutorial/__init__.py
-    :linenos:
+       :linenos:
 
 #. Rather than implement a new view, we will "stack" another decorator on the
    ``hello`` view in ``views.py``:
 
    .. literalinclude:: json/tutorial/views.py
-    :linenos:
+       :linenos:
 
 #. We need a new functional test at the end of ``json/tutorial/tests.py``:
 
    .. literalinclude:: json/tutorial/tests.py
-    :linenos:
+       :linenos:
 
 #. Run the tests:
 
    .. code-block:: bash
 
-    $ $VENV/bin/py.test tutorial/tests.py -q
-    .....
-    5 passed in 0.47 seconds
+       $VENV/bin/py.test tutorial/tests.py -q
+       .....
+       5 passed in 0.47 seconds
 
 
 #. Run your Pyramid application with:

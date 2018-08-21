@@ -24,7 +24,7 @@ If you need to install the SQLite3 packages, then, for example, using the Debian
 
 .. code-block:: bash
 
-    $ sudo apt-get install libsqlite3-dev
+    sudo apt-get install libsqlite3-dev
 
 
 Install cookiecutter
@@ -35,23 +35,23 @@ We will use a :term:`cookiecutter` to create a Python package project from a Pyt
 Generate a Pyramid project from a cookiecutter
 ----------------------------------------------
 
-We will create a Pyramid project in your home directory for UNIX or at the root for Windows. It is assumed you know the path to where you installed ``cookiecutter``. Issue the following commands and override the defaults in the prompts as follows.
+We will create a Pyramid project in your home directory for Unix or at the root for Windows. It is assumed you know the path to where you installed ``cookiecutter``. Issue the following commands and override the defaults in the prompts as follows.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ cd ~
-    $ cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout master
+    cd ~
+    cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout master
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    c:\> cd \
-    c:\> cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout master
+    cd \
+    cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout master
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -67,19 +67,19 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
 Change directory into your newly created project
 ------------------------------------------------
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ cd tutorial
+    cd tutorial
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    c:\> cd tutorial
+    cd tutorial
 
 
 Set and use a ``VENV`` environment variable
@@ -87,30 +87,30 @@ Set and use a ``VENV`` environment variable
 
 We will set the ``VENV`` environment variable to the absolute path of the virtual environment, and use it going forward.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ export VENV=~/tutorial
+    export VENV=~/tutorial
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    c:\tutorial> set VENV=c:\tutorial
+    set VENV=c:\tutorial
 
 
 Create a virtual environment
 ----------------------------
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ python3 -m venv $VENV
+    python3 -m venv $VENV
 
 On Windows
 ^^^^^^^^^^
@@ -121,31 +121,31 @@ Python 2.7:
 
 .. code-block:: doscon
 
-    c:\tutorial> c:\Python27\Scripts\virtualenv %VENV%
+    c:\Python27\Scripts\virtualenv %VENV%
 
 Python 3.6:
 
 .. code-block:: doscon
 
-    c:\tutorial> python -m venv %VENV%
+    python -m venv %VENV%
 
 
 Upgrade packaging tools in the virtual environment
 --------------------------------------------------
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ $VENV/bin/pip install --upgrade pip setuptools
+    $VENV/bin/pip install --upgrade pip setuptools
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    c:\tutorial> %VENV%\Scripts\pip install --upgrade pip setuptools
+    %VENV%\Scripts\pip install --upgrade pip setuptools
 
 
 .. _installing_project_in_dev_mode:
@@ -155,19 +155,19 @@ Installing the project in development mode
 
 In order to do development on the project easily, you must "register" the project as a development egg in your workspace. We will install testing requirements at the same time. We do so with the following command.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ $VENV/bin/pip install -e ".[testing]"
+    $VENV/bin/pip install -e ".[testing]"
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    c:\tutorial> %VENV%\Scripts\pip install -e ".[testing]"
+    %VENV%\Scripts\pip install -e ".[testing]"
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -188,14 +188,14 @@ The console will show ``pip`` checking for packages and installing missing packa
 Testing requirements are defined in our project's ``setup.py`` file, in the ``tests_require`` and ``extras_require`` stanzas.
 
 .. literalinclude:: src/installation/setup.py
-   :language: python
-   :lineno-match:
-   :lines: 24-28
+    :language: python
+    :lineno-match:
+    :lines: 24-28
 
 .. literalinclude:: src/installation/setup.py
-   :language: python
-   :lineno-match:
-   :lines: 48-50
+    :language: python
+    :lineno-match:
+    :lines: 48-50
 
 
 .. _initialize_db_wiki2:
@@ -207,93 +207,93 @@ We use :term:`Alembic` to manage our database initialization and migrations.
 
 Generate your first revision.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ $VENV/bin/alembic -c development.ini revision --autogenerate -m "init"
+    $VENV/bin/alembic -c development.ini revision --autogenerate -m "init"
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    c:\tutorial> %VENV%\Scripts\alembic -c development.ini revision --autogenerate -m "init"
+    %VENV%\Scripts\alembic -c development.ini revision --autogenerate -m "init"
 
 The output to your console should be something like this:
 
 .. code-block:: text
 
-   2018-06-22 17:57:31,587 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-   2018-06-22 17:57:31,587 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-   2018-06-22 17:57:31,588 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-   2018-06-22 17:57:31,588 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-   2018-06-22 17:57:31,589 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
-   2018-06-22 17:57:31,589 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-   2018-06-22 17:57:31,590 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
-   2018-06-22 17:57:31,590 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-   2018-06-22 17:57:31,590 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
-   CREATE TABLE alembic_version (
+    2018-06-22 17:57:31,587 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+    2018-06-22 17:57:31,587 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-22 17:57:31,588 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+    2018-06-22 17:57:31,588 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-22 17:57:31,589 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
+    2018-06-22 17:57:31,589 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-22 17:57:31,590 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
+    2018-06-22 17:57:31,590 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-22 17:57:31,590 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
+    CREATE TABLE alembic_version (
            version_num VARCHAR(32) NOT NULL,
            CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
-   )
+    )
 
 
-   2018-06-22 17:57:31,591 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-   2018-06-22 17:57:31,591 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
-   2018-06-22 17:57:31,594 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT name FROM sqlite_master WHERE type='table' ORDER BY name
-   2018-06-22 17:57:31,594 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-22 17:57:31,591 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-22 17:57:31,591 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-22 17:57:31,594 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT name FROM sqlite_master WHERE type='table' ORDER BY name
+    2018-06-22 17:57:31,594 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
      Generating /<somepath>/tutorial/alembic/versions/20180622_bab5a278ce04.py ... done
 
 Upgrade to that revision.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ $VENV/bin/alembic -c development.ini upgrade head
+    $VENV/bin/alembic -c development.ini upgrade head
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    c:\tutorial> %VENV%\Scripts\alembic -c development.ini upgrade head
+    %VENV%\Scripts\alembic -c development.ini upgrade head
 
 The output to your console should be something like this:
 
 .. code-block:: text
 
-   2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-   2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-   2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-   2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-   2018-06-22 17:57:37,816 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
-   2018-06-22 17:57:37,816 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-   2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT alembic_version.version_num
-   FROM alembic_version
-   2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-   2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
-   2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-   2018-06-22 17:57:37,819 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
-   CREATE TABLE models (
+    2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+    2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+    2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-22 17:57:37,816 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
+    2018-06-22 17:57:37,816 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT alembic_version.version_num
+    FROM alembic_version
+    2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
+    2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-22 17:57:37,819 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
+    CREATE TABLE models (
            id INTEGER NOT NULL,
            name TEXT,
            value INTEGER,
            CONSTRAINT pk_models PRIMARY KEY (id)
-   )
+    )
 
 
-   2018-06-22 17:57:37,820 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-   2018-06-22 17:57:37,822 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
-   2018-06-22 17:57:37,824 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] CREATE UNIQUE INDEX my_index ON models (name)
-   2018-06-22 17:57:37,824 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-   2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
-   2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO alembic_version (version_num) VALUES ('bab5a278ce04')
-   2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-   2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-22 17:57:37,820 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-22 17:57:37,822 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-22 17:57:37,824 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] CREATE UNIQUE INDEX my_index ON models (name)
+    2018-06-22 17:57:37,824 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO alembic_version (version_num) VALUES ('bab5a278ce04')
+    2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
+    2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
 
 
 .. _load_data_wiki2:
@@ -303,32 +303,32 @@ Load default data
 
 Load default data into the database using a :term:`console script`. Type the following command, making sure you are still in the ``tutorial`` directory (the directory with a ``development.ini`` in it):
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ $VENV/bin/initialize_tutorial_db development.ini
+   $VENV/bin/initialize_tutorial_db development.ini
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\initialize_tutorial_db development.ini
+   %VENV%\Scripts\initialize_tutorial_db development.ini
 
 The output to your console should be something like this:
 
 .. code-block:: bash
 
-   2018-06-22 17:57:46,241 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-   2018-06-22 17:57:46,241 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-   2018-06-22 17:57:46,242 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-   2018-06-22 17:57:46,242 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-   2018-06-22 17:57:46,243 INFO  [sqlalchemy.engine.base.Engine:682][MainThread] BEGIN (implicit)
-   2018-06-22 17:57:46,244 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO models (name, value) VALUES (?, ?)
-   2018-06-22 17:57:46,245 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ('one', 1)
-   2018-06-22 17:57:46,246 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2018-06-22 17:57:46,241 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+    2018-06-22 17:57:46,241 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-22 17:57:46,242 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+    2018-06-22 17:57:46,242 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
+    2018-06-22 17:57:46,243 INFO  [sqlalchemy.engine.base.Engine:682][MainThread] BEGIN (implicit)
+    2018-06-22 17:57:46,244 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO models (name, value) VALUES (?, ?)
+    2018-06-22 17:57:46,245 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ('one', 1)
+    2018-06-22 17:57:46,246 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
 
 Success!  You should now have a ``tutorial.sqlite`` file in your current
 working directory. This is an SQLite database with a single table defined in it
@@ -345,26 +345,26 @@ requirements, you may run the tests for the project. The following commands
 provide options to py.test that specify the module for which its tests shall be
 run, and to run py.test in quiet mode.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test -q
+    $VENV/bin/py.test -q
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\py.test -q
+    %VENV%\Scripts\py.test -q
 
 For a successful test run, you should see output that ends like this:
 
 .. code-block:: bash
 
-   ..
-   2 passed in 0.44 seconds
+    ..
+    2 passed in 0.44 seconds
 
 
 Expose test coverage information
@@ -378,19 +378,19 @@ tests.
 We've already installed the ``pytest-cov`` package into our virtual
 environment, so we can run the tests with coverage.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test --cov --cov-report=term-missing
+    $VENV/bin/py.test --cov --cov-report=term-missing
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\py.test --cov --cov-report=term-missing
+    c:\tutorial> %VENV%\Scripts\py.test --cov --cov-report=term-missing
 
 If successful, you will see output something like this:
 
@@ -404,20 +404,20 @@ If successful, you will see output something like this:
 
     tutorial/tests.py ..
     ------------------ coverage: platform Python 3.6.5 ------------------
-   Name                                Stmts   Miss  Cover   Missing
-   -----------------------------------------------------------------
-   tutorial/__init__.py                    8      6    25%   7-12
-   tutorial/models/__init__.py            24      0   100%
-   tutorial/models/meta.py                 5      0   100%
-   tutorial/models/mymodel.py              8      0   100%
-   tutorial/routes.py                      3      3     0%   1-3
-   tutorial/scripts/__init__.py            0      0   100%
-   tutorial/scripts/initialize_db.py      24     24     0%   1-34
-   tutorial/views/__init__.py              0      0   100%
-   tutorial/views/default.py              12      0   100%
-   tutorial/views/notfound.py              4      4     0%   1-7
-   -----------------------------------------------------------------
-   TOTAL                                  88     37    58%
+    Name                                Stmts   Miss  Cover   Missing
+    -----------------------------------------------------------------
+    tutorial/__init__.py                    8      6    25%   7-12
+    tutorial/models/__init__.py            24      0   100%
+    tutorial/models/meta.py                 5      0   100%
+    tutorial/models/mymodel.py              8      0   100%
+    tutorial/routes.py                      3      3     0%   1-3
+    tutorial/scripts/__init__.py            0      0   100%
+    tutorial/scripts/initialize_db.py      24     24     0%   1-34
+    tutorial/views/__init__.py              0      0   100%
+    tutorial/views/default.py              12      0   100%
+    tutorial/views/notfound.py              4      4     0%   1-7
+    -----------------------------------------------------------------
+    TOTAL                                  88     37    58%
 
     ===================== 2 passed in 0.57 seconds ======================
 
@@ -434,19 +434,19 @@ These configuration files are ``pytest.ini`` and ``.coveragerc``, located at
 the root of your package. Without these defaults, we would need to specify the
 path to the module on which we want to run tests and coverage.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test --cov=tutorial tutorial/tests.py -q
+    $VENV/bin/py.test --cov=tutorial tutorial/tests.py -q
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\py.test --cov=tutorial tutorial\tests.py -q
+    %VENV%\Scripts\py.test --cov=tutorial tutorial\tests.py -q
 
 py.test follows :ref:`conventions for Python test discovery
 <pytest:test discovery>`, and the configuration defaults from the cookiecutter
@@ -465,19 +465,19 @@ Start the application
 Start the application. See :ref:`what_is_this_pserve_thing` for more
 information on ``pserve``.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ $VENV/bin/pserve development.ini --reload
+    $VENV/bin/pserve development.ini --reload
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\pserve development.ini --reload
+    %VENV%\Scripts\pserve development.ini --reload
 
 .. note::
 

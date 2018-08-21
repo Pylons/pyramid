@@ -25,17 +25,17 @@ When this code is inserted into a Python script named ``helloworld.py`` and
 executed by a Python interpreter which has the :app:`Pyramid` software
 installed, an HTTP server is started on TCP port 8080.
 
-On UNIX:
+On Unix:
 
 .. code-block:: bash
 
-   $ $VENV/bin/python helloworld.py
+    $VENV/bin/python helloworld.py
 
 On Windows:
 
 .. code-block:: doscon
 
-   c:\> %VENV%\Scripts\python helloworld.py
+    %VENV%\Scripts\python helloworld.py
 
 This command will not return and nothing will be printed to the console. When
 port 8080 is visited by a browser on the URL ``/hello/world``, the server will

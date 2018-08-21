@@ -35,71 +35,71 @@ Steps
 
    .. code-block:: bash
 
-    $ cd ..; cp -r view_classes forms; cd forms
+       cd ..; cp -r view_classes forms; cd forms
 
 #. Let's edit ``forms/setup.py`` to declare a dependency on Deform (which then
    pulls in Colander as a dependency:
 
    .. literalinclude:: forms/setup.py
-    :emphasize-lines: 4
-    :linenos:
+       :emphasize-lines: 4
+       :linenos:
 
 #. We can now install our project in development mode:
 
    .. code-block:: bash
 
-      $ $VENV/bin/pip install -e .
+       $VENV/bin/pip install -e .
 
 #. Register a static view in ``forms/tutorial/__init__.py`` for Deform's CSS,
    JavaScript, etc., as well as our demo wiki page's views:
 
    .. literalinclude:: forms/tutorial/__init__.py
-    :linenos:
+       :linenos:
 
 #. Implement the new views, as well as the form schemas and some dummy data, in
    ``forms/tutorial/views.py``:
 
    .. literalinclude:: forms/tutorial/views.py
-    :linenos:
+       :linenos:
 
 #. A template for the top of the "wiki" in ``forms/tutorial/wiki_view.pt``:
 
    .. literalinclude:: forms/tutorial/wiki_view.pt
-    :language: html
-    :linenos:
+       :language: html
+       :linenos:
 
 #. Another template for adding/editing in
    ``forms/tutorial/wikipage_addedit.pt``:
 
    .. literalinclude:: forms/tutorial/wikipage_addedit.pt
-    :language: html
-    :linenos:
+       :language: html
+       :linenos:
 
 #. Add a template at ``forms/tutorial/wikipage_view.pt`` for viewing a wiki
    page:
 
    .. literalinclude:: forms/tutorial/wikipage_view.pt
-    :language: html
-    :linenos:
+       :language: html
+       :linenos:
 
 #. Our tests in ``forms/tutorial/tests.py`` don't run, so let's modify them:
 
    .. literalinclude:: forms/tutorial/tests.py
-    :linenos:
+       :linenos:
 
 #. Run the tests:
 
    .. code-block:: bash
 
-    $ $VENV/bin/py.test tutorial/tests.py -q
-    ..
-    2 passed in 0.45 seconds
+       $VENV/bin/py.test tutorial/tests.py -q
+       ..
+       2 passed in 0.45 seconds
 
 #. Run your Pyramid application with:
 
    .. code-block:: bash
 
-    $ $VENV/bin/pserve development.ini --reload
+       $VENV/bin/pserve development.ini --reload
 
 #. Open http://localhost:6543/ in a browser.
 

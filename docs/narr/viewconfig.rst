@@ -134,7 +134,7 @@ Non-Predicate Arguments
   When the renderer is a path—although a path is usually just a simple relative
   pathname (e.g., ``templates/foo.pt``, implying that a template named "foo.pt"
   is in the "templates" directory relative to the directory of the current
-  :term:`package`)—the path can be absolute, starting with a slash on UNIX or a
+  :term:`package`)—the path can be absolute, starting with a slash on Unix or a
   drive letter prefix on Windows.  The path can alternatively be a :term:`asset
   specification` in the form ``some.dotted.package_name:relative/path``, making
   it possible to address template assets which live in a separate package.
@@ -267,15 +267,15 @@ Non-Predicate Arguments
 
   .. code-block:: python
 
-     def log_timer(wrapped):
-         def wrapper(context, request):
-             start = time.time()
-             response = wrapped(context, request)
-             duration = time.time() - start
-             response.headers['X-View-Time'] = '%.3f' % (duration,)
-             log.info('view took %.3f seconds', duration)
-             return response
-         return wrapper
+      def log_timer(wrapped):
+          def wrapper(context, request):
+              start = time.time()
+              response = wrapped(context, request)
+              duration = time.time() - start
+              response.headers['X-View-Time'] = '%.3f' % (duration,)
+              log.info('view took %.3f seconds', duration)
+              return response
+          return wrapper
 
 ``mapper``
   A Python object or :term:`dotted Python name` which refers to a :term:`view
@@ -546,15 +546,15 @@ You can invert the meaning of any predicate value by wrapping it in a call to
 :class:`pyramid.config.not_`.
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.config import not_
+    from pyramid.config import not_
 
-   config.add_view(
-       'mypackage.views.my_view',
-       route_name='ok',
-       request_method=not_('POST')
-       )
+    config.add_view(
+        'mypackage.views.my_view',
+        route_name='ok',
+        request_method=not_('POST')
+        )
 
 The above example will ensure that the view is called if the request method is
 *not* ``POST``, at least if no other view is more specific.
@@ -593,37 +593,37 @@ Here's an example of the :class:`~pyramid.view.view_config` decorator that
 lives within a :app:`Pyramid` application module ``views.py``:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from resources import MyResource
-   from pyramid.view import view_config
-   from pyramid.response import Response
+    from resources import MyResource
+    from pyramid.view import view_config
+    from pyramid.response import Response
 
-   @view_config(route_name='ok', request_method='POST', permission='read')
-   def my_view(request):
-       return Response('OK')
+    @view_config(route_name='ok', request_method='POST', permission='read')
+    def my_view(request):
+        return Response('OK')
 
 Using this decorator as above replaces the need to add this imperative
 configuration stanza:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   config.add_view('mypackage.views.my_view', route_name='ok',
-                   request_method='POST', permission='read')
+    config.add_view('mypackage.views.my_view', route_name='ok',
+                    request_method='POST', permission='read')
 
 All arguments to ``view_config`` may be omitted.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
-   from pyramid.view import view_config
+    from pyramid.response import Response
+    from pyramid.view import view_config
 
-   @view_config()
-   def my_view(request):
-       """ My view """
-       return Response()
+    @view_config()
+    def my_view(request):
+        """ My view """
+        return Response()
 
 Such a registration as the one directly above implies that the view name will
 be ``my_view``, registered with a ``context`` argument that matches any
@@ -637,11 +637,11 @@ with your configuration declarations, it doesn't process them. To make
 *must* use the ``scan`` method of a :class:`pyramid.config.Configurator`:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   # config is assumed to be an instance of the
-   # pyramid.config.Configurator class
-   config.scan()
+    # config is assumed to be an instance of the
+    # pyramid.config.Configurator class
+    config.scan()
 
 Please see :ref:`decorations_and_code_scanning` for detailed information about
 what happens when code is scanned for configuration declarations resulting from
@@ -674,65 +674,65 @@ in your application.
 If your view callable is a function, it may be used as a function decorator:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
-   from pyramid.response import Response
+    from pyramid.view import view_config
+    from pyramid.response import Response
 
-   @view_config(route_name='edit')
-   def edit(request):
-       return Response('edited!')
+    @view_config(route_name='edit')
+    def edit(request):
+        return Response('edited!')
 
 If your view callable is a class, the decorator can also be used as a class
 decorator. All the arguments to the decorator are the same when applied against
 a class as when they are applied against a function.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
-   from pyramid.view import view_config
+    from pyramid.response import Response
+    from pyramid.view import view_config
 
-   @view_config(route_name='hello')
-   class MyView(object):
-       def __init__(self, request):
-           self.request = request
+    @view_config(route_name='hello')
+    class MyView(object):
+        def __init__(self, request):
+            self.request = request
 
-       def __call__(self):
-           return Response('hello')
+        def __call__(self):
+            return Response('hello')
 
 More than one :class:`~pyramid.view.view_config` decorator can be stacked on
 top of any number of others.  Each decorator creates a separate view
 registration.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
-   from pyramid.response import Response
+    from pyramid.view import view_config
+    from pyramid.response import Response
 
-   @view_config(route_name='edit')
-   @view_config(route_name='change')
-   def edit(request):
-       return Response('edited!')
+    @view_config(route_name='edit')
+    @view_config(route_name='change')
+    def edit(request):
+        return Response('edited!')
 
 This registers the same view under two different names.
 
 The decorator can also be used against a method of a class:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
-   from pyramid.view import view_config
+    from pyramid.response import Response
+    from pyramid.view import view_config
 
-   class MyView(object):
-       def __init__(self, request):
-           self.request = request
+    class MyView(object):
+        def __init__(self, request):
+            self.request = request
 
-       @view_config(route_name='hello')
-       def amethod(self):
-           return Response('hello')
+        @view_config(route_name='hello')
+        def amethod(self):
+            return Response('hello')
 
 When the decorator is used against a method of a class, a view is registered
 for the *class*, so the class constructor must accept an argument list in one
@@ -747,18 +747,18 @@ example, the above registration implied by the decorator being used against the
 ``amethod`` method could be written equivalently as follows:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
-   from pyramid.view import view_config
+    from pyramid.response import Response
+    from pyramid.view import view_config
 
-   @view_config(attr='amethod', route_name='hello')
-   class MyView(object):
-       def __init__(self, request):
-           self.request = request
+    @view_config(attr='amethod', route_name='hello')
+    class MyView(object):
+        def __init__(self, request):
+            self.request = request
 
-       def amethod(self):
-           return Response('hello')
+        def amethod(self):
+            return Response('hello')
 
 
 .. index::
@@ -776,16 +776,16 @@ are very similar to the arguments that you provide to the
 :class:`~pyramid.view.view_config` decorator.  For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
+    from pyramid.response import Response
 
-   def hello_world(request):
-       return Response('hello!')
+    def hello_world(request):
+        return Response('hello!')
 
-   # config is assumed to be an instance of the
-   # pyramid.config.Configurator class
-   config.add_view(hello_world, route_name='hello')
+    # config is assumed to be an instance of the
+    # pyramid.config.Configurator class
+    config.add_view(hello_world, route_name='hello')
 
 The first argument, a :term:`view callable`, is the only required argument. It
 must either be a Python object which is the view itself or a :term:`dotted
@@ -816,52 +816,52 @@ actions", all of which are mapped to the same route but different request
 methods, instead of this:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_config
-   from pyramid.response import Response
+    from pyramid.view import view_config
+    from pyramid.response import Response
 
-   class RESTView(object):
-       def __init__(self, request):
-           self.request = request
+    class RESTView(object):
+        def __init__(self, request):
+            self.request = request
 
-       @view_config(route_name='rest', request_method='GET')
-       def get(self):
-           return Response('get')
+        @view_config(route_name='rest', request_method='GET')
+        def get(self):
+            return Response('get')
 
-       @view_config(route_name='rest', request_method='POST')
-       def post(self):
-           return Response('post')
+        @view_config(route_name='rest', request_method='POST')
+        def post(self):
+            return Response('post')
 
-       @view_config(route_name='rest', request_method='DELETE')
-       def delete(self):
-           return Response('delete')
+        @view_config(route_name='rest', request_method='DELETE')
+        def delete(self):
+            return Response('delete')
 
 You can do this:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_defaults
-   from pyramid.view import view_config
-   from pyramid.response import Response
+    from pyramid.view import view_defaults
+    from pyramid.view import view_config
+    from pyramid.response import Response
 
-   @view_defaults(route_name='rest')
-   class RESTView(object):
-       def __init__(self, request):
-           self.request = request
+    @view_defaults(route_name='rest')
+    class RESTView(object):
+        def __init__(self, request):
+            self.request = request
 
-       @view_config(request_method='GET')
-       def get(self):
-           return Response('get')
+        @view_config(request_method='GET')
+        def get(self):
+            return Response('get')
 
-       @view_config(request_method='POST')
-       def post(self):
-           return Response('post')
+        @view_config(request_method='POST')
+        def post(self):
+            return Response('post')
 
-       @view_config(request_method='DELETE')
-       def delete(self):
-           return Response('delete')
+        @view_config(request_method='DELETE')
+        def delete(self):
+            return Response('delete')
 
 In the above example, we were able to take the ``route_name='rest'`` argument
 out of the call to each individual ``@view_config`` statement because we used a
@@ -877,67 +877,67 @@ is passed to that directive as its ``view`` argument.  For example, instead of
 this:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.response import Response
-   from pyramid.config import Configurator
+    from pyramid.response import Response
+    from pyramid.config import Configurator
 
-   class RESTView(object):
-       def __init__(self, request):
-           self.request = request
+    class RESTView(object):
+        def __init__(self, request):
+            self.request = request
 
-       def get(self):
-           return Response('get')
+        def get(self):
+            return Response('get')
 
-       def post(self):
-           return Response('post')
+        def post(self):
+            return Response('post')
 
-       def delete(self):
-           return Response('delete')
+        def delete(self):
+            return Response('delete')
 
-   def main(global_config, **settings):
-       config = Configurator()
-       config.add_route('rest', '/rest')
-       config.add_view(
-           RESTView, route_name='rest', attr='get', request_method='GET')
-       config.add_view(
-           RESTView, route_name='rest', attr='post', request_method='POST')
-       config.add_view(
-           RESTView, route_name='rest', attr='delete', request_method='DELETE')
-       return config.make_wsgi_app()
+    def main(global_config, **settings):
+        config = Configurator()
+        config.add_route('rest', '/rest')
+        config.add_view(
+            RESTView, route_name='rest', attr='get', request_method='GET')
+        config.add_view(
+            RESTView, route_name='rest', attr='post', request_method='POST')
+        config.add_view(
+            RESTView, route_name='rest', attr='delete', request_method='DELETE')
+        return config.make_wsgi_app()
 
 To reduce the amount of repetition in the ``config.add_view`` statements, we
 can move the ``route_name='rest'`` argument to a ``@view_defaults`` class
 decorator on the ``RESTView`` class:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.view import view_defaults
-   from pyramid.response import Response
-   from pyramid.config import Configurator
+    from pyramid.view import view_defaults
+    from pyramid.response import Response
+    from pyramid.config import Configurator
 
-   @view_defaults(route_name='rest')
-   class RESTView(object):
-       def __init__(self, request):
-           self.request = request
+    @view_defaults(route_name='rest')
+    class RESTView(object):
+        def __init__(self, request):
+            self.request = request
 
-       def get(self):
-           return Response('get')
+        def get(self):
+            return Response('get')
 
-       def post(self):
-           return Response('post')
+        def post(self):
+            return Response('post')
 
-       def delete(self):
-           return Response('delete')
+        def delete(self):
+            return Response('delete')
 
-   def main(global_config, **settings):
-       config = Configurator()
-       config.add_route('rest', '/rest')
-       config.add_view(RESTView, attr='get', request_method='GET')
-       config.add_view(RESTView, attr='post', request_method='POST')
-       config.add_view(RESTView, attr='delete', request_method='DELETE')
-       return config.make_wsgi_app()
+    def main(global_config, **settings):
+        config = Configurator()
+        config.add_route('rest', '/rest')
+        config.add_view(RESTView, attr='get', request_method='GET')
+        config.add_view(RESTView, attr='post', request_method='POST')
+        config.add_view(RESTView, attr='delete', request_method='DELETE')
+        return config.make_wsgi_app()
 
 :class:`pyramid.view.view_defaults` accepts the same set of arguments that
 :class:`pyramid.view.view_config` does, and they have the same meaning.  Each
@@ -948,14 +948,14 @@ Normal Python inheritance rules apply to defaults added via ``view_defaults``.
 For example:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   @view_defaults(route_name='rest')
-   class Foo(object):
-       pass
+    @view_defaults(route_name='rest')
+    class Foo(object):
+        pass
 
-   class Bar(Foo):
-       pass
+    class Bar(Foo):
+        pass
 
 The ``Bar`` class above will inherit its view defaults from the arguments
 passed to the ``view_defaults`` decorator of the ``Foo`` class.  To prevent
@@ -963,15 +963,15 @@ this from happening, use a ``view_defaults`` decorator without any arguments on
 the subclass:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   @view_defaults(route_name='rest')
-   class Foo(object):
-       pass
+    @view_defaults(route_name='rest')
+    class Foo(object):
+        pass
 
-   @view_defaults()
-   class Bar(Foo):
-       pass
+    @view_defaults()
+    class Bar(Foo):
+        pass
 
 The ``view_defaults`` decorator only works as a class decorator; using it
 against a function or a method will produce nonsensical results.
@@ -993,13 +993,13 @@ called.  Here's an example of specifying a permission in a view configuration
 using :meth:`~pyramid.config.Configurator.add_view`:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   # config is an instance of pyramid.config.Configurator
+    # config is an instance of pyramid.config.Configurator
 
-   config.add_route('add', '/add.html', factory='mypackage.Blog')
-   config.add_view('myproject.views.add_entry', route_name='add',
-                   permission='add')
+    config.add_route('add', '/add.html', factory='mypackage.Blog')
+    config.add_view('myproject.views.add_entry', route_name='add',
+                    permission='add')
 
 When an :term:`authorization policy` is enabled, this view will be protected
 with the ``add`` permission.  The view will *not be called* if the user does
@@ -1055,14 +1055,14 @@ However, the view itself prevents caching from taking place unless there's a
 
 .. code-block:: python
 
-   from pyramid.view import view_config
+    from pyramid.view import view_config
 
-   @view_config(http_cache=3600)
-   def view(request):
-       response = Response()
-       if 'should_cache' not in request.params:
-           response.cache_control.prevent_auto = True
-       return response
+    @view_config(http_cache=3600)
+    def view(request):
+        response = Response()
+        if 'should_cache' not in request.params:
+            response.cache_control.prevent_auto = True
+        return response
 
 Note that the ``http_cache`` machinery will overwrite or add to caching headers
 you set within the view itself, unless you use ``prevent_auto``.

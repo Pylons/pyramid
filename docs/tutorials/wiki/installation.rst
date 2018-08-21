@@ -23,23 +23,23 @@ We will use a :term:`cookiecutter` to create a Python package project from a Pyt
 Generate a Pyramid project from a cookiecutter
 ----------------------------------------------
 
-We will create a Pyramid project in your home directory for UNIX or at the root for Windows. It is assumed you know the path to where you installed ``cookiecutter``. Issue the following commands and override the defaults in the prompts as follows.
+We will create a Pyramid project in your home directory for Unix or at the root for Windows. It is assumed you know the path to where you installed ``cookiecutter``. Issue the following commands and override the defaults in the prompts as follows.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ cd ~
-    $ cookiecutter gh:Pylons/pyramid-cookiecutter-zodb --checkout master
+    cd ~
+    cookiecutter gh:Pylons/pyramid-cookiecutter-zodb --checkout master
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    c:\> cd \
-    c:\> cookiecutter gh:Pylons/pyramid-cookiecutter-zodb --checkout master
+    cd \
+    cookiecutter gh:Pylons/pyramid-cookiecutter-zodb --checkout master
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -55,19 +55,19 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
 Change directory into your newly created project
 ------------------------------------------------
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ cd tutorial
+    cd tutorial
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    c:\> cd tutorial
+    cd tutorial
 
 
 Set and use a ``VENV`` environment variable
@@ -75,30 +75,30 @@ Set and use a ``VENV`` environment variable
 
 We will set the ``VENV`` environment variable to the absolute path of the virtual environment, and use it going forward.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ export VENV=~/tutorial
+    export VENV=~/tutorial
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    c:\tutorial> set VENV=c:\tutorial
+    set VENV=c:\tutorial
 
 
 Create a virtual environment
 ----------------------------
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ python3 -m venv $VENV
+    python3 -m venv $VENV
 
 On Windows
 ^^^^^^^^^^
@@ -109,31 +109,31 @@ Python 2.7:
 
 .. code-block:: doscon
 
-    c:\tutorial> c:\Python27\Scripts\virtualenv %VENV%
+    c:\Python27\Scripts\virtualenv %VENV%
 
 Python 3.6:
 
 .. code-block:: doscon
 
-    c:\tutorial> python -m venv %VENV%
+    python -m venv %VENV%
 
 
 Upgrade packaging tools in the virtual environment
 --------------------------------------------------
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ $VENV/bin/pip install --upgrade pip setuptools
+    $VENV/bin/pip install --upgrade pip setuptools
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    c:\tutorial> %VENV%\Scripts\pip install --upgrade pip setuptools
+    %VENV%\Scripts\pip install --upgrade pip setuptools
 
 
 .. _installing_project_in_dev_mode_zodb:
@@ -143,19 +143,19 @@ Installing the project in development mode
 
 In order to do development on the project easily, you must "register" the project as a development egg in your workspace. We will install testing requirements at the same time. We do so with the following command.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-    $ $VENV/bin/pip install -e ".[testing]"
+    $VENV/bin/pip install -e ".[testing]"
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    c:\tutorial> %VENV%\Scripts\pip install -e ".[testing]"
+    %VENV%\Scripts\pip install -e ".[testing]"
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -198,26 +198,26 @@ requirements, you may run the tests for the project. The following commands
 provide options to py.test that specify the module for which its tests shall be
 run, and to run py.test in quiet mode.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test -q
+    $VENV/bin/py.test -q
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\py.test -q
+    %VENV%\Scripts\py.test -q
 
 For a successful test run, you should see output that ends like this:
 
 .. code-block:: bash
 
-   .
-   1 passed in 0.24 seconds
+    .
+    1 passed in 0.24 seconds
 
 
 Expose test coverage information
@@ -231,19 +231,19 @@ tests.
 We've already installed the ``pytest-cov`` package into our virtual
 environment, so we can run the tests with coverage.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test --cov --cov-report=term-missing
+    $VENV/bin/py.test --cov --cov-report=term-missing
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\py.test --cov --cov-report=term-missing
+    %VENV%\Scripts\py.test --cov --cov-report=term-missing
 
 If successful, you will see output something like this:
 
@@ -280,19 +280,19 @@ These configuration files are ``pytest.ini`` and ``.coveragerc``, located at
 the root of your package. Without these defaults, we would need to specify the
 path to the module on which we want to run tests and coverage.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ $VENV/bin/py.test --cov=tutorial tutorial/tests.py -q
+    $VENV/bin/py.test --cov=tutorial tutorial/tests.py -q
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\py.test --cov=tutorial tutorial\tests.py -q
+    %VENV%\Scripts\py.test --cov=tutorial tutorial\tests.py -q
 
 py.test follows :ref:`conventions for Python test discovery
 <pytest:test discovery>`, and the configuration defaults from the cookiecutter
@@ -311,19 +311,19 @@ Start the application
 Start the application. See :ref:`what_is_this_pserve_thing` for more
 information on ``pserve``.
 
-On UNIX
+On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-   $ $VENV/bin/pserve development.ini --reload
+    $VENV/bin/pserve development.ini --reload
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-   c:\tutorial> %VENV%\Scripts\pserve development.ini --reload
+    %VENV%\Scripts\pserve development.ini --reload
 
 .. note::
 

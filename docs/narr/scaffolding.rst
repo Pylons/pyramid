@@ -37,15 +37,15 @@ distribution's package directory, and create a file within that directory named
 ``__init__.py`` with something like the following:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   # CoolExtension/coolextension/scaffolds/__init__.py
+    # CoolExtension/coolextension/scaffolds/__init__.py
 
-   from pyramid.scaffolds import PyramidTemplate
+    from pyramid.scaffolds import PyramidTemplate
 
-   class CoolExtensionTemplate(PyramidTemplate):
-       _template_dir = 'coolextension_scaffold'
-       summary = 'My cool extension'
+    class CoolExtensionTemplate(PyramidTemplate):
+        _template_dir = 'coolextension_scaffold'
+        summary = 'My cool extension'
 
 Once this is done, within the ``scaffolds`` directory, create a template
 directory.  Our example used a template directory named
@@ -85,19 +85,19 @@ After you've created the template directory, add the following to the
 
 .. code-block:: ini
 
-   [pyramid.scaffold]
-   coolextension=coolextension.scaffolds:CoolExtensionTemplate
+    [pyramid.scaffold]
+    coolextension=coolextension.scaffolds:CoolExtensionTemplate
 
 For example:
 
 .. code-block:: python
 
     def setup(
-          ...,
-          entry_points = """\
+        #...,
+        entry_points = """\
             [pyramid.scaffold]
             coolextension=coolextension.scaffolds:CoolExtensionTemplate
-          """
+        """
         )
 
 Run your distribution's ``setup.py develop`` or ``setup.py install`` command.
@@ -120,25 +120,25 @@ want to have extension scaffolds that can work across Pyramid 1.0.X, 1.1.X,
 defining your scaffold template:
 
 .. code-block:: python
-     :linenos:
+    :linenos:
 
-     try: # pyramid 1.0.X
-         # "pyramid.paster.paste_script..." doesn't exist past 1.0.X
-         from pyramid.paster import paste_script_template_renderer
-         from pyramid.paster import PyramidTemplate
-     except ImportError:
-         try: # pyramid 1.1.X, 1.2.X
-             # trying to import "paste_script_template_renderer" fails on 1.3.X
-             from pyramid.scaffolds import paste_script_template_renderer
-             from pyramid.scaffolds import PyramidTemplate
-         except ImportError: # pyramid >=1.3a2
-             paste_script_template_renderer = None
-             from pyramid.scaffolds import PyramidTemplate
+    try: # pyramid 1.0.X
+        # "pyramid.paster.paste_script..." doesn't exist past 1.0.X
+        from pyramid.paster import paste_script_template_renderer
+        from pyramid.paster import PyramidTemplate
+    except ImportError:
+        try: # pyramid 1.1.X, 1.2.X
+            # trying to import "paste_script_template_renderer" fails on 1.3.X
+            from pyramid.scaffolds import paste_script_template_renderer
+            from pyramid.scaffolds import PyramidTemplate
+        except ImportError: # pyramid >=1.3a2
+            paste_script_template_renderer = None
+            from pyramid.scaffolds import PyramidTemplate
 
-     class CoolExtensionTemplate(PyramidTemplate):
-         _template_dir = 'coolextension_scaffold'
-         summary = 'My cool extension'
-         template_renderer = staticmethod(paste_script_template_renderer)
+    class CoolExtensionTemplate(PyramidTemplate):
+        _template_dir = 'coolextension_scaffold'
+        summary = 'My cool extension'
+        template_renderer = staticmethod(paste_script_template_renderer)
 
 And then in the setup.py of the package that contains your scaffold, define
 the template as a target of both ``paste.paster_create_template`` (for
@@ -160,13 +160,13 @@ If you want to support Pyramid 1.3 only, it's much cleaner, and the API is
 stable:
 
 .. code-block:: python
-   :linenos:
+    :linenos:
 
-   from pyramid.scaffolds import PyramidTemplate
+    from pyramid.scaffolds import PyramidTemplate
 
-   class CoolExtensionTemplate(PyramidTemplate):
-       _template_dir = 'coolextension_scaffold'
-       summary = 'My cool_extension'
+    class CoolExtensionTemplate(PyramidTemplate):
+        _template_dir = 'coolextension_scaffold'
+        summary = 'My cool_extension'
 
 You only need to specify a ``paste.paster_create_template`` entry point target
 in your ``setup.py`` if you want your scaffold to be consumable by users of
