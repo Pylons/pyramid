@@ -13,8 +13,8 @@ Here is one of the simplest :app:`Pyramid` applications you can make:
 .. literalinclude:: narr/helloworld.py
 
 After you install :app:`Pyramid` and run this application, when you visit
-`<http://localhost:8080/hello/world>`_ in a browser, you will see the text
-``Hello, world!`` See :ref:`firstapp_chapter` for a full explanation of how
+`<http://localhost:6543/>`_ in a browser, you will see the text
+``Hello World!`` See :ref:`firstapp_chapter` for a full explanation of how
 this application works.
 
 

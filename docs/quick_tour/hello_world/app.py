@@ -4,7 +4,7 @@ from pyramid.response import Response
 
 
 def hello_world(request):
-    return Response('<h1>Hello World!</h1>')
+    return Response('Hello World!')
 
 
 if __name__ == '__main__':

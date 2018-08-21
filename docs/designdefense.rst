@@ -1644,13 +1644,14 @@ If you can understand this "hello world" program, you can use Pyramid:
     from pyramid.response import Response
 
     def hello_world(request):
-        return Response('Hello world!')
+        return Response('Hello World!')
 
     if __name__ == '__main__':
         with Configurator() as config:
-            config.add_view(hello_world)
+            config.add_route('hello', '/')
+            config.add_view(hello_world, route_name='hello')
             app = config.make_wsgi_app()
-        server = make_server('0.0.0.0', 8080, app)
+        server = make_server('0.0.0.0', 6543, app)
         server.serve_forever()
 
 Pyramid has over 1200 pages of documentation (printed), covering topics from

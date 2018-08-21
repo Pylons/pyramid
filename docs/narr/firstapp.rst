@@ -23,7 +23,7 @@ Here's one of the very simplest :app:`Pyramid` applications:
 
 When this code is inserted into a Python script named ``helloworld.py`` and
 executed by a Python interpreter which has the :app:`Pyramid` software
-installed, an HTTP server is started on TCP port 8080.
+installed, an HTTP server is started on TCP port 6543.
 
 On Unix:
 
@@ -38,9 +38,9 @@ On Windows:
     %VENV%\Scripts\python helloworld.py
 
 This command will not return and nothing will be printed to the console. When
-port 8080 is visited by a browser on the URL ``/hello/world``, the server will
+port 6543 is visited by a browser on the URL ``/hello/world``, the server will
 simply serve up the text "Hello world!".  If your application is running on
-your local system, using `<http://localhost:8080/hello/world>`_ in a browser
+your local system, using `<http://localhost:6543/hello/world>`_ in a browser
 will show this result.
 
 Each time you visit a URL served by the application in a browser, a logging
@@ -63,15 +63,15 @@ The above ``helloworld.py`` script uses the following set of import statements:
    :lineno-match:
    :lines: 1-3
 
-The script imports the :class:`~pyramid.config.Configurator` class from the
-:mod:`pyramid.config` module.  An instance of the
-:class:`~pyramid.config.Configurator` class is later used to configure your
-:app:`Pyramid` application.
-
 Like many other Python web frameworks, :app:`Pyramid` uses the :term:`WSGI`
 protocol to connect an application and a web server together.  The
 :mod:`wsgiref` server is used in this example as a WSGI server for convenience,
 as it is shipped within the Python standard library.
+
+The script imports the :class:`~pyramid.config.Configurator` class from the
+:mod:`pyramid.config` module.  An instance of the
+:class:`~pyramid.config.Configurator` class is later used to configure your
+:app:`Pyramid` application.
 
 The script also imports the :class:`pyramid.response.Response` class for later
 use.  An instance of this class will be used to create a web response.
@@ -126,7 +126,7 @@ statement:
 
 .. literalinclude:: helloworld.py
    :lineno-match:
-   :lines: 9-15
+   :lines: 10-16
 
 Let's break this down piece by piece.
 
@@ -135,7 +135,7 @@ Configurator Construction
 
 .. literalinclude:: helloworld.py
    :lineno-match:
-   :lines: 9-10
+   :lines: 10-11
 
 The ``if __name__ == '__main__':`` line in the code sample above represents a
 Python idiom: the code inside this if clause is not invoked unless the script
@@ -167,7 +167,7 @@ Adding Configuration
 
 .. literalinclude:: helloworld.py
    :lineno-match:
-   :lines: 11-12
+   :lines: 12-13
 
 The first line above calls the :meth:`pyramid.config.Configurator.add_route`
 method, which registers a :term:`route` to match any URL path that begins with
@@ -186,7 +186,7 @@ WSGI Application Creation
 
 .. literalinclude:: helloworld.py
    :lineno-match:
-   :lines: 13
+   :lines: 14
 
 After configuring views and ending configuration, the script creates a WSGI
 *application* via the :meth:`pyramid.config.Configurator.make_wsgi_app` method.
@@ -213,7 +213,7 @@ WSGI Application Serving
 
 .. literalinclude:: helloworld.py
    :lineno-match:
-   :lines: 14-15
+   :lines: 15-16
 
 Finally, we actually serve the application to requestors by starting up a WSGI
 server.  We happen to use the :mod:`wsgiref` ``make_server`` server maker for
@@ -221,14 +221,14 @@ this purpose.  We pass in as the first argument ``'0.0.0.0'``, which means
 "listen on all TCP interfaces".  By default, the HTTP server listens only on
 the ``127.0.0.1`` interface, which is problematic if you're running the server
 on a remote system and you wish to access it with a web browser from a local
-system.  We also specify a TCP port number to listen on, which is 8080, passing
+system.  We also specify a TCP port number to listen on, which is 6543, passing
 it as the second argument.  The final argument is the ``app`` object (a
 :term:`router`), which is the application we wish to serve.  Finally, we call
 the server's ``serve_forever`` method, which starts the main loop in which it
 will wait for requests from the outside world.
 
 When this line is invoked, it causes the server to start listening on TCP port
-8080.  The server will serve requests forever, or at least until we stop it by
+6543.  The server will serve requests forever, or at least until we stop it by
 killing the process which runs it (usually by pressing ``Ctrl-C`` or
 ``Ctrl-Break`` in the terminal we used to start it).
 
