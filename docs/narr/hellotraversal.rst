@@ -18,16 +18,16 @@ Pyramid application that uses traversal:
 You may notice that this application is intentionally very similar to the
 "hello world" application from :doc:`firstapp`.
 
-On lines 5-6, we create a trivial :term:`resource` class that's just a
+On lines 6-7, we create a trivial :term:`resource` class that's just a
 dictionary subclass.
 
-On lines 8-9, we hard-code a :term:`resource tree` in our :term:`root factory`
+On lines 10-11, we hard-code a :term:`resource tree` in our :term:`root factory`
 function.
 
-On lines 11-13, we define a single :term:`view callable` that can display a
+On lines 14-15, we define a single :term:`view callable` that can display a
 single instance of our ``Resource`` class, passed as the ``context`` argument.
 
-The rest of the file sets up and serves our :app:`Pyramid` WSGI app.  Line 18
+The rest of the file sets up and serves our :app:`Pyramid` WSGI app.  Line 22
 is where our view gets configured for use whenever the traversal ends with an
 instance of our ``Resource`` class.
 
@@ -37,19 +37,19 @@ Instead, the URL space is defined entirely by the keys in the resource tree.
 Example requests
 ----------------
 
-If this example is running on http://localhost:8080, and the user browses to
-http://localhost:8080/a/b, Pyramid will call ``get_root(request)`` to get the
+If this example is running on http://localhost:6543, and the user browses to
+http://localhost:6543/a/b, Pyramid will call ``get_root(request)`` to get the
 root resource, then traverse the tree from there by key; starting from the
 root, it will find the child with key ``"a"``, then its child with key ``"b"``;
 then use that as the ``context`` argument for calling
 ``hello_world_of_resources``.
 
-Or, if the user browses to http://localhost:8080/, Pyramid will stop at the
+Or, if the user browses to http://localhost:6543/, Pyramid will stop at the
 root—the outermost ``Resource`` instance, in this case—and use that as the
 ``context`` argument to the same view.
 
 Or, if the user browses to a key that doesn't exist in this resource tree, like
-http://localhost:8080/xyz or http://localhost:8080/a/b/c/d, the traversal will
+http://localhost:6543/xyz or http://localhost:6543/a/b/c/d, the traversal will
 end by raising a KeyError, and Pyramid will turn that into a 404 HTTP response.
 
 A more complicated application could have many types of resources, with

@@ -48,9 +48,10 @@ configured imperatively:
 
     if __name__ == '__main__':
         with Configurator() as config:
+            config.add_route('hello', '/')
             config.add_view(hello_world)
             app = config.make_wsgi_app()
-        server = make_server('0.0.0.0', 8080, app)
+        server = make_server('0.0.0.0', 6543, app)
         server.serve_forever()
 
 We won't talk much about what this application does yet.  Just note that the
@@ -81,13 +82,14 @@ to by the declaration itself.  For example:
 
 .. code-block:: python
     :linenos:
+    :emphasize-lines: 2-4
 
     from pyramid.response import Response
     from pyramid.view import view_config
 
-    @view_config(name='hello', request_method='GET')
-    def hello(request):
-        return Response('Hello')
+    @view_config(route_name='hello', request_method='GET')
+    def hello_world(request):
+        return Response('Hello World!')
 
 The mere existence of configuration decoration doesn't cause any configuration
 registration to be performed.  Before it has any effect on the configuration of
@@ -95,7 +97,7 @@ a :app:`Pyramid` application, a configuration decoration within application
 code must be found through a process known as a :term:`scan`.
 
 For example, the :class:`pyramid.view.view_config` decorator in the code
-example above adds an attribute to the ``hello`` function, making it available
+example above adds an attribute to the ``hello_world`` function, making it available
 for a :term:`scan` to find it later.
 
 A :term:`scan` of a :term:`module` or a :term:`package` and its subpackages for
@@ -105,21 +107,25 @@ and its subpackages.  For example:
 
 .. code-block:: python
     :linenos:
+    :emphasize-lines: 15
 
     from wsgiref.simple_server import make_server
     from pyramid.config import Configurator
     from pyramid.response import Response
     from pyramid.view import view_config
 
-    @view_config()
-    def hello(request):
-        return Response('Hello')
+
+    @view_config(route_name='hello', request_method='GET')
+    def hello_world(request):
+        return Response('Hello World!')
+
 
     if __name__ == '__main__':
         with Configurator() as config:
+            config.add_route('hello', '/')
             config.scan()
             app = config.make_wsgi_app()
-        server = make_server('0.0.0.0', 8080, app)
+        server = make_server('0.0.0.0', 6543, app)
         server.serve_forever()
 
 The scanning machinery imports each module and subpackage in a package or
@@ -143,7 +149,8 @@ In the example above, the scanner translates the arguments to
 
 .. code-block:: python
 
-    config.add_view(hello)
+    config.add_view(hello_world, route_name='hello',
+                    request_method='GET')
 
 Summary
 -------
