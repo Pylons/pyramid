@@ -24,8 +24,8 @@ from pyramid.exceptions import (
 )
 
 from pyramid.httpexceptions import (
-    HTTPFound,
     HTTPNotFound,
+    HTTPTemporaryRedirect,
     default_exceptionresponse_view,
     )
 
@@ -292,7 +292,7 @@ class AppendSlashNotFoundViewFactory(object):
     .. deprecated:: 1.3
 
     """
-    def __init__(self, notfound_view=None, redirect_class=HTTPFound):
+    def __init__(self, notfound_view=None, redirect_class=HTTPTemporaryRedirect):
         if notfound_view is None:
             notfound_view = default_exceptionresponse_view
         self.notfound_view = notfound_view
@@ -377,8 +377,8 @@ class notfound_view_config(object):
     instead implements :class:`~pyramid.interfaces.IResponse`, the
     append_slash logic will behave as if ``append_slash=True`` was passed,
     but the provided class will be used as the response class instead of
-    the default :class:`~pyramid.httpexceptions.HTTPFound` response class
-    when a redirect is performed.  For example:
+    the default :class:`~pyramid.httpexceptions.HTTPTemporaryRedirect`
+    response class when a redirect is performed.  For example:
 
       .. code-block:: python
 
@@ -392,7 +392,7 @@ class notfound_view_config(object):
             return HTTPNotFound('not found')
 
     The above means that a redirect to a slash-appended route will be
-    attempted, but instead of :class:`~pyramid.httpexceptions.HTTPFound`
+    attempted, but instead of :class:`~pyramid.httpexceptions.HTTPTemporaryRedirect`
     being used, :class:`~pyramid.httpexceptions.HTTPMovedPermanently will
     be used` for the redirect response if a slash-appended route is found.
 

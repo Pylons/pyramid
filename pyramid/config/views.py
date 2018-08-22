@@ -1631,8 +1631,8 @@ class ViewsConfiguratorMixin(object):
         instead implements :class:`~pyramid.interfaces.IResponse`, the
         append_slash logic will behave as if ``append_slash=True`` was passed,
         but the provided class will be used as the response class instead of
-        the default :class:`~pyramid.httpexceptions.HTTPFound` response class
-        when a redirect is performed.  For example:
+        the default :class:`~pyramid.httpexceptions.HTTPTemporaryRedirect`
+        response class when a redirect is performed.  For example:
 
           .. code-block:: python
 
@@ -1640,9 +1640,14 @@ class ViewsConfiguratorMixin(object):
             config.add_notfound_view(append_slash=HTTPMovedPermanently)
 
         The above means that a redirect to a slash-appended route will be
-        attempted, but instead of :class:`~pyramid.httpexceptions.HTTPFound`
+        attempted, but instead of :class:`~pyramid.httpexceptions.HTTPTemporaryRedirect`
         being used, :class:`~pyramid.httpexceptions.HTTPMovedPermanently will
         be used` for the redirect response if a slash-appended route is found.
+
+        :class:`~pyramid.httpexceptions.HTTPTemporaryRedirect` class is used
+        as default response, which is equivalent to
+        :class:`~pyramid.httpexceptions.HTTPFound` with addition of redirecting
+        with the same HTTP method (useful when doing POST requests).
 
         .. versionadded:: 1.3
 
@@ -1655,6 +1660,12 @@ class ViewsConfiguratorMixin(object):
         .. versionchanged:: 1.8
 
            The view is created using ``exception_only=True``.
+
+        .. versionchanged: 1.10
+
+           Default response was changed from :class:`~pyramid.httpexceptions.HTTPFound`
+           to :class:`~pyramid.httpexceptions.HTTPTemporaryRedirect`.
+
         """
         for arg in (
             'name', 'permission', 'context', 'for_', 'require_csrf',

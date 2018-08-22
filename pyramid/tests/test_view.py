@@ -686,7 +686,7 @@ class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
         context = ExceptionResponse()
         self._registerMapper(request.registry, True)
         response = self._callFUT(context, request)
-        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.status, '307 Temporary Redirect')
         self.assertEqual(response.location, '/abc/')
 
     def test_matches_with_script_name(self):
@@ -694,7 +694,7 @@ class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
         context = ExceptionResponse()
         self._registerMapper(request.registry, True)
         response = self._callFUT(context, request)
-        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.status, '307 Temporary Redirect')
         self.assertEqual(response.location, '/foo/abc/')
 
     def test_with_query_string(self):
@@ -702,7 +702,7 @@ class Test_append_slash_notfound_view(BaseTest, unittest.TestCase):
         context = ExceptionResponse()
         self._registerMapper(request.registry, True)
         response = self._callFUT(context, request)
-        self.assertEqual(response.status, '302 Found')
+        self.assertEqual(response.status, '307 Temporary Redirect')
         self.assertEqual(response.location, '/abc/?a=1&b=2')
 
 class TestAppendSlashNotFoundViewFactory(BaseTest, unittest.TestCase):

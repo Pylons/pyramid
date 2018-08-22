@@ -386,11 +386,11 @@ class TestNotFoundView(IntegrationBase, unittest.TestCase):
     def test_it(self):
         res = self.testapp.get('/wontbefound', status=200)
         self.assertTrue(b'generic_notfound' in res.body)
-        res = self.testapp.get('/bar', status=302)
+        res = self.testapp.get('/bar', status=307)
         self.assertEqual(res.location, 'http://localhost/bar/')
         res = self.testapp.get('/bar/', status=200)
         self.assertTrue(b'OK bar' in res.body)
-        res = self.testapp.get('/foo', status=302)
+        res = self.testapp.get('/foo', status=307)
         self.assertEqual(res.location, 'http://localhost/foo/')
         res = self.testapp.get('/foo/', status=200)
         self.assertTrue(b'OK foo2' in res.body)

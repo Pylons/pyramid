@@ -2238,7 +2238,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
-        from pyramid.httpexceptions import HTTPFound, HTTPNotFound
+        from pyramid.httpexceptions import HTTPTemporaryRedirect, HTTPNotFound
         config = self._makeOne(autocommit=True)
         config.add_route('foo', '/foo/')
         def view(request): return Response('OK')
@@ -2251,7 +2251,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
                                      exc_iface=implementedBy(HTTPNotFound),
                                      request_iface=IRequest)
         result = view(None, request)
-        self.assertTrue(isinstance(result, HTTPFound))
+        self.assertTrue(isinstance(result, HTTPTemporaryRedirect))
         self.assertEqual(result.location, '/scriptname/foo/?a=1&b=2')
 
     def test_add_notfound_view_append_slash_custom_response(self):
