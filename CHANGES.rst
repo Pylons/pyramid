@@ -54,6 +54,9 @@ Features
   available within the user-defined ``setup`` function.
   See https://github.com/Pylons/pyramid/pull/3318
 
+- Add support for Python 3.7. Add testing on Python 3.8 with allowed failures.
+  See https://github.com/Pylons/pyramid/pull/3333
+
 Bug Fixes
 ---------
 
