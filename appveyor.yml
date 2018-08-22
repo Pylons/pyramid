@@ -1,5 +1,7 @@
 environment:
   matrix:
+    - PYTHON: "C:\\Python37"
+      TOXENV: "py37"
     - PYTHON: "C:\\Python36"
       TOXENV: "py36"
     - PYTHON: "C:\\Python35"
