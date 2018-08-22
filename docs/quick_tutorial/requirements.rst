@@ -23,7 +23,7 @@ This *Quick Tutorial* is based on:
   tutorial uses **Python 3.7** but runs fine under Python 2.7.
 
 * **venv**. We believe in virtual environments. For this tutorial, we use
-  Python 3.7's built-in solution :term:`venv`. For Python 2.7, you can install
+  Python 3's built-in solution :term:`venv`. For Python 2.7, you can install
   :term:`virtualenv`.
 
 * **pip**. We use :term:`pip` for package management.
