@@ -123,7 +123,7 @@ Python 2.7:
 
     c:\Python27\Scripts\virtualenv %VENV%
 
-Python 3.6:
+Python 3.7:
 
 .. code-block:: doscon
 

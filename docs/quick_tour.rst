@@ -26,7 +26,7 @@ To save a little bit of typing and to be certain that we use the modules,
 scripts, and packages installed in our virtual environment, we'll set an
 environment variable, too.
 
-As an example, for Python 3.6+ on Linux:
+As an example, for Python 3.7+ on Linux:
 
 .. parsed-literal::
 

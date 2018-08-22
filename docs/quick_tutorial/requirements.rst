@@ -19,11 +19,11 @@ virtual environment.)
 
 This *Quick Tutorial* is based on:
 
-* **Python 3.6**. Pyramid fully supports Python 3.4+ and Python 2.7+. This
-  tutorial uses **Python 3.6** but runs fine under Python 2.7.
+* **Python 3.7**. Pyramid fully supports Python 3.4+ and Python 2.7+. This
+  tutorial uses **Python 3.7** but runs fine under Python 2.7.
 
 * **venv**. We believe in virtual environments. For this tutorial, we use
-  Python 3.6's built-in solution :term:`venv`. For Python 2.7, you can install
+  Python 3.7's built-in solution :term:`venv`. For Python 2.7, you can install
   :term:`virtualenv`.
 
 * **pip**. We use :term:`pip` for package management.
