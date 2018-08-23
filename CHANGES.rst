@@ -102,6 +102,11 @@ Backward Incompatibilities
   longer override those set by the ``setup`` function.
   See https://github.com/Pylons/pyramid/pull/3318
 
+- ``pyramid.config.Configurator.add_notfound_view`` uses default redirect
+  class exception ``pyramid.httpexceptions.HTTPTemporaryRedirect`` instead
+  of previous ``pyramid.httpexceptions.HTTPFound``.
+  See https://github.com/Pylons/pyramid/pull/3328
+
 Documentation Changes
 ---------------------
 
