@@ -267,7 +267,7 @@ which will be used as the action of the generated form.
 
    Since our ``request.dbsession`` defined in the previous chapter is
    registered with the ``pyramid_tm`` transaction manager, any changes we make
-   to objects managed by the that session will be committed automatically. In
+   to objects managed by the session will be committed automatically. In
    the event that there was an error (even later, in our template code), the
    changes would be aborted. This means the view itself does not need to
    concern itself with commit/rollback logic.
