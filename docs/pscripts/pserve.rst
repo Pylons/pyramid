@@ -6,4 +6,4 @@
 .. autoprogram:: pyramid.scripts.pserve:PServeCommand.parser
     :prog: pserve
 
-.. seealso:: :ref:`running_the_project_application`
+.. seealso:: :ref:`running_the_project_application` and :ref:`running-pscripts`.

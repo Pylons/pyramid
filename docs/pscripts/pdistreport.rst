@@ -6,4 +6,4 @@
 .. autoprogram:: pyramid.scripts.pdistreport:get_parser()
     :prog: pdistreport
 
-.. seealso:: :ref:`showing_distributions`
+.. seealso:: :ref:`showing_distributions` and :ref:`running-pscripts`.
