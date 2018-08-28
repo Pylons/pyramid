@@ -1441,6 +1441,7 @@ add-on                    addon
 and so on                 etc.
 GitHub                    Github, github
 JavaScript                Javascript, javascript, js
+nginx                     Nginx
 plug-in                   plugin
 Pyramid                   pyramid
 Python                    python
