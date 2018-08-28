@@ -43,7 +43,7 @@ Each of Pyramid's console scripts may be run by its name.  For example:
 
 .. note:: ``$VENV/bin/`` is a convention we use to simplify Pyramid documentation.
     It represents the ``bin`` directory in a virtual environment, where ``$VENV`` is an environment variable representing its path.
-    See :ref:`installing_unix` and :ref:`venv-bin-pip-vs-source-bin-activate` for more information.
+    See :ref:`installing_unix` and :ref:`Why use $VENV/bin/pip instead of source bin/activate, then pip <venv-bin-pip-vs-source-bin-activate>` for more information.
 
 
 .. index::
