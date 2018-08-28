@@ -6,4 +6,4 @@
 .. autoprogram:: pyramid.scripts.pcreate:PCreateCommand.parser
     :prog: pcreate
 
-.. seealso:: :ref:`creating_a_project`
+.. seealso:: :ref:`creating_a_project` and :ref:`running-pscripts`.

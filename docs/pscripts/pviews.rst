@@ -6,4 +6,4 @@
 .. autoprogram:: pyramid.scripts.pviews:PViewsCommand.parser
     :prog: pviews
 
-.. seealso:: :ref:`displaying_matching_views`
+.. seealso:: :ref:`displaying_matching_views` and :ref:`running-pscripts`.

@@ -6,4 +6,4 @@
 .. autoprogram:: pyramid.scripts.ptweens:PTweensCommand.parser
     :prog: ptweens
 
-.. seealso:: :ref:`displaying_tweens`
+.. seealso:: :ref:`displaying_tweens` and :ref:`running-pscripts`.
