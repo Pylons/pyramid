@@ -23,7 +23,7 @@ Running p-scripts
 All of the Pyramid console scripts may be run either:
 
 *   by its name
-*   through a Python interpreter
+*   as a Python module
 
 
 .. index::
