@@ -1245,6 +1245,7 @@ class ViewsConfiguratorMixin(object):
             'application/xhtml+xml',
             'application/xml',
             'text/xml',
+            'text/plain',
             'application/json',
         ):
             self.add_accept_view_order(accept)
@@ -1277,6 +1278,10 @@ class ViewsConfiguratorMixin(object):
         .. versionadded:: 1.10
 
         """
+        value = value.lower()
+        if '*' in value:
+            raise ConfigurationError(
+                '"accept" ordering is done between media types, not ranges')
         discriminator = ('accept view order', value)
         intr = self.introspectable(
             'accept view order',

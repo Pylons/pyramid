@@ -57,6 +57,12 @@ Features
 - Add support for Python 3.7. Add testing on Python 3.8 with allowed failures.
   See https://github.com/Pylons/pyramid/pull/3333
 
+- Added the ``pyramid.config.Configurator.add_accept_view_order`` directive,
+  allowing users to specify media type preferences in ambiguous situations
+  such as when several views match. A default ordering is defined for media
+  types that prefers human-readable html/text responses over JSON.
+  See https://github.com/Pylons/pyramid/pull/3326
+
 Bug Fixes
 ---------
 
@@ -106,6 +112,13 @@ Backward Incompatibilities
   class exception ``pyramid.httpexceptions.HTTPTemporaryRedirect`` instead
   of previous ``pyramid.httpexceptions.HTTPFound``.
   See https://github.com/Pylons/pyramid/pull/3328
+
+- Accept-handling has undergone work to get rid of undefined behaviors and
+  runtime exceptions. As part of this effort, it is now a hard error to pass
+  any media ranges to the ``accept`` predicate on routes and views.
+  Previously, depending on the version of WebOb, this would error on certain
+  requests or it would work in undefined ways.
+  https://github.com/Pylons/pyramid/pull/3326
 
 Documentation Changes
 ---------------------

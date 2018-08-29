@@ -1035,11 +1035,12 @@ Accept Header Content Negotiation
 ---------------------------------
 
 The ``accept`` argument to :meth:`pyramid.config.Configurator.add_view` can be used to control :term:`view lookup` by dispatching to different views based on the HTTP ``Accept`` request header.
-Consider the below example in which there are two views, sharing the same view callable.
-Each view specifies uses the accept header to trigger the appropriate response renderer.
+Consider the example below in which there are three defined views.
+Each view uses the ``Accept`` header to trigger an appropriate response renderer.
 
 .. code-block:: python
 
+    from pyramid.httpexceptions import HTTPNotAcceptable
     from pyramid.view import view_config
 
     @view_config(accept='application/json', renderer='json')
@@ -1049,12 +1050,20 @@ Each view specifies uses the accept header to trigger the appropriate response r
             'name': request.GET.get('name', 'bob'),
         }
 
-Wildcard Accept header
-++++++++++++++++++++++
+    @view_config()
+    def myview_unacceptable(request):
+        raise HTTPNotAcceptable
 
 The appropriate view is selected here when the client specifies an unambiguous header such as ``Accept: text/*`` or ``Accept: application/json``.
-However, by default, if a client specifies ``Accept: */*``, the ordering is undefined.
-This can be fixed by telling :app:`Pyramid` what the preferred relative ordering is between various accept mimetypes by using :meth:`pyramid.config.Configurator.add_accept_view_option`.
+Similarly, if the client specifies a media type that no view is registered to handle, such as ``Accept: text/plain``, it will fall through to ``myview_unacceptable`` and raise ``406 Not Acceptable``.
+There are a few cases in which the client may specify ambiguous constraints:
+
+- ``Accept: */*``.
+- A missing ``Accept`` header.
+- An invalid ``Accept`` header.
+
+In these cases the preferred view is not clearly defined (see :rfc:`7231#section-5.3.2`) and :app:`Pyramid` will select one randomly.
+This can be controlled by telling :app:`Pyramid` what the preferred relative ordering is between various media types by using :meth:`pyramid.config.Configurator.add_accept_view_order`.
 For example:
 
 .. code-block:: python
@@ -1063,29 +1072,32 @@ For example:
 
     def main(global_config, **settings):
         config = Configurator(settings=settings)
-        config.add_accept_view_option('text/html')
-        config.add_accept_view_option(
+        config.add_accept_view_order('text/html')
+        config.add_accept_view_order(
             'application/json',
             weighs_more_than='text/html',
         )
         config.scan()
         return config.make_wsgi_app()
 
-Missing Accept header
-+++++++++++++++++++++
+In this case, the ``application/json`` view should always be selected in cases where it is otherwise ambiguous.
 
-The above example will not match any view if the ``Accept`` header is not specified by the client.
-This can be solved by adding a fallback view without an ``accept`` predicate.
-For example, below the html response will be returned in all cases unless ``application/json`` is requested specifically.
+Default Accept Ordering
++++++++++++++++++++++++
 
-.. code-block:: python
+By default, :app:`Pyramid` defines a very simple priority ordering for views that prefers human-readable responses over JSON:
 
-    @view_config(accept='application/json', renderer='json')
-    @view_config(renderer='templates/hello.jinja2')
-    def myview(request):
-        return {
-            'name': request.GET.get('name', 'bob'),
-        }
+- ``text/html``
+- ``application/xhtml+xml``
+- ``application/xml``
+- ``text/xml``
+- ``text/plain``
+- ``application/json``
+
+API clients tend to be able to specify their desired headers with more control than web browsers, and can specify the correct ``Accept`` value, if necessary.
+Therefore, the motivation for this ordering is to optimize for readability.
+Media types that are not listed above are ordered randomly during :term:`view lookup` between otherwise-similar views.
+The defaults can be overridden using :meth:`pyramid.config.Configurator.add_accept_view_order` as described above.
 
 .. _influencing_http_caching:
 
