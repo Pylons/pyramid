@@ -1,4 +1,4 @@
-import os
+import argparse
 import sys
 
 from pyramid.paster import bootstrap, setup_logging
@@ -24,19 +24,19 @@ def setup_models(dbsession):
     dbsession.add(page)
 
 
-def usage(argv):
-    cmd = os.path.basename(argv[0])
-    print('usage: %s <config_uri>\n'
-          '(example: "%s development.ini")' % (cmd, cmd))
-    sys.exit(1)
+def parse_args(argv):
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        'config_uri',
+        help='Configuration file, e.g., development.ini',
+    )
+    return parser.parse_args(argv[1:])
 
 
 def main(argv=sys.argv):
-    if len(argv) != 2:
-        usage(argv)
-    config_uri = argv[1]
-    setup_logging(config_uri)
-    env = bootstrap(config_uri)
+    args = parse_args(argv)
+    setup_logging(args.config_uri)
+    env = bootstrap(args.config_uri)
 
     try:
         with env['request'].tm:

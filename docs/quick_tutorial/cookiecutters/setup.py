@@ -9,15 +9,16 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
     CHANGES = f.read()
 
 requires = [
+    'plaster_pastedeploy',
     'pyramid',
-    'pyramid_debugtoolbar',
     'pyramid_jinja2',
+    'pyramid_debugtoolbar',
     'waitress',
 ]
 
 tests_require = [
     'WebTest >= 1.3.1',  # py3 compat
-    'pytest',
+    'pytest>=3.7.4',
     'pytest-cov',
 ]
 

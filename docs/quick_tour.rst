@@ -755,14 +755,14 @@ Pyramid (for example, when a new request comes in).
 Maybe you would like to log messages in your code? In your Python module,
 import and set up the logging in your ``views.py``:
 
-.. literalinclude:: quick_tour/logging/hello_world/views.py
+.. literalinclude:: quick_tour/logging/hello_world/views/default.py
     :language: python
     :lineno-match:
     :lines: 3-4
 
 You can now, in your code, log messages:
 
-.. literalinclude:: quick_tour/logging/hello_world/views.py
+.. literalinclude:: quick_tour/logging/hello_world/views/default.py
     :language: python
     :lineno-match:
     :lines: 7-8
@@ -819,13 +819,13 @@ Now make a "factory" and pass it to the :term:`configurator`'s
 .. literalinclude:: quick_tour/sessions/hello_world/__init__.py
     :language: python
     :lineno-match:
-    :lines: 10-13
+    :lines: 9-12
     :emphasize-lines: 2-3
 
 Pyramid's :term:`request` object now has a ``session`` attribute that we can
 use in our view code in ``views.py``:
 
-.. literalinclude:: quick_tour/sessions/hello_world/views.py
+.. literalinclude:: quick_tour/sessions/hello_world/views/default.py
     :language: python
     :lineno-match:
     :lines: 7-
