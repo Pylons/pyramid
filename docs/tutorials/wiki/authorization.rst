@@ -312,7 +312,7 @@ indicated by the highlighted lines.
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
    :lines: 35-39
-   :emphasize-lines: 3-5
+   :emphasize-lines: 2-4
    :language: html
 
 The attribute ``tal:condition="logged_in"`` will make the element be included
@@ -355,7 +355,7 @@ we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
    :linenos:
-   :emphasize-lines: 37-39
+   :emphasize-lines: 36-38
    :language: html
 
 Only the highlighted lines need to be added or edited.
@@ -365,7 +365,7 @@ we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt
    :linenos:
-   :emphasize-lines: 37-39
+   :emphasize-lines: 36-38
    :language: html
 
 Only the highlighted lines need to be added or edited.
