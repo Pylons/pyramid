@@ -20,7 +20,17 @@ Getting Started
 
     env/bin/pip install -e ".[testing]"
 
-- Configure the database.
+- Initialize and upgrade the database using Alembic.
+
+    - Generate your first revision.
+
+        env/bin/alembic -c development.ini revision --autogenerate -m "init"
+
+    - Upgrade to that revision.
+
+        env/bin/alembic -c development.ini upgrade head
+
+- Load default data into the database using a script.
 
     env/bin/initialize_sqla_demo_db development.ini
 
