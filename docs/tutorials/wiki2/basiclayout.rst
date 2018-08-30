@@ -44,7 +44,7 @@ When you invoke the ``pserve development.ini`` command, the ``main`` function
 above is executed.  It accepts some settings and returns a :term:`WSGI`
 application.  (See :ref:`startup_chapter` for more about ``pserve``.)
 
-Next in ``main``, construct a :term:`Configurator` object:
+Next in ``main``, construct a :term:`Configurator` object using a context manager:
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 7
