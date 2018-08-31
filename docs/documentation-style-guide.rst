@@ -18,6 +18,8 @@ This document is aimed at authors of and contributors to documentation for proje
 This document describes style and reStructuredText syntax used in project documentation.
 We provide examples, including reStructuredText code and its rendered output, for both visual and technical reference.
 
+The source code of this guide is located in its `project repository on GitHub <https://github.com/Pylons/docs-style-guide>`_.
+
 For Python coding style guidelines, see `Coding Style <https://pylonsproject.org/community-coding-style-standards.html#coding-style>`_.
 
 We have adopted the convention from :RFC:`2119` for key words.
@@ -39,6 +41,27 @@ When submitting a pull request for the first time in a project, sign its ``CONTR
 Contributors to documentation should be familiar with `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ (reST) for writing documentation.
 Most projects use `Sphinx <http://www.sphinx-doc.org/en/master/>`_ to build documentation from reST source files, and `Read The Docs <https://readthedocs.org/>`_ (RTD) for publishing them on the web.
 Experience with Sphinx and RTD may be helpful, but not required.
+
+
+.. _dsg_testing-documentation:
+
+Testing Documentation
+---------------------
+
+Before submitting a pull request, documentation should be tested locally.
+Ultimately testing of documentation must be done before merging a pull request.
+This is typically done through a project's integration with Travis CI or Appveyor.
+
+*   Use Sphinx's ``make html`` command to build the HTML output of the documentation without errors or warnings.
+    Some projects use ``tox -e docs`` or just ``tox`` to invoke Sphinx's ``make html``.
+    Most other build utilities like `restview <https://pypi.org/project/restview/>`_ and `readme_renderer <https://pypi.org/project/readme_renderer/>`_ test only a single file and do not support cross-references between files.
+*   If documentation has doctests and uses :ref:`dsg-sphinx-extension-doctest`, then run Sphinx's ``make doctest`` command.
+*   Optionally use Sphinx's ``make linkcheck`` command to verify that links are valid and to avoid bit rot.
+    It is acceptable to ignore broken links in a project's change log and history.
+    Narrative and API documentation should occasionally have its links checked.
+*   Optionally use Sphinx's ``make epub`` and ``make latexpdf`` or ``make xelatex`` commands to build epub or PDF output of the documentation.
+
+This project's `repository <https://github.com/Pylons/docs-style-guide>`_ has an example of how to configure Sphinx, tox, and Travis to build documentation.
 
 
 .. _dsg-documentation-structure:
@@ -1471,6 +1494,7 @@ Extensions need to be enabled and configured in ``docs/conf.py`` before they can
 API documentation uses the Sphinx extension :mod:`sphinx.ext.autodoc` to include documentation from docstrings.
 
 See the source of any documentation within the ``docs/api/`` directory for conventions and usage, as well as the Sphinx extension's :mod:`documentation <sphinx.ext.autodoc>`.
+Live examples can be found in Pyramid's :ref:`api_documentation`.
 
 
 .. _dsg-sphinx-extension-doctest:
@@ -1558,6 +1582,7 @@ When we run doctests, the output would be similar to the following.
 :mod:`sphinx.ext.viewcode` looks at your Python object descriptions and tries to find the source files where the objects are contained.
 When found, a separate HTML page will be output for each module with a highlighted version of the source code, and a link will be added to all object descriptions that leads to the source code of the described object.
 A link back from the source to the description will also be inserted.
+Live examples can be found in Pyramid's :ref:`api_documentation`.
 
 
 .. _dsg-sphinx-extension-repoze-sphinx-autointerface:
@@ -1573,4 +1598,4 @@ A link back from the source to the description will also be inserted.
 Script documentation
 --------------------
 
-We currently use `sphinxcontrib-autoprogram <https://pythonhosted.org/sphinxcontrib-autoprogram/>`_ to generate program output of the p* scripts.
+We currently use `sphinxcontrib-autoprogram <https://pythonhosted.org/sphinxcontrib-autoprogram/>`_ to generate program output of Pyramid's :ref:`pscripts_documentation`.
