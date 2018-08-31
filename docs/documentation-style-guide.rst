@@ -1481,6 +1481,57 @@ See the source of any documentation within the ``docs/api/`` directory for conve
 :mod:`sphinx.ext.doctest` allows you to test code snippets in the documentation in a natural way.
 It works by collecting specially-marked up code blocks and running them as doctest tests.
 We have only a few tests in our Pyramid documentation which can be found in ``narr/sessions.rst`` and ``narr/hooks.rst``.
+The following is an example.
+
+.. code-block:: rst
+
+    .. testsetup:: group1
+
+        a = 1
+        b = 2
+
+    .. doctest:: group1
+
+        >>> a + b
+        3
+
+And the rendered result.
+
+.. testsetup:: group1
+
+    a = 1
+    b = 2
+
+.. doctest:: group1
+
+    >>> a + b
+    3
+
+When we run doctests, the output would be similar to the following.
+
+.. code-block:: bash
+
+    tox -e doctest
+
+    # ...
+
+    Document: index
+    ---------------
+    1 items passed all tests:
+       1 tests in group1
+    1 tests in 1 items.
+    1 passed and 0 failed.
+    Test passed.
+
+    Doctest summary
+    ===============
+        1 test
+        0 failures in tests
+        0 failures in setup code
+        0 failures in cleanup code
+    build succeeded.
+
+    Testing of doctests in the sources finished, look at the results in ../.tox/doctest/doctest/output.txt.
 
 
 .. _dsg-sphinx-extension-intersphinx:
