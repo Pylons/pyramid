@@ -65,7 +65,7 @@ with the ``.jinja2`` extension within our project.
     :lineno-match:
     :language: py
 
-Next include the the package ``models`` using a dotted Python path. The exact
+Next include the package ``models`` using a dotted Python path. The exact
 setup of the models will be covered later.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
