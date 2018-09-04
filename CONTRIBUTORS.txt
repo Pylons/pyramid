@@ -326,3 +326,5 @@ Contributors
 - Jason Williams, 2018/06/11
 
 - Benjamin Gmurczyk, 2018/06/14
+
+- Stephen Martin, 2018/09/04
