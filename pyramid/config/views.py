@@ -123,7 +123,7 @@ class MultiView(object):
                     self.views[i] = (order, view, phash)
                     return
 
-        if accept is None:
+        if accept is None or '*' in accept:
             self.views.append((order, view, phash))
             self.views.sort(key=operator.itemgetter(0))
         else:
@@ -817,6 +817,17 @@ class ViewsConfiguratorMixin(object):
                 DeprecationWarning,
                 stacklevel=4,
                 )
+
+        if accept is not None and '*' in accept:
+            warnings.warn(
+                ('The usage of a media range in the "accept" view predicate '
+                 'is deprecated as of Pyramid 1.10. Register multiple views '
+                 'with explicit media ranges and read '
+                 '"Accept Header Content Negotiation" in the '
+                 '"View Configuration" documentation for more information.'),
+                DeprecationWarning,
+                stacklevel=4,
+            )
 
         if accept is not None and is_nonstr_iter(accept):
             raise ConfigurationError(

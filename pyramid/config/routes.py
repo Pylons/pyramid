@@ -299,6 +299,15 @@ class RoutesConfiguratorMixin(object):
                 stacklevel=3
                 )
 
+        if accept is not None and '*' in accept:
+            warnings.warn(
+                ('The usage of a media range in the "accept" route predicate '
+                 'is deprecated as of Pyramid 1.10. Use a list of explicit '
+                 'media types instead.'),
+                DeprecationWarning,
+                stacklevel=4,
+            )
+
         if accept is not None:
             accept = accept.lower()
 
