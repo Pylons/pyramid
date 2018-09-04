@@ -116,7 +116,7 @@ class MultiView(object):
         view = self.match(context, request)
         return view.__discriminator__(context, request)
 
-    def add(self, view, order, accept=None, phash=None, accept_order=None):
+    def add(self, view, order, phash=None, accept=None, accept_order=None):
         if phash is not None:
             for i, (s, v, h) in enumerate(list(self.views)):
                 if phash == h:
@@ -673,11 +673,11 @@ class ViewsConfiguratorMixin(object):
 
           A :term:`media type` that will be matched against the ``Accept``
           HTTP request header.  If this value is specified, it must be a
-          specific media type, such as ``text/html``.  If the media type is
-          acceptable by the ``Accept`` header of the request, or if the
-          ``Accept`` header isn't set at all in the request, this predicate
-          will match. If this does not match the ``Accept`` header of the
-          request, view matching continues.
+          specific media type, such as ``text/html``, or a list of media types.
+          If the media type is acceptable by the ``Accept`` header of the
+          request, or if the ``Accept`` header isn't set at all in the request,
+          this predicate will match. If this does not match the ``Accept``
+          header of the request, view matching continues.
 
           If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is
           not taken into consideration when deciding whether or not to invoke
@@ -686,10 +686,10 @@ class ViewsConfiguratorMixin(object):
           See :ref:`accept_content_negotation` for more information.
 
           .. versionchanged:: 1.10
-              Media ranges such as ``text/*`` will now raise
-              :class:`pyramid.exceptions.ConfigurationError`. Previously,
-              these values had undefined behavior based on the version of
-              WebOb being used and was never fully supported.
+              Media ranges such as ``text/*`` are deprecated. Use a list of
+              explicit media types instead. Media ranges are non-deterministic.
+
+              Also, added support for a list of media types.
 
         path_info
 
@@ -818,24 +818,21 @@ class ViewsConfiguratorMixin(object):
                 stacklevel=4,
                 )
 
-        if accept is not None and '*' in accept:
-            warnings.warn(
-                ('The usage of a media range in the "accept" view predicate '
-                 'is deprecated as of Pyramid 1.10. Register multiple views '
-                 'with explicit media ranges and read '
-                 '"Accept Header Content Negotiation" in the '
-                 '"View Configuration" documentation for more information.'),
-                DeprecationWarning,
-                stacklevel=4,
-            )
-
-        if accept is not None and is_nonstr_iter(accept):
-            raise ConfigurationError(
-                'A list is not supported in the "accept" view predicate.',
-            )
-
         if accept is not None:
-            accept = accept.lower()
+            if isinstance(accept, str):
+                accept = list(accept)
+            accept = [accept_option.lower() for accept_option in accept]
+            if any('*' in accept_option for accept_option in accept):
+                warnings.warn(
+                    ('The usage of a media range in the "accept" view '
+                     'predicate is deprecated as of Pyramid 1.10. You may '
+                     'pass multiple explicit media types, if necessary. '
+                     'Please read "Accept Header Content Negotiation" in the '
+                     '"View Configuration" documentation for more '
+                     'information.'),
+                    DeprecationWarning,
+                    stacklevel=4,
+                )
 
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
@@ -1092,7 +1089,19 @@ class ViewsConfiguratorMixin(object):
                 if old_view is not None:
                     break
 
-            def regclosure():
+            old_phash = getattr(old_view, '__phash__', DEFAULT_PHASH)
+            is_multiview = IMultiView.providedBy(old_view)
+            want_multiview = (
+                is_multiview
+                # multiple accept options requires a multiview
+                or (accept is not None and len(accept) > 1)
+                # no component was yet registered for exactly this triad
+                # or only one was registered but with the same hash as an
+                # override
+                or (old_view is not None and old_phash != phash)
+            )
+
+            if not want_multiview:
                 if hasattr(derived_view, '__call_permissive__'):
                     view_iface = ISecuredView
                 else:
@@ -1103,21 +1112,6 @@ class ViewsConfiguratorMixin(object):
                     view_iface,
                     name
                     )
-
-            is_multiview = IMultiView.providedBy(old_view)
-            old_phash = getattr(old_view, '__phash__', DEFAULT_PHASH)
-
-            if old_view is None:
-                # - No component was yet registered for any of our I*View
-                #   interfaces exactly; this is the first view for this
-                #   triad.
-                regclosure()
-
-            elif (not is_multiview) and (old_phash == phash):
-                # - A single view component was previously registered with
-                #   the same predicate hash as this view; this registration
-                #   is therefore an override.
-                regclosure()
 
             else:
                 # - A view or multiview was already registered for this
@@ -1132,13 +1126,23 @@ class ViewsConfiguratorMixin(object):
                     multiview = old_view
                 else:
                     multiview = MultiView(name)
-                    old_accept = getattr(old_view, '__accept__', None)
-                    old_order = getattr(old_view, '__order__', MAX_ORDER)
-                    # don't bother passing accept_order here as we know we're
-                    # adding another one right after which will re-sort
-                    multiview.add(old_view, old_order, old_accept, old_phash)
+                    if old_view is not None:
+                        old_accept = getattr(old_view, '__accept__', None)
+                        old_order = getattr(old_view, '__order__', MAX_ORDER)
+                        # don't bother passing accept_order here as we know
+                        # we're adding another one right after which will
+                        # re-sort
+                        multiview.add(
+                            old_view, old_order, old_phash, old_accept)
                 accept_order = self.registry.queryUtility(IAcceptOrder)
-                multiview.add(derived_view, order, accept, phash, accept_order)
+                for accept_option in accept:
+                    multiview.add(
+                        derived_view,
+                        order,
+                        phash,
+                        accept_option,
+                        accept_order,
+                    )
                 for view_type in (IView, ISecuredView):
                     # unregister any existing views
                     self.registry.adapters.unregister(
