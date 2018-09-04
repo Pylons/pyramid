@@ -818,6 +818,11 @@ class ViewsConfiguratorMixin(object):
                 stacklevel=4,
                 )
 
+        if accept is not None and is_nonstr_iter(accept):
+            raise ConfigurationError(
+                'A list is not supported in the "accept" view predicate.',
+            )
+
         if accept is not None:
             accept = accept.lower()
 

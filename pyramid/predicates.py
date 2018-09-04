@@ -131,19 +131,17 @@ class HeaderPredicate(object):
 
 class AcceptPredicate(object):
     def __init__(self, val, config):
-        self.val = val
-        if '*' in self.val:
-            raise ConfigurationError(
-                '"accept" predicate only accepts specific media types',
-            )
+        if not is_nonstr_iter(val):
+            val = (val,)
+        self.values = val
 
     def text(self):
-        return 'accept = %s' % (self.val,)
+        return 'accept = %s' % (self.values,)
 
     phash = text
 
     def __call__(self, context, request):
-        return bool(request.accept.acceptable_offers([self.val]))
+        return bool(request.accept.acceptable_offers(self.values))
 
 class ContainmentPredicate(object):
     def __init__(self, val, config):

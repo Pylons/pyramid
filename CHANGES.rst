@@ -63,6 +63,10 @@ Features
   types that prefers human-readable html/text responses over JSON.
   See https://github.com/Pylons/pyramid/pull/3326
 
+- Support a list of media types in the ``accept`` predicate used in
+  ``pyramid.config.Configurator.add_route``.
+  See https://github.com/Pylons/pyramid/pull/3326
+
 Bug Fixes
 ---------
 
