@@ -69,7 +69,7 @@ using the :meth:`pyramid.config.Configurator.set_session_factory` method.
      session data is stored unencrypted in a cookie, it will also be easier for
      evildoers to obtain the current user's cross-site scripting token.
 
-   - The default serialization method, while replacable with something like
+   - The default serialization method, while replaceable with something like
      JSON, is implemented using pickle which can lead to remote code execution
      if your secret key is compromised.
 
