@@ -64,20 +64,29 @@ using the :meth:`pyramid.config.Configurator.set_session_factory` method.
      easily read by both users of your application and third parties who have
      access to your users' network traffic.
 
-   - If you use this sessioning implementation, and you inadvertently create a
-     cross-site scripting vulnerability in your application, because the
-     session data is stored unencrypted in a cookie, it will also be easier for
-     evildoers to obtain the current user's cross-site scripting token.
+     To avoid this vulnerability, use TLS to encrypt the network traffic, making it unreadable by third parties.
+
+   - If you use this session implementation and you inadvertently create a
+     cross-site scripting vulnerability in your application, it will be easier for
+     evildoers to obtain the current user's cross-site scripting token, because the
+     session data is stored unencrypted in a cookie.
+
+     To avoid this vulnerability, set the argument ``httponly=True`` in the function :func:`~pyramid.session.SignedCookieSessionFactory`, which will hide the cookie from JavaScript.
+
+     In general cross-site scripting will have full access to the page in question.
+     If there is a form with a CSRF token as a form component on the page, then the token can already be stolen and stealing the cookie is unnecessary.
 
    - The default serialization method, while replaceable with something like
      JSON, is implemented using pickle which can lead to remote code execution
      if your secret key is compromised.
+
 
    In short, use a different session factory implementation (preferably one
    which keeps session data on the server) for anything but the most basic of
    applications where "session security doesn't matter", you are sure your
    application has no cross-site scripting vulnerabilities, and you are confident
    your secret key will not be exposed.
+   Most importantly, always use TLS to encrypt network traffic.
 
 .. index::
    single: session object
