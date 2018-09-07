@@ -223,13 +223,13 @@ class RoutesConfiguratorMixin(object):
 
         accept
 
-          A :term:`media type` that will be matched against the ``Accept``
-          HTTP request header.  If this value is specified, it must be a
-          specific media type, such as ``text/html``, or a list of media types.
-          If the media type is acceptable by the ``Accept`` header of the
-          request, or if the ``Accept`` header isn't set at all in the request,
-          this predicate will match. If this does not match the ``Accept``
-          header of the request, route matching continues.
+          A media type that will be matched against the ``Accept`` HTTP
+          request header.  If this value is specified, it must be a specific
+          media type, such as ``text/html``.  If the media type is acceptable
+          by the ``Accept`` header of the request, or if the ``Accept`` header
+          isn't set at all in the request, this predicate will match. If this
+          does not match the ``Accept`` header of the request, route matching
+          continues.
 
           If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is
           not taken into consideration when deciding whether or not to select
@@ -237,10 +237,10 @@ class RoutesConfiguratorMixin(object):
 
 
           .. versionchanged:: 1.10
-              Media ranges such as ``text/*`` are deprecated. Use a list of
-              explicit media types instead. Media ranges are non-deterministic.
-
-              Also, added support for a list of media types.
+              Media ranges such as ``text/*`` will now raise
+              :class:`pyramid.exceptions.ConfigurationError`. Previously,
+              these values had undefined behavior based on the version of
+              WebOb being used and was never fully supported.
 
         effective_principals
 
@@ -299,21 +299,17 @@ class RoutesConfiguratorMixin(object):
                 stacklevel=3
                 )
 
+        if accept is not None and '*' in accept:
+            warnings.warn(
+                ('The usage of a media range in the "accept" route predicate '
+                 'is deprecated as of Pyramid 1.10. Use a list of explicit '
+                 'media types instead.'),
+                DeprecationWarning,
+                stacklevel=4,
+            )
+
         if accept is not None:
-            if isinstance(accept, str):
-                accept = list(accept)
-            accept = [accept_option.lower() for accept_option in accept]
-            if any('*' in accept_option for accept_option in accept):
-                warnings.warn(
-                    ('The usage of a media range in the "accept" view '
-                     'predicate is deprecated as of Pyramid 1.10. You may '
-                     'pass multiple explicit media types, if necessary. '
-                     'Please read "Accept Header Content Negotiation" in the '
-                     '"View Configuration" documentation for more '
-                     'information.'),
-                    DeprecationWarning,
-                    stacklevel=4,
-                )
+            accept = accept.lower()
 
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried
