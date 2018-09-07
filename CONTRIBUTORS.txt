@@ -328,3 +328,6 @@ Contributors
 - Benjamin Gmurczyk, 2018/06/14
 
 - Stephen Martin, 2018/09/04
+
+- Kuzma Leshakov, 2018/09/07
+
