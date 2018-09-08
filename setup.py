@@ -21,7 +21,7 @@ def readfile(name):
 
 README = readfile('README.rst')
 CHANGES = readfile('CHANGES.rst')
-
+# instaling
 install_requires = [
     'hupper',
     'plaster',
@@ -33,7 +33,7 @@ install_requires = [
     'zope.deprecation >= 3.5.0',  # py3 compat
     'zope.interface >= 3.8.0',  # has zope.interface.registry
 ]
-
+# testing
 tests_require = [
     'webtest >= 1.3.1',  # py3 compat
     'zope.component >= 4.0',  # py3 compat
