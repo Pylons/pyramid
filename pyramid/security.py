@@ -192,7 +192,7 @@ def forget(request):
 
 def principals_allowed_by_permission(context, permission):
     """ Provided a ``context`` (a resource object), and a ``permission``
-    (a string or unicode object), if a :term:`authorization policy` is
+    (a string or unicode object), if an :term:`authorization policy` is
     in effect, return a sequence of :term:`principal` ids that possess
     the permission in the ``context``.  If no authorization policy is
     in effect, this will return a sequence with the single value
@@ -201,7 +201,7 @@ def principals_allowed_by_permission(context, permission):
 
     .. note::
 
-       even if an :term:`authorization policy` is in effect,
+       Even if an :term:`authorization policy` is in effect,
        some (exotic) authorization policies may not implement the
        required machinery for this function; those will cause a
        :exc:`NotImplementedError` exception to be raised when this
