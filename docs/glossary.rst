@@ -1159,6 +1159,17 @@ Glossary
 
       * `pyramid-cookiecutter-theonecc <https://github.com/Pylons/pyramid-cookiecutter-theonecc>`_
 
+      The unified cookiecutter ``pyramid-cookiecutter-theonecc`` merged
+      features from the three previous cookiecutters which are now deprecated.
+
+      .. versionadded:: 1.10
+
+      * `pyramid-cookiecutter-alchemy <https://github.com/Pylons/pyramid-cookiecutter-alchemy>`_
+      * `pyramid-cookiecutter-starter <https://github.com/Pylons/pyramid-cookiecutter-starter>`_
+      * `pyramid-cookiecutter-zodb <https://github.com/Pylons/pyramid-cookiecutter-zodb>`_
+
+      .. deprecated:: 1.10
+
       .. versionadded:: 1.8
 
       .. seealso:: See also :term:`scaffold`.
