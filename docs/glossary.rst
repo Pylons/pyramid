@@ -1155,12 +1155,10 @@ Glossary
    cookiecutter
       A command-line utility that creates projects from :ref:`cookiecutters <cookiecutter:readme>` (project templates), e.g., creating a Python package project from a Python package project template.
 
-      The Pyramid cookiecutter can be found here:
+      The unified cookiecutter ``pyramid-cookiecutter-theonecc`` merged features from the three previous cookiecutters which are now deprecated.
 
       * `pyramid-cookiecutter-theonecc <https://github.com/Pylons/pyramid-cookiecutter-theonecc>`_
 
-      The unified cookiecutter ``pyramid-cookiecutter-theonecc`` merged
-      features from the three previous cookiecutters which are now deprecated.
 
       .. versionadded:: 1.10
 
