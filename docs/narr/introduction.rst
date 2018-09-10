@@ -144,7 +144,7 @@ Develop interactively
 
 When your application has an error, an interactive debugger allows you to poke around from your browser to find out what happened.
 
-To use the :app:`Pyramid` debug toolbar, build your project with a :app:`Pyramid` :term:`cookiecutter`.
+To use the :app:`Pyramid` debug toolbar, build your project with our :term:`cookiecutter`.
 
 .. seealso::
 

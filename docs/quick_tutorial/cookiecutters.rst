@@ -24,17 +24,17 @@ Steps
 
         $VENV/bin/pip install cookiecutter
 
-#.  Let's use the cookiecutter ``pyramid-cookiecutter-starter`` to create a starter :app:`Pyramid` project in the current directory, entering values at the prompts as shown below for the following command.
+#.  Let's use the cookiecutter ``pyramid-cookiecutter-theonecc`` to create a starter :app:`Pyramid` project in the current directory, entering values at the prompts as shown below for the following command.
 
     .. code-block:: bash
 
-        $VENV/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
+        $VENV/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-theonecc --checkout master
 
     If prompted for the first item, accept the default ``yes`` by hitting return.
 
     .. code-block:: text
 
-        You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
+        You've cloned ~/.cookiecutters/pyramid-cookiecutter-theonecc before.
         Is it okay to delete and re-clone it? [yes]: yes
         project_name [Pyramid Scaffold]: cc_starter
         repo_name [cc_starter]: cc_starter
@@ -42,6 +42,11 @@ Steps
         1 - jinja2
         2 - chameleon
         3 - mako
+        Choose from 1, 2, 3 [1]: 1
+        Select backend:
+        1 - none
+        2 - sqlalchemy
+        3 - zodb
         Choose from 1, 2, 3 [1]: 1
 
 #.  We then run through the following commands.
@@ -56,6 +61,17 @@ Steps
         env/bin/pip install --upgrade pip setuptools
         # ...and into which we install our project.
         env/bin/pip install -e .
+
+    **Note:** If you selected ``sqlalchemy`` in the preceding step, continue. Otherwise, skip to the next step.
+
+    .. code-block:: bash
+
+    # Generate your first revision.
+    env/bin/alembic -c development.ini revision --autogenerate -m "init"
+    # Upgrade to that revision.
+    env/bin/alembic -c development.ini upgrade head
+    # Load default data.
+    env/bin/initialize_cc_starter_db development.ini
 
 #.  Start up the application by pointing :app:`Pyramid`'s ``pserve`` command at the
     project's (generated) configuration file:
@@ -79,7 +95,7 @@ Analysis
 ========
 
 Rather than starting from scratch, a cookiecutter can make it easy to get a Python
-project containing a working :app:`Pyramid` application. The Pylons Project provides `several cookiecutters <https://github.com/Pylons?q=pyramid-cookiecutter>`_.
+project containing a working :app:`Pyramid` application.
 
 ``pserve`` is :app:`Pyramid`'s application runner, separating operational details from
 your code. When you install :app:`Pyramid`, a small command program called ``pserve``

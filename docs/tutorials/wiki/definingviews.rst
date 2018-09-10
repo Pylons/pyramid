@@ -99,7 +99,7 @@ like the following:
 We added some imports and created a regular expression to find "WikiWords".
 
 We got rid of the ``my_view`` view function and its decorator that was added
-when we originally rendered the ``zodb`` cookiecutter.  It was only an example and
+when we originally rendered the ``zodb`` backend cookiecutter.  It was only an example and
 isn't relevant to our application.
 
 Then we added four :term:`view callable` functions to our ``views.py``

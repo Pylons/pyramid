@@ -16,16 +16,17 @@ We write tests for the ``model`` classes and the ``appmaker``.  Changing
 we'll write a test class for the ``appmaker``.
 
 To do so, we'll retain the ``tutorial.tests.ViewTests`` class that was
-generated as part of the ``zodb`` cookiecutter.  We'll add three test classes: one
-for the ``Page`` model named ``PageModelTests``, one for the ``Wiki`` model
-named ``WikiModelTests``, and one for the appmaker named ``AppmakerTests``.
+generated as part of the ``zodb`` backend cookiecutter.  We'll add three test
+classes: one for the ``Page`` model named ``PageModelTests``, one for the
+``Wiki`` model named ``WikiModelTests``, and one for the appmaker named
+``AppmakerTests``.
 
 Test the views
 ==============
 
 We'll modify our ``tests.py`` file, adding tests for each view function we
-added previously.  As a result, we'll delete the ``ViewTests`` class that
-the ``zodb`` cookiecutter provided, and add four other test classes:
+added previously.  As a result, we'll delete the ``ViewTests`` class that the
+``zodb`` backend cookiecutter provided, and add four other test classes:
 ``ViewWikiTests``, ``ViewPageTests``, ``AddPageTests``, and ``EditPageTests``.
 These test the ``view_wiki``, ``view_page``, ``add_page``, and ``edit_page``
 views.

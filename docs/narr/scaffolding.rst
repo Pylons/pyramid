@@ -5,7 +5,7 @@ Creating Pyramid Scaffolds
 
 .. deprecated:: 1.8
 
-    Scaffolds and the ``pcreate`` script used to generate :app:`Pyramid` projects from scaffolds have been deprecated. Use :ref:`cookiecutters` instead.
+    Scaffolds and the ``pcreate`` script used to generate :app:`Pyramid` projects from scaffolds have been deprecated. Use :ref:`cookiecutter` instead.
 
 You can extend Pyramid by creating a :term:`scaffold` template.  A scaffold
 template is useful if you'd like to distribute a customizable configuration of

@@ -32,20 +32,20 @@ specific path information for commands and files.
     <https://code.google.com/archive/p/modwsgi/wikis/InstallationInstructions.wiki>`_
     for your platform into your system's Apache installation.
 
-#.  Create a :app:`Pyramid` application. For this tutorial we'll use the
-    ``starter`` :term:`cookiecutter`. See :ref:`project_narr` for more
-    in-depth information about creating a new project.
+#.  Create a :app:`Pyramid` application using our :term:`cookiecutter`. See
+    :ref:`project_narr` for more in-depth information about creating a new
+    project.
 
     .. code-block:: bash
 
         cd ~
-        cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
+        cookiecutter gh:Pylons/pyramid-cookiecutter-theonecc --checkout master
 
     If prompted for the first item, accept the default ``yes`` by hitting return.
 
     .. code-block:: text
 
-        You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
+        You've cloned ~/.cookiecutters/pyramid-cookiecutter-theonecc before.
         Is it okay to delete and re-clone it? [yes]: yes
         project_name [Pyramid Scaffold]: myproject
         repo_name [myproject]: myproject
@@ -53,6 +53,11 @@ specific path information for commands and files.
         1 - jinja2
         2 - chameleon
         3 - mako
+        Choose from 1, 2, 3 [1]: 1
+        Select backend:
+        1 - none
+        2 - sqlalchemy
+        3 - zodb
         Choose from 1, 2, 3 [1]: 1
 
 #.  Create a :term:`virtual environment` which we'll use to install our
@@ -119,7 +124,7 @@ specific path information for commands and files.
          WSGIProcessGroup pyramid
          Require all granted
         </Directory>
- 
+
 #.  Restart Apache
 
     .. code-block:: bash

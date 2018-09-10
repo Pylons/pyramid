@@ -8,12 +8,12 @@ We will now add tests for the models and views as well as a few functional
 tests in a new ``tests`` subpackage.  Tests ensure that an application works,
 and that it continues to work when changes are made in the future.
 
-The file ``tests.py`` was generated as part of the ``alchemy`` cookiecutter, but it
-is a common practice to put tests into a ``tests`` subpackage, especially as
-projects grow in size and complexity.  Each module in the test subpackage
-should contain tests for its corresponding module in our application.  Each
-corresponding pair of modules should have the same names, except the test
-module should have the prefix ``test_``.
+The file ``tests.py`` was generated as part of the ``sqlalchemy`` backend
+cookiecutter, but it is a common practice to put tests into a ``tests``
+subpackage, especially as projects grow in size and complexity.  Each module in
+the test subpackage should contain tests for its corresponding module in our
+application.  Each corresponding pair of modules should have the same names,
+except the test module should have the prefix ``test_``.
 
 Start by deleting ``tests.py``, then create a new directory to contain our new
 tests as well as a new empty file ``tests/__init__.py``.

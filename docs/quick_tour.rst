@@ -498,7 +498,7 @@ So far we have done all of our *Quick Tour* as a single Python file. No Python
 packages, no structure. Most Pyramid projects, though, aren't developed this
 way.
 
-To ease the process of getting started, the Pylons Project provides :term:`cookiecutter`\ s that generate sample Pyramid projects from project templates. These cookiecutters will install Pyramid and its dependencies as well.
+To ease the process of getting started, the Pylons Project provides a :term:`cookiecutter` that generates sample Pyramid projects from project templates. This cookiecutter will install Pyramid and its dependencies as well.
 
 First you'll need to install cookiecutter.
 
@@ -506,17 +506,17 @@ First you'll need to install cookiecutter.
 
     $VENV/bin/pip install cookiecutter
 
-Let's use the cookiecutter ``pyramid-cookiecutter-starter`` to create a starter Pyramid project in the current directory, entering values at the prompts as shown below for the following command.
+Let's use the cookiecutter ``pyramid-cookiecutter-theonecc`` to create a starter Pyramid project in the current directory, entering values at the prompts as shown below for the following command.
 
 .. code-block:: bash
 
-    $VENV/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
+    $VENV/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-theonecc --checkout master
 
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
 .. code-block:: text
 
-    You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
+    You've cloned ~/.cookiecutters/pyramid-cookiecutter-theonecc before.
     Is it okay to delete and re-clone it? [yes]: yes
     project_name [Pyramid Scaffold]: hello_world
     repo_name [hello_world]: hello_world
@@ -524,6 +524,11 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
     1 - jinja2
     2 - chameleon
     3 - mako
+    Choose from 1, 2, 3 [1]: 1
+    Select backend:
+    1 - none
+    2 - sqlalchemy
+    3 - zodb
     Choose from 1, 2, 3 [1]: 1
 
 We then run through the following commands.
@@ -641,7 +646,7 @@ and earlier we showed ``--reload`` for application reloading.
 available in your browser. Adding it to your project illustrates several points
 about configuration.
 
-The cookiecutter ``pyramid-cookiecutter-starter`` already configured our package to include the
+Our cookiecutter ``pyramid-cookiecutter-theonecc`` already configured our package to include the
 add-on ``pyramid_debugtoolbar`` in its ``setup.py``:
 
 .. literalinclude:: quick_tour/package/setup.py
@@ -682,7 +687,7 @@ Yikes! We got this far and we haven't yet discussed tests. This is particularly
 egregious, as Pyramid has had a deep commitment to full test coverage since
 before its release.
 
-Our ``pyramid-cookiecutter-starter`` cookiecutter generated a ``tests.py`` module with
+Our ``pyramid-cookiecutter-theonecc`` cookiecutter generated a ``tests.py`` module with
 one unit test and one functional test in it. It also configured ``setup.py`` with test requirements:
 ``py.test`` as the test runner, ``WebTest`` for running view tests, and the
 ``pytest-cov`` tool which yells at us for code that isn't tested:
@@ -858,16 +863,26 @@ Pyramid and SQLAlchemy are great friends. That friendship includes a cookiecutte
 .. code-block:: bash
 
     cd ~
-    env/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout master
+    env/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-theonecc --checkout master
 
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
 .. code-block:: text
 
-    You've cloned ~/.cookiecutters/pyramid-cookiecutter-alchemy before.
+    You've cloned ~/.cookiecutters/pyramid-cookiecutter-theonecc before.
     Is it okay to delete and re-clone it? [yes]: yes
     project_name [Pyramid Scaffold]: sqla_demo
     repo_name [sqla_demo]: sqla_demo
+    Select template_language:
+    1 - jinja2
+    2 - chameleon
+    3 - mako
+    Choose from 1, 2, 3 [1]: 1
+    Select backend:
+    1 - none
+    2 - sqlalchemy
+    3 - zodb
+    Choose from 1, 2, 3 [1]: 2
 
 We then run through the following commands as before.
 

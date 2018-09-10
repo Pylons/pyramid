@@ -31,7 +31,7 @@ On Unix
 .. code-block:: bash
 
     cd ~
-    cookiecutter gh:Pylons/pyramid-cookiecutter-zodb --checkout master
+    cookiecutter gh:Pylons/pyramid-cookiecutter-theonecc --checkout master
 
 On Windows
 ^^^^^^^^^^
@@ -39,7 +39,7 @@ On Windows
 .. code-block:: doscon
 
     cd \
-    cookiecutter gh:Pylons/pyramid-cookiecutter-zodb --checkout master
+    cookiecutter gh:Pylons/pyramid-cookiecutter-theonecc --checkout master
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -47,10 +47,20 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
 
 .. code-block:: text
 
-    You've cloned ~/.cookiecutters/pyramid-cookiecutter-zodb before.
+    You've cloned ~/.cookiecutters/pyramid-cookiecutter-theone before.
     Is it okay to delete and re-clone it? [yes]: yes
     project_name [Pyramid Scaffold]: myproj
     repo_name [myproj]: tutorial
+    Select template_language:
+    1 - jinja2
+    2 - chameleon
+    3 - mako
+    Choose from 1, 2, 3 [1]: 1
+    Select backend:
+    1 - none
+    2 - sqlalchemy
+    3 - zodb
+    Choose from 1, 2, 3 [1]: 3
 
 Change directory into your newly created project
 ------------------------------------------------
@@ -275,10 +285,11 @@ Our package doesn't quite have 100% test coverage.
 Test and coverage cookiecutter defaults
 ---------------------------------------
 
-Cookiecutters include configuration defaults for ``py.test`` and test coverage.
-These configuration files are ``pytest.ini`` and ``.coveragerc``, located at
-the root of your package. Without these defaults, we would need to specify the
-path to the module on which we want to run tests and coverage.
+The Pyramid cookiecutter includes configuration defaults for ``py.test`` and
+test coverage.  These configuration files are ``pytest.ini`` and
+``.coveragerc``, located at the root of your package. Without these defaults,
+we would need to specify the path to the module on which we want to run tests
+and coverage.
 
 On Unix
 ^^^^^^^
@@ -354,10 +365,10 @@ page.  You can read more about the purpose of the icon at
 application while you develop.
 
 
-Decisions the ``zodb`` cookiecutter has made for you
-----------------------------------------------------
+Decisions the ``zodb`` backend cookiecutter has made for you
+------------------------------------------------------------
 
-Creating a project using the ``zodb`` cookiecutter makes the following
+Creating a project using the ``zodb`` backend cookiecutter makes the following
 assumptions:
 
 - You are willing to use :term:`ZODB` for persistent storage.
@@ -366,10 +377,6 @@ assumptions:
 
 - You want to use pyramid_zodbconn_, pyramid_tm_, and the transaction_ packages
   to manage connections and transactions with :term:`ZODB`.
-
-- You want to use pyramid_chameleon_ to render your templates. Different
-  templating engines can be used, but we had to choose one to make this
-  tutorial. See :ref:`available_template_system_bindings` for some options.
 
 .. note::
 

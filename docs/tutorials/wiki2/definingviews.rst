@@ -133,9 +133,9 @@ The highlighted lines need to be added or edited.
 We added some imports, and created a regular expression to find "WikiWords".
 
 We got rid of the ``my_view`` view function and its decorator that was added
-when we originally rendered the ``alchemy`` cookiecutter.  It was only an example
-and isn't relevant to our application.  We also deleted the ``db_err_msg``
-string.
+when we originally rendered the ``sqlalchemy`` backend cookiecutter.  It was
+only an example and isn't relevant to our application.  We also deleted the
+``db_err_msg`` string.
 
 Then we added four :term:`view callable` functions to our ``views/default.py``
 module, as mentioned in the previous step:
@@ -436,8 +436,8 @@ There are several important things to note about this configuration:
   the view.
 
 Finally, we may delete the ``tutorial/templates/mytemplate.jinja2`` template
-that was provided by the ``alchemy`` cookiecutter, as we have created our own
-templates for the wiki.
+that was provided by the ``sqlalchemy`` backend cookiecutter, as we have
+created our own templates for the wiki.
 
 .. note::
 

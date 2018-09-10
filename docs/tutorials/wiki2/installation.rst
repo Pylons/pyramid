@@ -43,7 +43,7 @@ On Unix
 .. code-block:: bash
 
     cd ~
-    cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout master
+    cookiecutter gh:Pylons/pyramid-cookiecutter-theonecc --checkout master
 
 On Windows
 ^^^^^^^^^^
@@ -51,7 +51,7 @@ On Windows
 .. code-block:: doscon
 
     cd \
-    cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout master
+    cookiecutter gh:Pylons/pyramid-cookiecutter-theonecc --checkout master
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -59,10 +59,21 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
 
 .. code-block:: text
 
-    You've cloned ~/.cookiecutters/pyramid-cookiecutter-alchemy before.
+    You've cloned ~/.cookiecutters/pyramid-cookiecutter-theonecc before.
     Is it okay to delete and re-clone it? [yes]: yes
     project_name [Pyramid Scaffold]: myproj
     repo_name [myproj]: tutorial
+    Select template_language:
+    1 - jinja2
+    2 - chameleon
+    3 - mako
+    Choose from 1, 2, 3 [1]: 1
+    Select backend:
+    1 - none
+    2 - sqlalchemy
+    3 - zodb
+    Choose from 1, 2, 3 [1]: 2
+
 
 Change directory into your newly created project
 ------------------------------------------------
@@ -508,10 +519,10 @@ page.  You can read more about the purpose of the icon at
 application while you develop.
 
 
-Decisions the ``alchemy`` cookiecutter has made for you
--------------------------------------------------------
+Decisions the ``sqlalchemy`` backend cookiecutter has made for you
+------------------------------------------------------------------
 
-Creating a project using the ``alchemy`` cookiecutter makes the following
+Creating a project using the ``sqlalchemy`` cookiecutter makes the following
 assumptions:
 
 - You are willing to use SQLite for persistent storage, although almost any SQL database could be used with SQLAlchemy.
@@ -526,10 +537,6 @@ assumptions:
 
 - You want to use zope.sqlalchemy_, pyramid_tm_, and the transaction_ packages
   to scope sessions to requests.
-
-- You want to use pyramid_jinja2_ to render your templates. Different
-  templating engines can be used, but we had to choose one to make this
-  tutorial. See :ref:`available_template_system_bindings` for some options.
 
 .. note::
 

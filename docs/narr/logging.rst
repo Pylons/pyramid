@@ -9,10 +9,10 @@ to send log messages to loggers that you've configured.
 
 .. warning::
 
-   This chapter assumes you've used a :term:`cookiecutter` to create a project
+   This chapter assumes you've used our :term:`cookiecutter` to create a project
    which contains ``development.ini`` and ``production.ini`` files which help
-   configure logging.  All of the Pyramid cookiecutters provided by the Pylons Project do
-   this.  If you're not using a cookiecutter, or if you've used a third-party
+   configure logging.  The Pyramid cookiecutter provided by the Pylons Project does
+   this.  If you're not using our cookiecutter, or if you've used a third-party
    cookiecutter which does not create these files, the configuration information in
    this chapter may not be applicable.
 
@@ -26,11 +26,11 @@ to send log messages to loggers that you've configured.
 Logging Configuration
 ---------------------
 
-A :app:`Pyramid` project created from a :term:`cookiecutter` is configured to allow
+A :app:`Pyramid` project created from our :term:`cookiecutter` is configured to allow
 you to send messages to :mod:`Python standard library logging package
 <logging>` loggers from within your application.  In particular, the
 :term:`PasteDeploy` ``development.ini`` and ``production.ini`` files created
-when you use a cookiecutter include a basic configuration for the Python
+when you use our cookiecutter include a basic configuration for the Python
 :mod:`logging` package.
 
 PasteDeploy ``.ini`` files use the Python standard library :mod:`ConfigParser
@@ -47,7 +47,7 @@ cookiecutter-generated ``.ini`` files do). ``setup_logging`` reads the logging
 configuration from the ini file upon which ``pserve`` was invoked.
 
 Default logging configuration is provided in both the default
-``development.ini`` and the ``production.ini`` files.  If you use ``pyramid-cookiecutter-starter`` to generate a Pyramid project with the name of the package as ``hello_world``, then the logging configuration
+``development.ini`` and the ``production.ini`` files.  If you use our cookiecutter to generate a Pyramid project with the name of the package as ``hello_world``, then the logging configuration
 in the ``development.ini`` file is as follows:
 
 .. literalinclude:: myproject/development.ini
@@ -75,7 +75,7 @@ that ask for a logger (via ``logging.getLogger``) that has a name which begins
 with anything except your project's package name (e.g., ``myproject``). The logger
 with the same name as your package name is reserved for your own usage in your
 :app:`Pyramid` application.  Its existence means that you can log to a known
-logging location from any :app:`Pyramid` application generated via a cookiecutter.
+logging location from any :app:`Pyramid` application generated via our cookiecutter.
 
 :app:`Pyramid` and many other libraries (such as Beaker, SQLAlchemy, Paste) log
 a number of messages to the root logger for debugging purposes. Switching the
@@ -88,9 +88,10 @@ root logger level to ``DEBUG`` reveals them:
     level = DEBUG
     handlers = console
 
-Some cookiecutters configure additional loggers for additional subsystems they use
-(such as SQLALchemy).  Take a look at the ``production.ini`` and
-``development.ini`` files rendered when you create a project from a cookiecutter.
+Some configurations of the :app:`Pyramid` cookiecutter configure additional loggers for
+additional subsystems they use (such as SQLALchemy).  Take a look at the
+``production.ini`` and ``development.ini`` files rendered when you create a
+project from our cookiecutter.
 
 Sending Logging Messages
 ------------------------
