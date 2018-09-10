@@ -13,7 +13,10 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.request import route_request_iface
 from pyramid.urldispatch import RoutesMapper
 
-from pyramid.util import as_sorted_tuple
+from pyramid.util import (
+    as_sorted_tuple,
+    is_nonstr_iter,
+)
 
 import pyramid.predicates
 
@@ -223,24 +226,17 @@ class RoutesConfiguratorMixin(object):
 
         accept
 
-          A media type that will be matched against the ``Accept`` HTTP
-          request header.  If this value is specified, it must be a specific
-          media type, such as ``text/html``.  If the media type is acceptable
-          by the ``Accept`` header of the request, or if the ``Accept`` header
-          isn't set at all in the request, this predicate will match. If this
-          does not match the ``Accept`` header of the request, route matching
-          continues.
+          A :term:`media type` that will be matched against the ``Accept``
+          HTTP request header.  This value may be a specific media type such
+          as ``text/html``, or a range like ``text/*``, or a list of the same.
+          If the media type is acceptable by the ``Accept`` header of the
+          request, or if the ``Accept`` header isn't set at all in the
+          request, this predicate will match. If this does not match the
+          ``Accept`` header of the request, route matching continues.
 
           If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is
           not taken into consideration when deciding whether or not to select
           the route.
-
-
-          .. versionchanged:: 1.10
-              Media ranges such as ``text/*`` will now raise
-              :class:`pyramid.exceptions.ConfigurationError`. Previously,
-              these values had undefined behavior based on the version of
-              WebOb being used and was never fully supported.
 
         effective_principals
 
@@ -299,17 +295,11 @@ class RoutesConfiguratorMixin(object):
                 stacklevel=3
                 )
 
-        if accept is not None and '*' in accept:
-            warnings.warn(
-                ('The usage of a media range in the "accept" route predicate '
-                 'is deprecated as of Pyramid 1.10. Use a list of explicit '
-                 'media types instead.'),
-                DeprecationWarning,
-                stacklevel=4,
-            )
-
         if accept is not None:
-            accept = accept.lower()
+            if is_nonstr_iter(accept):
+                accept = [accept]
+
+            accept = [accept_option.lower() for accept_option in accept]
 
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried

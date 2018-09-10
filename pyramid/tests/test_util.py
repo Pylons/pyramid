@@ -1109,3 +1109,63 @@ class TestSimpleSerializer(unittest.TestCase):
     def test_dumps(self):
         inst = self._makeOne()
         self.assertEqual(inst.dumps('abc'), bytes_('abc'))
+
+
+class Test_sort_accept_offers(unittest.TestCase):
+    def _callFUT(self, offers, order=None):
+        from pyramid.util import sort_accept_offers
+        return sort_accept_offers(offers, order)
+
+    def test_default_specificities(self):
+        result = self._callFUT(['*/*', 'text/*', 'text/html', 'text/html;charset=utf8'])
+        self.assertEqual(result, [
+            'text/html;charset=utf8', 'text/html', 'text/*', '*/*',
+        ])
+
+    def test_wildcard_type_order(self):
+        result = self._callFUT(
+            ['*/*', 'text/*', 'image/*'],
+            ['image/*', 'text/*'],
+        )
+        self.assertEqual(result, ['image/*', 'text/*', '*/*'])
+
+    def test_specific_type_order(self):
+        result = self._callFUT(
+            ['text/html', 'application/json', 'text/html;charset=utf8', 'text/plain'],
+            ['application/json', 'text/html'],
+        )
+        self.assertEqual(result, [
+            'application/json', 'text/html;charset=utf8', 'text/html', 'text/plain',
+        ])
+
+    def test_params_order(self):
+        result = self._callFUT(
+            ['text/html;charset=utf8', 'text/html;charset=latin1', 'text/html;foo=bar'],
+            ['text/html;charset=latin1', 'text/html;charset=utf8'],
+        )
+        self.assertEqual(result, [
+            'text/html;charset=latin1', 'text/html;charset=utf8', 'text/html;foo=bar',
+        ])
+
+    def test_params_inherit_type_prefs(self):
+        result = self._callFUT(
+            ['text/html;charset=utf8', 'text/plain;charset=latin1'],
+            ['text/plain', 'text/html'],
+        )
+        self.assertEqual(result, ['text/plain;charset=latin1', 'text/html;charset=utf8'])
+
+    def test_params_inherit_wildcard_prefs(self):
+        result = self._callFUT(
+            ['image/png;progressive=1', 'text/html;charset=utf8'],
+            ['text/*', 'image/*'],
+        )
+        self.assertEqual(result, ['text/html;charset=utf8', 'image/png;progressive=1'])
+
+    def test_type_overrides_wildcard_prefs(self):
+        result = self._callFUT(
+            ['text/html;charset=utf8', 'image/png', 'foo/bar', 'text/bar'],
+            ['foo/*', 'text/*', 'image/*', 'image/png', 'text/html'],
+        )
+        self.assertEqual(result, [
+            'image/png', 'text/html;charset=utf8', 'foo/bar', 'text/bar',
+        ])

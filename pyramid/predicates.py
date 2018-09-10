@@ -130,22 +130,17 @@ class HeaderPredicate(object):
         return self.val.match(val) is not None
 
 class AcceptPredicate(object):
-    _use_deprecated_range_fallback = False
-
     def __init__(self, val, config):
         if not is_nonstr_iter(val):
-            self._use_deprecated_range_fallback = '*' in val
             val = (val,)
         self.values = val
 
     def text(self):
-        return 'accept = %s' % (self.values,)
+        return 'accept = %s' % (', '.join(self.values),)
 
     phash = text
 
     def __call__(self, context, request):
-        if self._use_deprecated_range_fallback:
-            return self.values[0] in request.accept
         return bool(request.accept.acceptable_offers(self.values))
 
 class ContainmentPredicate(object):

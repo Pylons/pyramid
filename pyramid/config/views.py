@@ -5,6 +5,7 @@ import operator
 import os
 import warnings
 
+from webob.acceptparse import Accept
 from zope.interface import (
     Interface,
     implementedBy,
@@ -67,6 +68,7 @@ from pyramid.view import AppendSlashNotFoundViewFactory
 
 from pyramid.util import (
     as_sorted_tuple,
+    sort_accept_offers,
     TopologicalSorter,
     )
 
@@ -116,14 +118,14 @@ class MultiView(object):
         view = self.match(context, request)
         return view.__discriminator__(context, request)
 
-    def add(self, view, order, accept=None, phash=None, accept_order=None):
+    def add(self, view, order, phash=None, accept=None, accept_order=None):
         if phash is not None:
             for i, (s, v, h) in enumerate(list(self.views)):
                 if phash == h:
                     self.views[i] = (order, view, phash)
                     return
 
-        if accept is None or '*' in accept:
+        if accept is None:
             self.views.append((order, view, phash))
             self.views.sort(key=operator.itemgetter(0))
         else:
@@ -138,15 +140,9 @@ class MultiView(object):
             # dedupe accepts and sort appropriately
             accepts = set(self.accepts)
             accepts.add(accept)
-            if accept_order is not None:
-                sorted_accepts = []
-                for accept in accept_order.sorted():
-                    if accept in accepts:
-                        sorted_accepts.append(accept)
-                        accepts.remove(accept)
-                sorted_accepts.extend(accepts)
-                accepts = sorted_accepts
-            self.accepts = list(accepts)
+            if accept_order:
+                accept_order = accept_order.sorted()
+            self.accepts = sort_accept_offers(accepts, accept_order)
 
     def get_views(self, request):
         if self.accepts and hasattr(request, 'accept'):
@@ -245,6 +241,14 @@ def viewdefaults(wrapped):
         defaults.update(kw)
         return wrapped(self, *arg, **defaults)
     return functools.wraps(wrapped)(wrapper)
+
+def combine_decorators(*decorators):
+    def decorated(view_callable):
+        # reversed() allows a more natural ordering in the api
+        for decorator in reversed(decorators):
+            view_callable = decorator(view_callable)
+        return view_callable
+    return decorated
 
 class ViewsConfiguratorMixin(object):
     @viewdefaults
@@ -672,8 +676,8 @@ class ViewsConfiguratorMixin(object):
         accept
 
           A :term:`media type` that will be matched against the ``Accept``
-          HTTP request header.  If this value is specified, it must be a
-          specific media type, such as ``text/html``.  If the media type is
+          HTTP request header.  This value may be a specific media type such
+          as ``text/html``, or a range like ``text/*``.  If the media type is
           acceptable by the ``Accept`` header of the request, or if the
           ``Accept`` header isn't set at all in the request, this predicate
           will match. If this does not match the ``Accept`` header of the
@@ -684,12 +688,6 @@ class ViewsConfiguratorMixin(object):
           the associated view callable.
 
           See :ref:`accept_content_negotation` for more information.
-
-          .. versionchanged:: 1.10
-              Media ranges such as ``text/*`` will now raise
-              :class:`pyramid.exceptions.ConfigurationError`. Previously,
-              these values had undefined behavior based on the version of
-              WebOb being used and was never fully supported.
 
         path_info
 
@@ -818,23 +816,11 @@ class ViewsConfiguratorMixin(object):
                 stacklevel=4,
                 )
 
-        if accept is not None and '*' in accept:
-            warnings.warn(
-                ('The usage of a media range in the "accept" view predicate '
-                 'is deprecated as of Pyramid 1.10. Register multiple views '
-                 'with explicit media ranges and read '
-                 '"Accept Header Content Negotiation" in the '
-                 '"View Configuration" documentation for more information.'),
-                DeprecationWarning,
-                stacklevel=4,
-            )
-
-        if accept is not None and is_nonstr_iter(accept):
-            raise ConfigurationError(
-                'A list is not supported in the "accept" view predicate.',
-            )
-
         if accept is not None:
+            if is_nonstr_iter(accept):
+                raise ConfigurationError(
+                    'A list is not supported in the "accept" view predicate.',
+                )
             accept = accept.lower()
 
         view = self.maybe_dotted(view)
@@ -843,16 +829,8 @@ class ViewsConfiguratorMixin(object):
         containment = self.maybe_dotted(containment)
         mapper = self.maybe_dotted(mapper)
 
-        def combine(*decorators):
-            def decorated(view_callable):
-                # reversed() allows a more natural ordering in the api
-                for decorator in reversed(decorators):
-                    view_callable = decorator(view_callable)
-                return view_callable
-            return decorated
-
         if is_nonstr_iter(decorator):
-            decorator = combine(*map(self.maybe_dotted, decorator))
+            decorator = combine_decorators(*map(self.maybe_dotted, decorator))
         else:
             decorator = self.maybe_dotted(decorator)
 
@@ -1092,7 +1070,17 @@ class ViewsConfiguratorMixin(object):
                 if old_view is not None:
                     break
 
-            def regclosure():
+            old_phash = getattr(old_view, '__phash__', DEFAULT_PHASH)
+            is_multiview = IMultiView.providedBy(old_view)
+            want_multiview = (
+                is_multiview
+                # no component was yet registered for exactly this triad
+                # or only one was registered but with the same phash, meaning
+                # that this view is an override
+                or (old_view is not None and old_phash != phash)
+            )
+
+            if not want_multiview:
                 if hasattr(derived_view, '__call_permissive__'):
                     view_iface = ISecuredView
                 else:
@@ -1103,21 +1091,6 @@ class ViewsConfiguratorMixin(object):
                     view_iface,
                     name
                     )
-
-            is_multiview = IMultiView.providedBy(old_view)
-            old_phash = getattr(old_view, '__phash__', DEFAULT_PHASH)
-
-            if old_view is None:
-                # - No component was yet registered for any of our I*View
-                #   interfaces exactly; this is the first view for this
-                #   triad.
-                regclosure()
-
-            elif (not is_multiview) and (old_phash == phash):
-                # - A single view component was previously registered with
-                #   the same predicate hash as this view; this registration
-                #   is therefore an override.
-                regclosure()
 
             else:
                 # - A view or multiview was already registered for this
@@ -1136,9 +1109,9 @@ class ViewsConfiguratorMixin(object):
                     old_order = getattr(old_view, '__order__', MAX_ORDER)
                     # don't bother passing accept_order here as we know we're
                     # adding another one right after which will re-sort
-                    multiview.add(old_view, old_order, old_accept, old_phash)
+                    multiview.add(old_view, old_order, old_phash, old_accept)
                 accept_order = self.registry.queryUtility(IAcceptOrder)
-                multiview.add(derived_view, order, accept, phash, accept_order)
+                multiview.add(derived_view, order, phash, accept, accept_order)
                 for view_type in (IView, ISecuredView):
                     # unregister any existing views
                     self.registry.adapters.unregister(
@@ -1283,7 +1256,7 @@ class ViewsConfiguratorMixin(object):
         to specify a server-side, relative ordering between accept media types.
 
         ``value`` should be a :term:`media type` as specified by
-        :rfc:`7231#section-5.3.2`. For example, ``text/plain``,
+        :rfc:`7231#section-5.3.2`. For example, ``text/plain;charset=utf8``,
         ``application/json`` or ``text/html``.
 
         ``weighs_more_than`` and ``weighs_less_than`` control the ordering
@@ -1294,10 +1267,47 @@ class ViewsConfiguratorMixin(object):
         .. versionadded:: 1.10
 
         """
-        value = value.lower()
-        if '*' in value:
+        if value == '*/*':
             raise ConfigurationError(
-                '"accept" ordering is done between media types, not ranges')
+                'cannot specify an ordering for an offer of */*')
+
+        def normalize_type(type):
+            return type.lower()
+
+        def check_type(than):
+            than_type, than_subtype, than_params = Accept.parse_offer(than)
+            if (
+                # text/* vs text/plain
+                (offer_subtype == '*') ^ (than_subtype == '*')
+                # text/plain vs text/html;charset=utf8
+                or (bool(offer_params) ^ bool(than_params))
+            ):
+                raise ConfigurationError(
+                    'cannot compare across media range specificity levels')
+            # text/plain;charset=utf8 vs text/html;charset=utf8
+            if offer_params and (
+                offer_subtype != than_subtype or offer_type != than_type
+            ):
+                raise ConfigurationError(
+                    'cannot compare params across media types')
+
+        value = normalize_type(value)
+        offer_type, offer_subtype, offer_params = Accept.parse_offer(value)
+
+        if weighs_more_than:
+            if not is_nonstr_iter(weighs_more_than):
+                weighs_more_than = [weighs_more_than]
+            weighs_more_than = [normalize_type(w) for w in weighs_more_than]
+            for than in weighs_more_than:
+                check_type(than)
+
+        if weighs_less_than:
+            if not is_nonstr_iter(weighs_less_than):
+                weighs_less_than = [weighs_less_than]
+            weighs_less_than = [normalize_type(w) for w in weighs_less_than]
+            for than in weighs_less_than:
+                check_type(than)
+
         discriminator = ('accept view order', value)
         intr = self.introspectable(
             'accept view order',

@@ -255,12 +255,12 @@ Pre-defined Phases
 
 :const:`pyramid.config.PHASE1_CONFIG`
 
-- :meth:`pyramid.config.Configurator.add_accept_view_option`
+- :meth:`pyramid.config.Configurator.add_accept_view_order`
 - :meth:`pyramid.config.Configurator.add_renderer`
 - :meth:`pyramid.config.Configurator.add_route_predicate`
 - :meth:`pyramid.config.Configurator.add_subscriber_predicate`
-- :meth:`pyramid.config.Configurator.add_view_predicate`
 - :meth:`pyramid.config.Configurator.add_view_deriver`
+- :meth:`pyramid.config.Configurator.add_view_predicate`
 - :meth:`pyramid.config.Configurator.override_asset`
 - :meth:`pyramid.config.Configurator.set_authorization_policy`
 - :meth:`pyramid.config.Configurator.set_default_csrf_options`

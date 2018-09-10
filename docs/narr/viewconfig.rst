@@ -1027,7 +1027,8 @@ See :ref:`environment_chapter` for more information about how, and where to set
 these values.
 
 .. index::
-   single: HTTP caching
+   single: Accept
+   single: Accept content negotation
 
 .. _accept_content_negotation:
 
@@ -1059,10 +1060,11 @@ Similarly, if the client specifies a media type that no view is registered to ha
 There are a few cases in which the client may specify ambiguous constraints:
 
 - ``Accept: */*``.
+- More than one acceptable media type with the same quality.
 - A missing ``Accept`` header.
 - An invalid ``Accept`` header.
 
-In these cases the preferred view is not clearly defined (see :rfc:`7231#section-5.3.2`) and :app:`Pyramid` will select one randomly.
+In these cases the preferred view is not clearly defined (see :rfc:`7231#section-5.3.2`) and :app:`Pyramid` will select one semi-randomly.
 This can be controlled by telling :app:`Pyramid` what the preferred relative ordering is between various media types by using :meth:`pyramid.config.Configurator.add_accept_view_order`.
 For example:
 
@@ -1082,8 +1084,29 @@ For example:
 
 In this case, the ``application/json`` view should always be selected in cases where it is otherwise ambiguous.
 
+.. _default_accept_ordering:
+
 Default Accept Ordering
 +++++++++++++++++++++++
+
+:app:`Pyramid` will always sort multiple views with the same ``(name, context, route_name)`` first by the specificity of the ``accept`` offer.
+This means that ``text/plain`` will always be offered before ``text/*``.
+Similarly ``text/plain;charset=utf8`` will always be offered before ``text/plain``.
+The following order is always preserved between the following offers (more preferred to less preferred):
+
+- ``type/subtype;params``
+- ``type/subtype``
+- ``type/*``
+- ``*/*``
+
+Within each of these levels of specificity, the ordering is ambiguous and may be controlled using :meth:`pyramid.config.Configurator.add_accept_view_order`. For example, to sort ``text/plain`` higher than ``text/html`` and to prefer a ``charset=utf8`` versus a ``charset=latin-1`` within the ``text/plain`` media type:
+
+.. code-block:: python
+
+    config.add_accept_view_order('text/plain', weighs_more_than='text/html')
+    config.add_accept_view_order('text/plain;charset=utf8', weighs_more_than='text/plain;charset=latin-1')
+
+It is an error to try and sort accept headers across levels of specificity. You can only sort a ``type/subtype`` against another ``type/subtype``, not against a ``type/*``. That ordering is a hard requirement.
 
 By default, :app:`Pyramid` defines a very simple priority ordering for views that prefers human-readable responses over JSON:
 
@@ -1098,6 +1121,9 @@ API clients tend to be able to specify their desired headers with more control t
 Therefore, the motivation for this ordering is to optimize for readability.
 Media types that are not listed above are ordered randomly during :term:`view lookup` between otherwise-similar views.
 The defaults can be overridden using :meth:`pyramid.config.Configurator.add_accept_view_order` as described above.
+
+.. index::
+   single: HTTP caching
 
 .. _influencing_http_caching:
 
