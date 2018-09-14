@@ -853,7 +853,7 @@ Glossary
    Localization
      The process of displaying the user interface of an
      internationalized application in a particular language or
-     cultural context.  Often shortened to "l10" (because the word
+     cultural context.  Often shortened to "l10n" (because the word
      "localization" is L, 10 letters, then N).
 
      .. seealso::
