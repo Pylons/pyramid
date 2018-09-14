@@ -41,7 +41,7 @@ tests_require = [
 
 
 docs_extras = [
-    'Sphinx >= 1.7.4',
+    'Sphinx >= 1.7.4,<=1.7.9',
     'docutils',
     'pylons-sphinx-themes',
     'pylons_sphinx_latesturl',
