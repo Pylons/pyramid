@@ -17,3 +17,5 @@
 
   .. autoclass:: PickleSerializer
 
+  .. autoclass:: JSONSerializer
+

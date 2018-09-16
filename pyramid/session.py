@@ -4,11 +4,15 @@ import hashlib
 import hmac
 import os
 import time
+import warnings
 
 from zope.deprecation import deprecated
 from zope.interface import implementer
 
-from webob.cookies import SignedSerializer
+from webob.cookies import (
+    JSONSerializer,
+    SignedSerializer,
+)
 
 from pyramid.compat import (
     pickle,
@@ -131,6 +135,10 @@ class PickleSerializer(object):
         """Accept a Python object and return bytes."""
         return pickle.dumps(appstruct, self.protocol)
 
+
+JSONSerializer = JSONSerializer  # api
+
+
 def BaseCookieSessionFactory(
     serializer,
     cookie_name='session',
@@ -145,8 +153,6 @@ def BaseCookieSessionFactory(
     set_on_exception=True,
     ):
     """
-    .. versionadded:: 1.5
-
     Configure a :term:`session factory` which will provide cookie-based
     sessions.  The return value of this function is a :term:`session factory`,
     which may be provided as the ``session_factory`` argument of a
@@ -508,6 +514,7 @@ deprecated(
     'so existing user session data will be destroyed if you switch to it.'
     )
 
+
 def SignedCookieSessionFactory(
     secret,
     cookie_name='session',
@@ -618,14 +625,31 @@ def SignedCookieSessionFactory(
       should be raised for malformed inputs.  If a serializer is not passed,
       the :class:`pyramid.session.PickleSerializer` serializer will be used.
 
+    .. warning::
+
+       In :app:`Pyramid` 2.0 the default ``serializer`` option will change to
+       use :class:`pyramid.session.JSONSerializer`. See
+       :ref:`pickle_session_deprecation` for more information about why this
+       change is being made.
+
     .. versionadded: 1.5a3
 
     .. versionchanged: 1.10
 
        Added the ``samesite`` option and made the default ``Lax``.
+
     """
     if serializer is None:
         serializer = PickleSerializer()
+        warnings.warn(
+            'The default pickle serializer is deprecated as of Pyramid 1.9 '
+            'and it will be changed to use pyramid.session.JSONSerializer in '
+            'version 2.0. Explicitly set the serializer to avoid future '
+            'incompatibilities. See "Upcoming Changes to ISession in '
+            'Pyramid 2.0" for more information about this change.',
+            DeprecationWarning,
+            stacklevel=1,
+        )
 
     signed_serializer = SignedSerializer(
         secret,

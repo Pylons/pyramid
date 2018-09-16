@@ -57,6 +57,11 @@ Features
 - Add support for Python 3.7. Add testing on Python 3.8 with allowed failures.
   See https://github.com/Pylons/pyramid/pull/3333
 
+- Added ``pyramid.session.JSONSerializer``. See "Upcoming Changes to ISession
+  in Pyramid 2.0" in the "Sessions" chapter of the documentation for more
+  information about this feature.
+  See https://github.com/Pylons/pyramid/pull/3353
+
 Bug Fixes
 ---------
 
@@ -78,6 +83,12 @@ Bug Fixes
 
 Deprecations
 ------------
+
+- The ``pyramid.intefaces.ISession`` interface will move to require
+  json-serializable objects in Pyramid 2.0. See
+  "Upcoming Changes to ISession in Pyramid 2.0" in the "Sessions" chapter
+  of the documentation for more information about this change.
+  See https://github.com/Pylons/pyramid/pull/3353
 
 Backward Incompatibilities
 --------------------------
