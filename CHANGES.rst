@@ -90,6 +90,15 @@ Deprecations
   of the documentation for more information about this change.
   See https://github.com/Pylons/pyramid/pull/3353
 
+- The ``pyramid.session.signed_serialize`` and
+  ``pyramid.session.signed_deserialize`` functions will be removed in Pyramid
+  2.0, along with the removal of
+  ``pyramid.session.UnencryptedCookieSessionFactoryConfig`` which was
+  deprecated in Pyramid 1.5. Please switch to using the
+  ``SignedCookieSessionFactory``, copying the code, or another session
+  implementation if you're still using these features.
+  See https://github.com/Pylons/pyramid/pull/3353
+
 Backward Incompatibilities
 --------------------------
 

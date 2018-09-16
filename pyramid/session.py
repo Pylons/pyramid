@@ -64,6 +64,14 @@ def signed_serialize(data, secret):
 
        cookieval = signed_serialize({'a':1}, 'secret')
        response.set_cookie('signed_cookie', cookieval)
+
+    .. deprecated:: 1.10
+
+       This function will be removed in :app:`Pyramid` 2.0. It is using
+       pickle-based serialization, which is considered vulnerable to remote
+       code execution attacks and will no longer be used by the default
+       session factories at that time.
+
     """
     pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
     try:
@@ -73,6 +81,13 @@ def signed_serialize(data, secret):
         secret = bytes_(secret, 'utf-8')
     sig = hmac.new(secret, pickled, hashlib.sha1).hexdigest()
     return sig + native_(base64.b64encode(pickled))
+
+deprecated(
+    'signed_serialize',
+    'This function will be removed in Pyramid 2.0. It is using pickle-based '
+    'serialization, which is considered vulnerable to remote code execution '
+    'attacks.',
+)
 
 def signed_deserialize(serialized, secret, hmac=hmac):
     """ Deserialize the value returned from ``signed_serialize``.  If
@@ -86,6 +101,13 @@ def signed_deserialize(serialized, secret, hmac=hmac):
 
        cookieval = request.cookies['signed_cookie']
        data = signed_deserialize(cookieval, 'secret')
+
+    .. deprecated:: 1.10
+
+       This function will be removed in :app:`Pyramid` 2.0. It is using
+       pickle-based serialization, which is considered vulnerable to remote
+       code execution attacks and will no longer be used by the default
+       session factories at that time.
     """
     # hmac parameterized only for unit tests
     try:
@@ -108,6 +130,13 @@ def signed_deserialize(serialized, secret, hmac=hmac):
         raise ValueError('Invalid signature')
 
     return pickle.loads(pickled)
+
+deprecated(
+    'signed_deserialize',
+    'This function will be removed in Pyramid 2.0. It is using pickle-based '
+    'serialization, which is considered vulnerable to remote code execution '
+    'attacks.',
+)
 
 
 class PickleSerializer(object):
