@@ -79,10 +79,13 @@ using the :meth:`pyramid.config.Configurator.set_session_factory` method.
 
 .. _pickle_session_deprecation:
 
+.. index::
+    triple: pickle deprecation; JSON-serializable; ISession interface
+
 Upcoming Changes to ISession in Pyramid 2.0
 -------------------------------------------
 
-In :app:`Pyramid` 2.0 the :class:`pyramid.interfaces.ISession` interface will be changing to require that session implementations only need to support json-serializable data types.
+In :app:`Pyramid` 2.0 the :class:`pyramid.interfaces.ISession` interface will be changing to require that session implementations only need to support JSON-serializable data types.
 This is a stricter contract than the current requirement that all objects be pickleable and it is being done for security purposes.
 This is a backward-incompatible change.
 Currently, if a client-side session implementation is compromised, it leaves the application vulnerable to remote code execution attacks using specially-crafted sessions that execute code when deserialized.
@@ -104,7 +107,7 @@ Remember that sessions should be short-lived and thus the number of clients affe
         def dumps(self, value):
             # maybe catch serialization errors here and keep using pickle
             # while finding spots in your app that are not storing
-            # json-serializable objects, falling back to pickle
+            # JSON-serializable objects, falling back to pickle
             return self.json.dumps(value)
 
         def loads(self, value):
@@ -173,7 +176,7 @@ Some gotchas:
   that they are instances of basic types of objects, such as strings, lists,
   dictionaries, tuples, integers, etc.  If you place an object in a session
   data key or value that is not pickleable, an error will be raised when the
-  session is serialized.
+  session is serialized. Please also see :ref:`pickle_session_deprecation`.
 
 - If you place a mutable value (for example, a list or a dictionary) in a
   session object, and you subsequently mutate that value, you must call the
