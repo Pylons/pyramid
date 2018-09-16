@@ -51,7 +51,7 @@ This approach allows you to develop view code that is simpler, more easily under
 Stop Worrying About Transactions
 --------------------------------
 
-:app:`Pyramid`\ 's :term:`cookiecutter`\ renders projects that include a *transaction management* system.  When you use this system, you can stop worrying about when to commit your changes, :app:`Pyramid` handles it for you. The system will commit at the end of a request or abort if there was an exception.
+:app:`Pyramid`\ 's :term:`cookiecutter` renders projects that include a *transaction management* system.  When you use this system, you can stop worrying about when to commit your changes, :app:`Pyramid` handles it for you. The system will commit at the end of a request or abort if there was an exception.
 
 Why is that a good thing? Imagine a situation where you manually commit a change to your persistence layer. It's very likely that other framework code will run *after* your changes are done. If an error happens in that other code, you can easily wind up with inconsistent data if you're not extremely careful.
 

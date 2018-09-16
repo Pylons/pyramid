@@ -17,7 +17,7 @@ also be distributed more easily than one which does not live within a package.
 
 The Pylons Project provides a :app:`Pyramid` cookiecutter that you can use to
 generate a project.  Our cookiecutter allows several configuration options
-to layout what type of application you're trying to construct.
+to generate the type of application you're trying to construct.
 
 This cookiecutter is rendered using the ``cookiecutter`` command that you may install.
 
@@ -35,25 +35,27 @@ This cookiecutter is rendered using the ``cookiecutter`` command that you may in
 :app:`Pyramid` cookiecutters
 ----------------------------
 
-The Pyramid cookiecutter released under the Pylons Project differ in configuration options on a number of axes:
+The Pyramid cookiecutter released under the Pylons Project offers the following configuration options:
 
-- the persistence mechanism it offers (no persistence mechanism, :term:`SQLAlchemy` with SQLite, or :term:`ZODB`)
+- templating libraries (:term:`Jinja2`, :term:`Chameleon`, or :term:`Mako`)
 
-- the mechanism it uses to map URLs to code (:term:`URL dispatch` or :term:`traversal`)
+- the persistence mechanism (no persistence mechanism, :term:`SQLAlchemy` with SQLite, or :term:`ZODB`)
 
-- All include an option of templating libraries (:term:`Jinja2`, :term:`Chameleon`, or :term:`Mako`)
+- the mechanism of mapping URLs to code (:term:`URL dispatch` or :term:`traversal`)
 
 * `pyramid-cookiecutter-theonecc <https://github.com/Pylons/pyramid-cookiecutter-theonecc>`_
 
-These configurations include:
+All configuration options offer a choice of templating language.
 
-``no persistance``
+The configuration of mapping URLs to code (routing) depends on the backend option selected, with additional variations as follows.
+
+``none``
     :term:`URL dispatch` for routing
 
-``SQLAlchemy``
-    SQLite for persistent storage, :term:`SQLAlchemy` for an ORM, and :term:`URL dispatch` for routing
+``sqlalchemy``
+    SQLite for persistent storage, :term:`SQLAlchemy` for an ORM, :term:`URL dispatch` for routing, and :term:`Alembic` for database migrations
 
-``ZODB``
+``zodb``
     :term:`ZODB` for persistent storage and :term:`traversal` for routing
 
 

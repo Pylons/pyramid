@@ -262,4 +262,4 @@ What Gets Installed
 When you install :app:`Pyramid`, various libraries such as WebOb, PasteDeploy,
 and others are installed.
 
-Additionally, as chronicled in :ref:`project_narr`, our :term:`cookiecutter` will be used, which make it easy to start a new :app:`Pyramid` project.
+Additionally, as chronicled in :ref:`project_narr`, our :term:`cookiecutter` will be used, which makes it easy to start a new :app:`Pyramid` project.

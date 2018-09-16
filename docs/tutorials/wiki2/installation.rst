@@ -519,11 +519,11 @@ page.  You can read more about the purpose of the icon at
 application while you develop.
 
 
-Decisions the ``sqlalchemy`` backend cookiecutter has made for you
-------------------------------------------------------------------
+Decisions the cookiecutter backend option ``sqlalchemy`` has made for you
+-------------------------------------------------------------------------
 
-Creating a project using the ``sqlalchemy`` cookiecutter makes the following
-assumptions:
+When creating a project and selecting the backend option of ``sqlalchemy``, the
+cookiecutter makes the following assumptions:
 
 - You are willing to use SQLite for persistent storage, although almost any SQL database could be used with SQLAlchemy.
 

@@ -298,7 +298,7 @@ By defining the ``setup`` callable, we will create the module ``myapp.lib.pshell
         # start a transaction which can be used in the shell
         request.tm.begin()
 
-        # if using the alchemy backend to our cookiecutter, the dbsession is
+        # if using the SQLAlchemy backend from our cookiecutter, the dbsession is
         # connected to the transaction manager above
         env['tm'] = request.tm
         env['dbsession'] = request.dbsession

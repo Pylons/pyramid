@@ -4,7 +4,7 @@
 Prelude: Quick Project Startup with Cookiecutters
 =================================================
 
-To ease the process of getting started on a project, the Pylons Project provides :term:`cookiecutter`\ s that generate sample :app:`Pyramid` projects from project templates. These cookiecutters will install :app:`Pyramid` and its dependencies as well. We will still cover many topics of web application development using :app:`Pyramid`, but it's good to know of this facility. This prelude will demonstrate how to get a working :app:`Pyramid` web application running via ``cookiecutter``.
+To ease the process of getting started on a project, the Pylons Project provides a :term:`cookiecutter` that generates sample :app:`Pyramid` projects from project templates. The cookiecutter will install :app:`Pyramid` and its dependencies as well. We will still cover many topics of web application development using :app:`Pyramid`, but it's good to know of this facility. This prelude will demonstrate how to get a working :app:`Pyramid` web application running via ``cookiecutter``.
 
 
 Objectives
@@ -61,17 +61,6 @@ Steps
         env/bin/pip install --upgrade pip setuptools
         # ...and into which we install our project.
         env/bin/pip install -e .
-
-    **Note:** If you selected ``sqlalchemy`` in the preceding step, continue. Otherwise, skip to the next step.
-
-    .. code-block:: bash
-
-    # Generate your first revision.
-    env/bin/alembic -c development.ini revision --autogenerate -m "init"
-    # Upgrade to that revision.
-    env/bin/alembic -c development.ini upgrade head
-    # Load default data.
-    env/bin/initialize_cc_starter_db development.ini
 
 #.  Start up the application by pointing :app:`Pyramid`'s ``pserve`` command at the
     project's (generated) configuration file:

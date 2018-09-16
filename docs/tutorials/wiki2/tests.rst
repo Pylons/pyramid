@@ -8,8 +8,8 @@ We will now add tests for the models and views as well as a few functional
 tests in a new ``tests`` subpackage.  Tests ensure that an application works,
 and that it continues to work when changes are made in the future.
 
-The file ``tests.py`` was generated as part of the ``sqlalchemy`` backend
-cookiecutter, but it is a common practice to put tests into a ``tests``
+The file ``tests.py`` was generated from choosing the ``sqlalchemy`` backend
+option, but it is a common practice to put tests into a ``tests``
 subpackage, especially as projects grow in size and complexity.  Each module in
 the test subpackage should contain tests for its corresponding module in our
 application.  Each corresponding pair of modules should have the same names,

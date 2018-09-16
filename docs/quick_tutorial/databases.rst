@@ -21,10 +21,10 @@ storage and retrieval for the wiki pages in the previous step.
 
 .. note::
 
-    The Pyramid cookiecutter is really helpful for getting an SQLAlchemy
-    project going, including generation of the console script. Since we want to
-    see all the decisions, we will forgo convenience in this tutorial, and wire
-    it up ourselves.
+    The Pyramid cookiecutter ``pyramid-cookiecutter-theonecc`` is really
+    helpful for getting a SQLAlchemy project going, including generation of
+    the console script. Since we want to see all the decisions, we will forgo
+    convenience in this tutorial, and wire it up ourselves.
 
 
 Objectives

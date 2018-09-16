@@ -89,7 +89,7 @@ root logger level to ``DEBUG`` reveals them:
     handlers = console
 
 Some configurations of the :app:`Pyramid` cookiecutter configure additional loggers for
-additional subsystems they use (such as SQLALchemy).  Take a look at the
+additional subsystems they use (such as SQLAlchemy).  Take a look at the
 ``production.ini`` and ``development.ini`` files rendered when you create a
 project from our cookiecutter.
 

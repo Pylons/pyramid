@@ -27,7 +27,7 @@ asset:
   package.
 
 The use of assets is quite common in most web development projects.  For
-example, when you create a :app:`Pyramid` application using our
+example, when you create a :app:`Pyramid` application using the
 :term:`cookiecutter`, as described in :ref:`creating_a_project`, the directory
 representing the application contains a Python :term:`package`. Within that
 Python package, there are directories full of files which are static assets.
