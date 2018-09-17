@@ -24,17 +24,17 @@ Steps
 
         $VENV/bin/pip install cookiecutter
 
-#.  Let's use the cookiecutter ``pyramid-cookiecutter-theonecc`` to create a starter :app:`Pyramid` project in the current directory, entering values at the prompts as shown below for the following command.
+#.  Let's use the cookiecutter ``pyramid-cookiecutter-starter`` to create a starter :app:`Pyramid` project in the current directory, entering values at the prompts as shown below for the following command.
 
     .. code-block:: bash
 
-        $VENV/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-theonecc --checkout master
+        $VENV/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
 
     If prompted for the first item, accept the default ``yes`` by hitting return.
 
     .. code-block:: text
 
-        You've cloned ~/.cookiecutters/pyramid-cookiecutter-theonecc before.
+        You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
         Is it okay to delete and re-clone it? [yes]: yes
         project_name [Pyramid Scaffold]: cc_starter
         repo_name [cc_starter]: cc_starter

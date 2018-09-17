@@ -39,13 +39,13 @@ specific path information for commands and files.
     .. code-block:: bash
 
         cd ~
-        cookiecutter gh:Pylons/pyramid-cookiecutter-theonecc --checkout master
+        cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
 
     If prompted for the first item, accept the default ``yes`` by hitting return.
 
     .. code-block:: text
 
-        You've cloned ~/.cookiecutters/pyramid-cookiecutter-theonecc before.
+        You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
         Is it okay to delete and re-clone it? [yes]: yes
         project_name [Pyramid Scaffold]: myproject
         repo_name [myproject]: myproject

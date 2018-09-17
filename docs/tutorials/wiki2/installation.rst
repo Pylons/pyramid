@@ -43,7 +43,7 @@ On Unix
 .. code-block:: bash
 
     cd ~
-    cookiecutter gh:Pylons/pyramid-cookiecutter-theonecc --checkout master
+    cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
 
 On Windows
 ^^^^^^^^^^
@@ -51,7 +51,7 @@ On Windows
 .. code-block:: doscon
 
     cd \
-    cookiecutter gh:Pylons/pyramid-cookiecutter-theonecc --checkout master
+    cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -59,7 +59,7 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
 
 .. code-block:: text
 
-    You've cloned ~/.cookiecutters/pyramid-cookiecutter-theonecc before.
+    You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
     Is it okay to delete and re-clone it? [yes]: yes
     project_name [Pyramid Scaffold]: myproj
     repo_name [myproj]: tutorial

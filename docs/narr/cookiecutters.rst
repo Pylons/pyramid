@@ -16,11 +16,11 @@ Pyramid cookiecutters
 
 A :term:`cookiecutter` is a command-line utility that creates projects from :ref:`cookiecutters <cookiecutter:readme>` (project templates), e.g., creating a Python package project from a Python package project template.
 
-The unified cookiecutter ``pyramid-cookiecutter-theonecc`` merged features from the three previous cookiecutters which are now deprecated.
+The unified cookiecutter ``pyramid-cookiecutter-starter`` merged features from the three previous cookiecutters which are now deprecated.
 
 The Pyramid cookiecutter has replaced the now deprecated Pyramid scaffolds, and should be used going forward and can be found here:
 
-* `pyramid-cookiecutter-theonecc <https://github.com/Pylons/pyramid-cookiecutter-theonecc>`_
+* `pyramid-cookiecutter-starter <https://github.com/Pylons/pyramid-cookiecutter-starter>`_
 
 .. seealso::
 
