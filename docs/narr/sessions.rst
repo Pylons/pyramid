@@ -77,10 +77,10 @@ using the :meth:`pyramid.config.Configurator.set_session_factory` method.
 
    In short, use a different session factory implementation (preferably one which keeps session data on the server) for anything but the most basic of applications where "session security doesn't matter", you are sure your application has no cross-site scripting vulnerabilities, and you are confident your secret key will not be exposed.
 
-.. _pickle_session_deprecation:
-
 .. index::
     triple: pickle deprecation; JSON-serializable; ISession interface
+
+.. _pickle_session_deprecation:
 
 Upcoming Changes to ISession in Pyramid 2.0
 -------------------------------------------
