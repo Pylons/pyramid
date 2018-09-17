@@ -3,14 +3,13 @@
 Pyramid cookiecutters
 =====================
 
-.. versionadded:: 1.8
+.. versionchanged:: 1.8
     Added cookiecutter support.
 
 .. versionadded:: 1.10
     Merged features from ``pyramid-cookiecutter-alchemy`` and ``pyramid-cookiecutter-zodb`` into the single cookiecutter to rule them all, ``pyramid-cookiecutter-starter``.
 
 .. deprecated:: 1.10
-    Merged features from ``pyramid-cookiecutter-alchemy`` and ``pyramid-cookiecutter-zodb`` into the single cookiecutter to rule them all, ``pyramid-cookiecutter-starter``.
     ``pyramid-cookiecutter-alchemy`` and ``pyramid-cookiecutter-zodb`` are no longer supported.
     Use ``pyramid-cookiecutter-starter`` going forward.
 
