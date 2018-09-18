@@ -9,8 +9,9 @@ Using a Development Checkout
 
 You'll have to create a development environment to hack on Pyramid, using a
 Pyramid checkout.  You can either do this by hand, or if you have ``tox``
-installed (it's on PyPI), you can use ``tox`` to set up a working development
-environment.  Each installation method is described below.
+installed (`docs <http://tox.readthedocs.org/en/latest/>`_,
+`PyPI <https://pypi.org/project/tox/>`), you can use``tox`` to set up a
+working development environment.  Each installation method is described below.
 
 
 By Hand
@@ -89,8 +90,7 @@ way to get going.
 
 Since Pyramid is a framework and not an application, it can be convenient to
 work against a sample application, preferably in its own virtual environment. A
-quick way to achieve this is to use `tox
-<http://tox.readthedocs.org/en/latest/>`_ with a custom configuration file
+quick way to achieve this is to use `tox` with a custom configuration file
 that is part of the checkout:
 
     $ tox -c hacking-tox.ini
@@ -178,8 +178,8 @@ Running Tests
 
     $ tox -e py2-cover,py3-cover,coverage
 
-- To run the full set of Pyramid tests on all platforms, install `tox
-  <http://codespeak.net/~hpk/tox/>`_ into a system Python. The ``tox`` console
+- To run the full set of Pyramid tests on all platforms, install `tox` into a
+  system Python. The ``tox`` console
   script will be installed into the scripts location for that Python. While
   ``cd``'ed to the Pyramid checkout root directory (it contains ``tox.ini``),
   invoke the ``tox`` console script. This will read the ``tox.ini`` file and
