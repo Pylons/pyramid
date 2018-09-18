@@ -57,6 +57,10 @@ Features
 - Add support for Python 3.7. Add testing on Python 3.8 with allowed failures.
   See https://github.com/Pylons/pyramid/pull/3333
 
+- Add a ``registry`` argument to ``pyramid.renderers.get_renderer``
+  to allow users to avoid threadlocals during renderer lookup.
+  See https://github.com/Pylons/pyramid/pull/3358
+
 Bug Fixes
 ---------
 
