@@ -182,13 +182,12 @@ Running Tests
     $ tox -e py2-cover,py3-cover,coverage
 
 - To run the full set of Pyramid tests on all platforms, install `tox` into a
-  system Python. The `tox` console
-  script will be installed into the scripts location for that Python. While
-  `cd`'ed to the Pyramid checkout root directory (it contains `tox.ini`),
-  invoke the `tox` console script. This will read the `tox.ini` file and
-  execute the tests on multiple Python versions and platforms. While it runs,
-  it creates a virtual environment for each version/platform combination.  For
-  example:
+  system Python. The `tox` console script will be installed into the scripts
+  location for that Python. While `cd`'ed to the Pyramid checkout root
+  directory (it contains `tox.ini`), invoke the `tox` console script. This
+  will read the `tox.ini` file and execute the tests on multiple Python
+  versions and platforms. While it runs, it creates a virtual environment
+  for each version/platform combination.  For example:
 
     $ sudo /usr/bin/pip install tox
     $ cd ~/hack-on-pyramid/
