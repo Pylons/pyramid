@@ -163,6 +163,15 @@ html_theme_options = dict(
     outdated='true',
     )
 
+# Control display of sidebars
+html_sidebars = {'**': [
+    'localtoc.html',
+    'ethicalads.html',
+    'relations.html',
+    'sourcelink.html',
+    'searchbox.html',
+]}
+
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
 html_title = 'The Pyramid Web Framework v%s' % release
@@ -314,7 +323,6 @@ _PREAMBLE = r"""
 
 latex_elements = {
     'preamble': _PREAMBLE,
-    'wrapperclass': 'book',
     'date': '',
     'releasename': 'Version',
     'title': r'The Pyramid Web Framework',
