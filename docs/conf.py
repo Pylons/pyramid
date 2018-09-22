@@ -325,7 +325,6 @@ _PREAMBLE = r"""
 
 latex_elements = {
     'preamble': _PREAMBLE,
-    'wrapperclass': 'book',
     'date': '',
     'releasename': 'Version',
     'title': r'The Pyramid Web Framework',
