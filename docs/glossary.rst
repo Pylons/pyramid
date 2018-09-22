@@ -343,7 +343,7 @@ Glossary
      full-featured Python web framework.
 
    Grok
-     `A web framework based on Zope 3 <http://grok.zope.org>`_.
+     `A web framework based on Zope 3 <https://web.archive.org/web/20180615015013/http://grok.zope.org>`_.
 
    Django
      `A full-featured Python web framework <https://www.djangoproject.com/>`_.
@@ -1083,7 +1083,7 @@ Glossary
 
    Green Unicorn
       Aka ``gunicorn``, a fast :term:`WSGI` server that runs on Unix under
-      Python 2.6+ or Python 3.1+.  See http://gunicorn.org/ for detailed 
+      Python 2.6+ or Python 3.1+.  See https://gunicorn.org/ for detailed
       information.
 
    predicate factory
