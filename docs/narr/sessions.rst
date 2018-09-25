@@ -98,6 +98,7 @@ Remember that sessions should be short-lived and thus the number of clients affe
 
     from pyramid.session import JSONSerializer
     from pyramid.session import PickleSerializer
+    from pyramid.session import SignedCookieSessionFactory
 
     class JSONSerializerWithPickleFallback(object):
         def __init__(self):
@@ -115,6 +116,11 @@ Remember that sessions should be short-lived and thus the number of clients affe
                 return self.json.loads(value)
             except ValueError:
                 return self.pickle.loads(value)
+
+    # somewhere in your configuration code
+    serializer = JSONSerializerWithPickleFallback()
+    session_factory = SignedCookieSessionFactory(..., serializer=serializer)
+    config.set_session_factory(session_factory)
 
 .. index::
    single: session object
