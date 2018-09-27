@@ -296,7 +296,7 @@ class RoutesConfiguratorMixin(object):
                 )
 
         if accept is not None:
-            if is_nonstr_iter(accept):
+            if not is_nonstr_iter(accept):
                 accept = [accept]
 
             accept = [accept_option.lower() for accept_option in accept]

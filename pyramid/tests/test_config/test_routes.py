@@ -182,10 +182,25 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
         route = self._assertRoute(config, 'name', 'path', 1)
         predicate = route.predicates[0]
         request = self._makeRequest(config)
-        request.accept = ['text/xml']
+        request.accept = DummyAccept('text/xml')
         self.assertEqual(predicate(None, request), True)
         request = self._makeRequest(config)
-        request.accept = ['text/html']
+        request.accept = DummyAccept('text/html')
+        self.assertEqual(predicate(None, request), False)
+
+    def test_add_route_with_accept_list(self):
+        config = self._makeOne(autocommit=True)
+        config.add_route('name', 'path', accept=['text/xml', 'text/plain'])
+        route = self._assertRoute(config, 'name', 'path', 1)
+        predicate = route.predicates[0]
+        request = self._makeRequest(config)
+        request.accept = DummyAccept('text/xml')
+        self.assertEqual(predicate(None, request), True)
+        request = self._makeRequest(config)
+        request.accept = DummyAccept('text/plain')
+        self.assertEqual(predicate(None, request), True)
+        request = self._makeRequest(config)
+        request.accept = DummyAccept('text/html')
         self.assertEqual(predicate(None, request), False)
 
     def test_add_route_no_pattern_with_path(self):
@@ -253,3 +268,14 @@ class DummyRequest:
         self.environ = environ
         self.params = {}
         self.cookies = {}
+
+class DummyAccept(object):
+    def __init__(self, *matches):
+        self.matches = list(matches)
+
+    def acceptable_offers(self, offers):
+        results = []
+        for match in self.matches:
+            if match in offers:
+                results.append((match, 1.0))
+        return results

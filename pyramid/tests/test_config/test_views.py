@@ -842,7 +842,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view=view2, renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         self.assertTrue(IMultiView.providedBy(wrapper))
-        self.assertEqual([x[:2] for x in wrapper.views], [(view2, None)])
+        self.assertEqual([(x[0], x[2]) for x in wrapper.views], [(view2, None)])
         self.assertEqual(wrapper(None, None), 'OK1')
 
     def test_add_view_exc_multiview_replaces_multiviews(self):
@@ -869,13 +869,13 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         hot_wrapper = self._getViewCallable(
             config, ctx_iface=implementedBy(RuntimeError))
         self.assertTrue(IMultiView.providedBy(hot_wrapper))
-        self.assertEqual([x[:2] for x in hot_wrapper.views], [(view2, None)])
+        self.assertEqual([(x[0], x[2]) for x in hot_wrapper.views], [(view2, None)])
         self.assertEqual(hot_wrapper(None, None), 'OK1')
 
         exc_wrapper = self._getViewCallable(
             config, exc_iface=implementedBy(RuntimeError))
         self.assertTrue(IMultiView.providedBy(exc_wrapper))
-        self.assertEqual([x[:2] for x in exc_wrapper.views], [(view2, None)])
+        self.assertEqual([(x[0], x[2]) for x in exc_wrapper.views], [(view2, None)])
         self.assertEqual(exc_wrapper(None, None), 'OK1')
 
     def test_add_view_exc_multiview_replaces_only_exc_multiview(self):
@@ -908,7 +908,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         exc_wrapper = self._getViewCallable(
             config, exc_iface=implementedBy(RuntimeError))
         self.assertTrue(IMultiView.providedBy(exc_wrapper))
-        self.assertEqual([x[:2] for x in exc_wrapper.views], [(view2, None)])
+        self.assertEqual([(x[0], x[2]) for x in exc_wrapper.views], [(view2, None)])
         self.assertEqual(exc_wrapper(None, None), 'OK1')
 
     def test_add_view_multiview_context_superclass_then_subclass(self):
@@ -1465,7 +1465,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view=view, accept='text/xml', renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
-        request.accept = ['text/xml']
+        request.accept = DummyAccept('text/xml')
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_with_accept_nomatch(self):
@@ -1474,7 +1474,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_view(view=view, accept='text/xml')
         wrapper = self._getViewCallable(config)
         request = self._makeRequest(config)
-        request.accept = ['text/html']
+        request.accept = DummyAccept('text/html')
         self._assertNotFound(wrapper, None, request)
 
     def test_add_view_with_containment_true(self):
@@ -2499,19 +2499,17 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(mv.views, [(100, 'view', None)])
         mv.add('view2', 99)
         self.assertEqual(mv.views, [(99, 'view2', None), (100, 'view', None)])
-        mv.add('view3', 100, 'text/html')
+        mv.add('view3', 100, accept='text/html')
         self.assertEqual(mv.media_views['text/html'], [(100, 'view3', None)])
-        mv.add('view4', 99, 'text/html', 'abc')
+        mv.add('view4', 99, 'abc', accept='text/html')
         self.assertEqual(mv.media_views['text/html'],
                          [(99, 'view4', 'abc'), (100, 'view3', None)])
-        mv.add('view5', 100, 'text/xml')
+        mv.add('view5', 100, accept='text/xml')
         self.assertEqual(mv.media_views['text/xml'], [(100, 'view5', None)])
         self.assertEqual(set(mv.accepts), set(['text/xml', 'text/html']))
         self.assertEqual(mv.views, [(99, 'view2', None), (100, 'view', None)])
-        mv.add('view6', 98, 'text/*')
-        self.assertEqual(mv.views, [(98, 'view6', None),
-                                    (99, 'view2', None),
-                                    (100, 'view', None)])
+        mv.add('view6', 98, accept='text/*')
+        self.assertEqual(mv.media_views['text/*'], [(98, 'view6', None)])
 
     def test_add_with_phash(self):
         mv = self._makeOne()
@@ -3440,14 +3438,12 @@ class DummyAccept(object):
     def __init__(self, *matches):
         self.matches = list(matches)
 
-    def best_match(self, offered):
-        if self.matches:
-            for match in self.matches:
-                if match in offered:
-                    self.matches.remove(match)
-                    return match
-    def __contains__(self, val):
-        return val in self.matches
+    def acceptable_offers(self, offers):
+        results = []
+        for match in self.matches:
+            if match in offers:
+                results.append((match, 1.0))
+        return results
 
 class DummyConfig:
     def __init__(self):
@@ -3475,8 +3471,8 @@ class DummyMultiView:
     def __init__(self):
         self.views = []
         self.name = 'name'
-    def add(self, view, order, accept=None, phash=None):
-        self.views.append((view, accept, phash))
+    def add(self, view, order, phash=None, accept=None, accept_order=None):
+        self.views.append((view, phash, accept, accept_order))
     def __call__(self, context, request):
         return 'OK1'
     def __permitted__(self, context, request):
