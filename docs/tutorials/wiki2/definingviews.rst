@@ -149,7 +149,7 @@ We'll describe each one briefly in the following sections.
 
 .. note::
 
-  There is nothing special about the filename ``default.py`` exept that it is a
+  There is nothing special about the filename ``default.py`` except that it is a
   Python module. A project may have many view callables throughout its codebase
   in arbitrarily named modules. Modules implementing view callables often have
   ``view`` in their name (or may live in a Python subpackage of your
