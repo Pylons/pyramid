@@ -57,6 +57,11 @@ Features
 - Add support for Python 3.7. Add testing on Python 3.8 with allowed failures.
   See https://github.com/Pylons/pyramid/pull/3333
 
+- Added ``pyramid.session.JSONSerializer``. See "Upcoming Changes to ISession
+  in Pyramid 2.0" in the "Sessions" chapter of the documentation for more
+  information about this feature.
+  See https://github.com/Pylons/pyramid/pull/3353
+
 - Add a ``registry`` argument to ``pyramid.renderers.get_renderer``
   to allow users to avoid threadlocals during renderer lookup.
   See https://github.com/Pylons/pyramid/pull/3358
@@ -82,6 +87,21 @@ Bug Fixes
 
 Deprecations
 ------------
+
+- The ``pyramid.intefaces.ISession`` interface will move to require
+  JSON-serializable objects in Pyramid 2.0. See
+  "Upcoming Changes to ISession in Pyramid 2.0" in the "Sessions" chapter
+  of the documentation for more information about this change.
+  See https://github.com/Pylons/pyramid/pull/3353
+
+- The ``pyramid.session.signed_serialize`` and
+  ``pyramid.session.signed_deserialize`` functions will be removed in Pyramid
+  2.0, along with the removal of
+  ``pyramid.session.UnencryptedCookieSessionFactoryConfig`` which was
+  deprecated in Pyramid 1.5. Please switch to using the
+  ``SignedCookieSessionFactory``, copying the code, or another session
+  implementation if you're still using these features.
+  See https://github.com/Pylons/pyramid/pull/3353
 
 Backward Incompatibilities
 --------------------------
