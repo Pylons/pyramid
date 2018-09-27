@@ -62,6 +62,10 @@ Features
   information about this feature.
   See https://github.com/Pylons/pyramid/pull/3353
 
+- Add a ``registry`` argument to ``pyramid.renderers.get_renderer``
+  to allow users to avoid threadlocals during renderer lookup.
+  See https://github.com/Pylons/pyramid/pull/3358
+
 Bug Fixes
 ---------
 
@@ -129,6 +133,10 @@ Backward Incompatibilities
 
 Documentation Changes
 ---------------------
+
+- Ad support for Read The Docs Ethical Ads.
+  https://github.com/Pylons/pyramid/pull/3360
+  https://docs.readthedocs.io/en/latest/advertising/ethical-advertising.html
 
 - Add support for alembic to the pyramid-cookiecutter-alchemy cookiecutter
   and update the wiki2 tutorial to explain how it works.
