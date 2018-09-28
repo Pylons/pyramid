@@ -665,10 +665,8 @@ def sort_accept_offers(offers, order=None):
     - ``*/*``
 
     :param offers: A list of offers to be sorted.
-    :param order: A weighted list of offer where items closer to the start of
+    :param order: A weighted list of offers where items closer to the start of
                   the list will be a preferred over items closer to the end.
-    :param is_order_parsed: If the list of orders is pre-parsed then do not
-                            parse it again.
     :return: A list of offers sorted first by specificity (higher to lower)
              then by ``order``.
 

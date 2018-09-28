@@ -352,7 +352,7 @@ configured view.
 
   If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is not taken into consideration when deciding whether or not to invoke the associated view callable.
 
-  See :ref:`accept_content_negotation` for more information.
+  See :ref:`accept_content_negotiation` for more information.
 
   .. versionchanged:: 1.10
       Media ranges such as ``text/*`` will now raise :class:`pyramid.exceptions.ConfigurationError`.
@@ -1028,9 +1028,9 @@ these values.
 
 .. index::
    single: Accept
-   single: Accept content negotation
+   single: Accept content negotiation
 
-.. _accept_content_negotation:
+.. _accept_content_negotiation:
 
 Accept Header Content Negotiation
 ---------------------------------
@@ -1083,6 +1083,9 @@ For example:
         return config.make_wsgi_app()
 
 In this case, the ``application/json`` view should always be selected in cases where it is otherwise ambiguous.
+
+.. index::
+    single: default accept ordering
 
 .. _default_accept_ordering:
 

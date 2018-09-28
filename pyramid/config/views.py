@@ -687,7 +687,7 @@ class ViewsConfiguratorMixin(object):
           not taken into consideration when deciding whether or not to invoke
           the associated view callable.
 
-          See :ref:`accept_content_negotation` for more information.
+          See :ref:`accept_content_negotiation` for more information.
 
         path_info
 
@@ -1262,7 +1262,7 @@ class ViewsConfiguratorMixin(object):
         ``weighs_more_than`` and ``weighs_less_than`` control the ordering
         of media types. Each value may be a string or a list of strings.
 
-        See :ref:`accept_content_negotation` for more information.
+        See :ref:`accept_content_negotiation` for more information.
 
         .. versionadded:: 1.10
 
