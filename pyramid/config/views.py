@@ -68,7 +68,6 @@ from pyramid.view import AppendSlashNotFoundViewFactory
 
 from pyramid.util import (
     as_sorted_tuple,
-    sort_accept_offers,
     TopologicalSorter,
     )
 
@@ -90,6 +89,7 @@ from pyramid.config.util import (
     DEFAULT_PHASH,
     MAX_ORDER,
     predvalseq,
+    sort_accept_offers,
     )
 
 urljoin = urlparse.urljoin
