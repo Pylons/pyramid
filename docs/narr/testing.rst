@@ -396,10 +396,10 @@ As always, whenever you change your dependencies, make sure to run the correct
     $VENV/bin/pip install -e ".[testing]"
 
 In your ``MyPackage`` project, your :term:`package` is named ``myproject``
-which contains a ``views`` module, which in turn contains a :term:`view`
+which contains a ``views`` package containing a ``default.py`` module, which in turn contains a :term:`view`
 function ``my_view`` that returns an HTML body when the root URL is invoked:
 
-   .. literalinclude:: myproject/myproject/views.py
+   .. literalinclude:: myproject/myproject/views/default.py
       :linenos:
       :language: python
 

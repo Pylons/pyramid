@@ -6,4 +6,4 @@
 .. autoprogram:: pyramid.scripts.proutes:PRoutesCommand.parser
     :prog: proutes
 
-.. seealso:: :ref:`displaying_application_routes`
+.. seealso:: :ref:`displaying_application_routes` and :ref:`running-pscripts`.

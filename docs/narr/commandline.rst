@@ -6,6 +6,65 @@ Command-Line Pyramid
 Your :app:`Pyramid` application can be controlled and inspected using a variety
 of command-line utilities.  These utilities are documented in this chapter.
 
+We commonly refer to this collection of utilities as "p-scripts", which is short for "Pyramid console scripts".
+
+Each p-script's command line usage details is available in the :ref:`pscripts_documentation`.
+
+
+.. index::
+    single: running p-scripts
+    pair: running; p-scripts
+
+.. _running-pscripts:
+
+Running p-scripts
+-----------------
+
+All of the Pyramid console scripts may be run either:
+
+*   by its name
+*   as a Python module
+
+
+.. index::
+    single: running p-script by name
+    triple: p-script; running; name
+
+.. _running-pscripts-by-name:
+
+Running by ``p*`` script name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Each of Pyramid's console scripts may be run by its name.  For example:
+
+.. code-block:: bash
+
+    $VENV/bin/pserve development.ini --reload
+
+.. note:: ``$VENV/bin/`` is a convention we use to simplify Pyramid documentation.
+    It represents the ``bin`` directory in a virtual environment, where ``$VENV`` is an environment variable representing its path.
+    See :ref:`installing_unix` and :ref:`Why use $VENV/bin/pip instead of source bin/activate, then pip <venv-bin-pip-vs-source-bin-activate>` for more information.
+
+
+.. index::
+    single: running p-scripts via Python
+    triple: p-script; running; Python
+
+.. _custom-arguments-to-python:
+
+Using Custom Arguments to Python when Running ``p*`` Scripts
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.5
+
+Each of Pyramid's console scripts (``pserve``, ``pviews``, etc.) can be run
+using ``python3 -m``, allowing custom arguments to be sent to the
+Python interpreter at runtime. For example:
+
+.. code-block:: bash
+
+    python3 -m pyramid.scripts.pserve development.ini --reload
+
 
 .. index::
    pair: matching views; printing
@@ -13,8 +72,8 @@ of command-line utilities.  These utilities are documented in this chapter.
 
 .. _displaying_matching_views:
 
-Displaying Matching Views for a Given URL
------------------------------------------
+``pviews``: Displaying Matching Views for a Given URL
+-----------------------------------------------------
 
 .. seealso:: See also the output of :ref:`pviews --help <pviews_script>`.
 
@@ -31,7 +90,7 @@ to be ``main``.
 
 Here is an example for a simple view configuration using :term:`traversal`:
 
-.. code-block:: text
+.. code-block:: bash
     :linenos:
 
     $VENV/bin/pviews development.ini#tutorial /FrontPage
@@ -54,7 +113,7 @@ permissions and predicates that are part of that view configuration.
 
 A more complex configuration might generate something like this:
 
-.. code-block:: text
+.. code-block:: bash
     :linenos:
 
     $VENV/bin/pviews development.ini#shootout /about
@@ -114,8 +173,8 @@ found* message.
 
 .. _interactive_shell:
 
-The Interactive Shell
----------------------
+``pshell``: The Interactive Shell
+---------------------------------
 
 .. seealso:: See also the output of :ref:`pshell --help <pshell_script>`.
 
@@ -144,7 +203,7 @@ have an ``[app:main]`` section that looks like so:
 If so, you can use the following command to invoke a debug shell using the name
 ``main`` as a section name:
 
-.. code-block:: text
+.. code-block:: bash
 
     $VENV/bin/pshell starter/development.ini#main
     Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32)
@@ -178,7 +237,7 @@ default :term:`root factory`, ``registry``, and ``request`` will be available.
 You can also simply rely on the ``main`` default section name by omitting any
 hash after the filename:
 
-.. code-block:: text
+.. code-block:: bash
 
     $VENV/bin/pshell starter/development.ini
 
@@ -252,7 +311,7 @@ By defining the ``setup`` callable, we will create the module ``myapp.lib.pshell
 
 When this ``.ini`` file is loaded, the extra variable ``models`` will be available for use immediately. Since a ``setup`` callable was also specified, it is executed and new variables ``testapp``, ``tm``, and ``dbsession`` are exposed, and the request is configured to generate URLs from the host ``http://www.example.com``. For example:
 
-.. code-block:: text
+.. code-block:: bash
 
     $VENV/bin/pshell starter/development.ini
     Python 2.6.5 (r265:79063, Apr 29 2010, 00:31:32)
@@ -296,13 +355,13 @@ installed such as ``pyramid_ipython`` it will normally be auto-selected and
 used. You may also specifically invoke your choice with the ``-p choice`` or
 ``--python-shell choice`` option.
 
-.. code-block:: text
+.. code-block:: bash
 
     $VENV/bin/pshell -p ipython development.ini#MyProject
 
 You may use the ``--list-shells`` option to see the available shells.
 
-.. code-block:: text
+.. code-block:: bash
 
     $VENV/bin/pshell --list-shells
     Available shells:
@@ -363,8 +422,8 @@ specify a list of preferred shells.
 
 .. _displaying_application_routes:
 
-Displaying All Application Routes
----------------------------------
+``proutes``: Displaying All Application Routes
+----------------------------------------------
 
 .. seealso:: See also the output of :ref:`proutes --help <proutes_script>`.
 
@@ -378,7 +437,7 @@ the ``section_name`` is ``main`` and can be omitted.
 
 For example:
 
-.. code-block:: text
+.. code-block:: bash
     :linenos:
 
     $VENV/bin/proutes development.ini
@@ -415,7 +474,7 @@ and use those as defaults.
 
 For example you may remove the request method and place the view first:
 
-.. code-block:: text
+.. code-block:: ini
     :linenos:
 
     [proutes]
@@ -425,7 +484,7 @@ For example you may remove the request method and place the view first:
 
 You can also separate the formats with commas or spaces:
 
-.. code-block:: text
+.. code-block:: ini
     :linenos:
 
     [proutes]
@@ -446,8 +505,8 @@ include. The current available formats are ``name``, ``pattern``, ``view``, and
 
 .. _displaying_tweens:
 
-Displaying "Tweens"
--------------------
+``ptweens``: Displaying "Tweens"
+--------------------------------
 
 .. seealso:: See also the output of :ref:`ptweens --help <ptweens_script>`.
 
@@ -462,7 +521,7 @@ standard Python dotted name in the ``ptweens`` output.
 For example, here's the ``ptweens`` command run against a system configured
 without any explicit tweens:
 
-.. code-block:: text
+.. code-block:: bash
     :linenos:
 
     $VENV/bin/ptweens development.ini
@@ -480,10 +539,10 @@ without any explicit tweens:
 Here's the ``ptweens`` command run against a system configured *with* explicit
 tweens defined in its ``development.ini`` file:
 
-.. code-block:: text
+.. code-block:: bash
     :linenos:
 
-    ptweens development.ini
+    $VENV/bin/ptweens development.ini
     "pyramid.tweens" config value set (explicitly ordered tweens used)
 
     Explicit Tween Chain (used)
@@ -534,8 +593,8 @@ See :ref:`registering_tweens` for more information about tweens.
 
 .. _invoking_a_request:
 
-Invoking a Request
-------------------
+``prequest``: Invoking a Request
+--------------------------------
 
 .. seealso:: See also the output of :ref:`prequest --help <prequest_script>`.
 
@@ -553,9 +612,11 @@ There are two required arguments to ``prequest``:
 - The path: this should be the non-URL-quoted path element of the URL to the
   resource you'd like to be rendered on the server.  For example, ``/``.
 
-For example::
+For example:
 
-   $ $VENV/bin/prequest development.ini /
+.. code-block:: bash
+
+    $VENV/bin/prequest development.ini /
 
 This will print the body of the response to the console on which it was
 invoked.
@@ -564,16 +625,20 @@ Several options are supported by ``prequest``.  These should precede any config
 file name or URL.
 
 ``prequest`` has a ``-d`` (i.e., ``--display-headers``) option which prints the
-status and headers returned by the server before the output::
+status and headers returned by the server before the output:
 
-   $ $VENV/bin/prequest -d development.ini /
+.. code-block:: bash
+
+    $VENV/bin/prequest -d development.ini /
 
 This will print the status, headers, and the body of the response to the
 console.
 
-You can add request header values by using the ``--header`` option::
+You can add request header values by using the ``--header`` option:
 
-   $ $VENV/bin/prequest --header=Host:example.com development.ini /
+.. code-block:: bash
+
+    $VENV/bin/prequest --header=Host:example.com development.ini /
 
 Headers are added to the WSGI environment by converting them to their CGI/WSGI
 equivalents (e.g., ``Host=example.com`` will insert the ``HTTP_HOST`` header
@@ -584,21 +649,11 @@ in the WSGI environment.
 By default, ``prequest`` sends a ``GET`` request.  You can change this by using
 the ``-m`` (aka ``--method``) option.  ``GET``, ``HEAD``, ``POST``, and
 ``DELETE`` are currently supported.  When you use ``POST``, the standard input
-of the ``prequest`` process is used as the ``POST`` body::
+of the ``prequest`` process is used as the ``POST`` body:
 
-   $ $VENV/bin/prequest -mPOST development.ini / < somefile
+.. code-block:: bash
 
-
-Using Custom Arguments to Python when Running ``p*`` Scripts
-------------------------------------------------------------
-
-.. versionadded:: 1.5
-
-Each of Pyramid's console scripts (``pserve``, ``pviews``, etc.) can be run
-directly using ``python3 -m``, allowing custom arguments to be sent to the
-Python interpreter at runtime. For example::
-
-      python3 -m pyramid.scripts.pserve development.ini
+    $VENV/bin/prequest -mPOST development.ini / < somefile
 
 
 .. index::
@@ -608,8 +663,8 @@ Python interpreter at runtime. For example::
 
 .. _showing_distributions:
 
-Showing All Installed Distributions and Their Versions
-------------------------------------------------------
+``pdistreport``: Showing All Installed Distributions and Their Versions
+-----------------------------------------------------------------------
 
 .. versionadded:: 1.5
 
@@ -618,17 +673,19 @@ Showing All Installed Distributions and Their Versions
 
 You can use the ``pdistreport`` command to show the :app:`Pyramid` version in
 use, the Python version in use, and all installed versions of Python
-distributions in your Python environment::
+distributions in your Python environment:
 
-   $ $VENV/bin/pdistreport
-   Pyramid version: 1.5dev
-   Platform Linux-3.2.0-51-generic-x86_64-with-debian-wheezy-sid
-   Packages:
-     authapp 0.0
-       /home/chrism/projects/foo/src/authapp
-     beautifulsoup4 4.1.3
-       /home/chrism/projects/foo/lib/python2.7/site-packages/beautifulsoup4-4.1.3-py2.7.egg
-   ... more output ...
+.. code-block:: bash
+
+    $VENV/bin/pdistreport
+    Pyramid version: 1.5dev
+    Platform Linux-3.2.0-51-generic-x86_64-with-debian-wheezy-sid
+    Packages:
+      authapp 0.0
+        /home/chrism/projects/foo/src/authapp
+      beautifulsoup4 4.1.3
+        /home/chrism/projects/foo/lib/python2.7/site-packages/beautifulsoup4-4.1.3-py2.7.egg
+    # ... more output ...
 
 ``pdistreport`` takes no options.  Its output is useful to paste into a
 pastebin when you are having problems and need someone with more familiarity

@@ -6,4 +6,4 @@
 .. autoprogram:: pyramid.scripts.prequest:PRequestCommand.parser
     :prog: prequest
 
-.. seealso:: :ref:`invoking_a_request`
+.. seealso:: :ref:`invoking_a_request` and :ref:`running-pscripts`.
