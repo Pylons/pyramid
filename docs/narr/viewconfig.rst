@@ -1090,7 +1090,7 @@ In this case, the ``application/json`` view should always be selected in cases w
 .. _default_accept_ordering:
 
 Default Accept Ordering
-+++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~
 
 :app:`Pyramid` will always sort multiple views with the same ``(name, context, route_name)`` first by the specificity of the ``accept`` offer.
 This means that ``text/plain`` will always be offered before ``text/*``.
