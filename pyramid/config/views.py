@@ -1235,6 +1235,7 @@ class ViewsConfiguratorMixin(object):
             'application/xml',
             'text/xml',
             'text/plain',
+            'application/json',
         ):
             self.add_accept_view_order(accept)
 

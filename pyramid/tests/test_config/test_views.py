@@ -2407,6 +2407,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             'application/xml',
             'text/xml',
             'text/plain',
+            'application/json',
         ])
 
     def test_add_accept_view_order_override(self):
@@ -2426,6 +2427,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             'text/html',
             'text/xml',
             'text/plain',
+            'application/json',
         ])
 
     def test_add_accept_view_order_throws_on_wildcard(self):
