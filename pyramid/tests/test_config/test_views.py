@@ -2389,6 +2389,72 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request.exception = Exception()
         self.assertEqual(derived_view(None, request), 'OK')
 
+    def test_add_view_does_not_accept_iterable_accept(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(
+            ConfigurationError, config.add_view, accept=['image/*', 'text/*'],
+        )
+
+    def test_default_accept_view_order(self):
+        from pyramid.interfaces import IAcceptOrder
+        config = self._makeOne(autocommit=True)
+        order = config.registry.getUtility(IAcceptOrder)
+        result = [v for _, v in order.sorted()]
+        self.assertEqual(result, [
+            'text/html',
+            'application/xhtml+xml',
+            'application/xml',
+            'text/xml',
+            'text/plain',
+        ])
+
+    def test_add_accept_view_order_override(self):
+        from pyramid.interfaces import IAcceptOrder
+        config = self._makeOne(autocommit=False)
+        config.add_accept_view_order(
+            'text/html',
+            weighs_more_than='text/xml',
+            weighs_less_than='application/xml',
+        )
+        config.commit()
+        order = config.registry.getUtility(IAcceptOrder)
+        result = [v for _, v in order.sorted()]
+        self.assertEqual(result, [
+            'application/xhtml+xml',
+            'application/xml',
+            'text/html',
+            'text/xml',
+            'text/plain',
+        ])
+
+    def test_add_accept_view_order_throws_on_wildcard(self):
+        from pyramid.exceptions import ConfigurationError
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(
+            ConfigurationError, config.add_accept_view_order, '*/*',
+        )
+
+    def test_add_accept_view_order_throws_on_type_mismatch(self):
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(
+            ConfigurationError, config.add_accept_view_order,
+            'text/*', weighs_more_than='text/html',
+        )
+        self.assertRaises(
+            ConfigurationError, config.add_accept_view_order,
+            'text/html', weighs_less_than='application/*',
+        )
+        self.assertRaises(
+            ConfigurationError, config.add_accept_view_order,
+            'text/html', weighs_more_than='text/html;charset=utf8',
+        )
+        self.assertRaises(
+            ConfigurationError, config.add_accept_view_order,
+            'text/html;charset=utf8',
+            weighs_more_than='text/plain;charset=utf8',
+        )
+
 class Test_runtime_exc_view(unittest.TestCase):
     def _makeOne(self, view1, view2):
         from pyramid.config.views import runtime_exc_view

@@ -141,7 +141,7 @@ class MultiView(object):
             accepts = set(self.accepts)
             accepts.add(accept)
             if accept_order:
-                accept_order = accept_order.sorted()
+                accept_order = [v for _, v in accept_order.sorted()]
             self.accepts = sort_accept_offers(accepts, accept_order)
 
     def get_views(self, request):
@@ -1235,7 +1235,6 @@ class ViewsConfiguratorMixin(object):
             'application/xml',
             'text/xml',
             'text/plain',
-            'application/json',
         ):
             self.add_accept_view_order(accept)
 
@@ -1260,7 +1259,13 @@ class ViewsConfiguratorMixin(object):
         ``application/json`` or ``text/html``.
 
         ``weighs_more_than`` and ``weighs_less_than`` control the ordering
-        of media types. Each value may be a string or a list of strings.
+        of media types. Each value may be a string or a list of strings. If
+        all options for ``weighs_more_than`` (or ``weighs_less_than``) cannot
+        be found, it is an error.
+
+        Earlier calls to ``add_accept_view_order`` are given higher priority
+        over later calls, assuming similar constraints but standard conflict
+        resolution mechanisms can be used to override constraints.
 
         See :ref:`accept_content_negotiation` for more information.
 
@@ -1324,8 +1329,8 @@ class ViewsConfiguratorMixin(object):
                 self.registry.registerUtility(sorter, IAcceptOrder)
             sorter.add(
                 value, value,
-                after=weighs_more_than,
-                before=weighs_less_than,
+                before=weighs_more_than,
+                after=weighs_less_than,
             )
         self.action(discriminator, register, introspectables=(intr,),
                     order=PHASE1_CONFIG) # must be registered before add_view
