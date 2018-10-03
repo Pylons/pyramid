@@ -1,7 +1,6 @@
 graft pyramid
 graft docs
 prune docs/_build
-graft .github
 
 include README.rst
 include CHANGES.rst HISTORY.rst BFG_HISTORY.rst
@@ -9,10 +8,11 @@ include CONTRIBUTORS.txt LICENSE.txt COPYRIGHT.txt
 
 include contributing.md RELEASING.txt
 include tox.ini appveyor.yml .travis.yml rtd.txt
+graft .github
 
 include HACKING.txt hacking-tox.ini
 include builddocs.sh coverage.sh scaffoldtests.sh
 include TODO.txt
 
 global-exclude __pycache__ *.py[cod]
-exclude .DS_Store
+global-exclude .DS_Store
