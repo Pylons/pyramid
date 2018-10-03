@@ -128,11 +128,11 @@ Steps
    .. literalinclude:: databases/tutorial/tests.py
        :linenos:
 
-#. Run the tests in your package using ``py.test``:
+#. Run the tests in your package using ``pytest``:
 
    .. code-block:: bash
 
-       $VENV/bin/py.test tutorial/tests.py -q
+       $VENV/bin/pytest tutorial/tests.py -q
        ..
        2 passed in 1.41 seconds
 
