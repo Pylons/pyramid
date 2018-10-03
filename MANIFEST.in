@@ -13,6 +13,8 @@ include HACKING.txt hacking-tox.ini
 include builddocs.sh coverage.sh scaffoldtests.sh
 include TODO.txt
 
-include .github .github/*
+include .github .github/ISSUE_TEMPLATE .github/ISSUE_TEMPLATE/bug_report.md
+include .github/ISSUE_TEMPLATE/documentation.md
+include .github/ISSUE_TEMPLATE/feature_request.md
 
 global-exclude __pycache__ *.py[cod]
