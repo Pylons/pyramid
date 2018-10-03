@@ -128,7 +128,7 @@ When a command that should be typed on one line is too long to fit on the displa
 
 .. code-block:: bash
 
-    $VENV/bin/py.test tutorial/tests.py --cov-report term-missing \
+    $VENV/bin/pytest tutorial/tests.py --cov-report term-missing \
         --cov=tutorial -q
 
 
