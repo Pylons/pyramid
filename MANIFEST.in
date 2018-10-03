@@ -15,5 +15,4 @@ include builddocs.sh coverage.sh scaffoldtests.sh
 include TODO.txt
 
 global-exclude __pycache__ *.py[cod]
-recursive-exclude docs .DS_Store
-recursive-exclude pyramid .DS_Store
+exclude .DS_Store
