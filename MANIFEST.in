@@ -1,6 +1,7 @@
 graft pyramid
 graft docs
 prune docs/_build
+graft .github
 
 include README.rst
 include CHANGES.rst HISTORY.rst BFG_HISTORY.rst
@@ -12,9 +13,5 @@ include tox.ini appveyor.yml .travis.yml rtd.txt
 include HACKING.txt hacking-tox.ini
 include builddocs.sh coverage.sh scaffoldtests.sh
 include TODO.txt
-
-include .github .github/ISSUE_TEMPLATE .github/ISSUE_TEMPLATE/bug_report.md
-include .github/ISSUE_TEMPLATE/documentation.md
-include .github/ISSUE_TEMPLATE/feature_request.md
 
 global-exclude __pycache__ *.py[cod]
