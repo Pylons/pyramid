@@ -16,6 +16,7 @@ from pyramid.compat import (
     )
 
 from zope.interface import Interface
+from webtest import TestApp
 
 # 5 years from now (more or less)
 fiveyrsfuture = datetime.datetime.utcnow() + datetime.timedelta(5*365)
@@ -65,7 +66,6 @@ class IntegrationBase(object):
                               package=self.package)
         config.include(self.package)
         app = config.make_wsgi_app()
-        from webtest import TestApp
         self.testapp = TestApp(app)
         self.config = config
 
@@ -482,7 +482,6 @@ class TestConflictApp(unittest.TestCase):
         config = self._makeConfig()
         config.include(self.package)
         app = config.make_wsgi_app()
-        from webtest import TestApp
         self.testapp = TestApp(app)
         res = self.testapp.get('/')
         self.assertTrue(b'a view' in res.body)
@@ -497,7 +496,6 @@ class TestConflictApp(unittest.TestCase):
             return Response('this view')
         config.add_view(thisview)
         app = config.make_wsgi_app()
-        from webtest import TestApp
         self.testapp = TestApp(app)
         res = self.testapp.get('/')
         self.assertTrue(b'this view' in res.body)
@@ -510,7 +508,6 @@ class TestConflictApp(unittest.TestCase):
             return Response('this view')
         config.add_view(thisview, route_name='aroute')
         app = config.make_wsgi_app()
-        from webtest import TestApp
         self.testapp = TestApp(app)
         res = self.testapp.get('/route')
         self.assertTrue(b'this view' in res.body)
@@ -519,7 +516,6 @@ class TestConflictApp(unittest.TestCase):
         config = self._makeConfig()
         config.include(self.package)
         app = config.make_wsgi_app()
-        from webtest import TestApp
         self.testapp = TestApp(app)
         res = self.testapp.get('/protected', status=403)
         self.assertTrue(b'403 Forbidden' in res.body)
@@ -531,7 +527,6 @@ class TestConflictApp(unittest.TestCase):
         config.set_authorization_policy(DummySecurityPolicy('fred'))
         config.set_authentication_policy(DummySecurityPolicy(permissive=True))
         app = config.make_wsgi_app()
-        from webtest import TestApp
         self.testapp = TestApp(app)
         res = self.testapp.get('/protected', status=200)
         self.assertTrue('protected view' in res)
@@ -543,7 +538,6 @@ class ImperativeIncludeConfigurationTest(unittest.TestCase):
         from pyramid.tests.pkgs.includeapp1.root import configure
         configure(config)
         app = config.make_wsgi_app()
-        from webtest import TestApp
         self.testapp = TestApp(app)
         self.config = config
 
@@ -567,7 +561,6 @@ class SelfScanAppTest(unittest.TestCase):
         from pyramid.tests.test_config.pkgs.selfscan import main
         config = main()
         app = config.make_wsgi_app()
-        from webtest import TestApp
         self.testapp = TestApp(app)
         self.config = config
 
@@ -587,7 +580,6 @@ class WSGIApp2AppTest(unittest.TestCase):
         from pyramid.tests.pkgs.wsgiapp2app import main
         config = main()
         app = config.make_wsgi_app()
-        from webtest import TestApp
         self.testapp = TestApp(app)
         self.config = config
 
@@ -603,7 +595,6 @@ class SubrequestAppTest(unittest.TestCase):
         from pyramid.tests.pkgs.subrequestapp import main
         config = main()
         app = config.make_wsgi_app()
-        from webtest import TestApp
         self.testapp = TestApp(app)
         self.config = config
 
@@ -635,7 +626,6 @@ class RendererScanAppTest(IntegrationBase, unittest.TestCase):
     def test_rescan(self):
         self.config.scan('pyramid.tests.pkgs.rendererscanapp')
         app = self.config.make_wsgi_app()
-        from webtest import TestApp
         testapp = TestApp(app)
         res = testapp.get('/one', status=200)
         self.assertTrue(b'One!' in res.body)
@@ -649,7 +639,6 @@ class UnicodeInURLTest(unittest.TestCase):
         return config
 
     def _makeTestApp(self, config):
-        from webtest import TestApp
         app = config.make_wsgi_app()
         return TestApp(app)
 
@@ -685,43 +674,90 @@ class UnicodeInURLTest(unittest.TestCase):
 
 
 class AcceptContentTypeTest(unittest.TestCase):
-    def setUp(self):
+    def _makeConfig(self):
         def hello_view(request):
             return {'message': 'Hello!'}
         from pyramid.config import Configurator
         config = Configurator()
         config.add_route('hello', '/hello')
-        config.add_view(hello_view, route_name='hello', accept='text/plain', renderer='string')
-        config.add_view(hello_view, route_name='hello', accept='application/json', renderer='json')
+        config.add_view(hello_view, route_name='hello',
+                        accept='text/plain', renderer='string')
+        config.add_view(hello_view, route_name='hello',
+                        accept='application/json', renderer='json')
+        def hello_fallback_view(request):
+            request.response.content_type = 'text/x-fallback'
+            return 'hello fallback'
+        config.add_view(hello_fallback_view, route_name='hello',
+                        renderer='string')
+        return config
+
+    def _makeTestApp(self, config):
         app = config.make_wsgi_app()
-        from webtest import TestApp
-        self.testapp = TestApp(app)
+        return TestApp(app)
 
     def tearDown(self):
         import pyramid.config
-        pyramid.config.global_registries.empty()        
+        pyramid.config.global_registries.empty()
 
-    def test_ordering(self):
-        res = self.testapp.get('/hello', headers={'Accept': 'application/json; q=1.0, text/plain; q=0.9'}, status=200)
+    def test_client_side_ordering(self):
+        config = self._makeConfig()
+        app = self._makeTestApp(config)
+        res = app.get('/hello', headers={
+            'Accept': 'application/json; q=1.0, text/plain; q=0.9',
+        }, status=200)
         self.assertEqual(res.content_type, 'application/json')
-        res = self.testapp.get('/hello', headers={'Accept': 'text/plain; q=0.9, application/json; q=1.0'}, status=200)
+        res = app.get('/hello', headers={
+            'Accept': 'text/plain; q=0.9, application/json; q=1.0',
+        }, status=200)
         self.assertEqual(res.content_type, 'application/json')
-
-    def test_wildcards(self):
-        res = self.testapp.get('/hello', headers={'Accept': 'application/*'}, status=200)
+        res = app.get('/hello', headers={'Accept': 'application/*'}, status=200)
         self.assertEqual(res.content_type, 'application/json')
-        res = self.testapp.get('/hello', headers={'Accept': 'text/*'}, status=200)
+        res = app.get('/hello', headers={'Accept': 'text/*'}, status=200)
         self.assertEqual(res.content_type, 'text/plain')
-        res = self.testapp.get('/hello', headers={'Accept': '*/*'}, status=200)
-        self.assertEqual(res.content_type, 'text/plain')
+        res = app.get('/hello', headers={'Accept': 'something/else'}, status=200)
+        self.assertEqual(res.content_type, 'text/x-fallback')
 
-    def test_no_accept(self):
-        res = self.testapp.get('/hello', status=200)
+    def test_default_server_side_ordering(self):
+        config = self._makeConfig()
+        app = self._makeTestApp(config)
+        res = app.get('/hello', headers={
+            'Accept': 'application/json, text/plain',
+        }, status=200)
         self.assertEqual(res.content_type, 'text/plain')
+        res = app.get('/hello', headers={
+            'Accept': 'text/plain, application/json',
+        }, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+        res = app.get('/hello', headers={'Accept': '*/*'}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+        res = app.get('/hello', status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+        res = app.get('/hello', headers={'Accept': 'invalid'}, status=200)
+        self.assertEqual(res.content_type, 'text/plain')
+        res = app.get('/hello', headers={'Accept': 'something/else'}, status=200)
+        self.assertEqual(res.content_type, 'text/x-fallback')
 
-    def test_invalid_accept(self):
-        res = self.testapp.get('/hello', headers={'Accept': 'foo'}, status=200)
-        self.assertEqual(res.content_type, 'text/plain')
+    def test_custom_server_side_ordering(self):
+        config = self._makeConfig()
+        config.add_accept_view_order(
+            'application/json', weighs_more_than='text/plain')
+        app = self._makeTestApp(config)
+        res = app.get('/hello', headers={
+            'Accept': 'application/json, text/plain',
+        }, status=200)
+        self.assertEqual(res.content_type, 'application/json')
+        res = app.get('/hello', headers={
+            'Accept': 'text/plain, application/json',
+        }, status=200)
+        self.assertEqual(res.content_type, 'application/json')
+        res = app.get('/hello', headers={'Accept': '*/*'}, status=200)
+        self.assertEqual(res.content_type, 'application/json')
+        res = app.get('/hello', status=200)
+        self.assertEqual(res.content_type, 'application/json')
+        res = app.get('/hello', headers={'Accept': 'invalid'}, status=200)
+        self.assertEqual(res.content_type, 'application/json')
+        res = app.get('/hello', headers={'Accept': 'something/else'}, status=200)
+        self.assertEqual(res.content_type, 'text/x-fallback')
 
 class AddViewAcceptArgMediaRangeAllTest(unittest.TestCase):
     def setUp(self):
@@ -734,7 +770,6 @@ class AddViewAcceptArgMediaRangeAllTest(unittest.TestCase):
             view, route_name='root', accept='*/*', renderer='string',
         )
         app = config.make_wsgi_app()
-        from webtest import TestApp
         self.testapp = TestApp(app)
 
     def tearDown(self):
@@ -788,7 +823,6 @@ class AddViewAcceptArgMediaRangeAllSubtypesOfTypeTest(unittest.TestCase):
             view, route_name='root', accept='text/*', renderer='string',
         )
         app = config.make_wsgi_app()
-        from webtest import TestApp
         self.testapp = TestApp(app)
 
     def tearDown(self):
@@ -843,7 +877,6 @@ class AddRouteAcceptArgMediaRangeAllTest(unittest.TestCase):
         config.add_route('root', '/', accept='*/*')
         config.add_view(view, route_name='root', renderer='string')
         app = config.make_wsgi_app()
-        from webtest import TestApp
         self.testapp = TestApp(app)
 
     def tearDown(self):
@@ -895,7 +928,6 @@ class AddRouteAcceptArgMediaRangeAllSubtypesOfTypeTest(unittest.TestCase):
         config.add_route('root', '/', accept='text/*')
         config.add_view(view, route_name='root', renderer='string')
         app = config.make_wsgi_app()
-        from webtest import TestApp
         self.testapp = TestApp(app)
 
     def tearDown(self):
