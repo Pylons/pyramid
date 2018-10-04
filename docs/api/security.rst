@@ -8,20 +8,12 @@
 Authentication API Functions
 ----------------------------
 
-.. autofunction:: authenticated_userid
-
-.. autofunction:: unauthenticated_userid
-
-.. autofunction:: effective_principals
-
 .. autofunction:: forget
 
 .. autofunction:: remember(request, userid, **kwargs)
 
 Authorization API Functions
 ---------------------------
-
-.. autofunction:: has_permission
 
 .. autofunction:: principals_allowed_by_permission
 

@@ -1,4 +1,3 @@
-from zope.deprecation import deprecated
 from zope.interface import providedBy
 
 from pyramid.interfaces import (
@@ -48,86 +47,6 @@ def _get_registry(request):
 def _get_authentication_policy(request):
     registry = _get_registry(request)
     return registry.queryUtility(IAuthenticationPolicy)
-
-
-def has_permission(permission, context, request):
-    """
-    A function that calls :meth:`pyramid.request.Request.has_permission`
-    and returns its result.
-
-    .. deprecated:: 1.5
-        Use :meth:`pyramid.request.Request.has_permission` instead.
-
-    .. versionchanged:: 1.5a3
-        If context is None, then attempt to use the context attribute of self;
-        if not set, then the AttributeError is propagated.
-    """
-    return request.has_permission(permission, context)
-
-
-deprecated(
-    'has_permission',
-    'As of Pyramid 1.5 the "pyramid.security.has_permission" API is now '
-    'deprecated.  It will be removed in Pyramid 1.8.  Use the '
-    '"has_permission" method of the Pyramid request instead.',
-)
-
-
-def authenticated_userid(request):
-    """
-    A function that returns the value of the property
-    :attr:`pyramid.request.Request.authenticated_userid`.
-
-    .. deprecated:: 1.5
-       Use :attr:`pyramid.request.Request.authenticated_userid` instead.
-    """
-    return request.authenticated_userid
-
-
-deprecated(
-    'authenticated_userid',
-    'As of Pyramid 1.5 the "pyramid.security.authenticated_userid" API is now '
-    'deprecated.  It will be removed in Pyramid 1.8.  Use the '
-    '"authenticated_userid" attribute of the Pyramid request instead.',
-)
-
-
-def unauthenticated_userid(request):
-    """
-    A function that returns the value of the property
-    :attr:`pyramid.request.Request.unauthenticated_userid`.
-
-    .. deprecated:: 1.5
-        Use :attr:`pyramid.request.Request.unauthenticated_userid` instead.
-    """
-    return request.unauthenticated_userid
-
-
-deprecated(
-    'unauthenticated_userid',
-    'As of Pyramid 1.5 the "pyramid.security.unauthenticated_userid" API is '
-    'now deprecated.  It will be removed in Pyramid 1.8.  Use the '
-    '"unauthenticated_userid" attribute of the Pyramid request instead.',
-)
-
-
-def effective_principals(request):
-    """
-    A function that returns the value of the property
-    :attr:`pyramid.request.Request.effective_principals`.
-
-    .. deprecated:: 1.5
-        Use :attr:`pyramid.request.Request.effective_principals` instead.
-    """
-    return request.effective_principals
-
-
-deprecated(
-    'effective_principals',
-    'As of Pyramid 1.5 the "pyramid.security.effective_principals" API is '
-    'now deprecated.  It will be removed in Pyramid 1.8.  Use the '
-    '"effective_principals" attribute of the Pyramid request instead.',
-)
 
 
 def remember(request, userid, **kw):
@@ -363,10 +282,6 @@ class ACLAllowed(ACLPermitsResult, Allowed):
 
 
 class AuthenticationAPIMixin(object):
-    def _get_authentication_policy(self):
-        reg = _get_registry(self)
-        return reg.queryUtility(IAuthenticationPolicy)
-
     @property
     def authenticated_userid(self):
         """ Return the userid of the currently authenticated user or
@@ -375,7 +290,7 @@ class AuthenticationAPIMixin(object):
 
         .. versionadded:: 1.5
         """
-        policy = self._get_authentication_policy()
+        policy = _get_authentication_policy(self)
         if policy is None:
             return None
         return policy.authenticated_userid(self)
@@ -392,7 +307,7 @@ class AuthenticationAPIMixin(object):
 
         .. versionadded:: 1.5
         """
-        policy = self._get_authentication_policy()
+        policy = _get_authentication_policy(self)
         if policy is None:
             return None
         return policy.unauthenticated_userid(self)
@@ -406,7 +321,7 @@ class AuthenticationAPIMixin(object):
 
         .. versionadded:: 1.5
         """
-        policy = self._get_authentication_policy()
+        policy = _get_authentication_policy(self)
         if policy is None:
             return [Everyone]
         return policy.effective_principals(self)
