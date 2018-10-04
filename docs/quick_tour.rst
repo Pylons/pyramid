@@ -676,7 +676,7 @@ the relevant ``.ini`` configuration file.
     :ref:`pyramid_debugtoolbar <toolbar:overview>`
 
 Unit tests and ``pytest``
-==========================
+=========================
 
 Yikes! We got this far and we haven't yet discussed tests. This is particularly
 egregious, as Pyramid has had a deep commitment to full test coverage since

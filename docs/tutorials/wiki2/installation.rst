@@ -453,7 +453,7 @@ pytest follows :ref:`conventions for Python test discovery
 tell ``pytest`` where to find the module on which we want to run tests and
 coverage.
 
-.. seealso:: See pytest's documentation for :ref:`pytest:usage` or invoke
+.. seealso:: See ``pytest``'s documentation for :ref:`pytest:usage` or invoke
    ``pytest -h`` to see its full set of options.
 
 

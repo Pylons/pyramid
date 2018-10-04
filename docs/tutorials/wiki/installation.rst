@@ -195,7 +195,7 @@ Run the tests
 
 After you've installed the project in development mode as well as the testing
 requirements, you may run the tests for the project. The following commands
-provide options to `pytest` that specify the module for which its tests shall be
+provide options to ``pytest`` that specify the module for which its tests shall be
 run, and to run ``pytest`` in quiet mode.
 
 On Unix
@@ -299,7 +299,7 @@ On Windows
 tell ``pytest`` where to find the module on which we want to run tests and
 coverage.
 
-.. seealso:: See pytest's documentation for :ref:`pytest:usage` or invoke
+.. seealso:: See ``pytest``'s documentation for :ref:`pytest:usage` or invoke
    ``pytest -h`` to see its full set of options.
 
 

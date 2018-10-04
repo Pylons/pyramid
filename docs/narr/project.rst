@@ -286,7 +286,7 @@ path to the module on which we want to run tests and coverage.
 
     $VENV/bin/pytest --cov=myproject myproject/tests.py -q
 
-.. seealso:: See pytest's documentation for :ref:`pytest:usage` or invoke
+.. seealso:: See ``pytest``'s documentation for :ref:`pytest:usage` or invoke
    ``pytest -h`` to see its full set of options.
 
 
