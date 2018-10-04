@@ -150,6 +150,12 @@ Backward Incompatibilities
   request. For example, ``request.authenticated_userid``.
   See https://github.com/Pylons/pyramid/pull/3370
 
+- Removed ``pyramid.interfaces.ITemplateRenderer``. This interface was
+  deprecated since Pyramid 1.5 and was an interface
+  used by libraries like ``pyramid_mako`` and ``pyramid_chameleon`` but
+  provided no functionality within Pyramid itself.
+  See https://github.com/Pylons/pyramid/pull/3371
+
 Documentation Changes
 ---------------------
 
