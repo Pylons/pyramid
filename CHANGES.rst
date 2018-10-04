@@ -131,6 +131,10 @@ Backward Incompatibilities
   of previous ``pyramid.httpexceptions.HTTPFound``.
   See https://github.com/Pylons/pyramid/pull/3328
 
+- Removed ``pyramid.config.Configurator.set_request_property`` which had been
+  deprecated since Pyramid 1.5.
+  See https://github.com/Pylons/pyramid/pull/3368
+
 Documentation Changes
 ---------------------
 
