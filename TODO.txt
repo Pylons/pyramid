@@ -111,13 +111,6 @@ Nice-to-Have
          )
  
 
-Future
-------
-
-- 1.9: Remove set_request_property.
-- 1.9: Remove extra code enabling ``pyramid.security.remember(principal=...)``
-  and force use of ``userid``.
-
 Probably Bad Ideas
 ------------------
 

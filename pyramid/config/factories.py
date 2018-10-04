@@ -1,4 +1,3 @@
-from zope.deprecation import deprecated
 from zope.interface import implementer
 
 from pyramid.interfaces import (
@@ -214,25 +213,6 @@ class FactoriesConfiguratorMixin(object):
             intr['reify'] = False
             self.action(('request extensions', name), register,
                         introspectables=(intr,))
-
-    @action_method
-    def set_request_property(self, callable, name=None, reify=False):
-        """ Add a property to the request object.
-
-        .. deprecated:: 1.5
-            :meth:`pyramid.config.Configurator.add_request_method` should be
-            used instead.  (This method was docs-deprecated in 1.4 and
-            issues a real deprecation warning in 1.5).
-
-        .. versionadded:: 1.3
-        """
-        self.add_request_method(
-            callable, name=name, property=not reify, reify=reify)
-
-    deprecated(
-        set_request_property,
-        'set_request_propery() is deprecated as of Pyramid 1.5; use '
-        'add_request_method() with the property=True argument instead')
 
     @action_method
     def set_execution_policy(self, policy):
