@@ -132,8 +132,15 @@ Backward Incompatibilities
   See https://github.com/Pylons/pyramid/pull/3328
 
 - Removed ``pyramid.config.Configurator.set_request_property`` which had been
-  deprecated since Pyramid 1.5.
+  deprecated since Pyramid 1.5. Instead use
+  ``pyramid.config.Configurator.add_request_method`` with ``reify=True`` or
+  ``property=True``.
   See https://github.com/Pylons/pyramid/pull/3368
+
+- Removed the ``principal`` keyword argument from
+  ``pyramid.security.remember`` which had been deprecated since Pyramid 1.6
+  and replaced by the ``userid`` argument.
+  See https://github.com/Pylons/pyramid/pull/3369
 
 Documentation Changes
 ---------------------
