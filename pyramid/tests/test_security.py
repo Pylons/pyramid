@@ -300,19 +300,6 @@ class TestAuthenticatedUserId(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
         
-    def test_backward_compat_delegates_to_mixin(self):
-        from zope.deprecation import __show__
-        try:
-            __show__.off()
-            request = _makeFakeRequest()
-            from pyramid.security import authenticated_userid
-            self.assertEqual(
-                authenticated_userid(request),
-                'authenticated_userid'
-                )
-        finally:
-            __show__.on()
-
     def test_no_authentication_policy(self):
         request = _makeRequest()
         self.assertEqual(request.authenticated_userid, None)
@@ -337,19 +324,6 @@ class TestUnAuthenticatedUserId(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
         
-    def test_backward_compat_delegates_to_mixin(self):
-        from zope.deprecation import __show__
-        try:
-            __show__.off()
-            request = _makeFakeRequest()
-            from pyramid.security import unauthenticated_userid
-            self.assertEqual(
-                unauthenticated_userid(request),
-                'unauthenticated_userid',
-                )
-        finally:
-            __show__.on()
-
     def test_no_authentication_policy(self):
         request = _makeRequest()
         self.assertEqual(request.unauthenticated_userid, None)
@@ -374,19 +348,6 @@ class TestEffectivePrincipals(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
         
-    def test_backward_compat_delegates_to_mixin(self):
-        request = _makeFakeRequest()
-        from zope.deprecation import __show__
-        try:
-            __show__.off()
-            from pyramid.security import effective_principals
-            self.assertEqual(
-                effective_principals(request),
-                'effective_principals'
-                )
-        finally:
-            __show__.on()
-
     def test_no_authentication_policy(self):
         from pyramid.security import Everyone
         request = _makeRequest()
@@ -419,23 +380,6 @@ class TestHasPermission(unittest.TestCase):
         mixin.registry = Registry()
         mixin.context = object()
         return mixin
-
-    def test_delegates_to_mixin(self):
-        from zope.deprecation import __show__
-        try:
-            __show__.off()
-            mixin = self._makeOne()
-            from pyramid.security import has_permission
-            self.called_has_permission = False
-
-            def mocked_has_permission(*args, **kw):
-                self.called_has_permission = True
-
-            mixin.has_permission = mocked_has_permission
-            has_permission('view', object(), mixin)
-            self.assertTrue(self.called_has_permission)
-        finally:
-            __show__.on()
 
     def test_no_authentication_policy(self):
         request = self._makeOne()

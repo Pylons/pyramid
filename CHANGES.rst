@@ -142,6 +142,14 @@ Backward Incompatibilities
   and replaced by the ``userid`` argument.
   See https://github.com/Pylons/pyramid/pull/3369
 
+- Removed ``pyramid.security.has_permission``,
+  ``pyramid.security.authenticated_userid``,
+  ``pyramid.security.unauthenticated_userid``, and
+  ``pyramid.security.effective_principals``. These methods were deprecated
+  in Pyramid 1.5 and all have equivalents available as properties on the
+  request. For example, ``request.authenticated_userid``.
+  See https://github.com/Pylons/pyramid/pull/3370
+
 Documentation Changes
 ---------------------
 
