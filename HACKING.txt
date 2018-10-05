@@ -198,9 +198,9 @@ Running Tests
   `pytest`. Run the tests like so:
 
     $ $VENV/bin/pip install pytest
-    $ $VENV/bin/py.test --strict pyramid/
+    $ $VENV/bin/pytest --strict pyramid/
 
-  To run individual tests (i.e., during development), see "py.test usage -
+  To run individual tests (i.e., during development), see "pytest usage -
   Specifying tests / selecting tests":
   http://pytest.org/latest/usage.html#specifying-tests-selecting-tests
 
