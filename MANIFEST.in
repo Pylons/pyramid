@@ -8,9 +8,11 @@ include CONTRIBUTORS.txt LICENSE.txt COPYRIGHT.txt
 
 include contributing.md RELEASING.txt
 include tox.ini appveyor.yml .travis.yml rtd.txt
+graft .github
 
 include HACKING.txt hacking-tox.ini
 include builddocs.sh coverage.sh scaffoldtests.sh
 include TODO.txt
 
 global-exclude __pycache__ *.py[cod]
+global-exclude .DS_Store

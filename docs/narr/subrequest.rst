@@ -232,8 +232,7 @@ unconditionally does the following:
   callable) to the request object to which it is handed.
 
 - It sets request extensions (such as those added via
-  :meth:`~pyramid.config.Configurator.add_request_method` or
-  :meth:`~pyramid.config.Configurator.set_request_property`) on the subrequest
+  :meth:`~pyramid.config.Configurator.add_request_method`) on the subrequest
   object passed as ``request``.
 
 - It causes a :class:`~pyramid.events.NewRequest` event to be sent at the

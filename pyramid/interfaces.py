@@ -960,6 +960,14 @@ class ISession(IDict):
 
     Keys and values of a session must be pickleable.
 
+    .. warning::
+
+       In :app:`Pyramid` 2.0 the session will only be required to support
+       types that can be serialized using JSON. It's recommended to switch any
+       session implementations to support only JSON and to only store primitive
+       types in sessions. See :ref:`pickle_session_deprecation` for more
+       information about why this change is being made.
+
     .. versionchanged:: 1.9
 
        Sessions are no longer required to implement ``get_csrf_token`` and

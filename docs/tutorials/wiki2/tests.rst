@@ -99,14 +99,14 @@ On Unix:
 .. code-block:: bash
 
     rm tutorial.sqlite
-    $VENV/bin/py.test -q
+    $VENV/bin/pytest -q
 
 On Windows:
 
 .. code-block:: doscon
 
     del tutorial.sqlite
-    %VENV%\Scripts\py.test -q
+    %VENV%\Scripts\pytest -q
 
 The expected result should look like the following:
 

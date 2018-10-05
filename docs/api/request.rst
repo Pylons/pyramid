@@ -228,8 +228,7 @@
         handed.
 
       - sets request extensions (such as those added via
-        :meth:`~pyramid.config.Configurator.add_request_method` or
-        :meth:`~pyramid.config.Configurator.set_request_property`) on the
+        :meth:`~pyramid.config.Configurator.add_request_method`) on the
         request it's passed.
 
       - causes a :class:`~pyramid.events.NewRequest` event to be sent at the

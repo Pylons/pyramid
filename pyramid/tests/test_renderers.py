@@ -624,6 +624,20 @@ class Test_get_renderer(unittest.TestCase):
         result = self._callFUT('abc/def.pt', package=pyramid.tests)
         self.assertEqual(result, renderer)
 
+    def test_it_with_registry(self):
+        renderer = self.config.testing_add_renderer(
+            'pyramid.tests:abc/def.pt')
+        result = self._callFUT('abc/def.pt', registry=self.config.registry)
+        self.assertEqual(result, renderer)
+
+    def test_it_with_isolated_registry(self):
+        from pyramid.config import Configurator
+        isolated_config = Configurator()
+        renderer = isolated_config.testing_add_renderer(
+            'pyramid.tests:abc/def.pt')
+        result = self._callFUT('abc/def.pt', registry=isolated_config.registry)
+        self.assertEqual(result, renderer)
+
 class TestJSONP(unittest.TestCase):
     def _makeOne(self, param_name='callback'):
         from pyramid.renderers import JSONP

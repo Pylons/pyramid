@@ -183,13 +183,6 @@ class TestRemember(unittest.TestCase):
         result = self._callFUT(request, 'me')
         self.assertEqual(result, [('X-Pyramid-Test', 'me')])
 
-    def test_with_deprecated_principal_arg(self):
-        request = _makeRequest()
-        registry = request.registry
-        _registerAuthenticationPolicy(registry, 'yo')
-        result = self._callFUT(request, principal='me')
-        self.assertEqual(result, [('X-Pyramid-Test', 'me')])
-
     def test_with_missing_arg(self):
         request = _makeRequest()
         registry = request.registry
