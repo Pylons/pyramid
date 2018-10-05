@@ -51,7 +51,7 @@ System](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/install.h
          git remote add upstream git@github.com:Pylons/pyramid.git
 
 5.  Create a virtual environment and set an environment variable as instructed in the
-    [prerequisites](https://github.com/Pylons/pyramid/blob/master/HACKING.txt#L55-L58).
+    [prerequisites](https://github.com/Pylons/pyramid/blob/master/HACKING.txt#L48-L56).
 
          # Mac and Linux
          $ export VENV=~/hack-on-pyramid/env
