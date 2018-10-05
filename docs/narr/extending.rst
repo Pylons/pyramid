@@ -190,7 +190,7 @@ The general pattern for extending an existing application looks something like
 this:
 
 - Create a new Python package.  The easiest way to do this is to create a new
-  :app:`Pyramid` application using a :term:`cookiecutter`.  See
+  :app:`Pyramid` application using our :term:`cookiecutter`.  See
   :ref:`creating_a_project` for more information.
 
 - In the new package, create Python files containing views and other overridden

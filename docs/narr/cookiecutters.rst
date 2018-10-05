@@ -2,16 +2,24 @@
 
 Pyramid cookiecutters
 =====================
+A :term:`cookiecutter` is a command-line utility that creates projects from :ref:`cookiecutters <cookiecutter:readme>` (project templates).
+
+The Pyramid cookiecutter replaced the deprecated Pyramid scaffolds, and should be used going forward.
+
+`pyramid-cookiecutter-starter <https://github.com/Pylons/pyramid-cookiecutter-starter>`_
 
 .. versionadded:: 1.8
+    Added cookiecutter support.
 
-A :term:`cookiecutter` is a command-line utility that creates projects from :ref:`cookiecutters <cookiecutter:readme>` (project templates), e.g., creating a Python package project from a Python package project template.
+.. deprecated:: 1.8
+    Scaffolds may be removed in a future version of Pyramid.
 
-Pyramid cookiecutters have replaced the now deprecated Pyramid scaffolds, and should be used going forward. Pyramid cookiecutters released under the Pylons Project include:
+.. versionchanged:: 1.10
+    Merged features from ``pyramid-cookiecutter-alchemy`` and ``pyramid-cookiecutter-zodb`` into the single cookiecutter to rule them all, ``pyramid-cookiecutter-starter``.
 
-* `pyramid-cookiecutter-alchemy <https://github.com/Pylons/pyramid-cookiecutter-alchemy>`_
-* `pyramid-cookiecutter-starter <https://github.com/Pylons/pyramid-cookiecutter-starter>`_
-* `pyramid-cookiecutter-zodb <https://github.com/Pylons/pyramid-cookiecutter-zodb>`_
+.. deprecated:: 1.10
+    ``pyramid-cookiecutter-alchemy`` and ``pyramid-cookiecutter-zodb`` are no longer supported.
+    Use ``pyramid-cookiecutter-starter`` going forward.
 
 .. seealso::
 

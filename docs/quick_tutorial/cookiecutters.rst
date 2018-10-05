@@ -4,7 +4,7 @@
 Prelude: Quick Project Startup with Cookiecutters
 =================================================
 
-To ease the process of getting started on a project, the Pylons Project provides :term:`cookiecutter`\ s that generate sample :app:`Pyramid` projects from project templates. These cookiecutters will install :app:`Pyramid` and its dependencies as well. We will still cover many topics of web application development using :app:`Pyramid`, but it's good to know of this facility. This prelude will demonstrate how to get a working :app:`Pyramid` web application running via ``cookiecutter``.
+To ease the process of getting started on a project, the Pylons Project provides a :term:`cookiecutter` that generates sample :app:`Pyramid` projects from project templates. The cookiecutter will install :app:`Pyramid` and its dependencies as well. We will still cover many topics of web application development using :app:`Pyramid`, but it's good to know of this facility. This prelude will demonstrate how to get a working :app:`Pyramid` web application running via ``cookiecutter``.
 
 
 Objectives
@@ -43,6 +43,11 @@ Steps
         2 - chameleon
         3 - mako
         Choose from 1, 2, 3 [1]: 1
+        Select backend:
+        1 - none
+        2 - sqlalchemy
+        3 - zodb
+        Choose from 1, 2, 3 [1]: 1
 
 #.  We then run through the following commands.
 
@@ -79,7 +84,7 @@ Analysis
 ========
 
 Rather than starting from scratch, a cookiecutter can make it easy to get a Python
-project containing a working :app:`Pyramid` application. The Pylons Project provides `several cookiecutters <https://github.com/Pylons?q=pyramid-cookiecutter>`_.
+project containing a working :app:`Pyramid` application.
 
 ``pserve`` is :app:`Pyramid`'s application runner, separating operational details from
 your code. When you install :app:`Pyramid`, a small command program called ``pserve``

@@ -5,21 +5,21 @@ Creating a :app:`Pyramid` Project
 
 As we saw in :ref:`firstapp_chapter`, it's possible to create a :app:`Pyramid`
 application completely manually.  However, it's usually more convenient to use
-a :term:`cookiecutter` to generate a basic :app:`Pyramid` :term:`project`.
+our :term:`cookiecutter` to generate a basic :app:`Pyramid` :term:`project`.
 
 A project is a directory that contains at least one Python :term:`package`.
-You'll use a cookiecutter to create a project, and you'll create your application
-logic within a package that lives inside the project.  Even if your application
-is extremely simple, it is useful to place code that drives the application
-within a package, because (1) a package is more easily extended with new code,
-and (2) an application that lives inside a package can also be distributed more
-easily than one which does not live within a package.
+You'll use the :app:`Pyramid` cookiecutter to create a project, and you'll
+create your application logic within a package that lives inside the project.
+Even if your application is extremely simple, it is useful to place code that
+drives the application within a package, because (1) a package is more easily
+extended with new code, and (2) an application that lives inside a package can
+also be distributed more easily than one which does not live within a package.
 
-The Pylons Project provides several :app:`Pyramid` cookiecutters that you can use to generate a
-project.  Each cookiecutter makes different configuration assumptions about what
-type of application you're trying to construct.
+The Pylons Project provides a :app:`Pyramid` cookiecutter that you can use to
+generate a project.  Our cookiecutter allows several configuration options
+to generate the type of application you're trying to construct.
 
-These cookiecutters are rendered using the ``cookiecutter`` command that you may install.
+This cookiecutter is rendered using the ``cookiecutter`` command that you may install.
 
 .. seealso::
 
@@ -29,36 +29,34 @@ These cookiecutters are rendered using the ``cookiecutter`` command that you may
 .. index::
    single: cookiecutters
    single: pyramid-cookiecutter-starter
-   single: pyramid-cookiecutter-zodb
-   single: pyramid-cookiecutter-alchemy
 
 .. _additional_cookiecutters:
 
 :app:`Pyramid` cookiecutters
 ----------------------------
 
-Pyramid cookiecutters released under the Pylons Project differ from each other on a number of axes:
-
-- the persistence mechanism they offer (no persistence mechanism, :term:`SQLAlchemy` with SQLite, or :term:`ZODB`)
-
-- the mechanism they use to map URLs to code (:term:`URL dispatch` or :term:`traversal`)
+The Pyramid cookiecutter released under the Pylons Project offers the following configuration options:
 
 - templating libraries (:term:`Jinja2`, :term:`Chameleon`, or :term:`Mako`)
 
+- the persistence mechanism (no persistence mechanism, :term:`SQLAlchemy` with SQLite, or :term:`ZODB`)
+
+- the mechanism of mapping URLs to code (:term:`URL dispatch` or :term:`traversal`)
+
 * `pyramid-cookiecutter-starter <https://github.com/Pylons/pyramid-cookiecutter-starter>`_
-* `pyramid-cookiecutter-alchemy <https://github.com/Pylons/pyramid-cookiecutter-alchemy>`_
-* `pyramid-cookiecutter-zodb <https://github.com/Pylons/pyramid-cookiecutter-zodb>`_
 
-These cookiecutters include:
+All configuration options offer a choice of templating language.
 
-``pyramid-cookiecutter-starter``
-    :term:`URL dispatch` for routing and either :term:`Jinja2`, :term:`Chameleon`, or :term:`Mako` for templating
+The configuration of mapping URLs to code (routing) depends on the backend option selected, with additional variations as follows.
 
-``pyramid-cookiecutter-alchemy``
-    SQLite for persistent storage, :term:`SQLAlchemy` for an ORM, :term:`URL dispatch` for routing, and :term:`Jinja2` for templating.
+``none``
+    :term:`URL dispatch` for routing
 
-``pyramid-cookiecutter-zodb``
-    :term:`ZODB` for persistent storage, :term:`traversal` for routing, and :term:`Chameleon` for templating
+``sqlalchemy``
+    SQLite for persistent storage, :term:`SQLAlchemy` for an ORM, :term:`URL dispatch` for routing, and :term:`Alembic` for database migrations
+
+``zodb``
+    :term:`ZODB` for persistent storage and :term:`traversal` for routing
 
 
 .. index::
@@ -77,7 +75,7 @@ In :ref:`installing_chapter`, you created a virtual Python environment via the
 
 We assume that you :ref:`previously installed cookiecutter <cookiecutters>`, following its installation instructions.
 
-We'll choose ``pyramid-cookiecutter-starter`` to start the project.  When we invoke ``cookiecutter``, it will create a directory that represents our project.
+When we invoke ``cookiecutter``, it will create a directory that represents our project.
 
 We assume our current working directory is the value of ``VENV``.
 
@@ -99,6 +97,11 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
     1 - jinja2
     2 - chameleon
     3 - mako
+    Choose from 1, 2, 3 [1]: 1
+    Select backend:
+    1 - none
+    2 - sqlalchemy
+    3 - zodb
     Choose from 1, 2, 3 [1]: 1
 
 We then run through the following commands.
@@ -818,6 +821,8 @@ The ``myproject`` :term:`package` lives inside the ``myproject``
 
 #. A ``tests.py`` module, which contains unit test code for the application.
 
+#. A ``routes.py`` module, which contains routing code for the application.
+
 #. A ``views`` package, which contains view code for the application.
 
 #. A ``static`` directory, which contains static files, including images and CSS.
@@ -853,7 +858,7 @@ also informs Python that the directory which contains it is a *package*.
 
    Within this function, application configuration is performed.
 
-   Line 7 creates an instance of a :term:`Configurator`.
+   Line 7 opens a context manager with an instance of a :term:`Configurator`.
 
    Line 8 adds support for Jinja2 templating bindings, allowing us to
    specify renderers with the ``.jinja2`` extension.
