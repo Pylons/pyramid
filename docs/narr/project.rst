@@ -239,26 +239,26 @@ On Windows:
     %VENV%\Scripts\pip install -e ".[testing]"
 
 Once the testing requirements are installed, then you can run the tests using
-the ``py.test`` command that was just installed in the ``bin`` directory of
+the ``pytest`` command that was just installed in the ``bin`` directory of
 your virtual environment.
 
 On Unix:
 
 .. code-block:: bash
 
-    $VENV/bin/py.test -q
+    $VENV/bin/pytest -q
 
 On Windows:
 
 .. code-block:: doscon
 
-    %VENV%\Scripts\py.test -q
+    %VENV%\Scripts\pytest -q
 
 Here's sample output from a test run on Unix:
 
 .. code-block:: bash
 
-    $VENV/bin/py.test -q
+    $VENV/bin/pytest -q
     ..
     2 passed in 0.47 seconds
 
@@ -266,28 +266,28 @@ The tests themselves are found in the ``tests.py`` module in your ``cookiecutter
 
 .. note::
 
-    The ``-q`` option is passed to the ``py.test`` command to limit the output
+    The ``-q`` option is passed to the ``pytest`` command to limit the output
     to a stream of dots. If you don't pass ``-q``, you'll see verbose test
     result output (which normally isn't very useful).
 
 Alternatively, if you'd like to see test coverage, pass the ``--cov`` option
-to ``py.test``:
+to ``pytest``:
 
 .. code-block:: bash
 
-    $VENV/bin/py.test --cov -q
+    $VENV/bin/pytest --cov -q
 
-Cookiecutters include configuration defaults for ``py.test`` and test coverage.
+Cookiecutters include configuration defaults for ``pytest`` and test coverage.
 These configuration files are ``pytest.ini`` and ``.coveragerc``, located at
 the root of your package. Without these defaults, we would need to specify the
 path to the module on which we want to run tests and coverage.
 
 .. code-block:: bash
 
-    $VENV/bin/py.test --cov=myproject myproject/tests.py -q
+    $VENV/bin/pytest --cov=myproject myproject/tests.py -q
 
-.. seealso:: See py.test's documentation for :ref:`pytest:usage` or invoke
-   ``py.test -h`` to see its full set of options.
+.. seealso:: See ``pytest``'s documentation for :ref:`pytest:usage` or invoke
+   ``pytest -h`` to see its full set of options.
 
 
 .. index::
@@ -1042,7 +1042,7 @@ The ``tests.py`` module includes tests for your application.
    :linenos:
 
 This sample ``tests.py`` file has one unit test and one functional test defined
-within it. These tests are executed when you run ``py.test -q``. You may add
+within it. These tests are executed when you run ``pytest -q``. You may add
 more tests here as you build your application. You are not required to write
 tests to use :app:`Pyramid`. This file is simply provided for convenience and
 example.

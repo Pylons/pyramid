@@ -61,7 +61,7 @@ Steps
 
    .. code-block:: bash
 
-       $VENV/bin/py.test tutorial/tests.py -q
+       $VENV/bin/pytest tutorial/tests.py -q
        .....
        5 passed in 0.30 seconds
 

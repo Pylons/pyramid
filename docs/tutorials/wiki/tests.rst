@@ -51,22 +51,22 @@ follows:
 Running the tests
 =================
 
-We can run these tests by using ``py.test`` similarly to how we did in
+We can run these tests by using ``pytest`` similarly to how we did in
 :ref:`running_tests`. Courtesy of the cookiecutter, our testing dependencies have
-already been satisfied and ``py.test`` and coverage have already been
+already been satisfied and ``pytest`` and coverage have already been
 configured, so we can jump right to running tests.
 
 On Unix:
 
 .. code-block:: bash
 
-    $VENV/bin/py.test -q
+    $VENV/bin/pytest -q
 
 On Windows:
 
 .. code-block:: doscon
 
-    %VENV%\Scripts\py.test -q
+    %VENV%\Scripts\pytest -q
 
 The expected result should look like the following:
 

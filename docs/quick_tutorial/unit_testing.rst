@@ -62,7 +62,7 @@ Steps
    .. code-block:: bash
 
 
-       $VENV/bin/py.test tutorial/tests.py -q
+       $VENV/bin/pytest tutorial/tests.py -q
        .
        1 passed in 0.14 seconds
 
@@ -96,7 +96,7 @@ Extra credit
 ============
 
 #. Change the test to assert that the response status code should be ``404``
-   (meaning, not found). Run ``py.test`` again. Read the error report and see
+   (meaning, not found). Run ``pytest`` again. Read the error report and see
    if you can decipher what it is telling you.
 
 #. As a more realistic example, put the ``tests.py`` back as you found it, and

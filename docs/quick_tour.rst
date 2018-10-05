@@ -675,8 +675,8 @@ the relevant ``.ini`` configuration file.
     :ref:`Quick Tutorial pyramid_debugtoolbar <qtut_debugtoolbar>` and
     :ref:`pyramid_debugtoolbar <toolbar:overview>`
 
-Unit tests and ``py.test``
-==========================
+Unit tests and ``pytest``
+=========================
 
 Yikes! We got this far and we haven't yet discussed tests. This is particularly
 egregious, as Pyramid has had a deep commitment to full test coverage since
@@ -684,7 +684,7 @@ before its release.
 
 Our ``pyramid-cookiecutter-starter`` cookiecutter generated a ``tests.py`` module with
 one unit test and one functional test in it. It also configured ``setup.py`` with test requirements:
-``py.test`` as the test runner, ``WebTest`` for running view tests, and the
+``pytest`` as the test runner, ``WebTest`` for running view tests, and the
 ``pytest-cov`` tool which yells at us for code that isn't tested:
 
 .. literalinclude:: quick_tour/package/setup.py
@@ -701,7 +701,7 @@ We already installed the test requirements when we ran the command ``$VENV/bin/p
 
 .. code-block:: bash
 
-    $VENV/bin/py.test --cov --cov-report=term-missing
+    $VENV/bin/pytest --cov --cov-report=term-missing
 
 This yields the following output.
 
