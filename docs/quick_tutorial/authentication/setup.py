@@ -2,6 +2,7 @@ from setuptools import setup
 
 requires = [
     'bcrypt',
+    'pyramid',
     'pyramid_chameleon',
     'waitress',
 ]

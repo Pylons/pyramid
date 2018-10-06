@@ -35,7 +35,7 @@ Steps
 
        cd ..; cp -r view_classes authentication; cd authentication
 
-#. Add ``bcrypt`` as a dependency in ``authentication/setup.py``:
+#. Add ``bcrypt`` and ``pyramid[pyramid]`` as a dependency in ``authentication/setup.py``:
 
    .. literalinclude:: authentication/setup.py
     :language: python
@@ -104,6 +104,13 @@ Steps
 #. Lets test if only the logged one can see ``Logout`` message:
 
    .. literalinclude:: authentication/tutorial/tests.py
+    :linenos:
+
+#. Add  ``pyramid[pyramid]`` as a test dependency in ``authentication/setup.py``:
+
+   .. literalinclude:: authentication/setup.py
+    :language: python
+    :emphasize-lines: 11
     :linenos:
 
 #. Install testing dependency:
