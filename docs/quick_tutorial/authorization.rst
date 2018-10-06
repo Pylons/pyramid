@@ -74,7 +74,7 @@ Steps
 #. Visit http://localhost:6543/howdy in a browser. You should be asked to
    login.
 
-#. Lets test if the ``editor`` can access howdy and the the ``viewer`` can't.:
+#. Lets test if the ``editor`` can access howdy and the the ``viewer`` can't:
 
    .. literalinclude:: authorization/tutorial/tests.py
        :linenos:
