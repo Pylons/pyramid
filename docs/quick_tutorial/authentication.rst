@@ -106,10 +106,16 @@ Steps
    .. literalinclude:: authentication/tutorial/tests.py
     :linenos:
 
+#. Install testing dependency:
+
+   .. code-block:: bash
+
+       $VENV/bin/pip install -e ".[testing]"
+
 #. Run your Pyramid application tests with:
 
    .. code-block:: bash
-       $VENV/bin/pip install -e ".[testing]"
+
        $VENV/bin/pytest tutorial/tests.py
 
 
