@@ -594,7 +594,14 @@ def make_contextmanager(fn):
 
 
 def takes_one_arg(callee, attr=None, argname=None):
+    ispartial = False
     ismethod = False
+    if isinstance(callee, functools.partial):
+        if attr:
+            raise TypeError('"attr" with a partial function does not make sense')
+        ispartial = True
+        callee_wrapper = callee
+        callee = callee.func
     if attr is None:
         attr = '__call__'
     if inspect.isroutine(callee):
@@ -623,6 +630,10 @@ def takes_one_arg(callee, attr=None, argname=None):
         if not args:
             return False
         args = args[1:]
+
+    if ispartial:
+        args = args[len(callee_wrapper.args):]
+        args = [arg for arg in args if arg not in callee_wrapper.keywords]
 
     if not args:
         return False
