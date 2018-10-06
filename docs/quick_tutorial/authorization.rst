@@ -61,12 +61,6 @@ Steps
    .. literalinclude:: authorization/tutorial/views.py
        :linenos:
 
-#. Run your Pyramid application tests with:
-
-   .. code-block:: bash
-
-       $VENV/bin/pytest tutorial/tests.py
-
 #. Run your Pyramid application with:
 
    .. code-block:: bash
@@ -79,6 +73,17 @@ Steps
 
 #. Visit http://localhost:6543/howdy in a browser. You should be asked to
    login.
+
+#. Lets test if the ``editor`` can access howdy and the the ``viewer`` can't.:
+
+   .. literalinclude:: authorization/tutorial/tests.py
+       :linenos:
+
+#. Run your Pyramid application tests with:
+
+   .. code-block:: bash
+
+       $VENV/bin/pytest tutorial/tests.py
 
 
 Analysis
