@@ -61,6 +61,12 @@ Steps
    .. literalinclude:: authorization/tutorial/views.py
        :linenos:
 
+#. Run your Pyramid application tests with:
+
+   .. code-block:: bash
+
+       $VENV/bin/pytest tutorial/tests.py
+
 #. Run your Pyramid application with:
 
    .. code-block:: bash
