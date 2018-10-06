@@ -639,10 +639,10 @@ def takes_one_arg(callee, attr=None, argname=None):
         return False
 
     if len(args) == 1:
-        return True
+        if not argname or argname in args:
+            return True
 
     if argname:
-
         defaults = argspec[3]
         if defaults is None:
             defaults = ()

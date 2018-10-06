@@ -1107,6 +1107,26 @@ class Test_takes_one_arg(unittest.TestCase):
         self.assertTrue(self._callFUT(partial(func, 1, 2)))
         self.assertFalse(self._callFUT(partial(func, 1, 2, 3)))
 
+        self.assertTrue(self._callFUT(partial(func, a=1, b=2)))
+        self.assertTrue(self._callFUT(partial(func, b=2, c=3)))
+        self.assertTrue(self._callFUT(partial(func, 2, c=3)))
+
+
+    def test_partial_decorated_func_with_argname(self):
+        from functools import partial
+
+        def func(a, b, c):
+            pass
+
+        self.assertFalse(self._callFUT(partial(func, 1, 2), argname='a'))
+        self.assertTrue(self._callFUT(partial(func, 1, 2), argname='c'))
+        self.assertFalse(self._callFUT(partial(func, a=1, c=3), argname='c'))
+        self.assertTrue(self._callFUT(partial(func, a=1, c=3), argname='b'))
+
+        self.assertFalse(self._callFUT(partial(func,), argname='a'))
+        self.assertFalse(self._callFUT(partial(func, a=1), argname='b'))
+        self.assertFalse(self._callFUT(partial(func, a=1, b=2), argname='b'))
+
     def test_partial_decorated_method(self):
         from functools import partial
 
