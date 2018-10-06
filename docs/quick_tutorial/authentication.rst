@@ -103,14 +103,14 @@ Steps
 
 #. Lets test if only the logged one can see ``Logout`` message:
 
-    .. literalinclude:: authentication/tutorial/tests.py
+   .. literalinclude:: authentication/tutorial/tests.py
     :linenos:
 
 #. Run your Pyramid application tests with:
 
-    .. code-block:: bash
+   .. code-block:: bash
 
-        $VENV/bin/pytest tutorial/tests.py
+       $VENV/bin/pytest tutorial/tests.py
 
 
 Analysis
