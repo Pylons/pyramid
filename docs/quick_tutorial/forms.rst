@@ -93,7 +93,7 @@ Steps
 
        $VENV/bin/pytest tutorial/tests.py -q
        ..
-       2 passed in 0.45 seconds
+       6 passed in 0.81 seconds
 
 #. Run your Pyramid application with:
 
