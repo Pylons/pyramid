@@ -107,6 +107,7 @@ Steps
 
  #. Run your Pyramid application tests with:
     .. code-block:: bash
+
         $VENV/bin/pytest tutorial/tests.py
 
 Analysis
