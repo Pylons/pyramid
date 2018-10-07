@@ -159,3 +159,6 @@ Documentation Changes
   https://github.com/Pylons/pyramid/pull/3271,
   https://github.com/Pylons/pyramid/issues/667, and
   https://github.com/Pylons/pyramid/issues/2572
+
+- Added extra tests to the quick tutorial.
+  See https://github.com/Pylons/pyramid/pull/3375

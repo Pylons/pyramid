@@ -22,45 +22,55 @@ Objectives
 Steps
 =====
 
-#. In this step let's start by copying the ``view_class`` step's  directory,
-   and then installing the ``pyramid_jinja2`` add-on.
+#.  In this step let's start by copying the ``view_class`` step's directory from a few steps ago.
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       cd ..; cp -r view_classes jinja2; cd jinja2
-       $VENV/bin/pip install -e .
-       $VENV/bin/pip install pyramid_jinja2
+        cd ..; cp -r view_classes jinja2; cd jinja2
 
-#. We need to include ``pyramid_jinja2`` in ``jinja2/tutorial/__init__.py``:
+#.  Add ``pyramid_jinja2`` to our project's dependencies in ``setup.py``:
 
-   .. literalinclude:: jinja2/tutorial/__init__.py
-       :linenos:
+    .. literalinclude:: jinja2/setup.py
+        :language: python
+        :linenos:
+        :emphasize-lines: 7
 
-#. Our ``jinja2/tutorial/views.py`` simply changes its ``renderer``:
+#.  Install our project and its newly added dependency.
 
-   .. literalinclude:: jinja2/tutorial/views.py
-       :linenos:
+    .. code-block:: bash
 
-#. Add ``jinja2/tutorial/home.jinja2`` as a template:
+        $VENV/bin/pip install -e .
 
-   .. literalinclude:: jinja2/tutorial/home.jinja2
-       :language: html
+#.  We need to include ``pyramid_jinja2`` in ``jinja2/tutorial/__init__.py``:
 
-#. Now run the tests:
+    .. literalinclude:: jinja2/tutorial/__init__.py
+        :linenos:
 
-   .. code-block:: bash
+#.  Our ``jinja2/tutorial/views.py`` simply changes its ``renderer``:
 
-       $VENV/bin/pytest tutorial/tests.py -q
-       ....
-       4 passed in 0.40 seconds
+    .. literalinclude:: jinja2/tutorial/views.py
+        :linenos:
 
-#. Run your Pyramid application with:
+#.  Add ``jinja2/tutorial/home.jinja2`` as a template:
 
-   .. code-block:: bash
+    .. literalinclude:: jinja2/tutorial/home.jinja2
+        :language: html
 
-       $VENV/bin/pserve development.ini --reload
+#.  Now run the tests:
 
-#. Open http://localhost:6543/ in your browser.
+    .. code-block:: bash
+
+        $VENV/bin/pytest tutorial/tests.py -q
+        ....
+        4 passed in 0.40 seconds
+
+#.  Run your Pyramid application with:
+
+    .. code-block:: bash
+
+        $VENV/bin/pserve development.ini --reload
+
+#.  Open http://localhost:6543/ in your browser.
 
 
 Analysis
