@@ -896,7 +896,7 @@ See :ref:`logging_chapter` for more information on logging within
 Making Your Script into a Console Script
 ----------------------------------------
 
-A "console script" is :term:`setuptools` terminology for a script that gets
+A "console script" is :term:`Setuptools` terminology for a script that gets
 installed into the ``bin`` directory of a Python :term:`virtual environment`
 (or "base" Python environment) when a :term:`distribution` which houses that
 script is installed. Because it's installed into the ``bin`` directory of a

@@ -48,7 +48,7 @@ The line in ``[app:main]`` above that says ``use = egg:myproject`` is actually
 shorthand for a longer spelling: ``use = egg:myproject#main``.  The ``#main``
 part is omitted for brevity, as ``#main`` is a default defined by PasteDeploy.
 ``egg:myproject#main`` is a string which has meaning to PasteDeploy.  It points
-at a :term:`setuptools` :term:`entry point` named ``main`` defined in the
+at a :term:`Setuptools` :term:`entry point` named ``main`` defined in the
 ``myproject`` project.
 
 Take a look at the generated ``setup.py`` file for this project.
