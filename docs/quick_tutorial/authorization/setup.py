@@ -8,10 +8,6 @@ requires = [
     'waitress',
 ]
 
-tests_require = [
-    'pyramid[testing]'
-]
-
 setup(name='tutorial',
       install_requires=requires,
       extras_require={
