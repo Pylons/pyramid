@@ -31,77 +31,72 @@ Objectives
 Steps
 =====
 
-#. First we copy the results of the ``view_classes`` step:
+#.  First we copy the results of the ``view_classes`` step:
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       cd ..; cp -r view_classes forms; cd forms
+        cd ..; cp -r view_classes forms; cd forms
 
-#. Let's edit ``forms/setup.py`` to declare a dependency on Deform (which then
-   pulls in Colander as a dependency:
+#.  Let's edit ``forms/setup.py`` to declare a dependency on Deform, which in turn pulls in Colander as a dependency:
 
-   .. literalinclude:: forms/setup.py
-       :emphasize-lines: 4
-       :linenos:
+    .. literalinclude:: forms/setup.py
+        :emphasize-lines: 4
+        :linenos:
 
-#. We can now install our project in development mode:
+#.  We can now install our project in development mode:
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       $VENV/bin/pip install -e .
+        $VENV/bin/pip install -e .
 
-#. Register a static view in ``forms/tutorial/__init__.py`` for Deform's CSS,
-   JavaScript, etc., as well as our demo wiki page's views:
+#.  Register a static view in ``forms/tutorial/__init__.py`` for Deform's CSS, JavaScript, etc., as well as our demo wiki page's views:
 
-   .. literalinclude:: forms/tutorial/__init__.py
-       :linenos:
+    .. literalinclude:: forms/tutorial/__init__.py
+        :linenos:
 
-#. Implement the new views, as well as the form schemas and some dummy data, in
-   ``forms/tutorial/views.py``:
+#.  Implement the new views, as well as the form schemas and some dummy data, in ``forms/tutorial/views.py``:
 
-   .. literalinclude:: forms/tutorial/views.py
-       :linenos:
+    .. literalinclude:: forms/tutorial/views.py
+        :linenos:
 
-#. A template for the top of the "wiki" in ``forms/tutorial/wiki_view.pt``:
+#.  A template for the top of the "wiki" in ``forms/tutorial/wiki_view.pt``:
 
-   .. literalinclude:: forms/tutorial/wiki_view.pt
-       :language: html
-       :linenos:
+    .. literalinclude:: forms/tutorial/wiki_view.pt
+        :language: html
+        :linenos:
 
-#. Another template for adding/editing in
-   ``forms/tutorial/wikipage_addedit.pt``:
+#.  Another template for adding/editing in ``forms/tutorial/wikipage_addedit.pt``:
 
-   .. literalinclude:: forms/tutorial/wikipage_addedit.pt
-       :language: html
-       :linenos:
+    .. literalinclude:: forms/tutorial/wikipage_addedit.pt
+        :language: html
+        :linenos:
 
-#. Add a template at ``forms/tutorial/wikipage_view.pt`` for viewing a wiki
-   page:
+#.  Add a template at ``forms/tutorial/wikipage_view.pt`` for viewing a wiki page:
 
-   .. literalinclude:: forms/tutorial/wikipage_view.pt
-       :language: html
-       :linenos:
+    .. literalinclude:: forms/tutorial/wikipage_view.pt
+        :language: html
+        :linenos:
 
-#. Our tests in ``forms/tutorial/tests.py`` don't run, so let's modify them:
+#.  Our tests in ``forms/tutorial/tests.py`` don't run, so let's modify them:
 
-   .. literalinclude:: forms/tutorial/tests.py
-       :linenos:
+    .. literalinclude:: forms/tutorial/tests.py
+        :linenos:
 
-#. Run the tests:
+#.  Run the tests:
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       $VENV/bin/pytest tutorial/tests.py -q
-       ..
-       2 passed in 0.45 seconds
+        $VENV/bin/pytest tutorial/tests.py -q
+        ..
+        2 passed in 0.45 seconds
 
-#. Run your Pyramid application with:
+#.  Run your Pyramid application with:
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       $VENV/bin/pserve development.ini --reload
+        $VENV/bin/pserve development.ini --reload
 
-#. Open http://localhost:6543/ in a browser.
+#.  Open http://localhost:6543/ in a browser.
 
 
 Analysis
