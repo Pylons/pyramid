@@ -11,19 +11,16 @@ simpler, better application running.
 Background
 ==========
 
-Pyramid has a first-class concept of :ref:`configuration <configuration_narr>`
-distinct from code. This approach is optional, but its presence makes it
-distinct from other Python web frameworks. It taps into Python's ``setuptools``
-library, which establishes conventions for installing and providing "entry
-points" for Python projects. Pyramid uses an entry point to let a Pyramid
-application know where to find the WSGI app.
+Pyramid has a first-class concept of :ref:`configuration <configuration_narr>` distinct from code.
+This approach is optional, but its presence makes it distinct from other Python web frameworks.
+It taps into Python's Setuptools library, which establishes conventions for installing and providing ":term:`entry point`\ s" for Python projects.
+Pyramid uses an :term:`entry point` to let a Pyramid application know where to find the WSGI app.
 
 
 Objectives
 ==========
 
-- Modify our ``setup.py`` to have an entry point telling Pyramid the location
-  of the WSGI app.
+- Modify our ``setup.py`` to have an :term:`entry point` telling Pyramid the location of the WSGI app.
 
 - Create an application driven by an ``.ini`` file.
 
@@ -41,8 +38,7 @@ Steps
 
        cd ..; cp -r package ini; cd ini
 
-#. Our ``ini/setup.py`` needs a setuptools "entry point" in the ``setup()``
-   function:
+#. Our ``ini/setup.py`` needs a setuptools :term:`entry point` in the ``setup()`` function:
 
    .. literalinclude:: ini/setup.py
        :linenos:
@@ -89,8 +85,7 @@ application. Processing then proceeds as described in the Pyramid chapter on
 
 - ``pserve`` looks for ``[app:main]`` and finds ``use = egg:tutorial``.
 
-- The projects's ``setup.py`` has defined an "entry point" (lines 10-13) for the
-  project's "main" entry point of ``tutorial:main``.
+- The projects's ``setup.py`` has defined an :term:`entry point` (lines 10-13) for the project's "main" :term:`entry point` of ``tutorial:main``.
 
 - The ``tutorial`` package's ``__init__`` has a ``main`` function.
 
@@ -133,8 +128,7 @@ Extra credit
 #. Can we have multiple ``.ini`` configuration files for a project? Why might
    you want to do that?
 
-#. The entry point in ``setup.py`` didn't mention ``__init__.py`` when it
-   declared ``tutorial:main`` function. Why not?
+#. The :term:`entry point` in ``setup.py`` didn't mention ``__init__.py`` when it declared ``tutorial:main`` function. Why not?
 
 #. What is the purpose of ``**settings``? What does the ``**`` signify?
 
