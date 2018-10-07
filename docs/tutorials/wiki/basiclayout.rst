@@ -21,7 +21,7 @@ code.
 
 When you run the application using the ``pserve`` command using the
 ``development.ini`` generated configuration file, the application
-configuration points at a setuptools *entry point* described as
+configuration points at a :term:`Setuptools` :term:`entry point` described as
 ``egg:tutorial``.  In our application, because the application's ``setup.py``
 file says so, this entry point happens to be the ``main`` function within the
 file named ``__init__.py``.
