@@ -41,108 +41,100 @@ Objectives
 Steps
 =====
 
-#. We are going to use the forms step as our starting point:
+#.  We are going to use the forms step as our starting point:
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       cd ..; cp -r forms databases; cd databases
+        cd ..; cp -r forms databases; cd databases
 
-#. We need to add some dependencies in ``databases/setup.py`` as well as an
-   "entry point" for the command-line script:
+#.  We need to add some dependencies in ``databases/setup.py`` as well as an :term:`entry point` for the command-line script:
 
-   .. literalinclude:: databases/setup.py
-    :linenos:
+    .. literalinclude:: databases/setup.py
+        :linenos:
+        :emphasize-lines: 8-9, 11, 25-26
 
-   .. note::
+    .. note:: We aren't yet doing ``$VENV/bin/pip install -e .`` because we need to write a script and update configuration first.
 
-     We aren't yet doing ``$VENV/bin/pip install -e .`` as we will change it
-     later.
+#.  Our configuration file at ``databases/development.ini`` wires together some new pieces:
 
-#. Our configuration file at ``databases/development.ini`` wires together some
-   new pieces:
+    .. literalinclude:: databases/development.ini
+        :language: ini
 
-   .. literalinclude:: databases/development.ini
-       :language: ini
+#.  This engine configuration now needs to be read into the application through changes in ``databases/tutorial/__init__.py``:
 
-#. This engine configuration now needs to be read into the application through
-   changes in ``databases/tutorial/__init__.py``:
+    .. literalinclude:: databases/tutorial/__init__.py
+        :linenos:
 
-   .. literalinclude:: databases/tutorial/__init__.py
-       :linenos:
+#.  Make a command-line script at ``databases/tutorial/initialize_db.py`` to initialize the database:
 
-#. Make a command-line script at ``databases/tutorial/initialize_db.py`` to
-   initialize the database:
+    .. literalinclude:: databases/tutorial/initialize_db.py
+        :linenos:
 
-   .. literalinclude:: databases/tutorial/initialize_db.py
-       :linenos:
+#.  Now that we've got all the pieces ready, and because we changed ``setup.py``, we now install all the goodies:
 
-#. Since ``setup.py`` changed, we now run it:
+    .. code-block:: bash
 
-   .. code-block:: bash
+        $VENV/bin/pip install -e .
 
-       $VENV/bin/pip install -e .
+#.  The script references some models in ``databases/tutorial/models.py``:
 
-#. The script references some models in ``databases/tutorial/models.py``:
+    .. literalinclude:: databases/tutorial/models.py
+        :linenos:
 
-   .. literalinclude:: databases/tutorial/models.py
-       :linenos:
+#.  Let's run this console script, thus producing our database and table:
 
-#. Let's run this console script, thus producing our database and table:
+    .. code-block:: bash
 
-   .. code-block:: bash
+        $VENV/bin/initialize_tutorial_db development.ini
 
-       $VENV/bin/initialize_tutorial_db development.ini
-
-       2016-04-16 13:01:33,055 INFO  [sqlalchemy.engine.base.Engine][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-       2016-04-16 13:01:33,055 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-       2016-04-16 13:01:33,056 INFO  [sqlalchemy.engine.base.Engine][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-       2016-04-16 13:01:33,056 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-       2016-04-16 13:01:33,057 INFO  [sqlalchemy.engine.base.Engine][MainThread] PRAGMA table_info("wikipages")
-       2016-04-16 13:01:33,057 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-       2016-04-16 13:01:33,058 INFO  [sqlalchemy.engine.base.Engine][MainThread]
-       CREATE TABLE wikipages (
+        2016-04-16 13:01:33,055 INFO  [sqlalchemy.engine.base.Engine][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+        2016-04-16 13:01:33,055 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+        2016-04-16 13:01:33,056 INFO  [sqlalchemy.engine.base.Engine][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+        2016-04-16 13:01:33,056 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+        2016-04-16 13:01:33,057 INFO  [sqlalchemy.engine.base.Engine][MainThread] PRAGMA table_info("wikipages")
+        2016-04-16 13:01:33,057 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+        2016-04-16 13:01:33,058 INFO  [sqlalchemy.engine.base.Engine][MainThread]
+        CREATE TABLE wikipages (
                uid INTEGER NOT NULL,
                title TEXT,
                body TEXT,
                PRIMARY KEY (uid),
                UNIQUE (title)
-       )
+        )
 
 
-       2016-04-16 13:01:33,058 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-       2016-04-16 13:01:33,059 INFO  [sqlalchemy.engine.base.Engine][MainThread] COMMIT
-       2016-04-16 13:01:33,062 INFO  [sqlalchemy.engine.base.Engine][MainThread] BEGIN (implicit)
-       2016-04-16 13:01:33,062 INFO  [sqlalchemy.engine.base.Engine][MainThread] INSERT INTO wikipages (title, body) VALUES (?, ?)
-       2016-04-16 13:01:33,063 INFO  [sqlalchemy.engine.base.Engine][MainThread] ('Root', '<p>Root</p>')
-       2016-04-16 13:01:33,063 INFO  [sqlalchemy.engine.base.Engine][MainThread] COMMIT
+        2016-04-16 13:01:33,058 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
+        2016-04-16 13:01:33,059 INFO  [sqlalchemy.engine.base.Engine][MainThread] COMMIT
+        2016-04-16 13:01:33,062 INFO  [sqlalchemy.engine.base.Engine][MainThread] BEGIN (implicit)
+        2016-04-16 13:01:33,062 INFO  [sqlalchemy.engine.base.Engine][MainThread] INSERT INTO wikipages (title, body) VALUES (?, ?)
+        2016-04-16 13:01:33,063 INFO  [sqlalchemy.engine.base.Engine][MainThread] ('Root', '<p>Root</p>')
+        2016-04-16 13:01:33,063 INFO  [sqlalchemy.engine.base.Engine][MainThread] COMMIT
 
-#. With our data now driven by SQLAlchemy queries, we need to update our
-   ``databases/tutorial/views.py``:
+#.  With our data now driven by SQLAlchemy queries, we need to update our ``databases/tutorial/views.py``:
 
-   .. literalinclude:: databases/tutorial/views.py
-       :linenos:
+    .. literalinclude:: databases/tutorial/views.py
+        :linenos:
 
-#. Our tests in ``databases/tutorial/tests.py`` changed to include SQLAlchemy
-   bootstrapping:
+#.  Our tests in ``databases/tutorial/tests.py`` changed to include SQLAlchemy bootstrapping:
 
-   .. literalinclude:: databases/tutorial/tests.py
-       :linenos:
+    .. literalinclude:: databases/tutorial/tests.py
+        :linenos:
 
-#. Run the tests in your package using ``pytest``:
+#.  Run the tests in your package using ``pytest``:
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       $VENV/bin/pytest tutorial/tests.py -q
-       ..
-       2 passed in 1.41 seconds
+        $VENV/bin/pytest tutorial/tests.py -q
+        ..
+        2 passed in 1.41 seconds
 
-#. Run your Pyramid application with:
+#.  Run your Pyramid application with:
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       $VENV/bin/pserve development.ini --reload
+        $VENV/bin/pserve development.ini --reload
 
-#. Open http://localhost:6543/ in a browser.
+#.  Open http://localhost:6543/ in a browser.
 
 
 Analysis
