@@ -43,19 +43,17 @@ Glossary
      <http://svn.repoze.org>`_.  Pyramid was originally known as
      :mod:`repoze.bfg`.
 
-   setuptools
-     `Setuptools <http://peak.telecommunity.com/DevCenter/setuptools>`_
+   Setuptools
+     `Setuptools <https://setuptools.readthedocs.io/en/latest/>`_
      builds on Python's ``distutils`` to provide easier building,
-     distribution, and installation of libraries and applications.  As of
-     this writing, setuptools runs under Python 2, but not under Python 3.
-     You can use :term:`distribute` under Python 3 instead.
+     distribution, and installation of libraries and applications.
 
    distribute
-     `Distribute <https://pypi.org/project/distribute/>`_ is a fork of
-     :term:`setuptools` which runs on both Python 2 and Python 3.
+     `Distribute <https://pypi.org/project/distribute/>`_ is a fork of :term:`Setuptools` which runs on both Python 2 and Python 3.
+     It is now in legacy state because :term:`Setuptools` now runs on both Python 2 and 3.
 
    pkg_resources
-     A module which ships with :term:`setuptools` and :term:`distribute` that
+     A module which ships with :term:`Setuptools` and :term:`distribute` that
      provides an API for addressing "asset files" within a Python
      :term:`package`.  Asset files are static files, template files, etc;
      basically anything non-Python-source that lives in a Python package can
@@ -103,7 +101,7 @@ Glossary
      ``easy_install``.
 
    entry point
-     A :term:`setuptools` indirection, defined within a setuptools
+     A :term:`Setuptools` indirection, defined within a Setuptools
      :term:`distribution` setup.py.  It is usually a name which refers
      to a function somewhere in a package which is held by the
      distribution.
@@ -111,7 +109,7 @@ Glossary
    dotted Python name
      A reference to a Python object by name using a string, in the form
      ``path.to.modulename:attributename``.  Often used in Pyramid and
-     setuptools configurations.  A variant is used in dotted names within
+     Setuptools configurations.  A variant is used in dotted names within
      configurator method arguments that name objects (such as the "add_view"
      method's "view" and "context" attributes): the colon (``:``) is not
      used; in its place is a dot.
@@ -977,7 +975,7 @@ Glossary
    distutils
      The standard system for packaging and distributing Python packages.  See
      https://docs.python.org/2/distutils/index.html for more information.
-     :term:`setuptools` is actually an *extension* of the Distutils.
+     :term:`Setuptools` is actually an *extension* of the Distutils.
 
    exception response
      A :term:`response` that is generated as the result of a raised exception

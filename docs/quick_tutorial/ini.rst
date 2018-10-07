@@ -13,7 +13,7 @@ Background
 
 Pyramid has a first-class concept of :ref:`configuration <configuration_narr>` distinct from code.
 This approach is optional, but its presence makes it distinct from other Python web frameworks.
-It taps into Python's Setuptools library, which establishes conventions for installing and providing ":term:`entry point`\ s" for Python projects.
+It taps into Python's :term:`Setuptools` library, which establishes conventions for installing and providing ":term:`entry point`\ s" for Python projects.
 Pyramid uses an :term:`entry point` to let a Pyramid application know where to find the WSGI app.
 
 
@@ -38,7 +38,7 @@ Steps
 
        cd ..; cp -r package ini; cd ini
 
-#. Our ``ini/setup.py`` needs a setuptools :term:`entry point` in the ``setup()`` function:
+#. Our ``ini/setup.py`` needs a :term:`Setuptools` :term:`entry point` in the ``setup()`` function:
 
    .. literalinclude:: ini/setup.py
        :linenos:
