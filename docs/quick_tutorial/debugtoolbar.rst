@@ -38,7 +38,7 @@ Steps
 
         cd ..; cp -r ini debugtoolbar; cd debugtoolbar
 
-#.  Add ``pyramid_debugtoolbar`` to our project dependencies in ``setup.py``:
+#.  Add ``pyramid_debugtoolbar`` to our project's dependencies in ``setup.py``:
 
     .. literalinclude:: debugtoolbar/setup.py
         :language: python
