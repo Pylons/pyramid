@@ -31,31 +31,40 @@ Objectives
 Steps
 =====
 
-#. First we copy the results of the previous step, as well as install the
-   ``webtest`` package:
+#.  First we copy the results of the previous step.
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       cd ..; cp -r unit_testing functional_testing; cd functional_testing
-       $VENV/bin/pip install -e .
-       $VENV/bin/pip install webtest
+        cd ..; cp -r unit_testing functional_testing; cd functional_testing
 
-#. Let's extend ``functional_testing/tutorial/tests.py`` to include a
-   functional test:
+#.  Add ``webtest`` to our project's dependencies in ``setup.py`` as a :term:`Setuptools` "extra":
 
-   .. literalinclude:: functional_testing/tutorial/tests.py
-       :linenos:
+    .. literalinclude:: functional_testing/setup.py
+        :language: python
+        :linenos:
+        :emphasize-lines: 14
 
-   Be sure this file is not executable, or ``pytest`` may not include your
-   tests.
+#.  Install our project and its newly added dependency.
+    Note that we use the extra specifier ``[test]`` to install testing requirements.
+
+    .. code-block:: bash
+
+        $VENV/bin/pip install -e .[test]
+
+#.  Let's extend ``functional_testing/tutorial/tests.py`` to include a functional test:
+
+    .. literalinclude:: functional_testing/tutorial/tests.py
+        :linenos:
+
+    Be sure this file is not executable, or ``pytest`` may not include your tests.
    
-#. Now run the tests:
+#.  Now run the tests:
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       $VENV/bin/pytest tutorial/tests.py -q
-       ..
-       2 passed in 0.25 seconds
+        $VENV/bin/pytest tutorial/tests.py -q
+        ..
+        2 passed in 0.25 seconds
 
 
 Analysis
