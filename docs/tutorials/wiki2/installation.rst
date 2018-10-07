@@ -43,7 +43,7 @@ On Unix
 .. code-block:: bash
 
     cd ~
-    cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout master
+    cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
 
 On Windows
 ^^^^^^^^^^
@@ -51,7 +51,7 @@ On Windows
 .. code-block:: doscon
 
     cd \
-    cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout master
+    cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -59,10 +59,21 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
 
 .. code-block:: text
 
-    You've cloned ~/.cookiecutters/pyramid-cookiecutter-alchemy before.
+    You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
     Is it okay to delete and re-clone it? [yes]: yes
     project_name [Pyramid Scaffold]: myproj
     repo_name [myproj]: tutorial
+    Select template_language:
+    1 - jinja2
+    2 - chameleon
+    3 - mako
+    Choose from 1, 2, 3 [1]: 1
+    Select backend:
+    1 - none
+    2 - sqlalchemy
+    3 - zodb
+    Choose from 1, 2, 3 [1]: 2
+
 
 Change directory into your newly created project
 ------------------------------------------------
@@ -342,22 +353,22 @@ Run the tests
 
 After you've installed the project in development mode as well as the testing
 requirements, you may run the tests for the project. The following commands
-provide options to py.test that specify the module for which its tests shall be
-run, and to run py.test in quiet mode.
+provide options to ``pytest`` that specify the module for which its tests shall be
+run, and to run ``pytest`` in quiet mode.
 
 On Unix
 ^^^^^^^
 
 .. code-block:: bash
 
-    $VENV/bin/py.test -q
+    $VENV/bin/pytest -q
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    %VENV%\Scripts\py.test -q
+    %VENV%\Scripts\pytest -q
 
 For a successful test run, you should see output that ends like this:
 
@@ -370,8 +381,8 @@ For a successful test run, you should see output that ends like this:
 Expose test coverage information
 --------------------------------
 
-You can run the ``py.test`` command to see test coverage information. This
-runs the tests in the same way that ``py.test`` does, but provides additional
+You can run the ``pytest`` command to see test coverage information. This
+runs the tests in the same way that ``pytest`` does, but provides additional
 :term:`coverage` information, exposing which lines of your project are covered by the
 tests.
 
@@ -383,14 +394,14 @@ On Unix
 
 .. code-block:: bash
 
-    $VENV/bin/py.test --cov --cov-report=term-missing
+    $VENV/bin/pytest --cov --cov-report=term-missing
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    c:\tutorial> %VENV%\Scripts\py.test --cov --cov-report=term-missing
+    c:\tutorial> %VENV%\Scripts\pytest --cov --cov-report=term-missing
 
 If successful, you will see output something like this:
 
@@ -429,7 +440,7 @@ Our package doesn't quite have 100% test coverage.
 Test and coverage cookiecutter defaults
 ---------------------------------------
 
-Cookiecutters include configuration defaults for ``py.test`` and test coverage.
+Cookiecutters include configuration defaults for ``pytest`` and test coverage.
 These configuration files are ``pytest.ini`` and ``.coveragerc``, located at
 the root of your package. Without these defaults, we would need to specify the
 path to the module on which we want to run tests and coverage.
@@ -439,22 +450,22 @@ On Unix
 
 .. code-block:: bash
 
-    $VENV/bin/py.test --cov=tutorial tutorial/tests.py -q
+    $VENV/bin/pytest --cov=tutorial tutorial/tests.py -q
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    %VENV%\Scripts\py.test --cov=tutorial tutorial\tests.py -q
+    %VENV%\Scripts\pytest --cov=tutorial tutorial\tests.py -q
 
-py.test follows :ref:`conventions for Python test discovery
+pytest follows :ref:`conventions for Python test discovery
 <pytest:test discovery>`, and the configuration defaults from the cookiecutter
-tell ``py.test`` where to find the module on which we want to run tests and
+tell ``pytest`` where to find the module on which we want to run tests and
 coverage.
 
-.. seealso:: See py.test's documentation for :ref:`pytest:usage` or invoke
-   ``py.test -h`` to see its full set of options.
+.. seealso:: See ``pytest``'s documentation for :ref:`pytest:usage` or invoke
+   ``pytest -h`` to see its full set of options.
 
 
 .. _wiki2-start-the-application:
@@ -508,11 +519,11 @@ page.  You can read more about the purpose of the icon at
 application while you develop.
 
 
-Decisions the ``alchemy`` cookiecutter has made for you
--------------------------------------------------------
+Decisions the cookiecutter backend option ``sqlalchemy`` has made for you
+-------------------------------------------------------------------------
 
-Creating a project using the ``alchemy`` cookiecutter makes the following
-assumptions:
+When creating a project and selecting the backend option of ``sqlalchemy``, the
+cookiecutter makes the following assumptions:
 
 - You are willing to use SQLite for persistent storage, although almost any SQL database could be used with SQLAlchemy.
 
@@ -526,10 +537,6 @@ assumptions:
 
 - You want to use zope.sqlalchemy_, pyramid_tm_, and the transaction_ packages
   to scope sessions to requests.
-
-- You want to use pyramid_jinja2_ to render your templates. Different
-  templating engines can be used, but we had to choose one to make this
-  tutorial. See :ref:`available_template_system_bindings` for some options.
 
 .. note::
 

@@ -17,8 +17,6 @@ Authenticated = 'system.Authenticated'
 Allow = 'Allow'
 Deny = 'Deny'
 
-_marker = object()
-
 class AllPermissionsList(object):
     """ Stand in 'permission list' to represent all permissions """
 
@@ -120,7 +118,7 @@ deprecated(
     '"effective_principals" attribute of the Pyramid request instead.'
     )
 
-def remember(request, userid=_marker, **kw):
+def remember(request, userid, **kw):
     """
     Returns a sequence of header tuples (e.g. ``[('Set-Cookie', 'foo=abc')]``)
     on this request's response.
@@ -143,24 +141,14 @@ def remember(request, userid=_marker, **kw):
     always return an empty sequence. If used, the composition and
     meaning of ``**kw`` must be agreed upon by the calling code and
     the effective authentication policy.
-    
-    .. deprecated:: 1.6
-        Renamed the ``principal`` argument to ``userid`` to clarify its
-        purpose.
+
+    .. versionchanged:: 1.6
+        Deprecated the ``principal`` argument in favor of ``userid`` to clarify
+        its relationship to the authentication policy.
+
+    .. versionchanged:: 1.10
+        Removed the deprecated ``principal`` argument.
     """
-    if userid is _marker:
-        principal = kw.pop('principal', _marker)
-        if principal is _marker:
-            raise TypeError(
-                'remember() missing 1 required positional argument: '
-                '\'userid\'')
-        else:
-            deprecated(
-                'principal',
-                'The "principal" argument was deprecated in Pyramid 1.6. '
-                'It will be removed in Pyramid 1.9. Use the "userid" '
-                'argument instead.')
-            userid = principal
     policy = _get_authentication_policy(request)
     if policy is None:
         return []
@@ -192,7 +180,7 @@ def forget(request):
 
 def principals_allowed_by_permission(context, permission):
     """ Provided a ``context`` (a resource object), and a ``permission``
-    (a string or unicode object), if a :term:`authorization policy` is
+    (a string or unicode object), if an :term:`authorization policy` is
     in effect, return a sequence of :term:`principal` ids that possess
     the permission in the ``context``.  If no authorization policy is
     in effect, this will return a sequence with the single value
@@ -201,7 +189,7 @@ def principals_allowed_by_permission(context, permission):
 
     .. note::
 
-       even if an :term:`authorization policy` is in effect,
+       Even if an :term:`authorization policy` is in effect,
        some (exotic) authorization policies may not implement the
        required machinery for this function; those will cause a
        :exc:`NotImplementedError` exception to be raised when this

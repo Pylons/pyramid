@@ -298,8 +298,8 @@ By defining the ``setup`` callable, we will create the module ``myapp.lib.pshell
         # start a transaction which can be used in the shell
         request.tm.begin()
 
-        # if using the alchemy cookiecutter, the dbsession is connected
-        # to the transaction manager above
+        # if using the SQLAlchemy backend from our cookiecutter, the dbsession is
+        # connected to the transaction manager above
         env['tm'] = request.tm
         env['dbsession'] = request.dbsession
         try:
@@ -896,7 +896,7 @@ See :ref:`logging_chapter` for more information on logging within
 Making Your Script into a Console Script
 ----------------------------------------
 
-A "console script" is :term:`setuptools` terminology for a script that gets
+A "console script" is :term:`Setuptools` terminology for a script that gets
 installed into the ``bin`` directory of a Python :term:`virtual environment`
 (or "base" Python environment) when a :term:`distribution` which houses that
 script is installed. Because it's installed into the ``bin`` directory of a

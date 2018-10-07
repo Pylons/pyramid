@@ -147,7 +147,7 @@ def render_to_response(renderer_name,
 
     return result
 
-def get_renderer(renderer_name, package=None):
+def get_renderer(renderer_name, package=None, registry=None):
     """ Return the renderer object for the renderer ``renderer_name``.
 
     You may supply a relative asset spec as ``renderer_name``.  If
@@ -157,10 +157,16 @@ def get_renderer(renderer_name, package=None):
     asset specification ``renderer_name``.  If ``package`` is ``None``
     (the default), the package name of the *caller* of this function
     will be used as the package.
+
+    You may directly supply an :term:`application registry` using the
+    ``registry`` argument, and it will be used to look up the renderer.
+    Otherwise, the current thread-local registry (obtained via
+    :func:`~pyramid.threadlocal.get_current_registry`) will be used.
     """
     if package is None:
         package = caller_package()
-    helper = RendererHelper(name=renderer_name, package=package)
+    helper = RendererHelper(name=renderer_name, package=package,
+                            registry=registry)
     return helper.renderer
 
 # concrete renderer factory implementations (also API)

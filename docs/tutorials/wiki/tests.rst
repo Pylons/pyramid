@@ -16,16 +16,17 @@ We write tests for the ``model`` classes and the ``appmaker``.  Changing
 we'll write a test class for the ``appmaker``.
 
 To do so, we'll retain the ``tutorial.tests.ViewTests`` class that was
-generated as part of the ``zodb`` cookiecutter.  We'll add three test classes: one
-for the ``Page`` model named ``PageModelTests``, one for the ``Wiki`` model
-named ``WikiModelTests``, and one for the appmaker named ``AppmakerTests``.
+generated from choosing the ``zodb`` backend option.  We'll add three test
+classes: one for the ``Page`` model named ``PageModelTests``, one for the
+``Wiki`` model named ``WikiModelTests``, and one for the appmaker named
+``AppmakerTests``.
 
 Test the views
 ==============
 
 We'll modify our ``tests.py`` file, adding tests for each view function we
-added previously.  As a result, we'll delete the ``ViewTests`` class that
-the ``zodb`` cookiecutter provided, and add four other test classes:
+added previously.  As a result, we'll delete the ``ViewTests`` class that the
+``zodb`` backend option provided, and add four other test classes:
 ``ViewWikiTests``, ``ViewPageTests``, ``AddPageTests``, and ``EditPageTests``.
 These test the ``view_wiki``, ``view_page``, ``add_page``, and ``edit_page``
 views.
@@ -51,22 +52,22 @@ follows:
 Running the tests
 =================
 
-We can run these tests by using ``py.test`` similarly to how we did in
+We can run these tests by using ``pytest`` similarly to how we did in
 :ref:`running_tests`. Courtesy of the cookiecutter, our testing dependencies have
-already been satisfied and ``py.test`` and coverage have already been
+already been satisfied and ``pytest`` and coverage have already been
 configured, so we can jump right to running tests.
 
 On Unix:
 
 .. code-block:: bash
 
-    $VENV/bin/py.test -q
+    $VENV/bin/pytest -q
 
 On Windows:
 
 .. code-block:: doscon
 
-    %VENV%\Scripts\py.test -q
+    %VENV%\Scripts\pytest -q
 
 The expected result should look like the following:
 

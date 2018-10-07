@@ -14,7 +14,7 @@ runner ``pserve``, as well as other commands such as ``pviews``, ``pshell``,
 PasteDeploy is not a particularly integral part of Pyramid.  It's possible to
 create a Pyramid application which does not use PasteDeploy at all.  We show a
 Pyramid application that doesn't use PasteDeploy in :ref:`firstapp_chapter`.
-However, all Pyramid cookiecutters render PasteDeploy configuration files, to
+However, the Pyramid cookiecutter renders PasteDeploy configuration files, to
 provide new developers with a standardized way of setting deployment values,
 and to provide new users with a standardized way of starting, stopping, and
 debugging an application.
@@ -48,7 +48,7 @@ The line in ``[app:main]`` above that says ``use = egg:myproject`` is actually
 shorthand for a longer spelling: ``use = egg:myproject#main``.  The ``#main``
 part is omitted for brevity, as ``#main`` is a default defined by PasteDeploy.
 ``egg:myproject#main`` is a string which has meaning to PasteDeploy.  It points
-at a :term:`setuptools` :term:`entry point` named ``main`` defined in the
+at a :term:`Setuptools` :term:`entry point` named ``main`` defined in the
 ``myproject`` project.
 
 Take a look at the generated ``setup.py`` file for this project.
@@ -75,7 +75,7 @@ In English, this entry point can thus be referred to as a "PasteDeploy
 application factory in the ``myproject`` project which has the entry point
 named ``main`` where the entry point refers to a ``main`` function in the
 ``mypackage`` module".  Indeed, if you open up the ``__init__.py`` module
-generated within any cookiecutter-generated package, you'll see a ``main``
+generated within the cookiecutter-generated package, you'll see a ``main``
 function.  This is the function called by :term:`PasteDeploy` when the
 ``pserve`` command is invoked against our application.  It accepts a global
 configuration object and *returns* an instance of our application.

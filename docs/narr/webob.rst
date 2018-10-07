@@ -345,7 +345,7 @@ against your ``mypackage`` package during application initialization.
 
 .. note::
    This is only an example.  In particular, it is not necessary to cause
-   ``DBSession.remove`` to be called in an application generated from a
+   ``DBSession.remove`` to be called in an application generated from the
    :app:`Pyramid` cookiecutter, because these all use the ``pyramid_tm`` package.
    The cleanup done by ``DBSession.remove`` is unnecessary when ``pyramid_tm``
    :term:`middleware` is configured into the application.

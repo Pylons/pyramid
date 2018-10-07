@@ -57,6 +57,15 @@ Features
 - Add support for Python 3.7. Add testing on Python 3.8 with allowed failures.
   See https://github.com/Pylons/pyramid/pull/3333
 
+- Added ``pyramid.session.JSONSerializer``. See "Upcoming Changes to ISession
+  in Pyramid 2.0" in the "Sessions" chapter of the documentation for more
+  information about this feature.
+  See https://github.com/Pylons/pyramid/pull/3353
+
+- Add a ``registry`` argument to ``pyramid.renderers.get_renderer``
+  to allow users to avoid threadlocals during renderer lookup.
+  See https://github.com/Pylons/pyramid/pull/3358
+
 Bug Fixes
 ---------
 
@@ -78,6 +87,21 @@ Bug Fixes
 
 Deprecations
 ------------
+
+- The ``pyramid.intefaces.ISession`` interface will move to require
+  JSON-serializable objects in Pyramid 2.0. See
+  "Upcoming Changes to ISession in Pyramid 2.0" in the "Sessions" chapter
+  of the documentation for more information about this change.
+  See https://github.com/Pylons/pyramid/pull/3353
+
+- The ``pyramid.session.signed_serialize`` and
+  ``pyramid.session.signed_deserialize`` functions will be removed in Pyramid
+  2.0, along with the removal of
+  ``pyramid.session.UnencryptedCookieSessionFactoryConfig`` which was
+  deprecated in Pyramid 1.5. Please switch to using the
+  ``SignedCookieSessionFactory``, copying the code, or another session
+  implementation if you're still using these features.
+  See https://github.com/Pylons/pyramid/pull/3353
 
 Backward Incompatibilities
 --------------------------
@@ -107,8 +131,23 @@ Backward Incompatibilities
   of previous ``pyramid.httpexceptions.HTTPFound``.
   See https://github.com/Pylons/pyramid/pull/3328
 
+- Removed ``pyramid.config.Configurator.set_request_property`` which had been
+  deprecated since Pyramid 1.5. Instead use
+  ``pyramid.config.Configurator.add_request_method`` with ``reify=True`` or
+  ``property=True``.
+  See https://github.com/Pylons/pyramid/pull/3368
+
+- Removed the ``principal`` keyword argument from
+  ``pyramid.security.remember`` which had been deprecated since Pyramid 1.6
+  and replaced by the ``userid`` argument.
+  See https://github.com/Pylons/pyramid/pull/3369
+
 Documentation Changes
 ---------------------
+
+- Ad support for Read The Docs Ethical Ads.
+  https://github.com/Pylons/pyramid/pull/3360
+  https://docs.readthedocs.io/en/latest/advertising/ethical-advertising.html
 
 - Add support for alembic to the pyramid-cookiecutter-alchemy cookiecutter
   and update the wiki2 tutorial to explain how it works.
@@ -120,3 +159,6 @@ Documentation Changes
   https://github.com/Pylons/pyramid/pull/3271,
   https://github.com/Pylons/pyramid/issues/667, and
   https://github.com/Pylons/pyramid/issues/2572
+
+- Added extra tests to the quick tutorial.
+  See https://github.com/Pylons/pyramid/pull/3375

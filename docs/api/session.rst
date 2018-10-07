@@ -5,15 +5,11 @@
 
 .. automodule:: pyramid.session
 
-  .. autofunction:: signed_serialize
-
-  .. autofunction:: signed_deserialize
-
   .. autofunction:: SignedCookieSessionFactory
-
-  .. autofunction:: UnencryptedCookieSessionFactoryConfig
 
   .. autofunction:: BaseCookieSessionFactory
 
   .. autoclass:: PickleSerializer
+
+  .. autoclass:: JSONSerializer
 

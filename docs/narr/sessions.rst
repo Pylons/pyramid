@@ -57,18 +57,70 @@ using the :meth:`pyramid.config.Configurator.set_session_factory` method.
 .. warning::
 
    By default the :func:`~pyramid.session.SignedCookieSessionFactory`
-   implementation is *unencrypted*.  You should not use it when you keep
-   sensitive information in the session object, as the information can be
-   easily read by both users of your application and third parties who have
-   access to your users' network traffic.  And, if you use this sessioning
-   implementation, and you inadvertently create a cross-site scripting
-   vulnerability in your application, because the session data is stored
-   unencrypted in a cookie, it will also be easier for evildoers to obtain the
-   current user's cross-site scripting token.  In short, use a different
-   session factory implementation (preferably one which keeps session data on
-   the server) for anything but the most basic of applications where "session
-   security doesn't matter", and you are sure your application has no
-   cross-site scripting vulnerabilities.
+   implementation contains the following security concerns:
+
+   - Session data is *unencrypted* (but it is signed / authenticated).
+
+     This means an attacker cannot change the session data, but they can view it.
+     You should not use it when you keep sensitive information in the session object, as the information can be easily read by both users of your application and third parties who have access to your users' network traffic.
+
+     At the very least, use TLS and set ``secure=True`` to avoid arbitrary users on the network from viewing the session contents.
+
+   - If you use this sessioning implementation, and you inadvertently create a cross-site scripting vulnerability in your application, because the session data is stored unencrypted in a cookie, it will also be easier for evildoers to obtain the current user's cross-site scripting token.
+
+     Set ``httponly=True`` to mitigate this vulnerability by hiding the cookie from client-side JavaScript.
+
+   - The default serialization method, while replaceable with something like JSON, is implemented using pickle which can lead to remote code execution if your secret key is compromised.
+
+     To mitigate this, set ``serializer=pyramid.session.JSONSerializer()`` to use :class:`pyramid.session.JSONSerializer`. This option will be the default in :app:`Pyramid` 2.0.
+     See :ref:`pickle_session_deprecation` for more information about this change.
+
+   In short, use a different session factory implementation (preferably one which keeps session data on the server) for anything but the most basic of applications where "session security doesn't matter", you are sure your application has no cross-site scripting vulnerabilities, and you are confident your secret key will not be exposed.
+
+.. index::
+    triple: pickle deprecation; JSON-serializable; ISession interface
+
+.. _pickle_session_deprecation:
+
+Upcoming Changes to ISession in Pyramid 2.0
+-------------------------------------------
+
+In :app:`Pyramid` 2.0 the :class:`pyramid.interfaces.ISession` interface will be changing to require that session implementations only need to support JSON-serializable data types.
+This is a stricter contract than the current requirement that all objects be pickleable and it is being done for security purposes.
+This is a backward-incompatible change.
+Currently, if a client-side session implementation is compromised, it leaves the application vulnerable to remote code execution attacks using specially-crafted sessions that execute code when deserialized.
+
+For users with compatibility concerns, it's possible to craft a serializer that can handle both formats until you are satisfied that clients have had time to reasonably upgrade.
+Remember that sessions should be short-lived and thus the number of clients affected should be small (no longer than an auth token, at a maximum). An example serializer:
+
+.. code-block:: python
+    :linenos:
+
+    from pyramid.session import JSONSerializer
+    from pyramid.session import PickleSerializer
+    from pyramid.session import SignedCookieSessionFactory
+
+    class JSONSerializerWithPickleFallback(object):
+        def __init__(self):
+            self.json = JSONSerializer()
+            self.pickle = PickleSerializer()
+
+        def dumps(self, value):
+            # maybe catch serialization errors here and keep using pickle
+            # while finding spots in your app that are not storing
+            # JSON-serializable objects, falling back to pickle
+            return self.json.dumps(value)
+
+        def loads(self, value):
+            try:
+                return self.json.loads(value)
+            except ValueError:
+                return self.pickle.loads(value)
+
+    # somewhere in your configuration code
+    serializer = JSONSerializerWithPickleFallback()
+    session_factory = SignedCookieSessionFactory(..., serializer=serializer)
+    config.set_session_factory(session_factory)
 
 .. index::
    single: session object
@@ -130,7 +182,7 @@ Some gotchas:
   that they are instances of basic types of objects, such as strings, lists,
   dictionaries, tuples, integers, etc.  If you place an object in a session
   data key or value that is not pickleable, an error will be raised when the
-  session is serialized.
+  session is serialized. Please also see :ref:`pickle_session_deprecation`.
 
 - If you place a mutable value (for example, a list or a dictionary) in a
   session object, and you subsequently mutate that value, you must call the

@@ -53,7 +53,7 @@ Objectives
 Steps
 =====
 
-#. First we copy the results of the previous step:
+#. First we copy the results of the ``templating`` step:
 
    .. code-block:: bash
 
@@ -105,7 +105,7 @@ Steps
 
    .. code-block:: bash
 
-       $VENV/bin/py.test tutorial/tests.py -q
+       $VENV/bin/pytest tutorial/tests.py -q
        ..
        2 passed in 0.40 seconds
 

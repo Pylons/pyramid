@@ -9,8 +9,9 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
     CHANGES = f.read()
 
 requires = [
+    'alembic',
     'plaster_pastedeploy',
-    'pyramid >= 1.9a',
+    'pyramid >= 1.9',
     'pyramid_debugtoolbar',
     'pyramid_jinja2',
     'pyramid_retry',
@@ -23,7 +24,7 @@ requires = [
 
 tests_require = [
     'WebTest >= 1.3.1',  # py3 compat
-    'pytest',
+    'pytest>=3.7.4',
     'pytest-cov',
 ]
 
@@ -54,7 +55,7 @@ setup(
             'main = sqla_demo:main',
         ],
         'console_scripts': [
-            'initialize_sqla_demo_db = sqla_demo.scripts.initializedb:main',
+            'initialize_sqla_demo_db = sqla_demo.scripts.initialize_db:main',
         ],
     },
 )

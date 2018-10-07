@@ -275,7 +275,7 @@ without needing to invoke the actual application configuration implied by its
            
 In the above example, we create a ``MyTest`` test case that inherits from
 :class:`unittest.TestCase`.  If it's in our :app:`Pyramid` application, it will
-be found when ``py.test`` is run.  It has two test methods.
+be found when ``pytest`` is run.  It has two test methods.
 
 The first test method, ``test_view_fn_forbidden`` tests the ``view_fn`` when
 the authentication policy forbids the current user the ``edit`` permission. Its
@@ -365,7 +365,7 @@ Functional tests test your literal application.
 
 In Pyramid, functional tests are typically written using the :term:`WebTest`
 package, which provides APIs for invoking HTTP(S) requests to your application.
-We also like ``py.test`` and ``pytest-cov`` to provide simple testing and
+We also like ``pytest`` and ``pytest-cov`` to provide simple testing and
 coverage reports.
 
 Regardless of which testing :term:`package` you use, be sure to add a
@@ -396,10 +396,10 @@ As always, whenever you change your dependencies, make sure to run the correct
     $VENV/bin/pip install -e ".[testing]"
 
 In your ``MyPackage`` project, your :term:`package` is named ``myproject``
-which contains a ``views`` module, which in turn contains a :term:`view`
+which contains a ``views`` package containing a ``default.py`` module, which in turn contains a :term:`view`
 function ``my_view`` that returns an HTML body when the root URL is invoked:
 
-   .. literalinclude:: myproject/myproject/views.py
+   .. literalinclude:: myproject/myproject/views/default.py
       :linenos:
       :language: python
 

@@ -21,11 +21,11 @@ Basics
 
 A scaffold template is just a bunch of source files and directories on disk. A
 small definition class points at this directory.  It is in turn pointed at by a
-:term:`setuptools` "entry point" which registers the scaffold so it can be
+:term:`Setuptools` "entry point" which registers the scaffold so it can be
 found by the ``pcreate`` command.
 
 To create a scaffold template, create a Python :term:`distribution` to house
-the scaffold which includes a ``setup.py`` that relies on the ``setuptools``
+the scaffold which includes a ``setup.py`` that relies on the :term:`Setuptools`
 package.  See `Packaging and Distributing Projects
 <https://packaging.python.org/tutorials/packaging-projects/>`_ for more information
 about how to do this.  For example, we'll pretend the distribution you create

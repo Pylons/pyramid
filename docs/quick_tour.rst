@@ -19,7 +19,7 @@ Once you have a standard Python environment setup, getting started with Pyramid
 is a breeze. Unfortunately "standard" is not so simple in Python. For this
 Quick Tour, it means `Python <https://www.python.org/downloads/>`_, :mod:`python:venv` (or `virtualenv for
 Python 2.7 <https://virtualenv.pypa.io/en/stable/>`_),
-`pip <https://pypi.org/project/pip/>`_, and `setuptools
+`pip <https://pypi.org/project/pip/>`_, and `Setuptools
 <https://pypi.org/project/setuptools/>`_.
 
 To save a little bit of typing and to be certain that we use the modules,
@@ -498,7 +498,7 @@ So far we have done all of our *Quick Tour* as a single Python file. No Python
 packages, no structure. Most Pyramid projects, though, aren't developed this
 way.
 
-To ease the process of getting started, the Pylons Project provides :term:`cookiecutter`\ s that generate sample Pyramid projects from project templates. These cookiecutters will install Pyramid and its dependencies as well.
+To ease the process of getting started, the Pylons Project provides a :term:`cookiecutter` that generates sample Pyramid projects from project templates. This cookiecutter will install Pyramid and its dependencies as well.
 
 First you'll need to install cookiecutter.
 
@@ -524,6 +524,11 @@ If prompted for the first item, accept the default ``yes`` by hitting return.
     1 - jinja2
     2 - chameleon
     3 - mako
+    Choose from 1, 2, 3 [1]: 1
+    Select backend:
+    1 - none
+    2 - sqlalchemy
+    3 - zodb
     Choose from 1, 2, 3 [1]: 1
 
 We then run through the following commands.
@@ -641,7 +646,7 @@ and earlier we showed ``--reload`` for application reloading.
 available in your browser. Adding it to your project illustrates several points
 about configuration.
 
-The cookiecutter ``pyramid-cookiecutter-starter`` already configured our package to include the
+Our cookiecutter ``pyramid-cookiecutter-starter`` already configured our package to include the
 add-on ``pyramid_debugtoolbar`` in its ``setup.py``:
 
 .. literalinclude:: quick_tour/package/setup.py
@@ -675,8 +680,8 @@ the relevant ``.ini`` configuration file.
     :ref:`Quick Tutorial pyramid_debugtoolbar <qtut_debugtoolbar>` and
     :ref:`pyramid_debugtoolbar <toolbar:overview>`
 
-Unit tests and ``py.test``
-==========================
+Unit tests and ``pytest``
+=========================
 
 Yikes! We got this far and we haven't yet discussed tests. This is particularly
 egregious, as Pyramid has had a deep commitment to full test coverage since
@@ -684,7 +689,7 @@ before its release.
 
 Our ``pyramid-cookiecutter-starter`` cookiecutter generated a ``tests.py`` module with
 one unit test and one functional test in it. It also configured ``setup.py`` with test requirements:
-``py.test`` as the test runner, ``WebTest`` for running view tests, and the
+``pytest`` as the test runner, ``WebTest`` for running view tests, and the
 ``pytest-cov`` tool which yells at us for code that isn't tested:
 
 .. literalinclude:: quick_tour/package/setup.py
@@ -701,7 +706,7 @@ We already installed the test requirements when we ran the command ``$VENV/bin/p
 
 .. code-block:: bash
 
-    $VENV/bin/py.test --cov --cov-report=term-missing
+    $VENV/bin/pytest --cov --cov-report=term-missing
 
 This yields the following output.
 
@@ -755,14 +760,14 @@ Pyramid (for example, when a new request comes in).
 Maybe you would like to log messages in your code? In your Python module,
 import and set up the logging in your ``views.py``:
 
-.. literalinclude:: quick_tour/logging/hello_world/views.py
+.. literalinclude:: quick_tour/logging/hello_world/views/default.py
     :language: python
     :lineno-match:
     :lines: 3-4
 
 You can now, in your code, log messages:
 
-.. literalinclude:: quick_tour/logging/hello_world/views.py
+.. literalinclude:: quick_tour/logging/hello_world/views/default.py
     :language: python
     :lineno-match:
     :lines: 7-8
@@ -819,13 +824,13 @@ Now make a "factory" and pass it to the :term:`configurator`'s
 .. literalinclude:: quick_tour/sessions/hello_world/__init__.py
     :language: python
     :lineno-match:
-    :lines: 10-13
+    :lines: 9-12
     :emphasize-lines: 2-3
 
 Pyramid's :term:`request` object now has a ``session`` attribute that we can
 use in our view code in ``views.py``:
 
-.. literalinclude:: quick_tour/sessions/hello_world/views.py
+.. literalinclude:: quick_tour/sessions/hello_world/views/default.py
     :language: python
     :lineno-match:
     :lines: 7-
@@ -858,16 +863,26 @@ Pyramid and SQLAlchemy are great friends. That friendship includes a cookiecutte
 .. code-block:: bash
 
     cd ~
-    env/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-alchemy --checkout master
+    env/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
 
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
 .. code-block:: text
 
-    You've cloned ~/.cookiecutters/pyramid-cookiecutter-alchemy before.
+    You've cloned ~/.cookiecutters/pyramid-cookiecutter-starter before.
     Is it okay to delete and re-clone it? [yes]: yes
     project_name [Pyramid Scaffold]: sqla_demo
     repo_name [sqla_demo]: sqla_demo
+    Select template_language:
+    1 - jinja2
+    2 - chameleon
+    3 - mako
+    Choose from 1, 2, 3 [1]: 1
+    Select backend:
+    1 - none
+    2 - sqlalchemy
+    3 - zodb
+    Choose from 1, 2, 3 [1]: 2
 
 We then run through the following commands as before.
 

@@ -117,7 +117,7 @@ following options:
    ``py`` that allows users to run any installed version of Python.
 
 .. warning:: After you install Python on Windows, you might need to add the
-   directory where Python and other programs—such as pip, setuptools, and
+   directory where Python and other programs—such as pip, :term:`Setuptools`, and
    cookiecutter—are installed to your environment's ``Path``. This will make it
    possible to invoke them from a command prompt.
 
@@ -262,5 +262,4 @@ What Gets Installed
 When you install :app:`Pyramid`, various libraries such as WebOb, PasteDeploy,
 and others are installed.
 
-Additionally, as chronicled in :ref:`project_narr`, :term:`cookiecutter`\ s will be
-used, which make it easy to start a new :app:`Pyramid` project.
+Additionally, as chronicled in :ref:`project_narr`, our :term:`cookiecutter` will be used, which makes it easy to start a new :app:`Pyramid` project.
