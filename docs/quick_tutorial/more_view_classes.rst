@@ -53,7 +53,7 @@ Objectives
 Steps
 =====
 
-#. First we copy the results of the previous step:
+#. First we copy the results of the ``templating`` step:
 
    .. code-block:: bash
 
