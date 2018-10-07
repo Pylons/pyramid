@@ -32,30 +32,39 @@ Objectives
 Steps
 =====
 
-#. First we copy the results of the previous step, as well as install the
-   ``pyramid_debugtoolbar`` package:
+#.  First we copy the results of the previous step.
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       cd ..; cp -r ini debugtoolbar; cd debugtoolbar
-       $VENV/bin/pip install -e .
-       $VENV/bin/pip install pyramid_debugtoolbar
+        cd ..; cp -r ini debugtoolbar; cd debugtoolbar
 
-#. Our ``debugtoolbar/development.ini`` gets a configuration entry for
-   ``pyramid.includes``:
+#.  Add ``pyramid_debugtoolbar`` to our project dependencies in ``setup.py``:
 
-   .. literalinclude:: debugtoolbar/development.ini
-       :language: ini
-       :linenos:
+    .. literalinclude:: debugtoolbar/setup.py
+        :language: python
+        :linenos:
+        :emphasize-lines: 5
 
-#. Run the WSGI application with:
+#.  Install our project and its newly added dependency.
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       $VENV/bin/pserve development.ini --reload
+        $VENV/bin/pip install -e .
 
-#. Open http://localhost:6543/ in your browser. See the handy
-   toolbar on the right.
+#.  Our ``debugtoolbar/development.ini`` gets a configuration entry for ``pyramid.includes``:
+
+    .. literalinclude:: debugtoolbar/development.ini
+        :language: ini
+        :linenos:
+
+#.  Run the WSGI application with:
+
+    .. code-block:: bash
+
+        $VENV/bin/pserve development.ini --reload
+
+#.  Open http://localhost:6543/ in your browser.
+    See the handy toolbar on the right.
 
 
 Analysis
@@ -93,24 +102,24 @@ temporarily.
 Extra credit
 ============
 
-#. Why don't we add ``pyramid_debugtoolbar`` to the list of
-   ``install_requires`` dependencies in ``debugtoolbar/setup.py``?
+#.  We added ``pyramid_debugtoolbar`` to the list of ``install_requires`` dependencies in ``debugtoolbar/setup.py`` because this tutorial is for development and educational purposes only.
+    In what cases would you *not* want to add ``pyramid_debugtoolbar`` to your dependencies?
 
-#. Introduce a bug into your application. Change:
+#.  Introduce a bug into your application. Change:
 
-   .. code-block:: python
+    .. code-block:: python
 
-       def hello_world(request):
-           return Response('<body><h1>Hello World!</h1></body>')
+        def hello_world(request):
+            return Response('<body><h1>Hello World!</h1></body>')
 
-   to:
+    to:
 
-   .. code-block:: python
+    .. code-block:: python
 
-       def hello_world(request):
-           return xResponse('<body><h1>Hello World!</h1></body>')
+        def hello_world(request):
+            return xResponse('<body><h1>Hello World!</h1></body>')
 
-   Save, and visit http://localhost:6543/ again. Notice the nice traceback
-   display. On the lowest line, click the "screen" icon to the right, and try
-   typing the variable names ``request`` and ``Response``. What else can you
-   discover?
+    Save, and visit http://localhost:6543/ again.
+    Notice the nice traceback display.
+    On the lowest line, click the "screen" icon to the right, and try typing the variable names ``request`` and ``Response``.
+    What else can you discover?
