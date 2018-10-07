@@ -2,6 +2,7 @@ from setuptools import setup
 
 requires = [
     'pyramid',
+    'pyramid_debugtoolbar',
     'waitress',
 ]
 
@@ -11,4 +12,4 @@ setup(name='tutorial',
       [paste.app_factory]
       main = tutorial:main
       """,
-)
+      )

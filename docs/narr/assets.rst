@@ -735,7 +735,7 @@ feature, a :term:`Configurator` API exists named
 - A directory of static files served up by an instance of the
   ``pyramid.static.static_view`` helper class.
 
-- Any other asset (or set of assets) addressed by code that uses the setuptools
+- Any other asset (or set of assets) addressed by code that uses the Setuptools
   :term:`pkg_resources` API.
 
 .. index::

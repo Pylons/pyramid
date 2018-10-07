@@ -43,28 +43,39 @@ Objectives
 Steps
 =====
 
-#. First we copy the results of the previous step, as well as install the
-   ``pytest`` package:
+#.  First we copy the results of the previous step.
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       cd ..; cp -r debugtoolbar unit_testing; cd unit_testing
-       $VENV/bin/pip install -e .
-       $VENV/bin/pip install pytest
+        cd ..; cp -r debugtoolbar unit_testing; cd unit_testing
 
-#. Now we write a simple unit test in ``unit_testing/tutorial/tests.py``:
+#.  Add ``pytest`` to our project's dependencies in ``setup.py`` as a :term:`Setuptools` "extra":
 
-   .. literalinclude:: unit_testing/tutorial/tests.py
-       :linenos:
+    .. literalinclude:: unit_testing/setup.py
+        :language: python
+        :linenos:
+        :emphasize-lines: 11-15
 
-#. Now run the tests:
+#.  Install our project and its newly added dependency.
+    Note that we use the extra specifier ``[test]`` to install testing requirements.
 
-   .. code-block:: bash
+    .. code-block:: bash
+
+        $VENV/bin/pip install -e .[test]
+
+#.  Now we write a simple unit test in ``unit_testing/tutorial/tests.py``:
+
+    .. literalinclude:: unit_testing/tutorial/tests.py
+        :linenos:
+
+#.  Now run the tests:
+
+    .. code-block:: bash
 
 
-       $VENV/bin/pytest tutorial/tests.py -q
-       .
-       1 passed in 0.14 seconds
+        $VENV/bin/pytest tutorial/tests.py -q
+        .
+        1 passed in 0.14 seconds
 
 
 Analysis
@@ -91,6 +102,11 @@ Note that our use of ``pyramid.testing.setUp()`` and
 necessary when your test needs to make use of the ``config`` object (it's a
 Configurator) to add stuff to the configuration state before calling the view.
 
+Finally we've introduced the concept of :term:`Setuptools` extras.
+These are optional or recommended features that may be installed with an "extras" specifier.
+The specifier is the name of a key in a Python dictionary, and is surrounded by square brackets when invoked on the command line.
+The value for the key is a Python list of dependencies.
+
 
 Extra credit
 ============
@@ -114,4 +130,4 @@ Extra credit
 #. Why do we import the ``hello_world`` view function *inside* the
    ``test_hello_world`` method instead of at the top of the module?
 
-.. seealso:: See also :ref:`testing_chapter`
+.. seealso:: See also :ref:`testing_chapter` and `Setuptools Declaring "Extras" (optional features with their own dependencies) <https://setuptools.readthedocs.io/en/latest/setuptools.html#declaring-extras-optional-features-with-their-own-dependencies>`_.
