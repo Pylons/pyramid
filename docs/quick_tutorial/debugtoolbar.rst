@@ -43,7 +43,7 @@ Steps
     .. literalinclude:: debugtoolbar/setup.py
         :language: python
         :linenos:
-        :emphasize-lines: 5
+        :emphasize-lines: 7
 
 #.  Install our project and its newly added dependency.
 
