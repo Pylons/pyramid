@@ -42,7 +42,7 @@ Steps
     .. literalinclude:: functional_testing/setup.py
         :language: python
         :linenos:
-        :emphasize-lines: 14
+        :emphasize-lines: 16
 
 #.  Install our project and its newly added dependency.
     Note that we use the extra specifier ``[testing]`` to install testing requirements and surround it with double quote marks.
