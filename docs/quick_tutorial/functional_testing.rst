@@ -45,11 +45,11 @@ Steps
         :emphasize-lines: 14
 
 #.  Install our project and its newly added dependency.
-    Note that we use the extra specifier ``[test]`` to install testing requirements.
+    Note that we use the extra specifier ``[testing]`` to install testing requirements and surround it with double quote marks.
 
     .. code-block:: bash
 
-        $VENV/bin/pip install -e .[test]
+        $VENV/bin/pip install -e ".[testing]"
 
 #.  Let's extend ``functional_testing/tutorial/tests.py`` to include a functional test:
 
