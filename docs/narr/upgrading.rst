@@ -83,14 +83,13 @@ At the time of a Pyramid version release, each supports all versions of Python
 through the end of their lifespans. The end-of-life for a given version of
 Python is when security updates are no longer released.
 
-- `Python 3.2 Lifespan <https://www.python.org/dev/peps/pep-0392/#lifespan>`_
-  ends February 2016.
-- `Python 3.3 Lifespan <https://www.python.org/dev/peps/pep-0392/#lifespan>`_
-  ends September 2017.
-- `Python 3.4 Lifespan <https://www.python.org/dev/peps/pep-0429/>`_ TBD.
-- `Python 3.5 Lifespan <https://www.python.org/dev/peps/pep-0478/>`_ TBD.
-- `Python 3.6 Lifespan <https://www.python.org/dev/peps/pep-0494/#id4>`_
-  December 2021.
+- `Python 2.7 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2020-01-01.
+- `Python 3.2 Lifespan <https://www.python.org/dev/peps/pep-0392/#lifespan>`_ 2016-02-20.
+- `Python 3.3 Lifespan <https://www.python.org/dev/peps/pep-0398/>`_ 2017-09-29.
+- `Python 3.4 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2019-03-16	.
+- `Python 3.5 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2020-09-13	.
+- `Python 3.6 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2021-12-23.
+- `Python 3.7 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2023-06-27	.
 
 To determine the Python support for a specific release of Pyramid, view its
 ``tox.ini`` file at the root of the repository's version.
