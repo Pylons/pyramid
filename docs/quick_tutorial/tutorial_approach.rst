@@ -36,11 +36,13 @@ Each of the directories in our ``quick_tutorial`` workspace (e.g., ``request_res
 project* (except as noted for the ``hello_world`` step). The ``tutorial``
 directory is a *Python package*.
 
-For most steps you will copy the previous step's directory to a new directory, and change your working directory to the new directory, then install your project:
+For most steps you will copy an earlier step's directory to a new directory, change your working directory to the new directory, then install your project:
 
 .. code-block:: bash
 
     cd ..; cp -r package ini; cd ini
     $VENV/bin/pip install -e .
 
-For a few steps, you won't copy the previous step's directory, but you will still need to install your project with ``$VENV/bin/pip install -e .``.
+For a few steps, you won't copy an earlier step's directory, but you will still need to install your project with ``$VENV/bin/pip install -e .``.
+
+Finally for a few steps, you might add a dependency to your project in its ``setup.py`` file, and then install both the dependency and the project with either ``$VENV/bin/pip install -e .`` or ``$VENV/bin/pip install -e ".[testing]"``.
