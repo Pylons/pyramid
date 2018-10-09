@@ -6,7 +6,6 @@ requires = [
     'deform',
     'pyramid',
     'pyramid_chameleon',
-    'pyramid_debugtoolbar',
     'pyramid_tm',
     'sqlalchemy',
     'waitress',
@@ -16,7 +15,8 @@ requires = [
 # List of dependencies installed via `pip install -e ".[testing]"`
 # by virtue of the Setuptools `extras_require` value in the Python
 # dictionary below.
-tests_require = [
+dev_requires = [
+    'pyramid_debugtoolbar',
     'pytest',
     'webtest',
 ]
@@ -25,7 +25,7 @@ setup(
     name='tutorial',
     install_requires=requires,
     extras_require={
-        'testing': tests_require,
+        'dev': dev_requires,
     },
     entry_points={
         'paste.app_factory': [

@@ -4,13 +4,19 @@ from setuptools import setup
 # by virtue of the Setuptools `install_requires` value below.
 requires = [
     'pyramid',
-    'pyramid_debugtoolbar',
     'waitress',
+]
+
+dev_requires = [
+    'pyramid_debugtoolbar',
 ]
 
 setup(
     name='tutorial',
     install_requires=requires,
+    extras_require={
+        'dev': dev_requires,
+    },
     entry_points={
         'paste.app_factory': [
             'main = tutorial:main'
