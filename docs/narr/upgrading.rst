@@ -84,8 +84,6 @@ through the end of their lifespans. The end-of-life for a given version of
 Python is when security updates are no longer released.
 
 - `Python 2.7 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2020-01-01.
-- `Python 3.2 Lifespan <https://www.python.org/dev/peps/pep-0392/#lifespan>`_ 2016-02-20.
-- `Python 3.3 Lifespan <https://www.python.org/dev/peps/pep-0398/>`_ 2017-09-29.
 - `Python 3.4 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2019-03-16	.
 - `Python 3.5 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2020-09-13	.
 - `Python 3.6 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2021-12-23.
