@@ -1,13 +1,13 @@
 from setuptools import setup
 
-# List of dependencies installed via `pip install -e .`.
+# List of dependencies installed via `pip install -e .`
 # by virtue of the Setuptools `install_requires` value below.
 requires = [
     'pyramid',
     'waitress',
 ]
 
-# List of dependencies installed via `pip install -e ".[testing]"`
+# List of dependencies installed via `pip install -e ".[dev]"`
 # by virtue of the Setuptools `extras_require` value in the Python
 # dictionary below.
 dev_requires = [
