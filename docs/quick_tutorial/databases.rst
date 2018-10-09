@@ -51,7 +51,7 @@ Steps
 
     .. literalinclude:: databases/setup.py
         :linenos:
-        :emphasize-lines: 10-11, 13, 34-36
+        :emphasize-lines: 9-10, 12, 34-36
 
     .. note:: We aren't yet doing ``$VENV/bin/pip install -e .`` because we need to write a script and update configuration first.
 

@@ -33,7 +33,7 @@ Steps
     .. literalinclude:: jinja2/setup.py
         :language: python
         :linenos:
-        :emphasize-lines: 9
+        :emphasize-lines: 8
 
 #.  Install our project and its newly added dependency.
 

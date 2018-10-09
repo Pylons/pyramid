@@ -54,7 +54,7 @@ Steps
     .. literalinclude:: unit_testing/setup.py
         :language: python
         :linenos:
-        :emphasize-lines: 11-16, 21-23
+        :emphasize-lines: 15
 
 #.  Install our project and its newly added dependency.
     Note that we use the extra specifier ``[dev]`` to install testing requirements and surround it with double quote marks.
