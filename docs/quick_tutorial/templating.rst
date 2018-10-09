@@ -42,67 +42,64 @@ Objectives
 Steps
 =====
 
-#. Let's begin by using the previous package as a starting point for a new
-   project:
+#.  Let's begin by using the previous package as a starting point for a new project:
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       cd ..; cp -r views templating; cd templating
+        cd ..; cp -r views templating; cd templating
 
-#. This step depends on ``pyramid_chameleon``, so add it as a dependency in
-   ``templating/setup.py``:
+#.  This step depends on ``pyramid_chameleon``, so add it as a dependency in ``templating/setup.py``:
 
-   .. literalinclude:: templating/setup.py
-       :linenos:
+    .. literalinclude:: templating/setup.py
+        :linenos:
+        :emphasize-lines: 7
 
-#. Now we can activate the development-mode distribution:
+#.  Now we can activate the development-mode distribution:
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       $VENV/bin/pip install -e .
+        $VENV/bin/pip install -e .
 
-#. We need to connect ``pyramid_chameleon`` as a renderer by making a call in
-   the setup of ``templating/tutorial/__init__.py``:
+#.  We need to connect ``pyramid_chameleon`` as a renderer by making a call in the setup of ``templating/tutorial/__init__.py``:
 
-   .. literalinclude:: templating/tutorial/__init__.py
-       :linenos:
+    .. literalinclude:: templating/tutorial/__init__.py
+        :linenos:
 
-#. Our ``templating/tutorial/views.py`` no longer has HTML in it:
+#.  Our ``templating/tutorial/views.py`` no longer has HTML in it:
 
-   .. literalinclude:: templating/tutorial/views.py
-       :linenos:
+    .. literalinclude:: templating/tutorial/views.py
+        :linenos:
 
-#. Instead we have ``templating/tutorial/home.pt`` as a template:
+#.  Instead we have ``templating/tutorial/home.pt`` as a template:
 
-   .. literalinclude:: templating/tutorial/home.pt
-       :language: html
+    .. literalinclude:: templating/tutorial/home.pt
+        :language: html
 
-#. For convenience, change ``templating/development.ini`` to reload templates
-   automatically with ``pyramid.reload_templates``:
+#.  For convenience, change ``templating/development.ini`` to reload templates automatically with ``pyramid.reload_templates``:
 
-   .. literalinclude:: templating/development.ini
-       :language: ini
+    .. literalinclude:: templating/development.ini
+        :language: ini
 
-#. Our unit tests in ``templating/tutorial/tests.py`` can focus on data:
+#.  Our unit tests in ``templating/tutorial/tests.py`` can focus on data:
 
-   .. literalinclude:: templating/tutorial/tests.py
-       :linenos:
+    .. literalinclude:: templating/tutorial/tests.py
+        :linenos:
 
-#. Now run the tests:
+#.  Now run the tests:
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       $VENV/bin/pytest tutorial/tests.py -q
-       ....
-       4 passed in 0.46 seconds
+        $VENV/bin/pytest tutorial/tests.py -q
+        ....
+        4 passed in 0.46 seconds
 
-#. Run your Pyramid application with:
+#.  Run your Pyramid application with:
 
-   .. code-block:: bash
+    .. code-block:: bash
 
-       $VENV/bin/pserve development.ini --reload
+        $VENV/bin/pserve development.ini --reload
 
-#. Open http://localhost:6543/ and http://localhost:6543/howdy in your browser.
+#.  Open http://localhost:6543/ and http://localhost:6543/howdy in your browser.
 
 
 Analysis

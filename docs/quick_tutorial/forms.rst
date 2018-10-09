@@ -40,7 +40,7 @@ Steps
 #.  Let's edit ``forms/setup.py`` to declare a dependency on Deform, which in turn pulls in Colander as a dependency:
 
     .. literalinclude:: forms/setup.py
-        :emphasize-lines: 4
+        :emphasize-lines: 6
         :linenos:
 
 #.  We can now install our project in development mode:
