@@ -45,4 +45,4 @@ For most steps you will copy an earlier step's directory to a new directory, cha
 
 For a few steps, you won't copy an earlier step's directory, but you will still need to install your project with ``$VENV/bin/pip install -e .``.
 
-Finally for a few steps, you might add a dependency to your project in its ``setup.py`` file, and then install both the dependency and the project with either ``$VENV/bin/pip install -e .`` or ``$VENV/bin/pip install -e ".[testing]"``.
+Finally for a few steps, you might add a dependency to your project in its ``setup.py`` file, and then install both the dependency and the project with either ``$VENV/bin/pip install -e .`` or ``$VENV/bin/pip install -e ".[dev]"``.

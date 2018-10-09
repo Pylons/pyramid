@@ -102,8 +102,9 @@ temporarily.
 Extra credit
 ============
 
-#.  We added ``pyramid_debugtoolbar`` to the list of ``install_requires`` dependencies in ``debugtoolbar/setup.py`` because this tutorial is for development and educational purposes only.
-    In what cases would you *not* want to add ``pyramid_debugtoolbar`` to your dependencies?
+#.  We added ``pyramid_debugtoolbar`` to the list of ``dev_requires`` dependencies in ``debugtoolbar/setup.py``.
+    We then installed the dependencies via ``pip install -e ".[dev]"`` by virtue of the Setuptools ``extras_require`` value in the Python dictionary.
+    Why did we add them there instead of in the ``requires`` list?
 
 #.  Introduce a bug into your application. Change:
 

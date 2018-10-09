@@ -57,11 +57,11 @@ Steps
         :emphasize-lines: 11-16, 21-23
 
 #.  Install our project and its newly added dependency.
-    Note that we use the extra specifier ``[testing]`` to install testing requirements and surround it with double quote marks.
+    Note that we use the extra specifier ``[dev]`` to install testing requirements and surround it with double quote marks.
 
     .. code-block:: bash
 
-        $VENV/bin/pip install -e ".[testing]"
+        $VENV/bin/pip install -e ".[dev]"
 
 #.  Now we write a simple unit test in ``unit_testing/tutorial/tests.py``:
 
