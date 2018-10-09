@@ -45,7 +45,7 @@ Steps
         :emphasize-lines: 16
 
 #.  Install our project and its newly added dependency.
-    Note that we use the extra specifier ``[dev]`` to install testing requirements and surround it with double quote marks.
+    Note that we use the extra specifier ``[dev]`` to install testing requirements for development and surround it and the period with double quote marks.
 
     .. code-block:: bash
 

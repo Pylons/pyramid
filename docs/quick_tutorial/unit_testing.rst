@@ -57,7 +57,7 @@ Steps
         :emphasize-lines: 15
 
 #.  Install our project and its newly added dependency.
-    Note that we use the extra specifier ``[dev]`` to install testing requirements and surround it with double quote marks.
+    Note that we use the extra specifier ``[dev]`` to install testing requirements for development and surround it and the period with double quote marks.
 
     .. code-block:: bash
 
@@ -101,11 +101,6 @@ Note that our use of ``pyramid.testing.setUp()`` and
 ``pyramid.testing.tearDown()`` aren't actually necessary here; they are only
 necessary when your test needs to make use of the ``config`` object (it's a
 Configurator) to add stuff to the configuration state before calling the view.
-
-Finally we've introduced the concept of :term:`Setuptools` extras.
-These are optional or recommended features that may be installed with an "extras" specifier.
-The specifier is the name of a key in a Python dictionary, and is surrounded by square brackets when invoked on the command line.
-The value for the key is a Python list of dependencies.
 
 
 Extra credit
