@@ -285,6 +285,23 @@ Non-Predicate Arguments
   are just developing stock Pyramid applications. Pay no attention to the man
   behind the curtain.
 
+``accept``
+  A :term:`media type` that will be matched against the ``Accept`` HTTP request header.
+  If this value is specified, it must be a specific media type such as ``text/html`` or ``text/html;level=1``.
+  If the media type is acceptable by the ``Accept`` header of the request, or if the ``Accept`` header isn't set at all in the request, this predicate will match.
+  If this does not match the ``Accept`` header of the request, view matching continues.
+
+  If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is not taken into consideration when deciding whether or not to invoke the associated view callable.
+
+  The ``accept`` argument is technically not a predicate and does not support wrapping with :func:`pyramid.config.not_`.
+
+  See :ref:`accept_content_negotiation` for more information.
+
+  .. versionchanged:: 1.10
+
+      Specifying a media range is deprecated and will be removed in :app:`Pyramid` 2.0.
+      Use explicit media types to avoid any ambiguities in content negotiation.
+
 ``exception_only``
 
   When this value is ``True``, the ``context`` argument must be a subclass of
@@ -343,20 +360,6 @@ configured view.
   of being invoked if no other route was matched. This is when the
   request/context pair found via :term:`resource location` does not indicate it
   matched any configured route.
-
-``accept``
-  A :term:`media type` that will be matched against the ``Accept`` HTTP request header.
-  If this value is specified, it must be a specific media type, such as ``text/html``.
-  If the media type is acceptable by the ``Accept`` header of the request, or if the ``Accept`` header isn't set at all in the request, this predicate will match.
-  If this does not match the ``Accept`` header of the request, view matching continues.
-
-  If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is not taken into consideration when deciding whether or not to invoke the associated view callable.
-
-  See :ref:`accept_content_negotiation` for more information.
-
-  .. versionchanged:: 1.10
-      Media ranges such as ``text/*`` will now raise :class:`pyramid.exceptions.ConfigurationError`.
-      Previously these values had undefined behavior based on the version of WebOb being used and was never fully supported.
 
 ``request_type``
   This value should be an :term:`interface` that the :term:`request` must

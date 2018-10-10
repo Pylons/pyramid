@@ -542,6 +542,31 @@ class ViewsConfiguratorMixin(object):
           very useful for 'civilians' who are just developing stock Pyramid
           applications. Pay no attention to the man behind the curtain.
 
+        accept
+
+          A :term:`media type` that will be matched against the ``Accept``
+          HTTP request header.  If this value is specified, it must be a
+          specific media type such as ``text/html`` or ``text/html;level=1``.
+          If the media type is acceptable by the ``Accept`` header of the
+          request, or if the ``Accept`` header isn't set at all in the request,
+          this predicate will match. If this does not match the ``Accept``
+          header of the request, view matching continues.
+
+          If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is
+          not taken into consideration when deciding whether or not to invoke
+          the associated view callable.
+
+          The ``accept`` argument is technically not a predicate and does
+          not support wrapping with :func:`pyramid.config.not_`.
+
+          See :ref:`accept_content_negotiation` for more information.
+
+          .. versionchanged:: 1.10
+
+              Specifying a media range is deprecated and will be removed in
+              :app:`Pyramid` 2.0. Use explicit media types to avoid any
+              ambiguities in content negotiation.
+
         exception_only
 
           .. versionadded:: 1.8
@@ -673,28 +698,6 @@ class ViewsConfiguratorMixin(object):
           value must match the header value.  Whether or not the value
           represents a header name or a header name/value pair, the
           case of the header name is not significant.
-
-        accept
-
-          A :term:`media type` that will be matched against the ``Accept``
-          HTTP request header.  This value must be a specific media type such
-          as ``text/html`` or ``text/html;level=1``. If the media type is
-          acceptable by the ``Accept`` header of the request, or if the
-          ``Accept`` header isn't set at all in the request, this predicate
-          will match. If this does not match the ``Accept`` header of the
-          request, view matching continues.
-
-          If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is
-          not taken into consideration when deciding whether or not to invoke
-          the associated view callable.
-
-          See :ref:`accept_content_negotiation` for more information.
-
-          .. versionchanged:: 1.10
-
-              Specifying a media range is deprecated and will be removed in
-              :app:`Pyramid` 2.0. Use explicit media types to avoid any
-              ambiguities in content negotiation.
 
         path_info
 

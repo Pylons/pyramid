@@ -228,16 +228,20 @@ class RoutesConfiguratorMixin(object):
         accept
 
           A :term:`media type` that will be matched against the ``Accept``
-          HTTP request header.  This value may be a specific media type such
-          as ``text/html``, or a list of the same. If the media type is
-          acceptable by the ``Accept`` header of the request, or if the
-          ``Accept`` header isn't set at all in the request, this predicate
-          will match. If this does not match the ``Accept`` header of the
-          request, route matching continues.
+          HTTP request header.  If this value is specified, it may be a
+          specific media type such as ``text/html``, or a list of the same.
+          If the media type is acceptable by the ``Accept`` header of the
+          request, or if the ``Accept`` header isn't set at all in the request,
+          this predicate will match. If this does not match the ``Accept``
+          header of the request, route matching continues.
 
           If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is
           not taken into consideration when deciding whether or not to select
           the route.
+
+          Unlike the ``accept`` argument to
+          :meth:`pyramid.config.Configurator.add_view`, this value is
+          strictly a predicate and supports :func:`pyramid.config.not_`.
 
           .. versionchanged:: 1.10
 
