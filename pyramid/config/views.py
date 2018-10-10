@@ -840,8 +840,8 @@ class ViewsConfiguratorMixin(object):
                     DeprecationWarning,
                     stacklevel=4,
                     )
-            # XXX when media ranges are gone, switch verify=True
-            accept = normalize_accept_offer(accept, verify=False)
+            # XXX when media ranges are gone, switch allow_range=False
+            accept = normalize_accept_offer(accept, allow_range=True)
 
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
@@ -1308,12 +1308,12 @@ class ViewsConfiguratorMixin(object):
                     'cannot compare params across different media types')
 
         def normalize_types(thans):
-            thans = [normalize_accept_offer(o, verify=False) for o in thans]
-            for o in thans:
-                check_type(o)
+            thans = [normalize_accept_offer(than) for than in thans]
+            for than in thans:
+                check_type(than)
             return thans
 
-        value = normalize_accept_offer(value, verify=False)
+        value = normalize_accept_offer(value)
         offer_type, offer_subtype, offer_params = Accept.parse_offer(value)
 
         if weighs_more_than:

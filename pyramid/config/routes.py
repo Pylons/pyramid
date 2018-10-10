@@ -318,8 +318,8 @@ class RoutesConfiguratorMixin(object):
                         DeprecationWarning,
                         stacklevel=3,
                         )
-                # XXX switch this to verify=True when range support is dropped
-                accept = [normalize_accept_offer(accept, verify=False)]
+                # XXX switch this to False when range support is dropped
+                accept = [normalize_accept_offer(accept, allow_range=True)]
 
             else:
                 accept = [
