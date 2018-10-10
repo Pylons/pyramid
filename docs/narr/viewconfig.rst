@@ -1099,14 +1099,21 @@ Default Accept Ordering
 For any set of media type offers with the same ``type/subtype``, the offers with params will weigh more than the bare ``type/subtype`` offer.
 This means that ``text/plain;charset=utf8`` will always be offered before ``text/plain``.
 
-By default, within a given ``type/subtype``, the order of offers is ambiguous. For example, ``text/plain;charset=utf8`` versus ``text/plain;charset=latin1`` are sorted in an unspecified way. Similarly, between media types the order is also unspecified other than the defaults described below. For example, ``image/jpeg`` versus ``image/png`` versus ``application/pdf``. In these cases, the ordering may be controlled using :meth:`pyramid.config.Configurator.add_accept_view_order`. For example, to sort ``text/plain`` higher than ``text/html`` and to prefer a ``charset=utf8`` versus a ``charset=latin-1`` within the ``text/plain`` media type:
+By default, within a given ``type/subtype``, the order of offers is ambiguous.
+For example, ``text/plain;charset=utf8`` versus ``text/plain;charset=latin1`` are sorted in an unspecified way.
+Similarly, between media types the order is also unspecified other than the defaults described below.
+For example, ``image/jpeg`` versus ``image/png`` versus ``application/pdf``.
+In these cases, the ordering may be controlled using :meth:`pyramid.config.Configurator.add_accept_view_order`.
+For example, to sort ``text/plain`` higher than ``text/html`` and to prefer a ``charset=utf8`` versus a ``charset=latin-1`` within the ``text/plain`` media type:
 
 .. code-block:: python
 
     config.add_accept_view_order('text/plain', weighs_more_than='text/html')
     config.add_accept_view_order('text/plain;charset=utf8', weighs_more_than='text/plain;charset=latin-1')
 
-It is an error to try and sort accept headers across levels of specificity. You can only sort a ``type/subtype`` against another ``type/subtype``, not against a ``type/subtype;params``. That ordering is a hard requirement.
+It is an error to try and sort accept headers across levels of specificity.
+You can only sort a ``type/subtype`` against another ``type/subtype``, not against a ``type/subtype;params``.
+That ordering is a hard requirement.
 
 By default, :app:`Pyramid` defines a very simple priority ordering for views that prefers human-readable responses over JSON:
 
