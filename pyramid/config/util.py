@@ -221,16 +221,18 @@ class PredicateList(object):
         return order, preds, phash.hexdigest()
 
 
+def normalize_accept_offer(offer, verify=True):
+    if verify:
+        Accept.parse_offer(offer)
+    return offer.lower()
+
+
 def sort_accept_offers(offers, order=None):
     """
-    Sort a list of offers by specificity and preference.
+    Sort a list of offers by preference.
 
-    Supported offers are of the following forms, ordered by specificity
-    (higher to lower):
-
-    - ``type/subtype;params`` and ``type/subtype``
-    - ``type/*``
-    - ``*/*``
+    For a given ``type/subtype`` category of offers, this algorithm will
+    always sort offers with params higher than the bare offer.
 
     :param offers: A list of offers to be sorted.
     :param order: A weighted list of offers where items closer to the start of
@@ -249,20 +251,10 @@ def sort_accept_offers(offers, order=None):
 
     def offer_sort_key(value):
         """
-        (category, type_weight, params_weight)
-
-        category:
-            1 - foo/bar and foo/bar;params
-            2 - foo/*
-            3 - */*
+        (type_weight, params_weight)
 
         type_weight:
-            if category 1 & 2:
-                - index of type/* in order list
-                - ``max_weight`` if no match is found
-
-            - index of type/subtype in order list
-            - index of type/* in order list + ``max_weight``
+            - index of specific ``type/subtype`` in order list
             - ``max_weight * 2`` if no match is found
 
         params_weight:
@@ -273,17 +265,10 @@ def sort_accept_offers(offers, order=None):
         """
         parsed = Accept.parse_offer(value)
 
-        if value == '*/*':
-            return (3, 0, 0)
-
-        elif parsed.subtype == '*':
-            type_w = find_order_index(value, max_weight)
-            return (2, type_w, 0)
-
-        type_w = find_order_index(parsed.type + '/' + parsed.subtype, None)
-        if type_w is None:
-            type_w = max_weight + find_order_index(
-                parsed.type + '/*', max_weight)
+        type_w = find_order_index(
+            parsed.type + '/' + parsed.subtype,
+            max_weight,
+        )
 
         if parsed.params:
             param_w = find_order_index(value, max_weight)
@@ -291,6 +276,6 @@ def sort_accept_offers(offers, order=None):
         else:
             param_w = max_weight + 1
 
-        return (1, type_w, param_w)
+        return (type_w, param_w)
 
     return sorted(offers, key=offer_sort_key)

@@ -130,10 +130,16 @@ class HeaderPredicate(object):
         return self.val.match(val) is not None
 
 class AcceptPredicate(object):
-    def __init__(self, val, config):
-        if not is_nonstr_iter(val):
-            val = (val,)
-        self.values = val
+    _is_using_deprecated_ranges = False
+
+    def __init__(self, values, config):
+        if not is_nonstr_iter(values):
+            values = (values,)
+        # deprecated media ranges were only supported in versions of the
+        # predicate that didn't support lists, so check it here
+        if len(values) == 1 and '*' in values[0]:
+            self._is_using_deprecated_ranges = True
+        self.values = values
 
     def text(self):
         return 'accept = %s' % (', '.join(self.values),)
@@ -141,6 +147,8 @@ class AcceptPredicate(object):
     phash = text
 
     def __call__(self, context, request):
+        if self._is_using_deprecated_ranges:
+            return self.values[0] in request.accept
         return bool(request.accept.acceptable_offers(self.values))
 
 class ContainmentPredicate(object):

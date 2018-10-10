@@ -1477,6 +1477,25 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request.accept = DummyAccept('text/html')
         self._assertNotFound(wrapper, None, request)
 
+    def test_add_view_with_range_accept_match(self):
+        from pyramid.renderers import null_renderer
+        view = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, accept='text/*', renderer=null_renderer)
+        wrapper = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        request.accept = DummyAccept('text/html', contains=True)
+        self.assertEqual(wrapper(None, request), 'OK')
+
+    def test_add_view_with_range_accept_nomatch(self):
+        view = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, accept='text/*')
+        wrapper = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        request.accept = DummyAccept('application/json', contains=False)
+        self._assertNotFound(wrapper, None, request)
+
     def test_add_view_with_containment_true(self):
         from pyramid.renderers import null_renderer
         from zope.interface import directlyProvides
@@ -2431,20 +2450,19 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         ])
 
     def test_add_accept_view_order_throws_on_wildcard(self):
-        from pyramid.exceptions import ConfigurationError
         config = self._makeOne(autocommit=True)
         self.assertRaises(
-            ConfigurationError, config.add_accept_view_order, '*/*',
+            ValueError, config.add_accept_view_order, '*/*',
         )
 
     def test_add_accept_view_order_throws_on_type_mismatch(self):
         config = self._makeOne(autocommit=True)
         self.assertRaises(
-            ConfigurationError, config.add_accept_view_order,
+            ValueError, config.add_accept_view_order,
             'text/*', weighs_more_than='text/html',
         )
         self.assertRaises(
-            ConfigurationError, config.add_accept_view_order,
+            ValueError, config.add_accept_view_order,
             'text/html', weighs_less_than='application/*',
         )
         self.assertRaises(
@@ -2577,7 +2595,8 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(set(mv.accepts), set(['text/xml', 'text/html']))
         self.assertEqual(mv.views, [(99, 'view2', None), (100, 'view', None)])
         mv.add('view6', 98, accept='text/*')
-        self.assertEqual(mv.media_views['text/*'], [(98, 'view6', None)])
+        self.assertEqual(mv.views, [
+            (98, 'view6', None), (99, 'view2', None), (100, 'view', None)])
 
     def test_add_with_phash(self):
         mv = self._makeOne()
@@ -3503,8 +3522,9 @@ class DummyContext:
     pass
 
 class DummyAccept(object):
-    def __init__(self, *matches):
+    def __init__(self, *matches, **kw):
         self.matches = list(matches)
+        self.contains = kw.pop('contains', False)
 
     def acceptable_offers(self, offers):
         results = []
@@ -3512,6 +3532,9 @@ class DummyAccept(object):
             if match in offers:
                 results.append((match, 1.0))
         return results
+
+    def __contains__(self, value):
+        return self.contains
 
 class DummyConfig:
     def __init__(self):

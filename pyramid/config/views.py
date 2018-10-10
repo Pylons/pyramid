@@ -88,6 +88,7 @@ from pyramid.config.util import (
     action_method,
     DEFAULT_PHASH,
     MAX_ORDER,
+    normalize_accept_offer,
     predvalseq,
     sort_accept_offers,
     )
@@ -125,7 +126,7 @@ class MultiView(object):
                     self.views[i] = (order, view, phash)
                     return
 
-        if accept is None:
+        if accept is None or '*' in accept:
             self.views.append((order, view, phash))
             self.views.sort(key=operator.itemgetter(0))
         else:
@@ -676,8 +677,8 @@ class ViewsConfiguratorMixin(object):
         accept
 
           A :term:`media type` that will be matched against the ``Accept``
-          HTTP request header.  This value may be a specific media type such
-          as ``text/html``, or a range like ``text/*``.  If the media type is
+          HTTP request header.  This value must be a specific media type such
+          as ``text/html`` or ``text/html;level=1``. If the media type is
           acceptable by the ``Accept`` header of the request, or if the
           ``Accept`` header isn't set at all in the request, this predicate
           will match. If this does not match the ``Accept`` header of the
@@ -688,6 +689,12 @@ class ViewsConfiguratorMixin(object):
           the associated view callable.
 
           See :ref:`accept_content_negotiation` for more information.
+
+          .. versionchanged:: 1.10
+
+              Specifying a media range is deprecated and will be removed in
+              :app:`Pyramid` 2.0. Use explicit media types to avoid any
+              ambiguities in content negotiation.
 
         path_info
 
@@ -821,7 +828,17 @@ class ViewsConfiguratorMixin(object):
                 raise ConfigurationError(
                     'A list is not supported in the "accept" view predicate.',
                 )
-            accept = accept.lower()
+            if '*' in accept:
+                warnings.warn(
+                    ('Passing a media range to the "accept" argument of '
+                     'Configurator.add_view is deprecated as of Pyramid 1.10. '
+                     'Use explicit media types to avoid ambiguities in '
+                     'content negotiation that may impact your users.'),
+                    DeprecationWarning,
+                    stacklevel=4,
+                    )
+            # XXX when media ranges are gone, switch verify=True
+            accept = normalize_accept_offer(accept, verify=False)
 
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
@@ -1273,46 +1290,38 @@ class ViewsConfiguratorMixin(object):
         .. versionadded:: 1.10
 
         """
-        if value == '*/*':
-            raise ConfigurationError(
-                'cannot specify an ordering for an offer of */*')
-
-        def normalize_type(type):
-            return type.lower()
-
         def check_type(than):
             than_type, than_subtype, than_params = Accept.parse_offer(than)
-            if (
-                # text/* vs text/plain
-                (offer_subtype == '*') ^ (than_subtype == '*')
-                # text/plain vs text/html;charset=utf8
-                or (bool(offer_params) ^ bool(than_params))
-            ):
+            # text/plain vs text/html;charset=utf8
+            if bool(offer_params) ^ bool(than_params):
                 raise ConfigurationError(
-                    'cannot compare across media range specificity levels')
+                    'cannot compare a media type with params to one without '
+                    'params')
             # text/plain;charset=utf8 vs text/html;charset=utf8
             if offer_params and (
                 offer_subtype != than_subtype or offer_type != than_type
             ):
                 raise ConfigurationError(
-                    'cannot compare params across media types')
+                    'cannot compare params across different media types')
 
-        value = normalize_type(value)
+        def normalize_types(thans):
+            thans = [normalize_accept_offer(o, verify=False) for o in thans]
+            for o in thans:
+                check_type(o)
+            return thans
+
+        value = normalize_accept_offer(value, verify=False)
         offer_type, offer_subtype, offer_params = Accept.parse_offer(value)
 
         if weighs_more_than:
             if not is_nonstr_iter(weighs_more_than):
                 weighs_more_than = [weighs_more_than]
-            weighs_more_than = [normalize_type(w) for w in weighs_more_than]
-            for than in weighs_more_than:
-                check_type(than)
+            weighs_more_than = normalize_types(weighs_more_than)
 
         if weighs_less_than:
             if not is_nonstr_iter(weighs_less_than):
                 weighs_less_than = [weighs_less_than]
-            weighs_less_than = [normalize_type(w) for w in weighs_less_than]
-            for than in weighs_less_than:
-                check_type(than)
+            weighs_less_than = normalize_types(weighs_less_than)
 
         discriminator = ('accept view order', value)
         intr = self.introspectable(

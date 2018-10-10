@@ -113,6 +113,17 @@ Deprecations
   implementation if you're still using these features.
   See https://github.com/Pylons/pyramid/pull/3353
 
+- Media ranges are deprecated in the ``accept`` argument of
+  ``pyramid.config.Configurator.add_route``. Use a list of explicit
+  media types to ``add_route`` to support multiple types.
+
+- Media ranges are deprecated in the ``accept`` argument of
+  ``pyramid.config.Configurator.add_view``.  There is no replacement for
+  ranges to ``add_view``, but after much discussion the workflow is
+  fundamentally ambiguous in the face of various client-supplied values for
+  the ``Accept`` header.
+  See https://github.com/Pylons/pyramid/pull/3326
+
 Backward Incompatibilities
 --------------------------
 

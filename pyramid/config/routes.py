@@ -22,6 +22,7 @@ import pyramid.predicates
 
 from pyramid.config.util import (
     action_method,
+    normalize_accept_offer,
     predvalseq,
 )
 
@@ -228,15 +229,23 @@ class RoutesConfiguratorMixin(object):
 
           A :term:`media type` that will be matched against the ``Accept``
           HTTP request header.  This value may be a specific media type such
-          as ``text/html``, or a range like ``text/*``, or a list of the same.
-          If the media type is acceptable by the ``Accept`` header of the
-          request, or if the ``Accept`` header isn't set at all in the
-          request, this predicate will match. If this does not match the
-          ``Accept`` header of the request, route matching continues.
+          as ``text/html``, or a list of the same. If the media type is
+          acceptable by the ``Accept`` header of the request, or if the
+          ``Accept`` header isn't set at all in the request, this predicate
+          will match. If this does not match the ``Accept`` header of the
+          request, route matching continues.
 
           If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is
           not taken into consideration when deciding whether or not to select
           the route.
+
+          .. versionchanged:: 1.10
+
+              Specifying a media range is deprecated due to changes in WebOb
+              and ambiguities that occur when trying to match ranges against
+              ranges in the ``Accept`` header. Support will be removed in
+              :app:`Pyramid` 2.0. Use a list of specific media types to match
+              more than one type.
 
         effective_principals
 
@@ -297,9 +306,22 @@ class RoutesConfiguratorMixin(object):
 
         if accept is not None:
             if not is_nonstr_iter(accept):
-                accept = [accept]
+                if '*' in accept:
+                    warnings.warn(
+                        ('Passing a media range to the "accept" argument of '
+                         'Configurator.add_route is deprecated as of Pyramid '
+                         '1.10. Use a list of explicit media types.'),
+                        DeprecationWarning,
+                        stacklevel=3,
+                        )
+                # XXX switch this to verify=True when range support is dropped
+                accept = [normalize_accept_offer(accept, verify=False)]
 
-            accept = [accept_option.lower() for accept_option in accept]
+            else:
+                accept = [
+                    normalize_accept_offer(accept_option)
+                    for accept_option in accept
+                ]
 
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried

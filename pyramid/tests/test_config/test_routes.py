@@ -203,6 +203,18 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
         request.accept = DummyAccept('text/html')
         self.assertEqual(predicate(None, request), False)
 
+    def test_add_route_with_wildcard_accept(self):
+        config = self._makeOne(autocommit=True)
+        config.add_route('name', 'path', accept='text/*')
+        route = self._assertRoute(config, 'name', 'path', 1)
+        predicate = route.predicates[0]
+        request = self._makeRequest(config)
+        request.accept = DummyAccept('text/xml', contains=True)
+        self.assertEqual(predicate(None, request), True)
+        request = self._makeRequest(config)
+        request.accept = DummyAccept('application/json', contains=False)
+        self.assertEqual(predicate(None, request), False)
+
     def test_add_route_no_pattern_with_path(self):
         config = self._makeOne(autocommit=True)
         config.add_route('name', path='path')
@@ -270,8 +282,9 @@ class DummyRequest:
         self.cookies = {}
 
 class DummyAccept(object):
-    def __init__(self, *matches):
+    def __init__(self, *matches, **kw):
         self.matches = list(matches)
+        self.contains = kw.pop('contains', False)
 
     def acceptable_offers(self, offers):
         results = []
@@ -279,3 +292,6 @@ class DummyAccept(object):
             if match in offers:
                 results.append((match, 1.0))
         return results
+
+    def __contains__(self, value):
+        return self.contains
