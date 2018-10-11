@@ -1039,8 +1039,7 @@ Accept Header Content Negotiation
 ---------------------------------
 
 The ``accept`` argument to :meth:`pyramid.config.Configurator.add_view` can be used to control :term:`view lookup` by dispatching to different views based on the HTTP ``Accept`` request header.
-Consider the example below in which there are three defined views.
-Each view uses the ``Accept`` header to trigger an appropriate response renderer.
+Consider the example below in which there are three views configured.
 
 .. code-block:: python
 
@@ -1058,16 +1057,19 @@ Each view uses the ``Accept`` header to trigger an appropriate response renderer
     def myview_unacceptable(request):
         raise HTTPNotAcceptable
 
-The appropriate view is selected here when the client specifies an unambiguous header such as ``Accept: text/*`` or ``Accept: application/json``.
+Each view relies on the ``Accept`` header to trigger an appropriate response renderer.
+The appropriate view is selected here when the client specifies headers such as ``Accept: text/*`` or ``Accept: application/json, text/html;q=0.9`` in which only one of the views matches or it's clear based on the preferences which one should win.
 Similarly, if the client specifies a media type that no view is registered to handle, such as ``Accept: text/plain``, it will fall through to ``myview_unacceptable`` and raise ``406 Not Acceptable``.
-There are a few cases in which the client may specify ambiguous constraints:
+
+There are a few cases in which the client may specify an ``Accept`` header such that it's not clear which view should win.
+For example:
 
 - ``Accept: */*``.
 - More than one acceptable media type with the same quality.
 - A missing ``Accept`` header.
 - An invalid ``Accept`` header.
 
-In these cases the preferred view is not clearly defined (see :rfc:`7231#section-5.3.2`) and :app:`Pyramid` will select one semi-randomly.
+In these cases the preferred view is not clearly defined (see :rfc:`7231#section-5.3.2`) and :app:`Pyramid` will select one randomly.
 This can be controlled by telling :app:`Pyramid` what the preferred relative ordering is between various media types by using :meth:`pyramid.config.Configurator.add_accept_view_order`.
 For example:
 
@@ -1085,7 +1087,7 @@ For example:
         config.scan()
         return config.make_wsgi_app()
 
-In this case, the ``application/json`` view should always be selected in cases where it is otherwise ambiguous.
+Now, the ``application/json`` view should always be preferred in cases where the client wasn't clear.
 
 .. index::
     single: default accept ordering
@@ -1099,8 +1101,8 @@ Default Accept Ordering
 For any set of media type offers with the same ``type/subtype``, the offers with params will weigh more than the bare ``type/subtype`` offer.
 This means that ``text/plain;charset=utf8`` will always be offered before ``text/plain``.
 
-By default, within a given ``type/subtype``, the order of offers is ambiguous.
-For example, ``text/plain;charset=utf8`` versus ``text/plain;charset=latin1`` are sorted in an unspecified way.
+By default, within a given ``type/subtype``, the order of offers is unspecified.
+For example, ``text/plain;charset=utf8`` versus ``text/plain;charset=latin1`` are sorted randomly.
 Similarly, between media types the order is also unspecified other than the defaults described below.
 For example, ``image/jpeg`` versus ``image/png`` versus ``application/pdf``.
 In these cases, the ordering may be controlled using :meth:`pyramid.config.Configurator.add_accept_view_order`.
@@ -1108,6 +1110,8 @@ For example, to sort ``text/plain`` higher than ``text/html`` and to prefer a ``
 
 .. code-block:: python
 
+    config.add_accept_view_order('text/html')
+    config.add_accept_view_order('text/plain;charset=latin-1')
     config.add_accept_view_order('text/plain', weighs_more_than='text/html')
     config.add_accept_view_order('text/plain;charset=utf8', weighs_more_than='text/plain;charset=latin-1')
 
