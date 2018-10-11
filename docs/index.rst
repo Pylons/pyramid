@@ -4,11 +4,10 @@
 The Pyramid Web Framework
 =========================
 
-:app:`Pyramid` is a small, fast, down-to-earth Python web framework.  It is
-developed as part of the `Pylons Project <https://pylonsproject.org>`_.
-It is licensed under a `BSD-like license <http://repoze.org/license.html>`_.
+:app:`Pyramid` 是一个小型，快速，接地气的 web 框架.  它是作为 `Pylons Project <https://pylonsproject.org>`的一部分而被开发.
+它是基于 `BSD-like 许可 <http://repoze.org/license.html>`_.
 
-Here is one of the simplest :app:`Pyramid` applications you can make:
+这是一个最简单的 :app:`Pyramid` 程序例子:
 
 .. literalinclude:: narr/helloworld.py
 
