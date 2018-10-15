@@ -27,8 +27,8 @@ class TestRenderingConfiguratorMixin(unittest.TestCase):
     def test_add_renderer_dottedname_factory(self):
         from pyramid.interfaces import IRendererFactory
         config = self._makeOne(autocommit=True)
-        import pyramid.tests.test_config
-        config.add_renderer('name', 'pyramid.tests.test_config')
+        import tests.test_config
+        config.add_renderer('name', 'tests.test_config')
         self.assertEqual(config.registry.getUtility(IRendererFactory, 'name'),
-                         pyramid.tests.test_config)
+                         tests.test_config)
 

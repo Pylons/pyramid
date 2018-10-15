@@ -299,11 +299,11 @@ class Test_InstancePropertyMixin(unittest.TestCase):
 
     def test_new_class_keeps_parent_module_name(self):
         foo = self._makeOne()
-        self.assertEqual(foo.__module__, 'pyramid.tests.test_util')
-        self.assertEqual(foo.__class__.__module__, 'pyramid.tests.test_util')
+        self.assertEqual(foo.__module__, 'tests.test_util')
+        self.assertEqual(foo.__class__.__module__, 'tests.test_util')
         foo.set_property(lambda _: 1, name='x', reify=True)
-        self.assertEqual(foo.__module__, 'pyramid.tests.test_util')
-        self.assertEqual(foo.__class__.__module__, 'pyramid.tests.test_util')
+        self.assertEqual(foo.__module__, 'tests.test_util')
+        self.assertEqual(foo.__class__.__module__, 'tests.test_util')
 
 class Test_WeakOrderedSet(unittest.TestCase):
     def _makeOne(self):
@@ -469,18 +469,18 @@ class Test_object_description(unittest.TestCase):
     def test_method(self):
         self.assertEqual(
             self._callFUT(self.test_method),
-            'method test_method of class pyramid.tests.test_util.'
+            'method test_method of class tests.test_util.'
             'Test_object_description')
 
     def test_class(self):
         self.assertEqual(
             self._callFUT(self.__class__),
-            'class pyramid.tests.test_util.Test_object_description')
+            'class tests.test_util.Test_object_description')
 
     def test_function(self):
         self.assertEqual(
             self._callFUT(dummyfunc),
-            'function pyramid.tests.test_util.dummyfunc')
+            'function tests.test_util.dummyfunc')
 
     def test_instance(self):
         inst = Dummy()

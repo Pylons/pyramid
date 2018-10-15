@@ -1,5 +1,5 @@
 import unittest
-from pyramid.tests.test_scripts import dummy
+from . import dummy
 
 class TestPRequestCommand(unittest.TestCase):
     def _getTargetClass(self):

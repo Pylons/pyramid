@@ -26,5 +26,5 @@ def includeme(config):
     config.add_route('foo2', '/foo/')
     config.add_route('bar', '/bar/')
     config.add_route('baz', '/baz')
-    config.scan('pyramid.tests.pkgs.notfoundview')
+    config.scan('tests.pkgs.notfoundview')
     

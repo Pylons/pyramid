@@ -14,14 +14,14 @@ class Test_resolve_asset_spec(unittest.TestCase):
         self.assertEqual(package_name, None)
 
     def test_rel_spec(self):
-        pkg = 'pyramid.tests'
+        pkg = 'tests'
         path = 'test_asset.py'
         package_name, filename = self._callFUT(path, pkg)
-        self.assertEqual(package_name, 'pyramid.tests')
+        self.assertEqual(package_name, 'tests')
         self.assertEqual(filename, 'test_asset.py')
         
     def test_abs_spec(self):
-        pkg = 'pyramid.tests'
+        pkg = 'tests'
         path = 'pyramid.nottests:test_asset.py'
         package_name, filename = self._callFUT(path, pkg)
         self.assertEqual(package_name, 'pyramid.nottests')
@@ -35,11 +35,11 @@ class Test_resolve_asset_spec(unittest.TestCase):
         self.assertEqual(filename, 'test_asset.py')
 
     def test_package_name_is_package_object(self):
-        import pyramid.tests
-        pkg = pyramid.tests
+        import tests
+        pkg = tests
         path = 'test_asset.py'
         package_name, filename = self._callFUT(path, pkg)
-        self.assertEqual(package_name, 'pyramid.tests')
+        self.assertEqual(package_name, 'tests')
         self.assertEqual(filename, 'test_asset.py')
 
 
@@ -57,7 +57,7 @@ class Test_abspath_from_asset_spec(unittest.TestCase):
         self.assertEqual(result, '/abc')
 
     def test_pkgrelative(self):
-        result = self._callFUT('abc', 'pyramid.tests')
+        result = self._callFUT('abc', 'tests')
         self.assertEqual(result, os.path.join(here, 'abc'))
 
 class Test_asset_spec_from_abspath(unittest.TestCase):
@@ -72,13 +72,13 @@ class Test_asset_spec_from_abspath(unittest.TestCase):
 
     def test_abspath_startswith_package_path(self):
         abspath = os.path.join(here, 'fixtureapp')
-        pkg = DummyPackage('pyramid.tests')
+        pkg = DummyPackage('tests')
         pkg.__file__ = 'file'
         result = self._callFUT(abspath, pkg)
-        self.assertEqual(result, 'pyramid:fixtureapp')
+        self.assertEqual(result, 'tests:fixtureapp')
 
     def test_abspath_doesnt_startwith_package_path(self):
-        pkg = DummyPackage('pyramid.tests')
+        pkg = DummyPackage('tests')
         result = self._callFUT(here, pkg)
         self.assertEqual(result, here)
 

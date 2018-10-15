@@ -1,6 +1,6 @@
 import os
 import unittest
-from pyramid.tests.test_scripts import dummy
+from . import dummy
 
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -55,7 +55,7 @@ class TestPServeCommand(unittest.TestCase):
         inst = self._makeOne('development.ini')
         loader = self.loader('/base/path.ini')
         loader.settings = {'pserve': {
-            'watch_files': 'foo\n/baz\npyramid.tests.test_scripts:*.py',
+            'watch_files': 'foo\n/baz\ntests.test_scripts:*.py',
         }}
         inst.pserve_file_config(loader, global_conf={'a': '1'})
         self.assertEqual(loader.calls[0]['defaults'], {

@@ -48,7 +48,7 @@ class WGSIAppPlusViewConfigTests(unittest.TestCase):
         from pyramid.interfaces import IView
         from pyramid.interfaces import IViewClassifier
         from pyramid.config import Configurator
-        from pyramid.tests import test_integration
+        from . import test_integration
         config = Configurator()
         config.scan(test_integration)
         config.commit()
@@ -189,7 +189,7 @@ class StaticAppBase(IntegrationBase):
         self.testapp.get('/%2F/test_integration.py', status=404)
 
 class TestEventOnlySubscribers(IntegrationBase, unittest.TestCase):
-    package = 'pyramid.tests.pkgs.eventonly'
+    package = 'tests.pkgs.eventonly'
 
     def test_sendfoo(self):
         res = self.testapp.get('/sendfoo', status=200)
@@ -201,10 +201,10 @@ class TestEventOnlySubscribers(IntegrationBase, unittest.TestCase):
                          [b'foobar', b'foobar2', b'foobaryup', b'foobaryup2'])
 
 class TestStaticAppUsingAbsPath(StaticAppBase, unittest.TestCase):
-    package = 'pyramid.tests.pkgs.static_abspath'
+    package = 'tests.pkgs.static_abspath'
 
 class TestStaticAppUsingAssetSpec(StaticAppBase, unittest.TestCase):
-    package = 'pyramid.tests.pkgs.static_assetspec'
+    package = 'tests.pkgs.static_assetspec'
 
 class TestStaticAppNoSubpath(unittest.TestCase):
     staticapp = static_view(os.path.join(here, 'fixtures'), use_subpath=False)
@@ -231,7 +231,7 @@ class TestStaticAppNoSubpath(unittest.TestCase):
         _assertBody(result.body, os.path.join(here, 'fixtures/minimal.txt'))
 
 class TestStaticAppWithRoutePrefix(IntegrationBase, unittest.TestCase):
-    package = 'pyramid.tests.pkgs.static_routeprefix'
+    package = 'tests.pkgs.static_routeprefix'
 
     def test_includelevel1(self):
         res = self.testapp.get('/static/minimal.txt', status=200)
@@ -245,7 +245,7 @@ class TestStaticAppWithRoutePrefix(IntegrationBase, unittest.TestCase):
 
 
 class TestFixtureApp(IntegrationBase, unittest.TestCase):
-    package = 'pyramid.tests.pkgs.fixtureapp'
+    package = 'tests.pkgs.fixtureapp'
     def test_another(self):
         res = self.testapp.get('/another.html', status=200)
         self.assertEqual(res.body, b'fixture')
@@ -265,8 +265,8 @@ class TestFixtureApp(IntegrationBase, unittest.TestCase):
         self.testapp.get('/protected.html', status=403)
 
 class TestStaticPermApp(IntegrationBase, unittest.TestCase):
-    package = 'pyramid.tests.pkgs.staticpermapp'
-    root_factory = 'pyramid.tests.pkgs.staticpermapp:RootFactory'
+    package = 'tests.pkgs.staticpermapp'
+    root_factory = 'tests.pkgs.staticpermapp:RootFactory'
     def test_allowed(self):
         result = self.testapp.get('/allowed/index.html', status=200)
         _assertBody(result.body,
@@ -295,7 +295,7 @@ class TestStaticPermApp(IntegrationBase, unittest.TestCase):
 class TestCCBug(IntegrationBase, unittest.TestCase):
     # "unordered" as reported in IRC by author of
     # http://labs.creativecommons.org/2010/01/13/cc-engine-and-web-non-frameworks/
-    package = 'pyramid.tests.pkgs.ccbugapp'
+    package = 'tests.pkgs.ccbugapp'
     def test_rdf(self):
         res = self.testapp.get('/licenses/1/v1/rdf', status=200)
         self.assertEqual(res.body, b'rdf')
@@ -308,7 +308,7 @@ class TestHybridApp(IntegrationBase, unittest.TestCase):
     # make sure views registered for a route "win" over views registered
     # without one, even though the context of the non-route view may
     # be more specific than the route view.
-    package = 'pyramid.tests.pkgs.hybridapp'
+    package = 'tests.pkgs.hybridapp'
     def test_root(self):
         res = self.testapp.get('/', status=200)
         self.assertEqual(res.body, b'global')
@@ -349,14 +349,14 @@ class TestHybridApp(IntegrationBase, unittest.TestCase):
 
 class TestRestBugApp(IntegrationBase, unittest.TestCase):
     # test bug reported by delijati 2010/2/3 (http://pastebin.com/d4cc15515)
-    package = 'pyramid.tests.pkgs.restbugapp'
+    package = 'tests.pkgs.restbugapp'
     def test_it(self):
         res = self.testapp.get('/pet', status=200)
         self.assertEqual(res.body, b'gotten')
 
 class TestForbiddenAppHasResult(IntegrationBase, unittest.TestCase):
     # test that forbidden exception has ACLDenied result attached
-    package = 'pyramid.tests.pkgs.forbiddenapp'
+    package = 'tests.pkgs.forbiddenapp'
     def test_it(self):
         res = self.testapp.get('/x', status=403)
         message, result = [x.strip() for x in res.body.split(b'\n')]
@@ -370,7 +370,7 @@ class TestForbiddenAppHasResult(IntegrationBase, unittest.TestCase):
             result.endswith(b"for principals ['system.Everyone']"))
 
 class TestViewDecoratorApp(IntegrationBase, unittest.TestCase):
-    package = 'pyramid.tests.pkgs.viewdecoratorapp'
+    package = 'tests.pkgs.viewdecoratorapp'
 
     def test_first(self):
         res = self.testapp.get('/first', status=200)
@@ -381,7 +381,7 @@ class TestViewDecoratorApp(IntegrationBase, unittest.TestCase):
         self.assertTrue(b'OK2' in res.body)
 
 class TestNotFoundView(IntegrationBase, unittest.TestCase):
-    package = 'pyramid.tests.pkgs.notfoundview'
+    package = 'tests.pkgs.notfoundview'
 
     def test_it(self):
         res = self.testapp.get('/wontbefound', status=200)
@@ -398,7 +398,7 @@ class TestNotFoundView(IntegrationBase, unittest.TestCase):
         self.assertTrue(b'baz_notfound' in res.body)
 
 class TestForbiddenView(IntegrationBase, unittest.TestCase):
-    package = 'pyramid.tests.pkgs.forbiddenview'
+    package = 'tests.pkgs.forbiddenview'
 
     def test_it(self):
         res = self.testapp.get('/foo', status=200)
@@ -408,7 +408,7 @@ class TestForbiddenView(IntegrationBase, unittest.TestCase):
         
 class TestViewPermissionBug(IntegrationBase, unittest.TestCase):
     # view_execution_permitted bug as reported by Shane at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003603.html
-    package = 'pyramid.tests.pkgs.permbugapp'
+    package = 'tests.pkgs.permbugapp'
     def test_test(self):
         res = self.testapp.get('/test', status=200)
         self.assertTrue(b'ACLDenied' in res.body)
@@ -418,7 +418,7 @@ class TestViewPermissionBug(IntegrationBase, unittest.TestCase):
 
 class TestDefaultViewPermissionBug(IntegrationBase, unittest.TestCase):
     # default_view_permission bug as reported by Wiggy at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003602.html
-    package = 'pyramid.tests.pkgs.defpermbugapp'
+    package = 'tests.pkgs.defpermbugapp'
     def test_x(self):
         res = self.testapp.get('/x', status=403)
         self.assertTrue(b'failed permission check' in res.body)
@@ -431,13 +431,12 @@ class TestDefaultViewPermissionBug(IntegrationBase, unittest.TestCase):
         res = self.testapp.get('/z', status=200)
         self.assertTrue(b'public' in res.body)
 
-from pyramid.tests.pkgs.exceptionviewapp.models import \
-     AnException, NotAnException
+from .pkgs.exceptionviewapp.models import AnException, NotAnException
 excroot = {'anexception':AnException(),
            'notanexception':NotAnException()}
 
 class TestExceptionViewsApp(IntegrationBase, unittest.TestCase):
-    package = 'pyramid.tests.pkgs.exceptionviewapp'
+    package = 'tests.pkgs.exceptionviewapp'
     root_factory = lambda *arg: excroot
     def test_root(self):
         res = self.testapp.get('/', status=200)
@@ -472,7 +471,7 @@ class TestExceptionViewsApp(IntegrationBase, unittest.TestCase):
         self.assertTrue(b'caught' in res.body)
         
 class TestConflictApp(unittest.TestCase):
-    package = 'pyramid.tests.pkgs.conflictapp'
+    package = 'tests.pkgs.conflictapp'
     def _makeConfig(self):
         from pyramid.config import Configurator
         config = Configurator()
@@ -535,7 +534,7 @@ class ImperativeIncludeConfigurationTest(unittest.TestCase):
     def setUp(self):
         from pyramid.config import Configurator
         config = Configurator()
-        from pyramid.tests.pkgs.includeapp1.root import configure
+        from .pkgs.includeapp1.root import configure
         configure(config)
         app = config.make_wsgi_app()
         self.testapp = TestApp(app)
@@ -558,7 +557,7 @@ class ImperativeIncludeConfigurationTest(unittest.TestCase):
 
 class SelfScanAppTest(unittest.TestCase):
     def setUp(self):
-        from pyramid.tests.test_config.pkgs.selfscan import main
+        from .test_config.pkgs.selfscan import main
         config = main()
         app = config.make_wsgi_app()
         self.testapp = TestApp(app)
@@ -577,7 +576,7 @@ class SelfScanAppTest(unittest.TestCase):
 
 class WSGIApp2AppTest(unittest.TestCase):
     def setUp(self):
-        from pyramid.tests.pkgs.wsgiapp2app import main
+        from .pkgs.wsgiapp2app import main
         config = main()
         app = config.make_wsgi_app()
         self.testapp = TestApp(app)
@@ -592,7 +591,7 @@ class WSGIApp2AppTest(unittest.TestCase):
 
 class SubrequestAppTest(unittest.TestCase):
     def setUp(self):
-        from pyramid.tests.pkgs.subrequestapp import main
+        from .pkgs.subrequestapp import main
         config = main()
         app = config.make_wsgi_app()
         self.testapp = TestApp(app)
@@ -614,7 +613,7 @@ class SubrequestAppTest(unittest.TestCase):
         self.assertTrue(b'Value error raised' in res.body)
 
 class RendererScanAppTest(IntegrationBase, unittest.TestCase):
-    package = 'pyramid.tests.pkgs.rendererscanapp'
+    package = 'tests.pkgs.rendererscanapp'
     def test_root(self):
         res = self.testapp.get('/one', status=200)
         self.assertTrue(b'One!' in res.body)
@@ -624,7 +623,7 @@ class RendererScanAppTest(IntegrationBase, unittest.TestCase):
         self.assertTrue(b'Two!' in res.body)
 
     def test_rescan(self):
-        self.config.scan('pyramid.tests.pkgs.rendererscanapp')
+        self.config.scan('tests.pkgs.rendererscanapp')
         app = self.config.make_wsgi_app()
         testapp = TestApp(app)
         res = testapp.get('/one', status=200)

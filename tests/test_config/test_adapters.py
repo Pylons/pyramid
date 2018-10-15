@@ -1,7 +1,7 @@
 import unittest
 
 from pyramid.compat import PY2
-from pyramid.tests.test_config import IDummy
+from . import IDummy
 
 class AdaptersConfiguratorMixinTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
@@ -50,15 +50,15 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(len(L), 1)
 
     def test_add_subscriber_dottednames(self):
-        import pyramid.tests.test_config
+        import tests.test_config
         from pyramid.interfaces import INewRequest
         config = self._makeOne(autocommit=True)
-        config.add_subscriber('pyramid.tests.test_config',
+        config.add_subscriber('tests.test_config',
                               'pyramid.interfaces.INewRequest')
         handlers = list(config.registry.registeredHandlers())
         self.assertEqual(len(handlers), 1)
         handler = handlers[0]
-        self.assertEqual(handler.handler, pyramid.tests.test_config)
+        self.assertEqual(handler.handler, tests.test_config)
         self.assertEqual(handler.required, (INewRequest,))
 
     def test_add_object_event_subscriber(self):
@@ -231,8 +231,8 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         from pyramid.interfaces import ITraverser
         config = self._makeOne(autocommit=True)
         config.add_traverser(
-            'pyramid.tests.test_config.test_adapters.DummyTraverser',
-            'pyramid.tests.test_config.test_adapters.DummyIface')
+            'tests.test_config.test_adapters.DummyTraverser',
+            'tests.test_config.test_adapters.DummyIface')
         iface = DummyIface()
         traverser = config.registry.getAdapter(iface, ITraverser)
         self.assertEqual(traverser.__class__, DummyTraverser)
@@ -273,8 +273,8 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         from pyramid.interfaces import IResourceURL
         config = self._makeOne(autocommit=True)
         config.add_resource_url_adapter(
-            'pyramid.tests.test_config.test_adapters.DummyResourceURL',
-            'pyramid.tests.test_config.test_adapters.DummyIface',
+            'tests.test_config.test_adapters.DummyResourceURL',
+            'tests.test_config.test_adapters.DummyIface',
             )
         iface = DummyIface()
         adapter = config.registry.getMultiAdapter((iface, iface), 
@@ -326,7 +326,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(
             intr.title,
             "resource url adapter for resource iface "
-            "<class 'pyramid.tests.test_config.test_adapters.DummyIface'>"
+            "<class 'tests.test_config.test_adapters.DummyIface'>"
             )
         self.assertEqual(intr['adapter'], DummyResourceURL)
         self.assertEqual(intr['resource_iface'], DummyIface)

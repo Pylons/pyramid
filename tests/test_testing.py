@@ -340,7 +340,7 @@ class Test_setUp(unittest.TestCase):
         self.assertEqual(config.registry, current['registry'])
         self.assertEqual(current['registry'].__class__, Registry)
         self.assertEqual(current['request'], None)
-        self.assertEqual(config.package.__name__, 'pyramid.tests')
+        self.assertEqual(config.package.__name__, 'tests')
         self._assertSMHook(get_current_registry)
 
     def test_it_with_registry(self):

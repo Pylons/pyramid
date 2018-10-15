@@ -47,7 +47,7 @@ class TestDeriveView(unittest.TestCase):
             self.assertEqual(
                 e.args[0],
                 'Could not convert return value of the view callable function '
-                'pyramid.tests.test_viewderivers.view into a response '
+                'tests.test_viewderivers.view into a response '
                 'object. The value returned was None. You may have forgotten '
                 'to return a value from the view callable.'
                 )
@@ -65,7 +65,7 @@ class TestDeriveView(unittest.TestCase):
             self.assertEqual(
                 e.args[0],
                 "Could not convert return value of the view callable function "
-                "pyramid.tests.test_viewderivers.view into a response "
+                "tests.test_viewderivers.view into a response "
                 "object. The value returned was {'a': 1}. You may have "
                 "forgotten to define a renderer in the view configuration."
                 )
@@ -85,7 +85,7 @@ class TestDeriveView(unittest.TestCase):
             msg = e.args[0]
             self.assertTrue(msg.startswith(
                 'Could not convert return value of the view callable object '
-                '<pyramid.tests.test_viewderivers.'))
+                '<tests.test_viewderivers.'))
             self.assertTrue(msg.endswith(
                 '> into a response object. The value returned was None. You '
                 'may have forgotten to return a value from the view callable.'))
@@ -129,7 +129,7 @@ class TestDeriveView(unittest.TestCase):
                 e.args[0],
                 'Could not convert return value of the view callable '
                 'method __call__ of '
-                'class pyramid.tests.test_viewderivers.AView into a '
+                'class tests.test_viewderivers.AView into a '
                 'response object. The value returned was None. You may have '
                 'forgotten to return a value from the view callable.'
                 )
@@ -152,7 +152,7 @@ class TestDeriveView(unittest.TestCase):
                 e.args[0],
                 'Could not convert return value of the view callable '
                 'method theviewmethod of '
-                'class pyramid.tests.test_viewderivers.AView into a '
+                'class tests.test_viewderivers.AView into a '
                 'response object. The value returned was None. You may have '
                 'forgotten to return a value from the view callable.'
                 )

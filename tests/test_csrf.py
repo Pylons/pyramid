@@ -239,7 +239,7 @@ class Test_check_csrf_token(unittest.TestCase):
         self.config.set_default_csrf_options(require_csrf=False)
 
     def _callFUT(self, *args, **kwargs):
-        from ..csrf import check_csrf_token
+        from pyramid.csrf import check_csrf_token
         return check_csrf_token(*args, **kwargs)
 
     def test_success_token(self):
@@ -281,7 +281,7 @@ class Test_check_csrf_token_without_defaults_configured(unittest.TestCase):
         self.config = testing.setUp()
 
     def _callFUT(self, *args, **kwargs):
-        from ..csrf import check_csrf_token
+        from pyramid.csrf import check_csrf_token
         return check_csrf_token(*args, **kwargs)
 
     def test_success_token(self):
@@ -304,7 +304,7 @@ class Test_check_csrf_token_without_defaults_configured(unittest.TestCase):
 
 class Test_check_csrf_origin(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
-        from ..csrf import check_csrf_origin
+        from pyramid.csrf import check_csrf_origin
         return check_csrf_origin(*args, **kwargs)
 
     def test_success_with_http(self):

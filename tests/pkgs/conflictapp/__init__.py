@@ -21,4 +21,4 @@ def includeme(config):
     config.set_authentication_policy(AuthTktAuthenticationPolicy(
         'seekri1t', hashalg='sha512'))
     config.set_authorization_policy(ACLAuthorizationPolicy())
-    config.include('pyramid.tests.pkgs.conflictapp.included')
+    config.include('tests.pkgs.conflictapp.included')

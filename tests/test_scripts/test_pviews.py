@@ -1,5 +1,5 @@
 import unittest
-from pyramid.tests.test_scripts import dummy
+from . import dummy
 
 class TestPViewsCommand(unittest.TestCase):
     def _getTargetClass(self):
@@ -280,7 +280,7 @@ class TestPViewsCommand(unittest.TestCase):
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
         self.assertEqual(L[8],
-                         '    pyramid.tests.test_scripts.dummy.DummyView')
+                         '    tests.test_scripts.dummy.DummyView')
 
     def test_views_command_single_view_function_traversal(self):
         from pyramid.registry import Registry
@@ -299,7 +299,7 @@ class TestPViewsCommand(unittest.TestCase):
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
         self.assertEqual(L[8],
-                         '    pyramid.tests.test_scripts.test_pviews.view')
+                         '    tests.test_scripts.test_pviews.view')
 
     def test_views_command_single_view_traversal_with_permission(self):
         from pyramid.registry import Registry
@@ -318,7 +318,7 @@ class TestPViewsCommand(unittest.TestCase):
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
         self.assertEqual(L[8],
-                         '    pyramid.tests.test_scripts.dummy.DummyView')
+                         '    tests.test_scripts.dummy.DummyView')
         self.assertEqual(L[9], '    required permission = test')
 
     def test_views_command_single_view_traversal_with_predicates(self):
@@ -340,7 +340,7 @@ class TestPViewsCommand(unittest.TestCase):
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
         self.assertEqual(L[8],
-                         '    pyramid.tests.test_scripts.dummy.DummyView')
+                         '    tests.test_scripts.dummy.DummyView')
         self.assertEqual(L[9], '    view predicates (predicate = x)')
 
     def test_views_command_single_view_route(self):
@@ -366,7 +366,7 @@ class TestPViewsCommand(unittest.TestCase):
         self.assertEqual(L[10], '    route path: /a')
         self.assertEqual(L[11], '    subpath: ')
         self.assertEqual(L[15],
-                   '        pyramid.tests.test_scripts.dummy.DummyView')
+                   '        tests.test_scripts.dummy.DummyView')
 
     def test_views_command_multi_view_nested(self):
         from pyramid.registry import Registry
@@ -390,9 +390,9 @@ class TestPViewsCommand(unittest.TestCase):
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
         self.assertEqual(L[8],
-                  '    pyramid.tests.test_scripts.dummy.DummyMultiView')
+                  '    tests.test_scripts.dummy.DummyMultiView')
         self.assertEqual(L[12],
-                  '        pyramid.tests.test_scripts.dummy.view1.call')
+                  '        tests.test_scripts.dummy.view1.call')
 
     def test_views_command_single_view_route_with_route_predicates(self):
         from pyramid.registry import Registry
@@ -420,7 +420,7 @@ class TestPViewsCommand(unittest.TestCase):
         self.assertEqual(L[11], '    subpath: ')
         self.assertEqual(L[12], '    route predicates (predicate = x)')
         self.assertEqual(L[16],
-               '        pyramid.tests.test_scripts.dummy.DummyView')
+               '        tests.test_scripts.dummy.DummyView')
 
     def test_views_command_multiview(self):
         from pyramid.registry import Registry
@@ -441,7 +441,7 @@ class TestPViewsCommand(unittest.TestCase):
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
         self.assertEqual(L[8],
-                     '    pyramid.tests.test_scripts.dummy.view.call')
+                     '    tests.test_scripts.dummy.view.call')
 
     def test_views_command_multiview_with_permission(self):
         from pyramid.registry import Registry
@@ -463,7 +463,7 @@ class TestPViewsCommand(unittest.TestCase):
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
         self.assertEqual(L[8],
-                       '    pyramid.tests.test_scripts.dummy.view.call')
+                       '    tests.test_scripts.dummy.view.call')
         self.assertEqual(L[9], '    required permission = test')
 
     def test_views_command_multiview_with_predicates(self):
@@ -488,7 +488,7 @@ class TestPViewsCommand(unittest.TestCase):
         self.assertEqual(L[3], '    context: context')
         self.assertEqual(L[4], '    view name: a')
         self.assertEqual(L[8],
-                         '    pyramid.tests.test_scripts.dummy.view.call')
+                         '    tests.test_scripts.dummy.view.call')
         self.assertEqual(L[9], '    view predicates (predicate = x)')
 
 class Test_main(unittest.TestCase):

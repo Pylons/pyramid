@@ -9,7 +9,7 @@ class Test_copy_dir(unittest.TestCase):
         from pyramid.compat import NativeIO
         self.dirname = tempfile.mkdtemp()
         self.out = NativeIO()
-        self.fixturetuple = ('pyramid.tests.test_scaffolds',
+        self.fixturetuple = ('tests.test_scaffolds',
                              'fixture_scaffold')
 
     def tearDown(self):
@@ -34,7 +34,7 @@ class Test_copy_dir(unittest.TestCase):
         self.assertTrue(
             'Copying fixture_scaffold/+package+/__init__.py_tmpl to' in result)
         source = pkg_resources.resource_filename(
-            'pyramid.tests.test_scaffolds',
+            'tests.test_scaffolds',
             'fixture_scaffold/+package+/__init__.py_tmpl')
         target = os.path.join(self.dirname, 'mypackage', '__init__.py')
         with open(target, 'r') as f:
@@ -55,7 +55,7 @@ class Test_copy_dir(unittest.TestCase):
         self.assertTrue('Creating' in result)
         self.assertTrue('Copying __init__.py_tmpl to' in result)
         source = pkg_resources.resource_filename(
-            'pyramid.tests.test_scaffolds',
+            'tests.test_scaffolds',
             'fixture_scaffold/+package+/__init__.py_tmpl')
         target = os.path.join(self.dirname, 'mypackage', '__init__.py')
         with open(target, 'r') as f:
@@ -328,8 +328,7 @@ class Test_query_interactive(unittest.TestCase):
         from pyramid.compat import NativeIO
         self.dirname = tempfile.mkdtemp()
         self.out = NativeIO()
-        self.fixturetuple = ('pyramid.tests.test_scaffolds',
-                             'fixture_scaffold')
+        self.fixturetuple = ('tests.test_scaffolds', 'fixture_scaffold')
         self.src_content = """\
 These are not the droids
 that you are looking for."""

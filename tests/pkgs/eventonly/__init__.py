@@ -60,5 +60,5 @@ def sendfoobar(request):
 
 def includeme(config):
     config.add_subscriber_predicate('yup', Yup)
-    config.scan('pyramid.tests.pkgs.eventonly')
+    config.scan('tests.pkgs.eventonly')
     

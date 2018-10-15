@@ -545,7 +545,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(settings[0]['custom_predicates'], (1,))
 
     def test_call_with_renderer_string(self):
-        import pyramid.tests
+        import tests
         decorator = self._makeOne(renderer='fixtures/minimal.pt')
         venusian = DummyVenusian()
         decorator.venusian = venusian
@@ -557,10 +557,10 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(len(settings), 1)
         renderer = settings[0]['renderer']
         self.assertEqual(renderer, 'fixtures/minimal.pt')
-        self.assertEqual(config.pkg, pyramid.tests)
+        self.assertEqual(config.pkg, tests)
 
     def test_call_with_renderer_dict(self):
-        import pyramid.tests
+        import tests
         decorator = self._makeOne(renderer={'a':1})
         venusian = DummyVenusian()
         decorator.venusian = venusian
@@ -571,10 +571,10 @@ class TestViewConfigDecorator(unittest.TestCase):
         settings = config.settings
         self.assertEqual(len(settings), 1)
         self.assertEqual(settings[0]['renderer'], {'a':1})
-        self.assertEqual(config.pkg, pyramid.tests)
+        self.assertEqual(config.pkg, tests)
 
     def test_call_with_renderer_IRendererInfo(self):
-        import pyramid.tests
+        import tests
         from pyramid.interfaces import IRendererInfo
         @implementer(IRendererInfo)
         class DummyRendererHelper(object):
@@ -592,7 +592,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(len(settings), 1)
         renderer = settings[0]['renderer']
         self.assertTrue(renderer is renderer_helper)
-        self.assertEqual(config.pkg, pyramid.tests)
+        self.assertEqual(config.pkg, tests)
 
     def test_call_withdepth(self):
         decorator = self._makeOne(_depth=1)
@@ -1027,7 +1027,7 @@ class IContext(Interface):
 
 class DummyVenusianInfo(object):
     scope = 'notaclass'
-    module = sys.modules['pyramid.tests']
+    module = sys.modules['tests']
     codeinfo = 'codeinfo'
 
 class DummyVenusian(object):

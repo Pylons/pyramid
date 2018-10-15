@@ -1,3 +1,3 @@
 def includeme(config):
-    config.add_static_view('/', 'pyramid.tests:fixtures')
+    config.add_static_view('/', 'tests:fixtures')
 

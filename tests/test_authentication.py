@@ -36,7 +36,7 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
         self.assertEqual(len(self.messages), 1)
         self.assertEqual(
             self.messages[0],
-            'pyramid.tests.test_authentication.MyAuthenticationPolicy.'
+            'tests.test_authentication.MyAuthenticationPolicy.'
             'authenticated_userid: call to unauthenticated_userid returned '
             'None; returning None')
 
@@ -47,7 +47,7 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
         self.assertEqual(len(self.messages), 1)
         self.assertEqual(
             self.messages[0],
-             "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+             "tests.test_authentication.MyAuthenticationPolicy."
             "authenticated_userid: there was no groupfinder callback; "
             "returning 'fred'")
 
@@ -60,7 +60,7 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
         self.assertEqual(len(self.messages), 1)
         self.assertEqual(
             self.messages[0],
-            'pyramid.tests.test_authentication.MyAuthenticationPolicy.'
+            'tests.test_authentication.MyAuthenticationPolicy.'
             'authenticated_userid: groupfinder callback returned None; '
             'returning None')
 
@@ -73,7 +73,7 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
         self.assertEqual(len(self.messages), 1)
         self.assertEqual(
             self.messages[0],
-            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "tests.test_authentication.MyAuthenticationPolicy."
             "authenticated_userid: groupfinder callback returned []; "
             "returning 'fred'")
 
@@ -84,7 +84,7 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
         self.assertEqual(len(self.messages), 1)
         self.assertEqual(
             self.messages[0],
-            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "tests.test_authentication.MyAuthenticationPolicy."
             "authenticated_userid: use of userid 'system.Authenticated' is "
             "disallowed by any built-in Pyramid security policy, returning "
             "None")
@@ -96,7 +96,7 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
         self.assertEqual(len(self.messages), 1)
         self.assertEqual(
             self.messages[0],
-            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "tests.test_authentication.MyAuthenticationPolicy."
             "authenticated_userid: use of userid 'system.Everyone' is "
             "disallowed by any built-in Pyramid security policy, returning "
             "None")
@@ -109,7 +109,7 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
         self.assertEqual(len(self.messages), 1)
         self.assertEqual(
             self.messages[0],
-            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "tests.test_authentication.MyAuthenticationPolicy."
             "effective_principals: unauthenticated_userid returned None; "
             "returning ['system.Everyone']")
 
@@ -122,12 +122,12 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
         self.assertEqual(len(self.messages), 2)
         self.assertEqual(
             self.messages[0],
-            'pyramid.tests.test_authentication.MyAuthenticationPolicy.'
+            'tests.test_authentication.MyAuthenticationPolicy.'
             'effective_principals: groupfinder callback is None, so groups '
             'is []')
         self.assertEqual(
             self.messages[1],
-            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "tests.test_authentication.MyAuthenticationPolicy."
             "effective_principals: returning effective principals: "
             "['system.Everyone', 'system.Authenticated', 'fred']")
 
@@ -141,12 +141,12 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
         self.assertEqual(len(self.messages), 2)
         self.assertEqual(
             self.messages[0],
-            'pyramid.tests.test_authentication.MyAuthenticationPolicy.'
+            'tests.test_authentication.MyAuthenticationPolicy.'
             'effective_principals: groupfinder callback returned None as '
             'groups')
         self.assertEqual(
             self.messages[1],
-            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "tests.test_authentication.MyAuthenticationPolicy."
             "effective_principals: returning effective principals: "
             "['system.Everyone']")
 
@@ -161,11 +161,11 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
         self.assertEqual(len(self.messages), 2)
         self.assertEqual(
             self.messages[0],
-            'pyramid.tests.test_authentication.MyAuthenticationPolicy.'
+            'tests.test_authentication.MyAuthenticationPolicy.'
             'effective_principals: groupfinder callback returned [] as groups')
         self.assertEqual(
             self.messages[1],
-            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "tests.test_authentication.MyAuthenticationPolicy."
             "effective_principals: returning effective principals: "
             "['system.Everyone', 'system.Authenticated', 'fred']")
 
@@ -178,7 +178,7 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
         self.assertEqual(len(self.messages), 1)
         self.assertEqual(
             self.messages[0],
-            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "tests.test_authentication.MyAuthenticationPolicy."
             "effective_principals: unauthenticated_userid returned disallowed "
             "'system.Authenticated'; returning ['system.Everyone'] as if it "
             "was None")
@@ -192,7 +192,7 @@ class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):
         self.assertEqual(len(self.messages), 1)
         self.assertEqual(
             self.messages[0],
-            "pyramid.tests.test_authentication.MyAuthenticationPolicy."
+            "tests.test_authentication.MyAuthenticationPolicy."
             "effective_principals: unauthenticated_userid returned disallowed "
             "'system.Everyone'; returning ['system.Everyone'] as if it "
             "was None")

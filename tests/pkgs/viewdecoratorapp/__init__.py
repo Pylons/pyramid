@@ -1,3 +1,3 @@
 def includeme(config):
-    config.scan('pyramid.tests.pkgs.viewdecoratorapp')
+    config.scan('tests.pkgs.viewdecoratorapp')
     

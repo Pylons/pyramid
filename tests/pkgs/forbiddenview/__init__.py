@@ -27,5 +27,5 @@ def includeme(config):
     config.set_default_permission('a')
     config.add_route('foo', '/foo')
     config.add_route('bar', '/bar')
-    config.scan('pyramid.tests.pkgs.forbiddenview')
+    config.scan('tests.pkgs.forbiddenview')
     

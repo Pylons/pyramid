@@ -21,32 +21,32 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.override_asset,
                           'a:foo/',
-                          'pyramid.tests.test_config.pkgs.asset:foo.pt')
+                          'tests.test_config.pkgs.asset:foo.pt')
 
     def test_override_asset_file_with_directory(self):
         from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.override_asset,
                           'a:foo.pt',
-                          'pyramid.tests.test_config.pkgs.asset:templates/')
+                          'tests.test_config.pkgs.asset:templates/')
 
     def test_override_asset_file_with_package(self):
         from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.override_asset,
                           'a:foo.pt',
-                          'pyramid.tests.test_config.pkgs.asset')
+                          'tests.test_config.pkgs.asset')
 
     def test_override_asset_file_with_file(self):
         from pyramid.config.assets import PackageAssetSource
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
-            'pyramid.tests.test_config.pkgs.asset:templates/foo.pt',
-            'pyramid.tests.test_config.pkgs.asset.subpackage:templates/bar.pt',
+            'tests.test_config.pkgs.asset:templates/foo.pt',
+            'tests.test_config.pkgs.asset.subpackage:templates/bar.pt',
             _override=override)
-        from pyramid.tests.test_config.pkgs import asset
-        from pyramid.tests.test_config.pkgs.asset import subpackage
+        from tests.test_config.pkgs import asset
+        from tests.test_config.pkgs.asset import subpackage
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, 'templates/foo.pt')
         source = override.source
@@ -65,11 +65,11 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
-            'pyramid.tests.test_config.pkgs.asset',
-            'pyramid.tests.test_config.pkgs.asset.subpackage',
+            'tests.test_config.pkgs.asset',
+            'tests.test_config.pkgs.asset.subpackage',
             _override=override)
-        from pyramid.tests.test_config.pkgs import asset
-        from pyramid.tests.test_config.pkgs.asset import subpackage
+        from tests.test_config.pkgs import asset
+        from tests.test_config.pkgs.asset import subpackage
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, '')
         source = override.source
@@ -88,11 +88,11 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
-            'pyramid.tests.test_config.pkgs.asset:templates/',
-            'pyramid.tests.test_config.pkgs.asset.subpackage:templates/',
+            'tests.test_config.pkgs.asset:templates/',
+            'tests.test_config.pkgs.asset.subpackage:templates/',
             _override=override)
-        from pyramid.tests.test_config.pkgs import asset
-        from pyramid.tests.test_config.pkgs.asset import subpackage
+        from tests.test_config.pkgs import asset
+        from tests.test_config.pkgs.asset import subpackage
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, 'templates/')
         source = override.source
@@ -111,11 +111,11 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
-            'pyramid.tests.test_config.pkgs.asset:templates/',
-            'pyramid.tests.test_config.pkgs.asset.subpackage',
+            'tests.test_config.pkgs.asset:templates/',
+            'tests.test_config.pkgs.asset.subpackage',
             _override=override)
-        from pyramid.tests.test_config.pkgs import asset
-        from pyramid.tests.test_config.pkgs.asset import subpackage
+        from tests.test_config.pkgs import asset
+        from tests.test_config.pkgs.asset import subpackage
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, 'templates/')
         source = override.source
@@ -134,11 +134,11 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
-            'pyramid.tests.test_config.pkgs.asset',
-            'pyramid.tests.test_config.pkgs.asset.subpackage:templates/',
+            'tests.test_config.pkgs.asset',
+            'tests.test_config.pkgs.asset.subpackage:templates/',
             _override=override)
-        from pyramid.tests.test_config.pkgs import asset
-        from pyramid.tests.test_config.pkgs.asset import subpackage
+        from tests.test_config.pkgs import asset
+        from tests.test_config.pkgs.asset import subpackage
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, '')
         source = override.source
@@ -181,10 +181,10 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         abspath = os.path.join(here, 'pkgs', 'asset', 'subpackage',
                                'templates', 'bar.pt')
         config.override_asset(
-            'pyramid.tests.test_config.pkgs.asset:templates/foo.pt',
+            'tests.test_config.pkgs.asset:templates/foo.pt',
             abspath,
             _override=override)
-        from pyramid.tests.test_config.pkgs import asset
+        from tests.test_config.pkgs import asset
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, 'templates/foo.pt')
         source = override.source
@@ -203,10 +203,10 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         override = DummyUnderOverride()
         abspath = os.path.join(here, 'pkgs', 'asset', 'subpackage', 'templates')
         config.override_asset(
-            'pyramid.tests.test_config.pkgs.asset:templates/',
+            'tests.test_config.pkgs.asset:templates/',
             abspath,
             _override=override)
-        from pyramid.tests.test_config.pkgs import asset
+        from tests.test_config.pkgs import asset
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, 'templates/')
         source = override.source
@@ -225,10 +225,10 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         override = DummyUnderOverride()
         abspath = os.path.join(here, 'pkgs', 'asset', 'subpackage', 'templates')
         config.override_asset(
-            'pyramid.tests.test_config.pkgs.asset',
+            'tests.test_config.pkgs.asset',
             abspath,
             _override=override)
-        from pyramid.tests.test_config.pkgs import asset
+        from tests.test_config.pkgs import asset
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, '')
         source = override.source
@@ -282,7 +282,7 @@ class TestOverrideProvider(unittest.TestCase):
         klass = self._getTargetClass()
         return klass(module)
 
-    def _registerOverrides(self, overrides, name='pyramid.tests.test_config'):
+    def _registerOverrides(self, overrides, name='tests.test_config'):
         from pyramid.interfaces import IPackageOverrides
         from pyramid.threadlocal import get_current_registry
         reg = get_current_registry()
@@ -290,38 +290,38 @@ class TestOverrideProvider(unittest.TestCase):
 
     def test_get_resource_filename_no_overrides(self):
         resource_name = 'test_assets.py'
-        import pyramid.tests.test_config
-        provider = self._makeOne(pyramid.tests.test_config)
+        import tests.test_config
+        provider = self._makeOne(tests.test_config)
         expected = os.path.join(here, resource_name)
         result = provider.get_resource_filename(None, resource_name)
         self.assertEqual(result, expected)
 
     def test_get_resource_stream_no_overrides(self):
         resource_name = 'test_assets.py'
-        import pyramid.tests.test_config
-        provider = self._makeOne(pyramid.tests.test_config)
+        import tests.test_config
+        provider = self._makeOne(tests.test_config)
         with provider.get_resource_stream(None, resource_name) as result:
             _assertBody(result.read(), os.path.join(here, resource_name))
 
     def test_get_resource_string_no_overrides(self):
         resource_name = 'test_assets.py'
-        import pyramid.tests.test_config
-        provider = self._makeOne(pyramid.tests.test_config)
+        import tests.test_config
+        provider = self._makeOne(tests.test_config)
         result = provider.get_resource_string(None, resource_name)
         _assertBody(result, os.path.join(here, resource_name))
 
     def test_has_resource_no_overrides(self):
         resource_name = 'test_assets.py'
-        import pyramid.tests.test_config
-        provider = self._makeOne(pyramid.tests.test_config)
+        import tests.test_config
+        provider = self._makeOne(tests.test_config)
         result = provider.has_resource(resource_name)
         self.assertEqual(result, True)
 
     def test_resource_isdir_no_overrides(self):
         file_resource_name = 'test_assets.py'
         directory_resource_name = 'files'
-        import pyramid.tests.test_config
-        provider = self._makeOne(pyramid.tests.test_config)
+        import tests.test_config
+        provider = self._makeOne(tests.test_config)
         result = provider.resource_isdir(file_resource_name)
         self.assertEqual(result, False)
         result = provider.resource_isdir(directory_resource_name)
@@ -329,8 +329,8 @@ class TestOverrideProvider(unittest.TestCase):
 
     def test_resource_listdir_no_overrides(self):
         resource_name = 'files'
-        import pyramid.tests.test_config
-        provider = self._makeOne(pyramid.tests.test_config)
+        import tests.test_config
+        provider = self._makeOne(tests.test_config)
         result = provider.resource_listdir(resource_name)
         self.assertTrue(result)
 
@@ -338,8 +338,8 @@ class TestOverrideProvider(unittest.TestCase):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
         resource_name = 'test_assets.py'
-        import pyramid.tests.test_config
-        provider = self._makeOne(pyramid.tests.test_config)
+        import tests.test_config
+        provider = self._makeOne(tests.test_config)
         expected = os.path.join(here, resource_name)
         result = provider.get_resource_filename(None, resource_name)
         self.assertEqual(result, expected)
@@ -348,8 +348,8 @@ class TestOverrideProvider(unittest.TestCase):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
         resource_name = 'test_assets.py'
-        import pyramid.tests.test_config
-        provider = self._makeOne(pyramid.tests.test_config)
+        import tests.test_config
+        provider = self._makeOne(tests.test_config)
         with provider.get_resource_stream(None, resource_name) as result:
             _assertBody(result.read(), os.path.join(here, resource_name))
 
@@ -357,8 +357,8 @@ class TestOverrideProvider(unittest.TestCase):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
         resource_name = 'test_assets.py'
-        import pyramid.tests.test_config
-        provider = self._makeOne(pyramid.tests.test_config)
+        import tests.test_config
+        provider = self._makeOne(tests.test_config)
         result = provider.get_resource_string(None, resource_name)
         _assertBody(result, os.path.join(here, resource_name))
 
@@ -366,8 +366,8 @@ class TestOverrideProvider(unittest.TestCase):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
         resource_name = 'test_assets.py'
-        import pyramid.tests.test_config
-        provider = self._makeOne(pyramid.tests.test_config)
+        import tests.test_config
+        provider = self._makeOne(tests.test_config)
         result = provider.has_resource(resource_name)
         self.assertEqual(result, True)
 
@@ -375,8 +375,8 @@ class TestOverrideProvider(unittest.TestCase):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
         resource_name = 'files'
-        import pyramid.tests.test_config
-        provider = self._makeOne(pyramid.tests.test_config)
+        import tests.test_config
+        provider = self._makeOne(tests.test_config)
         result = provider.resource_isdir(resource_name)
         self.assertEqual(result, True)
 
@@ -384,57 +384,57 @@ class TestOverrideProvider(unittest.TestCase):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
         resource_name = 'files'
-        import pyramid.tests.test_config
-        provider = self._makeOne(pyramid.tests.test_config)
+        import tests.test_config
+        provider = self._makeOne(tests.test_config)
         result = provider.resource_listdir(resource_name)
         self.assertTrue(result)
 
     def test_get_resource_filename_override_returns_value(self):
         overrides = DummyOverrides('value')
-        import pyramid.tests.test_config
+        import tests.test_config
         self._registerOverrides(overrides)
-        provider = self._makeOne(pyramid.tests.test_config)
+        provider = self._makeOne(tests.test_config)
         result = provider.get_resource_filename(None, 'test_assets.py')
         self.assertEqual(result, 'value')
 
     def test_get_resource_stream_override_returns_value(self):
         from io import BytesIO
         overrides = DummyOverrides(BytesIO(b'value'))
-        import pyramid.tests.test_config
+        import tests.test_config
         self._registerOverrides(overrides)
-        provider = self._makeOne(pyramid.tests.test_config)
+        provider = self._makeOne(tests.test_config)
         with provider.get_resource_stream(None, 'test_assets.py') as stream:
             self.assertEqual(stream.getvalue(), b'value')
 
     def test_get_resource_string_override_returns_value(self):
         overrides = DummyOverrides('value')
-        import pyramid.tests.test_config
+        import tests.test_config
         self._registerOverrides(overrides)
-        provider = self._makeOne(pyramid.tests.test_config)
+        provider = self._makeOne(tests.test_config)
         result = provider.get_resource_string(None, 'test_assets.py')
         self.assertEqual(result, 'value')
 
     def test_has_resource_override_returns_True(self):
         overrides = DummyOverrides(True)
-        import pyramid.tests.test_config
+        import tests.test_config
         self._registerOverrides(overrides)
-        provider = self._makeOne(pyramid.tests.test_config)
+        provider = self._makeOne(tests.test_config)
         result = provider.has_resource('test_assets.py')
         self.assertEqual(result, True)
 
     def test_resource_isdir_override_returns_False(self):
         overrides = DummyOverrides(False)
-        import pyramid.tests.test_config
+        import tests.test_config
         self._registerOverrides(overrides)
-        provider = self._makeOne(pyramid.tests.test_config)
+        provider = self._makeOne(tests.test_config)
         result = provider.resource_isdir('files')
         self.assertEqual(result, False)
 
     def test_resource_listdir_override_returns_values(self):
         overrides = DummyOverrides(['a'])
-        import pyramid.tests.test_config
+        import tests.test_config
         self._registerOverrides(overrides)
-        provider = self._makeOne(pyramid.tests.test_config)
+        provider = self._makeOne(tests.test_config)
         result = provider.resource_listdir('files')
         self.assertEqual(result, ['a'])
 
@@ -791,7 +791,7 @@ class TestPackageAssetSource(AssetSourceIntegrationTests, unittest.TestCase):
         from pyramid.config.assets import PackageAssetSource
         return PackageAssetSource
 
-    def _makeOne(self, prefix, package='pyramid.tests.test_config'):
+    def _makeOne(self, prefix, package='tests.test_config'):
         klass = self._getTargetClass()
         return klass(package, prefix)
 

@@ -1,7 +1,7 @@
 import unittest
 
-from pyramid.tests.test_config import dummyfactory
-from pyramid.tests.test_config import DummyContext
+from . import dummyfactory
+from . import DummyContext
 from pyramid.compat import text_
 
 class RoutesConfiguratorMixinTests(unittest.TestCase):
@@ -74,7 +74,7 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.add_route(
             'name', 'path',
-            factory='pyramid.tests.test_config.dummyfactory')
+            factory='tests.test_config.dummyfactory')
         route = self._assertRoute(config, 'name', 'path')
         self.assertEqual(route.factory, dummyfactory)
 

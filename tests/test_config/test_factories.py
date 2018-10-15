@@ -1,6 +1,6 @@
 import unittest
 
-from pyramid.tests.test_config import dummyfactory
+from . import dummyfactory
 
 class TestFactoriesMixin(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
@@ -19,7 +19,7 @@ class TestFactoriesMixin(unittest.TestCase):
         from pyramid.interfaces import IRequestFactory
         config = self._makeOne(autocommit=True)
         config.set_request_factory(
-            'pyramid.tests.test_config.dummyfactory')
+            'tests.test_config.dummyfactory')
         self.assertEqual(config.registry.getUtility(IRequestFactory),
                          dummyfactory)
 
@@ -34,7 +34,7 @@ class TestFactoriesMixin(unittest.TestCase):
         from pyramid.interfaces import IResponseFactory
         config = self._makeOne(autocommit=True)
         config.set_response_factory(
-            'pyramid.tests.test_config.dummyfactory')
+            'tests.test_config.dummyfactory')
         self.assertEqual(config.registry.getUtility(IResponseFactory),
                          dummyfactory)
 
@@ -59,7 +59,7 @@ class TestFactoriesMixin(unittest.TestCase):
     def test_set_root_factory_dottedname(self):
         from pyramid.interfaces import IRootFactory
         config = self._makeOne()
-        config.set_root_factory('pyramid.tests.test_config.dummyfactory')
+        config.set_root_factory('tests.test_config.dummyfactory')
         self.assertEqual(config.registry.queryUtility(IRootFactory), None)
         config.commit()
         self.assertEqual(config.registry.getUtility(IRootFactory), dummyfactory)
@@ -76,7 +76,7 @@ class TestFactoriesMixin(unittest.TestCase):
     def test_set_session_factory_dottedname(self):
         from pyramid.interfaces import ISessionFactory
         config = self._makeOne()
-        config.set_session_factory('pyramid.tests.test_config.dummyfactory')
+        config.set_session_factory('tests.test_config.dummyfactory')
         self.assertEqual(config.registry.queryUtility(ISessionFactory), None)
         config.commit()
         self.assertEqual(config.registry.getUtility(ISessionFactory),

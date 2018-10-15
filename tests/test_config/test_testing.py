@@ -2,7 +2,7 @@ import unittest
 
 from pyramid.compat import text_
 from pyramid.security import AuthenticationAPIMixin, AuthorizationAPIMixin
-from pyramid.tests.test_config import IDummy
+from . import IDummy
 
 class TestingConfiguratorMixinTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
@@ -91,7 +91,7 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
     def test_testing_add_subscriber_dottedname(self):
         config = self._makeOne(autocommit=True)
         L = config.testing_add_subscriber(
-            'pyramid.tests.test_config.test_init.IDummy')
+            'tests.test_config.test_init.IDummy')
         event = DummyEvent()
         config.registry.notify(event)
         self.assertEqual(len(L), 1)

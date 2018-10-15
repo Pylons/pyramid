@@ -1,6 +1,6 @@
 import os
 import unittest
-from pyramid.tests.test_scripts import dummy
+from . import dummy
 
 
 class TestPShellCommand(unittest.TestCase):

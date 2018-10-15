@@ -38,21 +38,21 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         self.assertEqual(inst.index, 'index.html')
 
     def test_call_adds_slash_path_info_empty(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':''})
         context = DummyContext()
         from pyramid.httpexceptions import HTTPMovedPermanently
         self.assertRaises(HTTPMovedPermanently, inst, context, request)
 
     def test_path_info_slash_means_index_html(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest()
         context = DummyContext()
         response = inst(context, request)
         self.assertTrue(b'<html>static</html>' in response.body)
 
     def test_oob_singledot(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/./index.html'})
         context = DummyContext()
         response = inst(context, request)
@@ -60,7 +60,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         self.assertTrue(b'<html>static</html>' in response.body)
 
     def test_oob_emptyelement(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'//index.html'})
         context = DummyContext()
         response = inst(context, request)
@@ -68,14 +68,14 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         self.assertTrue(b'<html>static</html>' in response.body)
 
     def test_oob_dotdotslash(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/subdir/../../minimal.pt'})
         context = DummyContext()
         from pyramid.httpexceptions import HTTPNotFound
         self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_oob_dotdotslash_encoded(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest(
             {'PATH_INFO':'/subdir/%2E%2E%2F%2E%2E/minimal.pt'})
         context = DummyContext()
@@ -84,7 +84,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
 
     def test_oob_os_sep(self):
         import os
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         dds = '..' + os.sep
         request = self._makeRequest({'PATH_INFO':'/subdir/%s%sminimal.pt' %
                                      (dds, dds)})
@@ -93,21 +93,21 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_resource_doesnt_exist(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/notthere'})
         context = DummyContext()
         from pyramid.httpexceptions import HTTPNotFound
         self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_resource_isdir(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/subdir/'})
         context = DummyContext()
         response = inst(context, request)
         self.assertTrue(b'<html>subdir</html>' in response.body)
 
     def test_resource_is_file(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/index.html'})
         context = DummyContext()
         response = inst(context, request)
@@ -115,7 +115,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
 
     def test_resource_is_file_with_wsgi_file_wrapper(self):
         from pyramid.response import _BLOCK_SIZE
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/index.html'})
         class _Wrapper(object):
             def __init__(self, file, block_size=None):
@@ -131,7 +131,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         app_iter.file.close()
 
     def test_resource_is_file_with_cache_max_age(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static', cache_max_age=600)
+        inst = self._makeOne('tests:fixtures/static', cache_max_age=600)
         request = self._makeRequest({'PATH_INFO':'/index.html'})
         context = DummyContext()
         response = inst(context, request)
@@ -144,7 +144,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
                           'Expires', 'Last-Modified'])
 
     def test_resource_is_file_with_no_cache_max_age(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static',
+        inst = self._makeOne('tests:fixtures/static',
                              cache_max_age=None)
         request = self._makeRequest({'PATH_INFO':'/index.html'})
         context = DummyContext()
@@ -158,7 +158,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
             ['Content-Length', 'Content-Type', 'Last-Modified'])
 
     def test_resource_notmodified(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/index.html'})
         request.if_modified_since = fiveyrsfuture
         context = DummyContext()
@@ -172,14 +172,14 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
             app_iter.close()
 
     def test_not_found(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/notthere.html'})
         context = DummyContext()
         from pyramid.httpexceptions import HTTPNotFound
         self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_gz_resource_no_content_encoding(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/arcs.svg.tgz'})
         context = DummyContext()
         response = inst(context, request)
@@ -189,7 +189,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         response.app_iter.close()
 
     def test_resource_no_content_encoding(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':'/index.html'})
         context = DummyContext()
         response = inst(context, request)
@@ -230,7 +230,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         self.assertEqual(inst.index, 'index.html')
 
     def test_call_adds_slash_path_info_empty(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO':''})
         request.subpath = ()
         context = DummyContext()
@@ -238,7 +238,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         self.assertRaises(HTTPMovedPermanently, inst, context, request)
 
     def test_path_info_slash_means_index_html(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest()
         request.subpath = ()
         context = DummyContext()
@@ -246,7 +246,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         self.assertTrue(b'<html>static</html>' in response.body)
 
     def test_oob_singledot(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest()
         request.subpath = ('.', 'index.html')
         context = DummyContext()
@@ -254,7 +254,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_oob_emptyelement(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest()
         request.subpath = ('', 'index.html')
         context = DummyContext()
@@ -262,7 +262,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_oob_dotdotslash(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest()
         request.subpath = ('subdir', '..', '..', 'minimal.pt')
         context = DummyContext()
@@ -270,7 +270,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_oob_dotdotslash_encoded(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest()
         request.subpath = ('subdir', '%2E%2E', '%2E%2E', 'minimal.pt')
         context = DummyContext()
@@ -279,7 +279,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
 
     def test_oob_os_sep(self):
         import os
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         dds = '..' + os.sep
         request = self._makeRequest()
         request.subpath = ('subdir', dds, dds, 'minimal.pt')
@@ -288,7 +288,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_resource_doesnt_exist(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest()
         request.subpath = ('notthere,')
         context = DummyContext()
@@ -296,7 +296,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         self.assertRaises(HTTPNotFound, inst, context, request)
 
     def test_resource_isdir(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest()
         request.subpath = ('subdir',)
         context = DummyContext()
@@ -304,7 +304,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         self.assertTrue(b'<html>subdir</html>' in response.body)
 
     def test_resource_is_file(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest()
         request.subpath = ('index.html',)
         context = DummyContext()
@@ -312,7 +312,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         self.assertTrue(b'<html>static</html>' in response.body)
 
     def test_resource_is_file_with_cache_max_age(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static', cache_max_age=600)
+        inst = self._makeOne('tests:fixtures/static', cache_max_age=600)
         request = self._makeRequest()
         request.subpath = ('index.html',)
         context = DummyContext()
@@ -326,7 +326,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
                           'Expires', 'Last-Modified'])
 
     def test_resource_is_file_with_no_cache_max_age(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static',
+        inst = self._makeOne('tests:fixtures/static',
                              cache_max_age=None)
         request = self._makeRequest()
         request.subpath = ('index.html',)
@@ -341,7 +341,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
             ['Content-Length', 'Content-Type', 'Last-Modified'])
 
     def test_resource_notmodified(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest()
         request.if_modified_since = fiveyrsfuture
         request.subpath = ('index.html',)
@@ -356,7 +356,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
             app_iter.close()
 
     def test_not_found(self):
-        inst = self._makeOne('pyramid.tests:fixtures/static')
+        inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest()
         request.subpath = ('notthere.html',)
         context = DummyContext()
@@ -423,7 +423,7 @@ class TestManifestCacheBuster(unittest.TestCase):
             ('css/main-test.css', {}))
 
     def test_it_with_absspec(self):
-        fut = self._makeOne('pyramid.tests:fixtures/manifest.json')
+        fut = self._makeOne('tests:fixtures/manifest.json')
         self.assertEqual(fut('foo', 'bar', {}), ('bar', {}))
         self.assertEqual(
             fut('foo', 'css/main.css', {}),

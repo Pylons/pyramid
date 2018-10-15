@@ -687,7 +687,7 @@ class TestPickleSerializer(unittest.TestCase):
 
     def test_loads(self):
         # generated from dumping Dummy() using protocol=2
-        cstruct = b'\x80\x02cpyramid.tests.test_session\nDummy\nq\x00)\x81q\x01.'
+        cstruct = b'\x80\x02ctests.test_session\nDummy\nq\x00)\x81q\x01.'
         serializer = self._makeOne()
         result = serializer.loads(cstruct)
         self.assertIsInstance(result, Dummy)

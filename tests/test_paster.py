@@ -1,6 +1,6 @@
 import os
 import unittest
-from pyramid.tests.test_scripts.dummy import DummyLoader
+from .test_scripts.dummy import DummyLoader
 
 here = os.path.dirname(__file__)
 

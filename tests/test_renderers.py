@@ -464,7 +464,7 @@ class Test_render(unittest.TestCase):
 
     def _registerRenderer(self):
         renderer = self.config.testing_add_renderer(
-            'pyramid.tests:abc/def.pt')
+            'tests:abc/def.pt')
         renderer.string_response = 'abc'
         return renderer
 
@@ -485,11 +485,11 @@ class Test_render(unittest.TestCase):
         renderer.assert_(request=request)
 
     def test_it_with_package(self):
-        import pyramid.tests
+        import tests
         renderer = self._registerRenderer()
         request = testing.DummyRequest()
         result = self._callFUT('abc/def.pt', dict(a=1), request=request,
-                               package=pyramid.tests)
+                               package=tests)
         self.assertEqual(result, 'abc')
         renderer.assert_(a=1)
         renderer.assert_(request=request)
@@ -533,7 +533,7 @@ class Test_render_to_response(unittest.TestCase):
 
     def test_it_no_request(self):
         renderer = self.config.testing_add_renderer(
-            'pyramid.tests:abc/def.pt')
+            'tests:abc/def.pt')
         renderer.string_response = 'abc'
         response = self._callFUT('abc/def.pt', dict(a=1))
         self.assertEqual(response.body, b'abc')
@@ -542,7 +542,7 @@ class Test_render_to_response(unittest.TestCase):
 
     def test_it_with_request(self):
         renderer = self.config.testing_add_renderer(
-            'pyramid.tests:abc/def.pt')
+            'tests:abc/def.pt')
         renderer.string_response = 'abc'
         request = testing.DummyRequest()
         response = self._callFUT('abc/def.pt',
@@ -552,13 +552,13 @@ class Test_render_to_response(unittest.TestCase):
         renderer.assert_(request=request)
 
     def test_it_with_package(self):
-        import pyramid.tests
+        import tests
         renderer = self.config.testing_add_renderer(
-            'pyramid.tests:abc/def.pt')
+            'tests:abc/def.pt')
         renderer.string_response = 'abc'
         request = testing.DummyRequest()
         response = self._callFUT('abc/def.pt', dict(a=1), request=request,
-                                 package=pyramid.tests)
+                                 package=tests)
         self.assertEqual(response.body, b'abc')
         renderer.assert_(a=1)
         renderer.assert_(request=request)
@@ -613,20 +613,20 @@ class Test_get_renderer(unittest.TestCase):
 
     def test_it_no_package(self):
         renderer = self.config.testing_add_renderer(
-            'pyramid.tests:abc/def.pt')
+            'tests:abc/def.pt')
         result = self._callFUT('abc/def.pt')
         self.assertEqual(result, renderer)
 
     def test_it_with_package(self):
-        import pyramid.tests
+        import tests
         renderer = self.config.testing_add_renderer(
-            'pyramid.tests:abc/def.pt')
-        result = self._callFUT('abc/def.pt', package=pyramid.tests)
+            'tests:abc/def.pt')
+        result = self._callFUT('abc/def.pt', package=tests)
         self.assertEqual(result, renderer)
 
     def test_it_with_registry(self):
         renderer = self.config.testing_add_renderer(
-            'pyramid.tests:abc/def.pt')
+            'tests:abc/def.pt')
         result = self._callFUT('abc/def.pt', registry=self.config.registry)
         self.assertEqual(result, renderer)
 
@@ -634,7 +634,7 @@ class Test_get_renderer(unittest.TestCase):
         from pyramid.config import Configurator
         isolated_config = Configurator()
         renderer = isolated_config.testing_add_renderer(
-            'pyramid.tests:abc/def.pt')
+            'tests:abc/def.pt')
         result = self._callFUT('abc/def.pt', registry=isolated_config.registry)
         self.assertEqual(result, renderer)
 

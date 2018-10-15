@@ -1,6 +1,6 @@
 import os
 import unittest
-from pyramid.tests.test_scripts import dummy
+from . import dummy
 
 
 class DummyIntrospector(object):
@@ -160,7 +160,7 @@ class TestPRoutesCommand(unittest.TestCase):
         compare_to = L[-1].split()[:3]
         self.assertEqual(
             compare_to,
-            ['a', '/a', 'pyramid.tests.test_scripts.test_proutes.view']
+            ['a', '/a', 'tests.test_scripts.test_proutes.view']
         )
 
     def test_one_route_with_long_name_one_view_registered(self):
@@ -202,7 +202,7 @@ class TestPRoutesCommand(unittest.TestCase):
             compare_to,
             ['very_long_name_123',
              '/and_very_long_pattern_as_well',
-             'pyramid.tests.test_scripts.test_proutes.view']
+             'tests.test_scripts.test_proutes.view']
         )
 
     def test_class_view(self):
@@ -228,7 +228,7 @@ class TestPRoutesCommand(unittest.TestCase):
         compare_to = L[-1].split()
         expected = [
             'foo', '/a/b',
-            'pyramid.tests.test_scripts.dummy.DummyView.view', 'POST'
+            'tests.test_scripts.dummy.DummyView.view', 'POST'
         ]
         self.assertEqual(compare_to, expected)
 
@@ -296,8 +296,8 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()[:3]
-        view_module = 'pyramid.tests.test_scripts.dummy'
-        view_str = '<pyramid.tests.test_scripts.dummy.DummyMultiView'
+        view_module = 'tests.test_scripts.dummy'
+        view_str = '<tests.test_scripts.dummy.DummyMultiView'
         final = '%s.%s' % (view_module, view_str)
 
         self.assertEqual(
@@ -337,7 +337,7 @@ class TestPRoutesCommand(unittest.TestCase):
         compare_to = L[-1].split()
         expected = [
             'foo', '/a/b',
-            'pyramid.tests.test_scripts.test_proutes.view1', 'POST'
+            'tests.test_scripts.test_proutes.view1', 'POST'
         ]
         self.assertEqual(compare_to, expected)
 
@@ -364,7 +364,7 @@ class TestPRoutesCommand(unittest.TestCase):
         compare_to = L[-1].split()
         expected = [
             'foo', '/a/b',
-            'pyramid.tests.test_scripts.test_proutes.view1', 'POST'
+            'tests.test_scripts.test_proutes.view1', 'POST'
         ]
         self.assertEqual(compare_to, expected)
 
@@ -392,7 +392,7 @@ class TestPRoutesCommand(unittest.TestCase):
         compare_to = L[-1].split()
         expected = [
             'foo', '/a/b',
-            'pyramid.tests.test_scripts.test_proutes.view1', 'POST'
+            'tests.test_scripts.test_proutes.view1', 'POST'
         ]
         self.assertEqual(compare_to, expected)
 
@@ -420,7 +420,7 @@ class TestPRoutesCommand(unittest.TestCase):
         compare_to = L[-1].split()
         expected = [
             'foo', '/a/b',
-            'pyramid.tests.test_scripts.test_proutes.view1',
+            'tests.test_scripts.test_proutes.view1',
             '<route', 'mismatch>'
         ]
         self.assertEqual(compare_to, expected)
@@ -446,7 +446,7 @@ class TestPRoutesCommand(unittest.TestCase):
 
         expected = [
             ['__static/', '/static/*subpath',
-             'pyramid.tests.test_scripts:static/', '*'],
+             'tests.test_scripts:static/', '*'],
             ['__static2/', '/static2/*subpath', path2 + os.sep, '*'],
             ['__pyramid_scaffold/', '/pyramid_scaffold/*subpath',
              'pyramid:scaffolds/starter/+package+/static/',  '*'],
@@ -531,7 +531,7 @@ class TestPRoutesCommand(unittest.TestCase):
         compare_to = L[-1].split()
         expected = [
             'foo', '/a/b',
-            'pyramid.tests.test_scripts.test_proutes.view1',
+            'tests.test_scripts.test_proutes.view1',
             'GET'
         ]
         self.assertEqual(compare_to, expected)
@@ -561,7 +561,7 @@ class TestPRoutesCommand(unittest.TestCase):
         compare_to = L[-1].split()
         expected = [
             'foo', '/a/b',
-            'pyramid.tests.test_scripts.test_proutes.view1',
+            'tests.test_scripts.test_proutes.view1',
             '!POST,*'
         ]
         self.assertEqual(compare_to, expected)
@@ -602,7 +602,7 @@ class TestPRoutesCommand(unittest.TestCase):
         compare_to = L[-1].split()
         expected = [
             'foo', '/a/b',
-            'pyramid.tests.test_scripts.test_proutes.view1',
+            'tests.test_scripts.test_proutes.view1',
             '!POST,*'
         ]
         self.assertEqual(compare_to, expected)

@@ -2,9 +2,9 @@ import os
 import unittest
 from pyramid import testing
 
-from pyramid.tests.test_config import IDummy
+from . import IDummy
 
-from pyramid.tests.test_config import dummy_view
+from . import dummy_view
 
 from pyramid.compat import (
     im_func,
@@ -155,7 +155,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
     def test_add_view_view_callable_dottedname(self):
         from pyramid.renderers import null_renderer
         config = self._makeOne(autocommit=True)
-        config.add_view(view='pyramid.tests.test_config.dummy_view',
+        config.add_view(view='tests.test_config.dummy_view',
                         renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         self.assertEqual(wrapper(None, None), 'OK')
@@ -367,7 +367,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(context='pyramid.tests.test_config.IDummy',
+        config.add_view(context='tests.test_config.IDummy',
                         view=view,  renderer=null_renderer)
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
@@ -376,7 +376,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.renderers import null_renderer
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(for_='pyramid.tests.test_config.IDummy',
+        config.add_view(for_='tests.test_config.IDummy',
                         view=view, renderer=null_renderer)
         wrapper = self._getViewCallable(config, IDummy)
         self.assertEqual(wrapper, view)
@@ -1162,7 +1162,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             )
 
     def test_add_view_with_template_renderer(self):
-        from pyramid.tests import test_config
+        from tests import test_config
         from pyramid.interfaces import ISettings
         class view(object):
             def __init__(self, context, request):
@@ -1173,7 +1173,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
                 return {'a':'1'}
         config = self._makeOne(autocommit=True)
         renderer = self._registerRenderer(config)
-        fixture = 'pyramid.tests.test_config:files/minimal.txt'
+        fixture = 'tests.test_config:files/minimal.txt'
         config.introspection = False
         config.add_view(view=view, renderer=fixture)
         wrapper = self._getViewCallable(config)
@@ -1210,11 +1210,11 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(result.body, b'moo')
 
     def test_add_view_with_template_renderer_no_callable(self):
-        from pyramid.tests import test_config
+        from tests import test_config
         from pyramid.interfaces import ISettings
         config = self._makeOne(autocommit=True)
         renderer = self._registerRenderer(config)
-        fixture = 'pyramid.tests.test_config:files/minimal.txt'
+        fixture = 'tests.test_config:files/minimal.txt'
         config.introspection = False
         config.add_view(view=None, renderer=fixture)
         wrapper = self._getViewCallable(config)
@@ -1522,7 +1522,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.add_view(
             view=view,
-            containment='pyramid.tests.test_config.IDummy',
+            containment='tests.test_config.IDummy',
             renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         context = DummyContext()
@@ -1773,7 +1773,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from zope.interface import directlyProvides
         class view(object):
             __view_defaults__ = {
-                'containment':'pyramid.tests.test_config.IDummy'
+                'containment':'tests.test_config.IDummy'
                 }
             def __init__(self, request):
                 pass
@@ -1798,7 +1798,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from zope.interface import directlyProvides
         config = self._makeOne(autocommit=True)
         config.add_view(
-            view='pyramid.tests.test_config.test_views.DummyViewDefaultsClass',
+            view='tests.test_config.test_views.DummyViewDefaultsClass',
             renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         context = DummyContext()
@@ -1815,7 +1815,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from zope.interface import directlyProvides
         config = self._makeOne(autocommit=True)
         config.add_view(
-            'pyramid.tests.test_config.test_views.DummyViewDefaultsClass',
+            'tests.test_config.test_views.DummyViewDefaultsClass',
             renderer=null_renderer)
         wrapper = self._getViewCallable(config)
         context = DummyContext()
@@ -1830,11 +1830,11 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.renderers import null_renderer
         class view(object):
             __view_defaults__ = {
-                'containment':'pyramid.tests.test_config.IDummy'
+                'containment':'tests.test_config.IDummy'
                 }
         class view2(object):
             __view_defaults__ = {
-                'containment':'pyramid.tests.test_config.IFactory'
+                'containment':'tests.test_config.IFactory'
                 }
         config = self._makeOne(autocommit=False)
         config.add_view(
@@ -1849,11 +1849,11 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.renderers import null_renderer
         class view(object):
             __view_defaults__ = {
-                'containment':'pyramid.tests.test_config.IDummy'
+                'containment':'tests.test_config.IDummy'
                 }
         class view2(object):
             __view_defaults__ = {
-                'containment':'pyramid.tests.test_config.IDummy'
+                'containment':'tests.test_config.IDummy'
                 }
         config = self._makeOne(autocommit=False)
         config.add_view(
@@ -1975,7 +1975,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from zope.interface import implementedBy
         class view(object):
             __view_defaults__ = {
-                'containment': 'pyramid.tests.test_config.IDummy'
+                'containment': 'tests.test_config.IDummy'
                 }
             def __init__(self, request):
                 pass
@@ -2009,7 +2009,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.renderers import null_renderer
         config = self._makeOne()
         result = config.derive_view(
-            'pyramid.tests.test_config.dummy_view',
+            'tests.test_config.dummy_view',
             renderer=null_renderer)
         self.assertFalse(result is dummy_view)
         self.assertEqual(result(None, None), 'OK')
@@ -2071,10 +2071,10 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.registry.registerUtility(info, IStaticURLInfo)
         config.add_static_view('static',
-                               'pyramid.tests.test_config:files')
+                               'tests.test_config:files')
         self.assertEqual(
             info.added,
-            [(config, 'static', 'pyramid.tests.test_config:files', {})])
+            [(config, 'static', 'tests.test_config:files', {})])
 
     def test_add_static_view_package_here_relative(self):
         from pyramid.interfaces import IStaticURLInfo
@@ -2084,7 +2084,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config.add_static_view('static', 'files')
         self.assertEqual(
             info.added,
-            [(config, 'static', 'pyramid.tests.test_config:files', {})])
+            [(config, 'static', 'tests.test_config:files', {})])
 
     def test_add_static_view_absolute(self):
         import os
@@ -2169,7 +2169,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from zope.interface import implementedBy
         class view(object):
             __view_defaults__ = {
-                'containment':'pyramid.tests.test_config.IDummy'
+                'containment':'tests.test_config.IDummy'
                 }
             def __init__(self, request):
                 pass
@@ -2305,7 +2305,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from zope.interface import implementedBy
         class view(object):
             __view_defaults__ = {
-                'containment':'pyramid.tests.test_config.IDummy'
+                'containment':'tests.test_config.IDummy'
                 }
             def __init__(self, request):
                 pass
@@ -2379,9 +2379,9 @@ class TestViewsConfigurationMixin(unittest.TestCase):
     def test_set_view_mapper_dottedname(self):
         from pyramid.interfaces import IViewMapperFactory
         config = self._makeOne(autocommit=True)
-        config.set_view_mapper('pyramid.tests.test_config')
+        config.set_view_mapper('tests.test_config')
         result = config.registry.getUtility(IViewMapperFactory)
-        from pyramid.tests import test_config
+        from tests import test_config
         self.assertEqual(result, test_config)
 
     def test_add_normal_and_exception_view_intr_derived_callable(self):
@@ -3284,8 +3284,8 @@ class TestStaticURLInfo(unittest.TestCase):
             request = testing.DummyRequest()
             config.add_static_view('static', 'path')
             config.override_asset(
-                'pyramid.tests.test_config:path/',
-                'pyramid.tests.test_config:other_path/')
+                'tests.test_config:path/',
+                'tests.test_config:other_path/')
             def cb(val):
                 def cb_(request, subpath, kw):
                     kw['_query'] = {'x': val}
@@ -3468,7 +3468,7 @@ class Test_view_description(unittest.TestCase):
         def view(): pass
         result = self._callFUT(view)
         self.assertEqual(result,
-                         'function pyramid.tests.test_config.test_views.view')
+                         'function tests.test_config.test_views.view')
 
 class Test_viewdefaults(unittest.TestCase):
     def _makeOne(self, wrapped):
@@ -3599,7 +3599,7 @@ class DummyStaticURLInfo:
 
 class DummyViewDefaultsClass(object):
     __view_defaults__ = {
-        'containment':'pyramid.tests.test_config.IDummy'
+        'containment':'tests.test_config.IDummy'
         }
     def __init__(self, request):
         pass

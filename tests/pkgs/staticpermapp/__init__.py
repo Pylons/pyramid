@@ -16,10 +16,10 @@ def includeme(config):
      authz_policy = ACLAuthorizationPolicy()
      config._set_authentication_policy(authn_policy)
      config._set_authorization_policy(authz_policy)
-     config.add_static_view('allowed', 'pyramid.tests:fixtures/static/')
-     config.add_static_view('protected', 'pyramid.tests:fixtures/static/',
+     config.add_static_view('allowed', 'tests:fixtures/static/')
+     config.add_static_view('protected', 'tests:fixtures/static/',
                             permission='view')
      config.add_static_view('factory_protected',
-                            'pyramid.tests:fixtures/static/',
+                            'tests:fixtures/static/',
                             permission='view',
                             factory=LocalRootFactory)

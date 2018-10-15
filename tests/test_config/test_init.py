@@ -5,12 +5,12 @@ import os
 from pyramid.compat import im_func
 from pyramid.testing import skip_on
 
-from pyramid.tests.test_config import dummy_tween_factory
-from pyramid.tests.test_config import dummy_include
-from pyramid.tests.test_config import dummy_extend
-from pyramid.tests.test_config import dummy_extend2
-from pyramid.tests.test_config import IDummy
-from pyramid.tests.test_config import DummyContext
+from . import dummy_tween_factory
+from . import dummy_include
+from . import dummy_extend
+from . import dummy_extend2
+from . import IDummy
+from . import DummyContext
 
 from pyramid.exceptions import ConfigurationExecutionError
 from pyramid.exceptions import ConfigurationConflictError
@@ -63,7 +63,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.config import Configurator
         from pyramid.interfaces import IRendererFactory
         config = Configurator()
-        this_pkg = sys.modules['pyramid.tests.test_config']
+        this_pkg = sys.modules['tests.test_config']
         self.assertTrue(config.registry.getUtility(ISettings))
         self.assertEqual(config.package, this_pkg)
         config.commit()
@@ -178,7 +178,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IDebugLogger
         config = self._makeOne()
         logger = config.registry.getUtility(IDebugLogger)
-        self.assertEqual(logger.name, 'pyramid.tests.test_config')
+        self.assertEqual(logger.name, 'tests.test_config')
 
     def test_ctor_noreg_debug_logger_non_None(self):
         from pyramid.interfaces import IDebugLogger
@@ -294,28 +294,28 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, response)
         
     def test_with_package_module(self):
-        from pyramid.tests.test_config import test_init
-        import pyramid.tests
+        from . import test_init
         config = self._makeOne()
         newconfig = config.with_package(test_init)
-        self.assertEqual(newconfig.package, pyramid.tests.test_config)
+        import tests.test_config
+        self.assertEqual(newconfig.package, tests.test_config)
 
     def test_with_package_package(self):
-        import pyramid.tests.test_config
+        from tests import test_config
         config = self._makeOne()
-        newconfig = config.with_package(pyramid.tests.test_config)
-        self.assertEqual(newconfig.package, pyramid.tests.test_config)
+        newconfig = config.with_package(test_config)
+        self.assertEqual(newconfig.package, test_config)
 
     def test_with_package(self):
-        import pyramid.tests
+        import tests
         config = self._makeOne()
         config.basepath = 'basepath'
         config.info = 'info'
         config.includepath = ('spec',)
         config.autocommit = True
         config.route_prefix = 'prefix'
-        newconfig = config.with_package(pyramid.tests)
-        self.assertEqual(newconfig.package, pyramid.tests)
+        newconfig = config.with_package(tests)
+        self.assertEqual(newconfig.package, tests)
         self.assertEqual(newconfig.registry, config.registry)
         self.assertEqual(newconfig.autocommit, True)
         self.assertEqual(newconfig.route_prefix, 'prefix')
@@ -324,38 +324,38 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(newconfig.includepath, ('spec',))
 
     def test_maybe_dotted_string_success(self):
-        import pyramid.tests.test_config
+        import tests.test_config
         config = self._makeOne()
-        result = config.maybe_dotted('pyramid.tests.test_config')
-        self.assertEqual(result, pyramid.tests.test_config)
+        result = config.maybe_dotted('tests.test_config')
+        self.assertEqual(result, tests.test_config)
 
     def test_maybe_dotted_string_fail(self):
         config = self._makeOne()
         self.assertRaises(ImportError, config.maybe_dotted, 'cant.be.found')
 
     def test_maybe_dotted_notstring_success(self):
-        import pyramid.tests.test_config
+        import tests.test_config
         config = self._makeOne()
-        result = config.maybe_dotted(pyramid.tests.test_config)
-        self.assertEqual(result, pyramid.tests.test_config)
+        result = config.maybe_dotted(tests.test_config)
+        self.assertEqual(result, tests.test_config)
 
     def test_absolute_asset_spec_already_absolute(self):
-        import pyramid.tests.test_config
-        config = self._makeOne(package=pyramid.tests.test_config)
+        import tests.test_config
+        config = self._makeOne(package=tests.test_config)
         result = config.absolute_asset_spec('already:absolute')
         self.assertEqual(result, 'already:absolute')
 
     def test_absolute_asset_spec_notastring(self):
-        import pyramid.tests.test_config
-        config = self._makeOne(package=pyramid.tests.test_config)
+        import tests.test_config
+        config = self._makeOne(package=tests.test_config)
         result = config.absolute_asset_spec(None)
         self.assertEqual(result, None)
 
     def test_absolute_asset_spec_relative(self):
-        import pyramid.tests.test_config
-        config = self._makeOne(package=pyramid.tests.test_config)
+        import tests.test_config
+        config = self._makeOne(package=tests.test_config)
         result = config.absolute_asset_spec('files')
-        self.assertEqual(result, 'pyramid.tests.test_config:files')
+        self.assertEqual(result, 'tests.test_config:files')
 
     def test__fix_registry_has_listeners(self):
         reg = DummyRegistry()
@@ -498,7 +498,7 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         config.setup_registry()
         logger = reg.getUtility(IDebugLogger)
-        self.assertEqual(logger.name, 'pyramid.tests.test_config')
+        self.assertEqual(logger.name, 'tests.test_config')
 
     def test_setup_registry_debug_logger_non_None(self):
         from pyramid.registry import Registry
@@ -535,11 +535,11 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IAuthenticationPolicy
         reg = Registry()
         config = self._makeOne(reg)
-        config.setup_registry(authentication_policy='pyramid.tests.test_config')
+        config.setup_registry(authentication_policy='tests.test_config')
         config.commit()
         result = reg.getUtility(IAuthenticationPolicy)
-        import pyramid.tests.test_config
-        self.assertEqual(result, pyramid.tests.test_config)
+        import tests.test_config
+        self.assertEqual(result, tests.test_config)
 
     def test_setup_registry_authorization_policy_dottedname(self):
         from pyramid.registry import Registry
@@ -548,11 +548,11 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         dummy = object()
         config.setup_registry(authentication_policy=dummy,
-                              authorization_policy='pyramid.tests.test_config')
+                              authorization_policy='tests.test_config')
         config.commit()
         result = reg.getUtility(IAuthorizationPolicy)
-        import pyramid.tests.test_config
-        self.assertEqual(result, pyramid.tests.test_config)
+        import tests.test_config
+        self.assertEqual(result, tests.test_config)
 
     def test_setup_registry_authorization_policy_only(self):
         from pyramid.registry import Registry
@@ -576,24 +576,23 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IRootFactory
         reg = Registry()
         config = self._makeOne(reg)
-        import pyramid.tests.test_config
-        config.setup_registry(root_factory='pyramid.tests.test_config')
+        import tests.test_config
+        config.setup_registry(root_factory='tests.test_config')
         self.assertEqual(reg.queryUtility(IRootFactory), None)
         config.commit()
-        self.assertEqual(reg.getUtility(IRootFactory),
-                         pyramid.tests.test_config)
+        self.assertEqual(reg.getUtility(IRootFactory), tests.test_config)
 
     def test_setup_registry_locale_negotiator_dottedname(self):
         from pyramid.registry import Registry
         from pyramid.interfaces import ILocaleNegotiator
         reg = Registry()
         config = self._makeOne(reg)
-        import pyramid.tests.test_config
-        config.setup_registry(locale_negotiator='pyramid.tests.test_config')
+        import tests.test_config
+        config.setup_registry(locale_negotiator='tests.test_config')
         self.assertEqual(reg.queryUtility(ILocaleNegotiator), None)
         config.commit()
         utility = reg.getUtility(ILocaleNegotiator)
-        self.assertEqual(utility, pyramid.tests.test_config)
+        self.assertEqual(utility, tests.test_config)
 
     def test_setup_registry_locale_negotiator(self):
         from pyramid.registry import Registry
@@ -636,12 +635,12 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IRequestFactory
         reg = Registry()
         config = self._makeOne(reg)
-        import pyramid.tests.test_config
-        config.setup_registry(request_factory='pyramid.tests.test_config')
+        import tests.test_config
+        config.setup_registry(request_factory='tests.test_config')
         self.assertEqual(reg.queryUtility(IRequestFactory), None)
         config.commit()
         utility = reg.getUtility(IRequestFactory)
-        self.assertEqual(utility, pyramid.tests.test_config)
+        self.assertEqual(utility, tests.test_config)
 
     def test_setup_registry_alternate_renderers(self):
         from pyramid.registry import Registry
@@ -669,8 +668,8 @@ class ConfiguratorTests(unittest.TestCase):
         config = self._makeOne(reg)
         settings = {
             'pyramid.includes':
-"""pyramid.tests.test_config.dummy_include
-pyramid.tests.test_config.dummy_include2""",
+"""tests.test_config.dummy_include
+tests.test_config.dummy_include2""",
         }
         config.setup_registry(settings=settings)
         self.assertTrue(reg.included)
@@ -682,7 +681,7 @@ pyramid.tests.test_config.dummy_include2""",
         config = self._makeOne(reg)
         settings = {
             'pyramid.includes':
-"""pyramid.tests.test_config.dummy_include pyramid.tests.test_config.dummy_include2""",
+"""tests.test_config.dummy_include tests.test_config.dummy_include2""",
         }
         config.setup_registry(settings=settings)
         self.assertTrue(reg.included)
@@ -695,14 +694,14 @@ pyramid.tests.test_config.dummy_include2""",
         config = self._makeOne(reg)
         settings = {
             'pyramid.tweens':
-                    'pyramid.tests.test_config.dummy_tween_factory'
+                    'tests.test_config.dummy_tween_factory'
         }
         config.setup_registry(settings=settings)
         config.commit()
         tweens = config.registry.getUtility(ITweens)
         self.assertEqual(
             tweens.explicit,
-            [('pyramid.tests.test_config.dummy_tween_factory',
+            [('tests.test_config.dummy_tween_factory',
               dummy_tween_factory)])
 
     def test_introspector_decorator(self):
@@ -739,9 +738,9 @@ pyramid.tests.test_config.dummy_include2""",
         pyramid.config.global_registries.empty()
 
     def test_include_with_dotted_name(self):
-        from pyramid.tests import test_config
+        from tests import test_config
         config = self._makeOne()
-        config.include('pyramid.tests.test_config.dummy_include')
+        config.include('tests.test_config.dummy_include')
         after = config.action_state
         actions = after.actions
         self.assertEqual(len(actions), 1)
@@ -751,7 +750,7 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(action['args'], test_config)
 
     def test_include_with_python_callable(self):
-        from pyramid.tests import test_config
+        from tests import test_config
         config = self._makeOne()
         config.include(dummy_include)
         after = config.action_state
@@ -763,9 +762,9 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(action['args'], test_config)
 
     def test_include_with_module_defaults_to_includeme(self):
-        from pyramid.tests import test_config
+        from tests import test_config
         config = self._makeOne()
-        config.include('pyramid.tests.test_config')
+        config.include('tests.test_config')
         after = config.action_state
         actions = after.actions
         self.assertEqual(len(actions), 1)
@@ -777,7 +776,7 @@ pyramid.tests.test_config.dummy_include2""",
     def test_include_with_module_defaults_to_includeme_missing(self):
         from pyramid.exceptions import ConfigurationError
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.include, 'pyramid.tests')
+        self.assertRaises(ConfigurationError, config.include, 'tests')
 
     def test_include_with_route_prefix(self):
         root_config = self._makeOne(autocommit=True)
@@ -812,18 +811,18 @@ pyramid.tests.test_config.dummy_include2""",
                 return None
         config.inspect = DummyInspect()
         try:
-            config.include('pyramid.tests.test_config.dummy_include')
+            config.include('tests.test_config.dummy_include')
         except ConfigurationError as e:
             self.assertEqual(
                 e.args[0], 
-                "No source file for module 'pyramid.tests.test_config' (.py "
+                "No source file for module 'tests.test_config' (.py "
                 "file must exist, refusing to use orphan .pyc or .pyo file).")
         else: # pragma: no cover
             raise AssertionError
 
     def test_include_constant_root_package(self):
-        from pyramid import tests
-        from pyramid.tests import test_config
+        import tests
+        from tests import test_config
         config = self._makeOne(root_package=tests)
         results = {}
         def include(config):
@@ -834,8 +833,8 @@ pyramid.tests.test_config.dummy_include2""",
         self.assertEqual(results['package'], test_config)
 
     def test_include_threadlocals_active(self):
-        from pyramid.tests import test_config
         from pyramid.threadlocal import get_current_registry
+        from tests import test_config
         stack = []
         def include(config):
             stack.append(get_current_registry())
@@ -935,7 +934,7 @@ pyramid.tests.test_config.dummy_include2""",
         from zope.interface import alsoProvides
         from pyramid.interfaces import IRequest
         from pyramid.view import render_view_to_response
-        import pyramid.tests.test_config.pkgs.scannable as package
+        import tests.test_config.pkgs.scannable as package
         config = self._makeOne(autocommit=True)
         config.scan(package)
 
@@ -1039,10 +1038,10 @@ pyramid.tests.test_config.dummy_include2""",
         from zope.interface import alsoProvides
         from pyramid.interfaces import IRequest
         from pyramid.view import render_view_to_response
-        import pyramid.tests.test_config.pkgs.scannable as package
+        import tests.test_config.pkgs.scannable as package
         config = self._makeOne(autocommit=True)
         config.scan(package, 
-                    ignore='pyramid.tests.test_config.pkgs.scannable.another')
+                    ignore='tests.test_config.pkgs.scannable.another')
 
         ctx = DummyContext()
         req = DummyRequest()
@@ -1062,7 +1061,7 @@ pyramid.tests.test_config.dummy_include2""",
         from pyramid.interfaces import IRequest
         from pyramid.view import render_view_to_response
         config = self._makeOne(autocommit=True)
-        config.scan('pyramid.tests.test_config.pkgs.scannable')
+        config.scan('tests.test_config.pkgs.scannable')
 
         ctx = DummyContext()
         req = DummyRequest()
@@ -1075,7 +1074,7 @@ pyramid.tests.test_config.dummy_include2""",
 
     def test_scan_integration_with_extra_kw(self):
         config = self._makeOne(autocommit=True)
-        config.scan('pyramid.tests.test_config.pkgs.scanextrakw', a=1)
+        config.scan('tests.test_config.pkgs.scanextrakw', a=1)
         self.assertEqual(config.a, 1)
 
     def test_scan_integration_with_onerror(self):
@@ -1097,7 +1096,7 @@ pyramid.tests.test_config.dummy_include2""",
             sys.path.remove(path)
 
     def test_scan_integration_conflict(self):
-        from pyramid.tests.test_config.pkgs import selfscan
+        from tests.test_config.pkgs import selfscan
         from pyramid.config import Configurator
         c = Configurator()
         c.scan(selfscan)
@@ -1275,10 +1274,10 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.config = Configurator()
 
     def test_extend_with_dotted_name(self):
-        from pyramid.tests import test_config
+        from tests import test_config
         config = self.config
         config.add_directive(
-            'dummy_extend', 'pyramid.tests.test_config.dummy_extend')
+            'dummy_extend', 'tests.test_config.dummy_extend')
         self.assertTrue(hasattr(config, 'dummy_extend'))
         config.dummy_extend('discrim')
         after = config.action_state
@@ -1288,10 +1287,10 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assertEqual(action['args'], test_config)
 
     def test_add_directive_with_partial(self):
-        from pyramid.tests import test_config
+        from tests import test_config
         config = self.config
         config.add_directive(
-                'dummy_partial', 'pyramid.tests.test_config.dummy_partial')
+                'dummy_partial', 'tests.test_config.dummy_partial')
         self.assertTrue(hasattr(config, 'dummy_partial'))
         config.dummy_partial()
         after = config.action_state
@@ -1301,10 +1300,10 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assertEqual(action['args'], test_config)
 
     def test_add_directive_with_custom_callable(self):
-        from pyramid.tests import test_config
+        from tests import test_config
         config = self.config
         config.add_directive(
-                'dummy_callable', 'pyramid.tests.test_config.dummy_callable')
+                'dummy_callable', 'tests.test_config.dummy_callable')
         self.assertTrue(hasattr(config, 'dummy_callable'))
         config.dummy_callable('discrim')
         after = config.action_state
@@ -1314,7 +1313,7 @@ class TestConfigurator_add_directive(unittest.TestCase):
         self.assertEqual(action['args'], test_config)
 
     def test_extend_with_python_callable(self):
-        from pyramid.tests import test_config
+        from tests import test_config
         config = self.config
         config.add_directive(
             'dummy_extend', dummy_extend)
@@ -1351,7 +1350,7 @@ class TestConfigurator_add_directive(unittest.TestCase):
     def test_directive_persists_across_configurator_creations(self):
         config = self.config
         config.add_directive('dummy_extend', dummy_extend)
-        config2 = config.with_package('pyramid.tests')
+        config2 = config.with_package('tests')
         config2.dummy_extend('discrim')
         after = config2.action_state
         actions = after.actions
@@ -1391,7 +1390,7 @@ class TestConfigurator__add_predicate(unittest.TestCase):
         config._add_predicate(
             'route',
             'testing',
-            'pyramid.tests.test_config.test_init.DummyPredicate'
+            'tests.test_config.test_init.DummyPredicate'
             )
         
 class TestActionState(unittest.TestCase):
@@ -1404,7 +1403,7 @@ class TestActionState(unittest.TestCase):
         self.assertEqual(c.actions, [])
 
     def test_action_simple(self):
-        from pyramid.tests.test_config import dummyfactory as f
+        from . import dummyfactory as f
         c = self._makeOne()
         c.actions = []
         c.action(1, f, (1,), {'x':1})
@@ -1733,7 +1732,7 @@ class Test_resolveConflicts(unittest.TestCase):
         return resolveConflicts(actions)
 
     def test_it_success_tuples(self):
-        from pyramid.tests.test_config import dummyfactory as f
+        from . import dummyfactory as f
         result = self._callFUT([
             (None, f),
             (1, f, (1,), {}, (), 'first'),
@@ -1794,7 +1793,7 @@ class Test_resolveConflicts(unittest.TestCase):
                   )
 
     def test_it_success_dicts(self):
-        from pyramid.tests.test_config import dummyfactory as f
+        from . import dummyfactory as f
         result = self._callFUT([
             (None, f),
             (1, f, (1,), {}, (), 'first'),
@@ -1855,7 +1854,7 @@ class Test_resolveConflicts(unittest.TestCase):
                   )
 
     def test_it_conflict(self):
-        from pyramid.tests.test_config import dummyfactory as f
+        from . import dummyfactory as f
         result = self._callFUT([
             (None, f),
             (1, f, (2,), {}, ('x',), 'eek'),     # will conflict
@@ -1867,7 +1866,7 @@ class Test_resolveConflicts(unittest.TestCase):
         self.assertRaises(ConfigurationConflictError, list, result)
 
     def test_it_with_actions_grouped_by_order(self):
-        from pyramid.tests.test_config import dummyfactory as f
+        from . import dummyfactory as f
         result = self._callFUT([
             (None, f),                                 # X
             (1, f, (1,), {}, (), 'third', 10),         # X
@@ -1941,7 +1940,7 @@ class Test_resolveConflicts(unittest.TestCase):
                   )
 
     def test_override_success_across_orders(self):
-        from pyramid.tests.test_config import dummyfactory as f
+        from . import dummyfactory as f
         result = self._callFUT([
             (1, f, (2,), {}, ('x',), 'eek', 0),
             (1, f, (3,), {}, ('x', 'y'), 'ack', 10),
@@ -1959,7 +1958,7 @@ class Test_resolveConflicts(unittest.TestCase):
         ])
 
     def test_conflicts_across_orders(self):
-        from pyramid.tests.test_config import dummyfactory as f
+        from . import dummyfactory as f
         result = self._callFUT([
             (1, f, (2,), {}, ('x', 'y'), 'eek', 0),
             (1, f, (3,), {}, ('x'), 'ack', 10),
