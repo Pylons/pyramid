@@ -209,19 +209,14 @@ Running Tests
   dependencies, start a server, and hit a URL on the server, can be run like
   so:
 
-    $ ./scaffoldtests.sh
-
-  Alternatively:
-
-    $ tox -e{py27,py34,py35,pyt36,py37,pypy}-scaffolds
+    $ tox -e{py27,py34,py35,py36,py37,pypy}-scaffolds
 
 
 Test Coverage
 -------------
 
 - The codebase *must* have 100% test statement coverage after each commit.  You
-  can test coverage via `./coverage.sh` (which itself just executes `tox
-  -epy2-cover,py3-cover,coverage`).
+  can test coverage via `tox -epy2-cover,py3-cover,coverage`.
 
 
 Documentation Coverage and Building HTML Documentation
@@ -232,10 +227,9 @@ documentation in this package which references that API or behavior must be
 changed to reflect the bug fix, ideally in the same commit that fixes the bug
 or adds the feature.  To build and review docs, use the following steps.
 
-1. In the main Pyramid checkout directory, run `./builddocs.sh` (which just
-   turns around and runs `tox -e docs`):
+1. In the main Pyramid checkout directory, run `tox -e docs`:
 
-     $ ./builddocs.sh
+     $ tox -e docs
 
 2. Open the `docs/_build/html/index.html` file to see the resulting HTML
    rendering.
