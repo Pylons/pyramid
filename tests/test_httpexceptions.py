@@ -1,40 +1,45 @@
 import unittest
 
-from pyramid.compat import (
-    bytes_,
-    string_types,
-    text_,
-    )
+from pyramid.compat import bytes_, string_types, text_
+
 
 class Test_exception_response(unittest.TestCase):
     def _callFUT(self, *arg, **kw):
         from pyramid.httpexceptions import exception_response
+
         return exception_response(*arg, **kw)
 
     def test_status_400(self):
         from pyramid.httpexceptions import HTTPBadRequest
+
         self.assertTrue(isinstance(self._callFUT(400), HTTPBadRequest))
 
     def test_status_404(self):
         from pyramid.httpexceptions import HTTPNotFound
+
         self.assertTrue(isinstance(self._callFUT(404), HTTPNotFound))
 
     def test_status_500(self):
         from pyramid.httpexceptions import HTTPInternalServerError
-        self.assertTrue(isinstance(self._callFUT(500),
-                        HTTPInternalServerError))
+
+        self.assertTrue(
+            isinstance(self._callFUT(500), HTTPInternalServerError)
+        )
 
     def test_status_201(self):
         from pyramid.httpexceptions import HTTPCreated
+
         self.assertTrue(isinstance(self._callFUT(201), HTTPCreated))
 
     def test_extra_kw(self):
         resp = self._callFUT(404, headers=[('abc', 'def')])
         self.assertEqual(resp.headers['abc'], 'def')
 
+
 class Test_default_exceptionresponse_view(unittest.TestCase):
     def _callFUT(self, context, request):
         from pyramid.httpexceptions import default_exceptionresponse_view
+
         return default_exceptionresponse_view(context, request)
 
     def test_call_with_exception(self):
@@ -49,9 +54,11 @@ class Test_default_exceptionresponse_view(unittest.TestCase):
         result = self._callFUT(None, request)
         self.assertEqual(result, context)
 
+
 class Test__no_escape(unittest.TestCase):
     def _callFUT(self, val):
         from pyramid.httpexceptions import _no_escape
+
         return _no_escape(val)
 
     def test_null(self):
@@ -64,19 +71,29 @@ class Test__no_escape(unittest.TestCase):
         class DummyUnicodeObject(object):
             def __unicode__(self):
                 return text_('42')
+
         duo = DummyUnicodeObject()
         self.assertEqual(self._callFUT(duo), text_('42'))
+
 
 class TestHTTPException(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.httpexceptions import HTTPException
+
         return HTTPException
 
-    def _getTargetSubclass(self, code='200', title='OK',
-                           explanation='explanation', empty_body=False):
+    def _getTargetSubclass(
+        self,
+        code='200',
+        title='OK',
+        explanation='explanation',
+        empty_body=False,
+    ):
         cls = self._getTargetClass()
+
         class Subclass(cls):
             pass
+
         Subclass.empty_body = empty_body
         Subclass.code = code
         Subclass.title = title
@@ -89,21 +106,25 @@ class TestHTTPException(unittest.TestCase):
 
     def test_implements_IResponse(self):
         from pyramid.interfaces import IResponse
+
         cls = self._getTargetClass()
         self.assertTrue(IResponse.implementedBy(cls))
 
     def test_provides_IResponse(self):
         from pyramid.interfaces import IResponse
+
         inst = self._getTargetClass()()
         self.assertTrue(IResponse.providedBy(inst))
 
     def test_implements_IExceptionResponse(self):
         from pyramid.interfaces import IExceptionResponse
+
         cls = self._getTargetClass()
         self.assertTrue(IExceptionResponse.implementedBy(cls))
 
     def test_provides_IExceptionResponse(self):
         from pyramid.interfaces import IExceptionResponse
+
         inst = self._getTargetClass()()
         self.assertTrue(IExceptionResponse.providedBy(inst))
 
@@ -130,7 +151,8 @@ class TestHTTPException(unittest.TestCase):
     def test_ctor_sets_body_template_obj(self):
         exc = self._makeOne(body_template='${foo}')
         self.assertEqual(
-            exc.body_template_obj.substitute({'foo': 'foo'}), 'foo')
+            exc.body_template_obj.substitute({'foo': 'foo'}), 'foo'
+        )
 
     def test_ctor_with_empty_body(self):
         cls = self._getTargetSubclass(empty_body=True)
@@ -323,17 +345,20 @@ class TestHTTPException(unittest.TestCase):
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
         import json
+
         retval = json.loads(body.decode('UTF-8'))
         self.assertEqual(retval['code'], '200 OK')
         self.assertEqual(retval['title'], 'OK')
 
     def test__default_app_iter_with_custom_json(self):
         def json_formatter(status, body, title, environ):
-            return {'message': body,
-                    'code': status,
-                    'title': title,
-                    'custom': environ['CUSTOM_VARIABLE']
-                    }
+            return {
+                'message': body,
+                'code': status,
+                'title': title,
+                'custom': environ['CUSTOM_VARIABLE'],
+            }
+
         cls = self._getTargetSubclass()
         exc = cls(comment='comment', json_formatter=json_formatter)
         environ = _makeEnviron()
@@ -342,6 +367,7 @@ class TestHTTPException(unittest.TestCase):
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
         import json
+
         retval = json.loads(body.decode('UTF-8'))
         self.assertEqual(retval['code'], '200 OK')
         self.assertEqual(retval['title'], 'OK')
@@ -359,9 +385,11 @@ class TestHTTPException(unittest.TestCase):
         cls = self._getTargetSubclass()
         exc = cls(body_template='${REQUEST_METHOD}')
         environ = _makeEnviron()
+
         class Choke(object):
             def __str__(self):  # pragma no cover
                 raise ValueError
+
         environ['gardentheory.user'] = Choke()
         start_response = DummyStartResponse()
         body = list(exc(environ, start_response))[0]
@@ -384,6 +412,7 @@ class TestHTTPException(unittest.TestCase):
 class TestRenderAllExceptionsWithoutArguments(unittest.TestCase):
     def _doit(self, content_type):
         from pyramid.httpexceptions import status_map
+
         L = []
         self.assertTrue(status_map)
         for v in status_map.values():
@@ -405,9 +434,11 @@ class TestRenderAllExceptionsWithoutArguments(unittest.TestCase):
     def test_it_html(self):
         self._doit('text/html')
 
+
 class Test_HTTPMove(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.httpexceptions import _HTTPMove
+
         return _HTTPMove(*arg, **kw)
 
     def test_it_location_none_valueerrors(self):
@@ -433,13 +464,19 @@ class Test_HTTPMove(unittest.TestCase):
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         app_iter = exc(environ, start_response)
-        self.assertEqual(app_iter[0],
-                         (b'520 Unknown Error\n\nThe resource has been moved to foo; '
-                          b'you should be redirected automatically.\n\n'))
+        self.assertEqual(
+            app_iter[0],
+            (
+                b'520 Unknown Error\n\nThe resource has been moved to foo; '
+                b'you should be redirected automatically.\n\n'
+            ),
+        )
+
 
 class TestHTTPForbidden(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.httpexceptions import HTTPForbidden
+
         return HTTPForbidden(*arg, **kw)
 
     def test_it_result_not_passed(self):
@@ -450,9 +487,11 @@ class TestHTTPForbidden(unittest.TestCase):
         exc = self._makeOne(result='foo')
         self.assertEqual(exc.result, 'foo')
 
+
 class TestHTTPMethodNotAllowed(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.httpexceptions import HTTPMethodNotAllowed
+
         return HTTPMethodNotAllowed(*arg, **kw)
 
     def test_it_with_default_body_tmpl(self):
@@ -460,23 +499,31 @@ class TestHTTPMethodNotAllowed(unittest.TestCase):
         environ = _makeEnviron()
         start_response = DummyStartResponse()
         app_iter = exc(environ, start_response)
-        self.assertEqual(app_iter[0],
-                         (b'405 Method Not Allowed\n\nThe method GET is not '
-                          b'allowed for this resource. \n\n\n'))
+        self.assertEqual(
+            app_iter[0],
+            (
+                b'405 Method Not Allowed\n\nThe method GET is not '
+                b'allowed for this resource. \n\n\n'
+            ),
+        )
 
 
 class DummyRequest(object):
     exception = None
+
 
 class DummyStartResponse(object):
     def __call__(self, status, headerlist):
         self.status = status
         self.headerlist = headerlist
 
+
 def _makeEnviron(**kw):
-    environ = {'REQUEST_METHOD': 'GET',
-               'wsgi.url_scheme': 'http',
-               'SERVER_NAME': 'localhost',
-               'SERVER_PORT': '80'}
+    environ = {
+        'REQUEST_METHOD': 'GET',
+        'wsgi.url_scheme': 'http',
+        'SERVER_NAME': 'localhost',
+        'SERVER_PORT': '80',
+    }
     environ.update(kw)
     return environ

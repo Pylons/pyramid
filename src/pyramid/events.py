@@ -1,9 +1,6 @@
 import venusian
 
-from zope.interface import (
-    implementer,
-    Interface
-    )
+from zope.interface import implementer, Interface
 
 from pyramid.interfaces import (
     IContextFound,
@@ -12,7 +9,8 @@ from pyramid.interfaces import (
     IApplicationCreated,
     IBeforeRender,
     IBeforeTraversal,
-    )
+)
+
 
 class subscriber(object):
     """ Decorator activated via a :term:`scan` which treats the function
@@ -89,7 +87,8 @@ class subscriber(object):
        Added the ``_depth`` and ``_category`` arguments.
 
     """
-    venusian = venusian # for unit testing
+
+    venusian = venusian  # for unit testing
 
     def __init__(self, *ifaces, **predicates):
         self.ifaces = ifaces
@@ -103,9 +102,14 @@ class subscriber(object):
             config.add_subscriber(wrapped, iface, **self.predicates)
 
     def __call__(self, wrapped):
-        self.venusian.attach(wrapped, self.register, category=self.category,
-                             depth=self.depth + 1)
+        self.venusian.attach(
+            wrapped,
+            self.register,
+            category=self.category,
+            depth=self.depth + 1,
+        )
         return wrapped
+
 
 @implementer(INewRequest)
 class NewRequest(object):
@@ -114,8 +118,10 @@ class NewRequest(object):
     event instance has an attribute, ``request``, which is a
     :term:`request` object.  This event class implements the
     :class:`pyramid.interfaces.INewRequest` interface."""
+
     def __init__(self, request):
         self.request = request
+
 
 @implementer(INewResponse)
 class NewResponse(object):
@@ -149,9 +155,11 @@ class NewResponse(object):
        almost purely for symmetry with the
        :class:`pyramid.interfaces.INewRequest` event.
     """
+
     def __init__(self, request, response):
         self.request = request
         self.response = response
+
 
 @implementer(IBeforeTraversal)
 class BeforeTraversal(object):
@@ -172,6 +180,7 @@ class BeforeTraversal(object):
 
     def __init__(self, request):
         self.request = request
+
 
 @implementer(IContextFound)
 class ContextFound(object):
@@ -194,10 +203,13 @@ class ContextFound(object):
        As of :app:`Pyramid` 1.0, for backwards compatibility purposes, this
        event may also be imported as :class:`pyramid.events.AfterTraversal`.
     """
+
     def __init__(self, request):
         self.request = request
 
-AfterTraversal = ContextFound # b/c as of 1.0
+
+AfterTraversal = ContextFound  # b/c as of 1.0
+
 
 @implementer(IApplicationCreated)
 class ApplicationCreated(object):
@@ -214,11 +226,14 @@ class ApplicationCreated(object):
        :class:`pyramid.events.WSGIApplicationCreatedEvent`.  This was the name
        of the event class before :app:`Pyramid` 1.0.
     """
+
     def __init__(self, app):
         self.app = app
         self.object = app
 
-WSGIApplicationCreatedEvent = ApplicationCreated # b/c (as of 1.0)
+
+WSGIApplicationCreatedEvent = ApplicationCreated  # b/c (as of 1.0)
+
 
 @implementer(IBeforeRender)
 class BeforeRender(dict):
@@ -283,7 +298,7 @@ class BeforeRender(dict):
 
         See also :class:`pyramid.interfaces.IBeforeRender`.
     """
+
     def __init__(self, system, rendering_val=None):
         dict.__init__(self, system)
         self.rendering_val = rendering_val
-

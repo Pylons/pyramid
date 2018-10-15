@@ -1,0 +1,18 @@
+[flake8]
+ignore =
+    # E203: whitespace before ':' (black fails to be PEP8 compliant)
+    E203
+    # E731: do not assign a lambda expression, use a def
+    E731
+    # W503: line break before binary operator (flake8 is not PEP8 compliant)
+    W503
+exclude =
+    src/pyramid/compat.py
+    src/pyramid/scaffolds/alchemy
+    src/pyramid/scaffolds/starter
+    src/pyramid/scaffolds/zodb
+    tests/fixtures
+    tests/pkgs
+    tests/test_config/pkgs
+    tests/test_config/path
+show-source = True

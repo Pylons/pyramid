@@ -1,11 +1,7 @@
-from pyramid.httpexceptions import (
-    HTTPBadRequest,
-    HTTPNotFound,
-    HTTPForbidden,
-    )
+from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound, HTTPForbidden
 
-NotFound = HTTPNotFound # bw compat
-Forbidden = HTTPForbidden # bw compat
+NotFound = HTTPNotFound  # bw compat
+Forbidden = HTTPForbidden  # bw compat
 
 CR = '\n'
 
@@ -15,6 +11,7 @@ class BadCSRFOrigin(HTTPBadRequest):
     This exception indicates the request has failed cross-site request forgery
     origin validation.
     """
+
     title = "Bad CSRF Origin"
     explanation = (
         "Access is denied. This server can not verify that the origin or "
@@ -29,6 +26,7 @@ class BadCSRFToken(HTTPBadRequest):
     This exception indicates the request has failed cross-site request
     forgery token validation.
     """
+
     title = 'Bad CSRF Token'
     explanation = (
         'Access is denied.  This server can not verify that your cross-site '
@@ -36,7 +34,9 @@ class BadCSRFToken(HTTPBadRequest):
         'supplied the wrong cross-site request forgery token or your session '
         'no longer exists.  This may be due to session timeout or because '
         'browser is not supplying the credentials required, as can happen '
-        'when the browser has cookies turned off.')
+        'when the browser has cookies turned off.'
+    )
+
 
 class PredicateMismatch(HTTPNotFound):
     """
@@ -65,6 +65,7 @@ class PredicateMismatch(HTTPNotFound):
     exception view.
     """
 
+
 class URLDecodeError(UnicodeDecodeError):
     """
     This exception is raised when :app:`Pyramid` cannot
@@ -76,9 +77,11 @@ class URLDecodeError(UnicodeDecodeError):
     decoded.
     """
 
+
 class ConfigurationError(Exception):
     """ Raised when inappropriate input values are supplied to an API
     method of a :term:`Configurator`"""
+
 
 class ConfigurationConflictError(ConfigurationError):
     """ Raised when a configuration conflict is detected during action
@@ -91,7 +94,7 @@ class ConfigurationConflictError(ConfigurationError):
         r = ["Conflicting configuration actions"]
         items = sorted(self._conflicts.items())
         for discriminator, infos in items:
-            r.append("  For: %s" % (discriminator, ))
+            r.append("  For: %s" % (discriminator,))
             for info in infos:
                 for line in str(info).rstrip().split(CR):
                     r.append("    " + line)
@@ -113,6 +116,7 @@ class ConfigurationExecutionError(ConfigurationError):
 class CyclicDependencyError(Exception):
     """ The exception raised when the Pyramid topological sorter detects a
     cyclic dependency."""
+
     def __init__(self, cycles):
         self.cycles = cycles
 

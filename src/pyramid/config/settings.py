@@ -2,6 +2,7 @@ import os
 
 from pyramid.settings import asbool, aslist
 
+
 class SettingsConfiguratorMixin(object):
     def _set_settings(self, mapping):
         if mapping is None:
@@ -60,11 +61,13 @@ def Settings(d=None, _environ_=os.environ, **kw):
     d.update(**kw)
 
     eget = _environ_.get
+
     def expand_key(key):
         keys = [key]
         if not key.startswith('pyramid.'):
             keys.append('pyramid.' + key)
         return keys
+
     def S(settings_key, env_key=None, type_=str, default=False):
         value = default
         keys = expand_key(settings_key)
@@ -74,6 +77,7 @@ def Settings(d=None, _environ_=os.environ, **kw):
             value = eget(env_key, value)
         value = type_(value)
         d.update({k: value for k in keys})
+
     def O(settings_key, override_key):  # noqa: E743
         for key in expand_key(settings_key):
             d[key] = d[key] or d[override_key]

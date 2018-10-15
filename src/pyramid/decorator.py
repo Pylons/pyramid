@@ -32,6 +32,7 @@ class reify(object):
         >>> f.jammy
         2
     """
+
     def __init__(self, wrapped):
         self.wrapped = wrapped
         update_wrapper(self, wrapped)
@@ -42,4 +43,3 @@ class reify(object):
         val = self.wrapped(inst)
         setattr(inst, self.wrapped.__name__, val)
         return val
-

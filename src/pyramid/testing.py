@@ -2,22 +2,11 @@ import copy
 import os
 from contextlib import contextmanager
 
-from zope.interface import (
-    implementer,
-    alsoProvides,
-    )
+from zope.interface import implementer, alsoProvides
 
-from pyramid.interfaces import (
-    IRequest,
-    ISession,
-    )
+from pyramid.interfaces import IRequest, ISession
 
-from pyramid.compat import (
-    PY3,
-    PYPY,
-    class_types,
-    text_,
-    )
+from pyramid.compat import PY3, PYPY, class_types, text_
 
 from pyramid.config import Configurator
 from pyramid.decorator import reify
@@ -30,12 +19,9 @@ from pyramid.security import (
     Everyone,
     AuthenticationAPIMixin,
     AuthorizationAPIMixin,
-    )
+)
 
-from pyramid.threadlocal import (
-    get_current_registry,
-    manager,
-    )
+from pyramid.threadlocal import get_current_registry, manager
 
 from pyramid.i18n import LocalizerRequestMixin
 from pyramid.request import CallbackMethodsMixin
@@ -46,17 +32,27 @@ from pyramid.view import ViewMethodsMixin
 
 _marker = object()
 
+
 class DummyRootFactory(object):
     __parent__ = None
     __name__ = None
+
     def __init__(self, request):
         if 'bfg.routes.matchdict' in request:
             self.__dict__.update(request['bfg.routes.matchdict'])
 
+
 class DummySecurityPolicy(object):
     """ A standin for both an IAuthentication and IAuthorization policy """
-    def __init__(self, userid=None, groupids=(), permissive=True,
-                 remember_result=None, forget_result=None):
+
+    def __init__(
+        self,
+        userid=None,
+        groupids=(),
+        permissive=True,
+        remember_result=None,
+        forget_result=None,
+    ):
         self.userid = userid
         self.groupids = groupids
         self.permissive = permissive
@@ -95,6 +91,7 @@ class DummySecurityPolicy(object):
     def principals_allowed_by_permission(self, context, permission):
         return self.effective_principals(None)
 
+
 class DummyTemplateRenderer(object):
     """
     An instance of this class is returned from
@@ -103,6 +100,7 @@ class DummyTemplateRenderer(object):
     assertion which compares data passed to the renderer by the view
     function against expected key/value pairs.
     """
+
     def __init__(self, string_response=''):
         self._received = {}
         self._string_response = string_response
@@ -113,9 +111,11 @@ class DummyTemplateRenderer(object):
     # source code, *everything* is an API!
     def _get_string_response(self):
         return self._string_response
+
     def _set_string_response(self, response):
         self._string_response = response
         self._implementation.response = response
+
     string_response = property(_get_string_response, _set_string_response)
 
     def implementation(self):
@@ -151,19 +151,23 @@ class DummyTemplateRenderer(object):
                 if myval is _marker:
                     raise AssertionError(
                         'A value for key "%s" was not passed to the renderer'
-                        % k)
+                        % k
+                    )
 
             if myval != v:
                 raise AssertionError(
-                    '\nasserted value for %s: %r\nactual value: %r' % (
-                        k, v, myval))
+                    '\nasserted value for %s: %r\nactual value: %r'
+                    % (k, v, myval)
+                )
         return True
 
 
 class DummyResource:
     """ A dummy :app:`Pyramid` :term:`resource` object."""
-    def __init__(self, __name__=None, __parent__=None, __provides__=None,
-                 **kw):
+
+    def __init__(
+        self, __name__=None, __parent__=None, __provides__=None, **kw
+    ):
         """ The resource's ``__name__`` attribute will be set to the
         value of the ``__name__`` argument, and the resource's
         ``__parent__`` attribute will be set to the value of the
@@ -250,12 +254,15 @@ class DummyResource:
             inst.__parent__ = __parent__
         return inst
 
-DummyModel = DummyResource # b/w compat (forever)
+
+DummyModel = DummyResource  # b/w compat (forever)
+
 
 @implementer(ISession)
 class DummySession(dict):
     created = None
     new = True
+
     def changed(self):
         pass
 
@@ -286,6 +293,7 @@ class DummySession(dict):
             token = self.new_csrf_token()
         return token
 
+
 @implementer(IRequest)
 class DummyRequest(
     URLMethodsMixin,
@@ -295,7 +303,7 @@ class DummyRequest(
     AuthenticationAPIMixin,
     AuthorizationAPIMixin,
     ViewMethodsMixin,
-    ):
+):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.
 
     The ``params``, ``environ``, ``headers``, ``path``, and
@@ -322,6 +330,7 @@ class DummyRequest(
     a Request, use the :class:`pyramid.request.Request` class itself rather
     than this class while writing tests.
     """
+
     method = 'GET'
     application_url = 'http://example.com'
     host = 'example.com:80'
@@ -333,8 +342,16 @@ class DummyRequest(
     _registry = None
     request_iface = IRequest
 
-    def __init__(self, params=None, environ=None, headers=None, path='/',
-                 cookies=None, post=None, **kw):
+    def __init__(
+        self,
+        params=None,
+        environ=None,
+        headers=None,
+        path='/',
+        cookies=None,
+        post=None,
+        **kw
+    ):
         if environ is None:
             environ = {}
         if params is None:
@@ -369,7 +386,7 @@ class DummyRequest(
         self.context = None
         self.root = None
         self.virtual_root = None
-        self.marshalled = params # repoze.monty
+        self.marshalled = params  # repoze.monty
         self.session = DummySession()
         self.__dict__.update(kw)
 
@@ -391,11 +408,18 @@ class DummyRequest(
         f = _get_response_factory(self.registry)
         return f(self)
 
+
 have_zca = True
 
 
-def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
-          settings=None, package=None):
+def setUp(
+    registry=None,
+    request=None,
+    hook_zca=True,
+    autocommit=True,
+    settings=None,
+    package=None,
+):
     """
     Set :app:`Pyramid` registry and request thread locals for the
     duration of a single unit test.
@@ -462,8 +486,9 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
         registry = Registry('testing')
     if package is None:
         package = caller_package()
-    config = Configurator(registry=registry, autocommit=autocommit,
-                          package=package)
+    config = Configurator(
+        registry=registry, autocommit=autocommit, package=package
+    )
     if settings is None:
         settings = {}
     if getattr(registry, 'settings', None) is None:
@@ -486,11 +511,12 @@ def setUp(registry=None, request=None, hook_zca=True, autocommit=True,
     global have_zca
     try:
         have_zca and hook_zca and config.hook_zca()
-    except ImportError: # pragma: no cover
+    except ImportError:  # pragma: no cover
         # (dont choke on not being able to import z.component)
         have_zca = False
     config.begin(request=request)
     return config
+
 
 def tearDown(unhook_zca=True):
     """Undo the effects of :func:`pyramid.testing.setUp`.  Use this
@@ -507,8 +533,9 @@ def tearDown(unhook_zca=True):
     if unhook_zca and have_zca:
         try:
             from zope.component import getSiteManager
+
             getSiteManager.reset()
-        except ImportError: # pragma: no cover
+        except ImportError:  # pragma: no cover
             have_zca = False
     info = manager.pop()
     manager.clear()
@@ -524,6 +551,7 @@ def tearDown(unhook_zca=True):
                 # understand, let's not blow up
                 pass
 
+
 def cleanUp(*arg, **kw):
     """ An alias for :func:`pyramid.testing.setUp`. """
     package = kw.get('package', None)
@@ -531,6 +559,7 @@ def cleanUp(*arg, **kw):
         package = caller_package()
         kw['package'] = package
     return setUp(*arg, **kw)
+
 
 class DummyRendererFactory(object):
     """ Registered by
@@ -540,9 +569,10 @@ class DummyRendererFactory(object):
     wild believing they can register either.  The ``factory`` argument
     passed to this constructor is usually the *real* template renderer
     factory, found when ``testing_add_renderer`` is called."""
+
     def __init__(self, name, factory):
         self.name = name
-        self.factory = factory # the "real" renderer factory reg'd previously
+        self.factory = factory  # the "real" renderer factory reg'd previously
         self.renderers = {}
 
     def add(self, spec, renderer):
@@ -562,8 +592,9 @@ class DummyRendererFactory(object):
                 if self.factory:
                     renderer = self.factory(info)
                 else:
-                    raise KeyError('No testing renderer registered for %r' %
-                                   spec)
+                    raise KeyError(
+                        'No testing renderer registered for %r' % spec
+                    )
         return renderer
 
 
@@ -571,15 +602,19 @@ class MockTemplate(object):
     def __init__(self, response):
         self._received = {}
         self.response = response
+
     def __getattr__(self, attrname):
         return self
+
     def __getitem__(self, attrname):
         return self
+
     def __call__(self, *arg, **kw):
         self._received.update(kw)
         return self.response
 
-def skip_on(*platforms): # pragma: no  cover
+
+def skip_on(*platforms):  # pragma: no  cover
     skip = False
     for platform in platforms:
         if skip_on.os_name.startswith(platform):
@@ -596,22 +631,26 @@ def skip_on(*platforms): # pragma: no  cover
             else:
                 return func
         else:
+
             def wrapper(*args, **kw):
                 if skip:
                     return
                 return func(*args, **kw)
+
             wrapper.__name__ = func.__name__
             wrapper.__doc__ = func.__doc__
             return wrapper
+
     return decorator
-skip_on.os_name = os.name # for testing
+
+
+skip_on.os_name = os.name  # for testing
+
 
 @contextmanager
-def testConfig(registry=None,
-        request=None,
-        hook_zca=True,
-        autocommit=True,
-        settings=None):
+def testConfig(
+    registry=None, request=None, hook_zca=True, autocommit=True, settings=None
+):
     """Returns a context manager for test set up.
 
     This context manager calls :func:`pyramid.testing.setUp` when
@@ -630,11 +669,13 @@ def testConfig(registry=None,
             req = DummyRequest()
             resp = myview(req)
     """
-    config = setUp(registry=registry,
-            request=request,
-            hook_zca=hook_zca,
-            autocommit=autocommit,
-            settings=settings)
+    config = setUp(
+        registry=registry,
+        request=request,
+        hook_zca=hook_zca,
+        autocommit=autocommit,
+        settings=settings,
+    )
     try:
         yield config
     finally:

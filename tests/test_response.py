@@ -4,24 +4,30 @@ import os
 import unittest
 from pyramid import testing
 
+
 class TestResponse(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.response import Response
+
         return Response
 
     def test_implements_IResponse(self):
         from pyramid.interfaces import IResponse
+
         cls = self._getTargetClass()
         self.assertTrue(IResponse.implementedBy(cls))
 
     def test_provides_IResponse(self):
         from pyramid.interfaces import IResponse
+
         inst = self._getTargetClass()()
         self.assertTrue(IResponse.providedBy(inst))
+
 
 class TestFileResponse(unittest.TestCase):
     def _makeOne(self, file, **kw):
         from pyramid.response import FileResponse
+
         return FileResponse(file, **kw)
 
     def _getPath(self, suffix='txt'):
@@ -40,8 +46,9 @@ class TestFileResponse(unittest.TestCase):
         path = self._getPath('xml')
         r = self._makeOne(path, content_type='application/xml')
         self.assertEqual(r.content_type, 'application/xml')
-        self.assertEqual(r.headers['content-type'],
-                         'application/xml; charset=UTF-8')
+        self.assertEqual(
+            r.headers['content-type'], 'application/xml; charset=UTF-8'
+        )
         r.app_iter.close()
 
     def test_with_pdf_content_type(self):
@@ -55,8 +62,10 @@ class TestFileResponse(unittest.TestCase):
         for suffix in ('txt', 'xml', 'pdf'):
             path = self._getPath(suffix)
             r = self._makeOne(path)
-            self.assertEqual(r.headers['content-type'].split(';')[0],
-                             mimetypes.guess_type(path, strict=False)[0])
+            self.assertEqual(
+                r.headers['content-type'].split(';')[0],
+                mimetypes.guess_type(path, strict=False)[0],
+            )
             r.app_iter.close()
 
     def test_python_277_bug_15207(self):
@@ -67,9 +76,11 @@ class TestFileResponse(unittest.TestCase):
         from pyramid.compat import text_
         import mimetypes as old_mimetypes
         from pyramid import response
+
         class FakeMimetypesModule(object):
-            def guess_type(self,  *arg, **kw):
+            def guess_type(self, *arg, **kw):
                 return text_('foo/bar'), None
+
         fake_mimetypes = FakeMimetypesModule()
         try:
             response.mimetypes = fake_mimetypes
@@ -80,9 +91,11 @@ class TestFileResponse(unittest.TestCase):
         finally:
             response.mimetypes = old_mimetypes
 
+
 class TestFileIter(unittest.TestCase):
     def _makeOne(self, file, block_size):
         from pyramid.response import FileIter
+
         return FileIter(file, block_size)
 
     def test___iter__(self):
@@ -97,7 +110,7 @@ class TestFileIter(unittest.TestCase):
         r = b''
         for x in inst:
             self.assertEqual(len(x), 1)
-            r+=x
+            r += x
         self.assertEqual(r, data)
 
     def test_close(self):
@@ -106,15 +119,18 @@ class TestFileIter(unittest.TestCase):
         inst.close()
         self.assertTrue(f.closed)
 
+
 class Test_patch_mimetypes(unittest.TestCase):
     def _callFUT(self, module):
         from pyramid.response import init_mimetypes
+
         return init_mimetypes(module)
 
     def test_has_init(self):
         class DummyMimetypes(object):
             def init(self):
                 self.initted = True
+
         module = DummyMimetypes()
         result = self._callFUT(module)
         self.assertEqual(result, True)
@@ -123,6 +139,7 @@ class Test_patch_mimetypes(unittest.TestCase):
     def test_missing_init(self):
         class DummyMimetypes(object):
             pass
+
         module = DummyMimetypes()
         result = self._callFUT(module)
         self.assertEqual(result, False)
@@ -138,13 +155,20 @@ class TestResponseAdapter(unittest.TestCase):
 
     def _makeOne(self, *types_or_ifaces, **kw):
         from pyramid.response import response_adapter
+
         return response_adapter(*types_or_ifaces, **kw)
 
     def test_register_single(self):
         from zope.interface import Interface
-        class IFoo(Interface): pass
+
+        class IFoo(Interface):
+            pass
+
         dec = self._makeOne(IFoo)
-        def foo(): pass
+
+        def foo():  # pragma: no cover
+            pass
+
         config = DummyConfigurator()
         scanner = Dummy()
         scanner.config = config
@@ -153,10 +177,18 @@ class TestResponseAdapter(unittest.TestCase):
 
     def test_register_multi(self):
         from zope.interface import Interface
-        class IFoo(Interface): pass
-        class IBar(Interface): pass
+
+        class IFoo(Interface):
+            pass
+
+        class IBar(Interface):
+            pass
+
         dec = self._makeOne(IFoo, IBar)
-        def foo(): pass
+
+        def foo():  # pragma: no cover
+            pass
+
         config = DummyConfigurator()
         scanner = Dummy()
         scanner.config = config
@@ -165,25 +197,39 @@ class TestResponseAdapter(unittest.TestCase):
 
     def test___call__(self):
         from zope.interface import Interface
-        class IFoo(Interface): pass
+
+        class IFoo(Interface):
+            pass
+
         dec = self._makeOne(IFoo)
         dummy_venusian = DummyVenusian()
         dec.venusian = dummy_venusian
-        def foo(): pass
+
+        def foo():  # pragma: no cover
+            pass
+
         dec(foo)
-        self.assertEqual(dummy_venusian.attached,
-                         [(foo, dec.register, 'pyramid', 1)])
+        self.assertEqual(
+            dummy_venusian.attached, [(foo, dec.register, 'pyramid', 1)]
+        )
 
     def test___call___with_venusian_args(self):
         from zope.interface import Interface
-        class IFoo(Interface): pass
+
+        class IFoo(Interface):
+            pass
+
         dec = self._makeOne(IFoo, _category='foo', _depth=1)
         dummy_venusian = DummyVenusian()
         dec.venusian = dummy_venusian
-        def foo(): pass
+
+        def foo():  # pragma: no cover
+            pass
+
         dec(foo)
-        self.assertEqual(dummy_venusian.attached,
-                         [(foo, dec.register, 'foo', 2)])
+        self.assertEqual(
+            dummy_venusian.attached, [(foo, dec.register, 'foo', 2)]
+        )
 
 
 class TestGetResponseFactory(unittest.TestCase):
@@ -199,12 +245,14 @@ class TestGetResponseFactory(unittest.TestCase):
 class Dummy(object):
     pass
 
+
 class DummyConfigurator(object):
     def __init__(self):
         self.adapters = []
 
     def add_response_adapter(self, wrapped, type_or_iface):
         self.adapters.append((wrapped, type_or_iface))
+
 
 class DummyVenusian(object):
     def __init__(self):

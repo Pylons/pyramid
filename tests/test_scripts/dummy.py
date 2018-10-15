@@ -1,22 +1,33 @@
+from zope.interface import implementer
+from pyramid.interfaces import IMultiView
+
+
 class DummyTweens(object):
     def __init__(self, implicit, explicit):
         self._implicit = implicit
         self.explicit = explicit
         self.name_to_alias = {}
+
     def implicit(self):
         return self._implicit
+
 
 class Dummy:
     pass
 
+
 dummy_root = Dummy()
+
 
 class DummyRegistry(object):
     settings = {}
+
     def queryUtility(self, iface, default=None, name=''):
         return default
 
+
 dummy_registry = DummyRegistry()
+
 
 class DummyShell(object):
     env = {}
@@ -30,14 +41,17 @@ class DummyShell(object):
         self.called = True
         self.env['request'].dummy_attr = self.dummy_attr
 
+
 class DummyInteractor:
     def __call__(self, banner, local):
         self.banner = banner
         self.local = local
 
+
 class DummyApp:
     def __init__(self):
         self.registry = dummy_registry
+
 
 class DummyMapper(object):
     def __init__(self, *routes):
@@ -46,9 +60,11 @@ class DummyMapper(object):
     def get_routes(self, include_static=False):
         return self.routes
 
+
 class DummyRoute(object):
-    def __init__(self, name, pattern, factory=None,
-                 matchdict=None, predicate=None):
+    def __init__(
+        self, name, pattern, factory=None, matchdict=None, predicate=None
+    ):
         self.name = name
         self.path = pattern
         self.pattern = pattern
@@ -61,35 +77,46 @@ class DummyRoute(object):
     def match(self, route):
         return self.matchdict
 
+
 class DummyRequest:
     application_url = 'http://example.com:5432'
     script_name = ''
+
     def __init__(self, environ):
         self.environ = environ
         self.matchdict = {}
+
 
 class DummyView(object):
     def __init__(self, **attrs):
         self.__request_attrs__ = attrs
 
-    def view(context, request): pass
+    def view(context, request):  # pragma: no cover
+        pass
 
-from zope.interface import implementer
-from pyramid.interfaces import IMultiView
+
 @implementer(IMultiView)
 class DummyMultiView(object):
-
     def __init__(self, *views, **attrs):
         self.views = [(None, view, None) for view in views]
         self.__request_attrs__ = attrs
+
 
 class DummyCloser(object):
     def __call__(self):
         self.called = True
 
+
 class DummyBootstrap(object):
-    def __init__(self, app=None, registry=None, request=None, root=None,
-                 root_factory=None, closer=None):
+    def __init__(
+        self,
+        app=None,
+        registry=None,
+        request=None,
+        root=None,
+        root_factory=None,
+        closer=None,
+    ):
         self.app = app or DummyApp()
         if registry is None:
             registry = DummyRegistry()
@@ -150,7 +177,9 @@ class dummy_setup_logging(object):
 
 
 class DummyLoader(object):
-    def __init__(self, settings=None, app_settings=None, app=None, server=None):
+    def __init__(
+        self, settings=None, app_settings=None, app=None, server=None
+    ):
         if not settings:
             settings = {}
         if not app_settings:
@@ -163,6 +192,7 @@ class DummyLoader(object):
 
     def __call__(self, uri):
         import plaster
+
         self.uri = plaster.parse_uri(uri)
         return self
 

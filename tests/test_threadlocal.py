@@ -1,6 +1,7 @@
 from pyramid import testing
 import unittest
 
+
 class TestThreadLocalManager(unittest.TestCase):
     def setUp(self):
         testing.setUp()
@@ -10,6 +11,7 @@ class TestThreadLocalManager(unittest.TestCase):
 
     def _getTargetClass(self):
         from pyramid.threadlocal import ThreadLocalManager
+
         return ThreadLocalManager
 
     def _makeOne(self, default=lambda *x: 1):
@@ -23,6 +25,7 @@ class TestThreadLocalManager(unittest.TestCase):
     def test_default(self):
         def thedefault():
             return '123'
+
         local = self._makeOne(thedefault)
         self.assertEqual(local.stack, [])
         self.assertEqual(local.get(), '123')
@@ -49,6 +52,7 @@ class TestThreadLocalManager(unittest.TestCase):
 class TestGetCurrentRequest(unittest.TestCase):
     def _callFUT(self):
         from pyramid.threadlocal import get_current_request
+
         return get_current_request()
 
     def test_it_None(self):
@@ -57,13 +61,15 @@ class TestGetCurrentRequest(unittest.TestCase):
 
     def test_it(self):
         from pyramid.threadlocal import manager
+
         request = object()
         try:
-            manager.push({'request':request})
+            manager.push({'request': request})
             self.assertEqual(self._callFUT(), request)
         finally:
             manager.pop()
         self.assertEqual(self._callFUT(), None)
+
 
 class GetCurrentRegistryTests(unittest.TestCase):
     def setUp(self):
@@ -71,25 +77,29 @@ class GetCurrentRegistryTests(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        
+
     def _callFUT(self):
         from pyramid.threadlocal import get_current_registry
+
         return get_current_registry()
 
     def test_it(self):
         from pyramid.threadlocal import manager
+
         try:
-            manager.push({'registry':123})
+            manager.push({'registry': 123})
             self.assertEqual(self._callFUT(), 123)
         finally:
             manager.pop()
 
+
 class GetCurrentRegistryWithoutTestingRegistry(unittest.TestCase):
     def _callFUT(self):
         from pyramid.threadlocal import get_current_registry
+
         return get_current_registry()
 
     def test_it(self):
         from pyramid.registry import global_registry
+
         self.assertEqual(self._callFUT(), global_registry)
-    

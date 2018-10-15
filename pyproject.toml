@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[tool.black]
+line-length = 79
+skip-string-normalization = true
+py36 = false
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | \.pytest_cache
+  | dist
+  | build
+  | docs
+  | src/pyramid/scaffolds/alchemy
+  | src/pyramid/scaffolds/starter
+  | src/pyramid/scaffolds/zodb
+)/
+'''
+
+ # This next section only exists for people that have their editors
+# automatically call isort, black already sorts entries on its own when run.
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+combine_as_imports = true
+line_length = 79

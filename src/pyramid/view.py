@@ -13,30 +13,25 @@ from pyramid.interfaces import (
     IViewClassifier,
     IRequest,
     IExceptionViewClassifier,
-    )
+)
 
 from pyramid.compat import decode_path_info
 from pyramid.compat import reraise as reraise_
 
-from pyramid.exceptions import (
-    ConfigurationError,
-    PredicateMismatch,
-)
+from pyramid.exceptions import ConfigurationError, PredicateMismatch
 
 from pyramid.httpexceptions import (
     HTTPNotFound,
     HTTPTemporaryRedirect,
     default_exceptionresponse_view,
-    )
+)
 
-from pyramid.threadlocal import (
-    get_current_registry,
-    manager,
-    )
+from pyramid.threadlocal import get_current_registry, manager
 
 from pyramid.util import hide_attrs
 
 _marker = object()
+
 
 def render_view_to_response(context, request, name='', secure=True):
     """ Call the :term:`view callable` configured with a :term:`view
@@ -84,9 +79,9 @@ def render_view_to_response(context, request, name='', secure=True):
         name,
         secure=secure,
         request_iface=request_iface,
-        )
+    )
 
-    return response # NB: might be None
+    return response  # NB: might be None
 
 
 def render_view_to_iterable(context, request, name='', secure=True):
@@ -119,6 +114,7 @@ def render_view_to_iterable(context, request, name='', secure=True):
         return None
     return response.app_iter
 
+
 def render_view(context, request, name='', secure=True):
     """ Call the :term:`view callable` configured with a :term:`view
     configuration` that matches the :term:`view name` ``name``
@@ -145,6 +141,7 @@ def render_view(context, request, name='', secure=True):
     if iterable is None:
         return None
     return b''.join(iterable)
+
 
 class view_config(object):
     """ A function, class or method :term:`decorator` which allows a
@@ -201,19 +198,21 @@ class view_config(object):
 
     See the :py:func:`venusian.attach` function in Venusian for more
     information about the ``_depth`` and ``_category`` arguments.
-    
+
     .. seealso::
-    
+
         See also :ref:`mapping_views_using_a_decorator_section` for
         details about using :class:`pyramid.view.view_config`.
 
     .. warning::
-    
+
         ``view_config`` will work ONLY on module top level members
         because of the limitation of ``venusian.Scanner.scan``.
 
     """
-    venusian = venusian # for testing injection
+
+    venusian = venusian  # for testing injection
+
     def __init__(self, **settings):
         if 'for_' in settings:
             if settings.get('context') is None:
@@ -229,8 +228,9 @@ class view_config(object):
             config = context.config.with_package(info.module)
             config.add_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category=category,
-                                    depth=depth + 1)
+        info = self.venusian.attach(
+            wrapped, callback, category=category, depth=depth + 1
+        )
 
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or
@@ -239,10 +239,12 @@ class view_config(object):
             if settings.get('attr') is None:
                 settings['attr'] = wrapped.__name__
 
-        settings['_info'] = info.codeinfo # fbo "action_method"
+        settings['_info'] = info.codeinfo  # fbo "action_method"
         return wrapped
 
-bfg_view = view_config # bw compat (forever)
+
+bfg_view = view_config  # bw compat (forever)
+
 
 class view_defaults(view_config):
     """ A class :term:`decorator` which, when applied to a class, will
@@ -256,6 +258,7 @@ class view_defaults(view_config):
     def __call__(self, wrapped):
         wrapped.__view_defaults__ = self.__dict__.copy()
         return wrapped
+
 
 class AppendSlashNotFoundViewFactory(object):
     """ There can only be one :term:`Not Found view` in any
@@ -292,7 +295,10 @@ class AppendSlashNotFoundViewFactory(object):
     .. deprecated:: 1.3
 
     """
-    def __init__(self, notfound_view=None, redirect_class=HTTPTemporaryRedirect):
+
+    def __init__(
+        self, notfound_view=None, redirect_class=HTTPTemporaryRedirect
+    ):
         if notfound_view is None:
             notfound_view = default_exceptionresponse_view
         self.notfound_view = notfound_view
@@ -309,8 +315,11 @@ class AppendSlashNotFoundViewFactory(object):
                     qs = request.query_string
                     if qs:
                         qs = '?' + qs
-                    return self.redirect_class(location=request.path + '/' + qs)
+                    return self.redirect_class(
+                        location=request.path + '/' + qs
+                    )
         return self.notfound_view(context, request)
+
 
 append_slash_notfound_view = AppendSlashNotFoundViewFactory()
 append_slash_notfound_view.__doc__ = """\
@@ -336,6 +345,7 @@ view as the Not Found view::
 .. deprecated:: 1.3
 
 """
+
 
 class notfound_view_config(object):
     """
@@ -392,7 +402,8 @@ class notfound_view_config(object):
             return HTTPNotFound('not found')
 
     The above means that a redirect to a slash-appended route will be
-    attempted, but instead of :class:`~pyramid.httpexceptions.HTTPTemporaryRedirect`
+    attempted, but instead of
+    :class:`~pyramid.httpexceptions.HTTPTemporaryRedirect`
     being used, :class:`~pyramid.httpexceptions.HTTPMovedPermanently will
     be used` for the redirect response if a slash-appended route is found.
 
@@ -417,8 +428,9 @@ class notfound_view_config(object):
             config = context.config.with_package(info.module)
             config.add_notfound_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category=category,
-                                    depth=depth + 1)
+        info = self.venusian.attach(
+            wrapped, callback, category=category, depth=depth + 1
+        )
 
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or
@@ -427,8 +439,9 @@ class notfound_view_config(object):
             if settings.get('attr') is None:
                 settings['attr'] = wrapped.__name__
 
-        settings['_info'] = info.codeinfo # fbo "action_method"
+        settings['_info'] = info.codeinfo  # fbo "action_method"
         return wrapped
+
 
 class forbidden_view_config(object):
     """
@@ -479,8 +492,9 @@ class forbidden_view_config(object):
             config = context.config.with_package(info.module)
             config.add_forbidden_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category=category,
-                                    depth=depth + 1)
+        info = self.venusian.attach(
+            wrapped, callback, category=category, depth=depth + 1
+        )
 
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or
@@ -489,8 +503,9 @@ class forbidden_view_config(object):
             if settings.get('attr') is None:
                 settings['attr'] = wrapped.__name__
 
-        settings['_info'] = info.codeinfo # fbo "action_method"
+        settings['_info'] = info.codeinfo  # fbo "action_method"
         return wrapped
+
 
 class exception_view_config(object):
     """
@@ -526,6 +541,7 @@ class exception_view_config(object):
        Added the ``_depth`` and ``_category`` arguments.
 
     """
+
     venusian = venusian
 
     def __init__(self, *args, **settings):
@@ -545,8 +561,9 @@ class exception_view_config(object):
             config = context.config.with_package(info.module)
             config.add_exception_view(view=ob, **settings)
 
-        info = self.venusian.attach(wrapped, callback, category=category,
-                                    depth=depth + 1)
+        info = self.venusian.attach(
+            wrapped, callback, category=category, depth=depth + 1
+        )
 
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or
@@ -555,8 +572,9 @@ class exception_view_config(object):
             if settings.get('attr') is None:
                 settings['attr'] = wrapped.__name__
 
-        settings['_info'] = info.codeinfo # fbo "action_method"
+        settings['_info'] = info.codeinfo  # fbo "action_method"
         return wrapped
+
 
 def _find_views(
     registry,
@@ -565,7 +583,7 @@ def _find_views(
     view_name,
     view_types=None,
     view_classifier=None,
-    ):
+):
     if view_types is None:
         view_types = (IView, ISecuredView, IMultiView)
     if view_classifier is None:
@@ -581,9 +599,7 @@ def _find_views(
             source_ifaces = (view_classifier, req_type, ctx_type)
             for view_type in view_types:
                 view_callable = registered(
-                    source_ifaces,
-                    view_type,
-                    name=view_name,
+                    source_ifaces, view_type, name=view_name
                 )
                 if view_callable is not None:
                     views.append(view_callable)
@@ -599,6 +615,7 @@ def _find_views(
 
     return views
 
+
 def _call_view(
     registry,
     request,
@@ -609,7 +626,7 @@ def _call_view(
     view_classifier=None,
     secure=True,
     request_iface=None,
-    ):
+):
     if request_iface is None:
         request_iface = getattr(request, 'request_iface', IRequest)
     view_callables = _find_views(
@@ -619,7 +636,7 @@ def _call_view(
         view_name,
         view_types=view_types,
         view_classifier=view_classifier,
-        )
+    )
 
     pme = None
     response = None
@@ -631,10 +648,8 @@ def _call_view(
                 # the view will have a __call_permissive__ attribute if it's
                 # secured; otherwise it won't.
                 view_callable = getattr(
-                    view_callable,
-                    '__call_permissive__',
-                    view_callable
-                    )
+                    view_callable, '__call_permissive__', view_callable
+                )
 
             # if this view is secured, it will raise a Forbidden
             # appropriately if the executing user does not have the proper
@@ -649,15 +664,13 @@ def _call_view(
 
     return response
 
+
 class ViewMethodsMixin(object):
     """ Request methods mixin for BaseRequest having to do with executing
     views """
+
     def invoke_exception_view(
-        self,
-        exc_info=None,
-        request=None,
-        secure=True,
-        reraise=False,
+        self, exc_info=None, request=None, secure=True, reraise=False
     ):
         """ Executes an exception view related to the request it's called upon.
         The arguments it takes are these:
@@ -742,7 +755,7 @@ class ViewMethodsMixin(object):
                     view_classifier=IExceptionViewClassifier,
                     secure=secure,
                     request_iface=request_iface.combined,
-                    )
+                )
             except Exception:
                 if reraise:
                     reraise_(*exc_info)

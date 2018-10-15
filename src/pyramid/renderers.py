@@ -3,22 +3,12 @@ import json
 import os
 import re
 
-from zope.interface import (
-    implementer,
-    providedBy,
-    )
+from zope.interface import implementer, providedBy
 from zope.interface.registry import Components
 
-from pyramid.interfaces import (
-    IJSONAdapter,
-    IRendererFactory,
-    IRendererInfo,
-    )
+from pyramid.interfaces import IJSONAdapter, IRendererFactory, IRendererInfo
 
-from pyramid.compat import (
-    string_types,
-    text_type,
-    )
+from pyramid.compat import string_types, text_type
 
 from pyramid.csrf import get_csrf_token
 from pyramid.decorator import reify
@@ -34,6 +24,7 @@ from pyramid.threadlocal import get_current_registry
 from pyramid.util import hide_attrs
 
 # API
+
 
 def render(renderer_name, value, request=None, package=None):
     """ Using the renderer ``renderer_name`` (a template
@@ -76,19 +67,19 @@ def render(renderer_name, value, request=None, package=None):
         registry = None
     if package is None:
         package = caller_package()
-    helper = RendererHelper(name=renderer_name, package=package,
-                            registry=registry)
+    helper = RendererHelper(
+        name=renderer_name, package=package, registry=registry
+    )
 
     with hide_attrs(request, 'response'):
         result = helper.render(value, None, request=request)
 
     return result
 
-def render_to_response(renderer_name,
-                       value,
-                       request=None,
-                       package=None,
-                       response=None):
+
+def render_to_response(
+    renderer_name, value, request=None, package=None, response=None
+):
     """ Using the renderer ``renderer_name`` (a template
     or a static renderer), render the value (or set of values) using
     the result of the renderer's ``__call__`` method (usually a string
@@ -137,8 +128,9 @@ def render_to_response(renderer_name,
         registry = None
     if package is None:
         package = caller_package()
-    helper = RendererHelper(name=renderer_name, package=package,
-                            registry=registry)
+    helper = RendererHelper(
+        name=renderer_name, package=package, registry=registry
+    )
 
     with hide_attrs(request, 'response'):
         if response is not None:
@@ -146,6 +138,7 @@ def render_to_response(renderer_name,
         result = helper.render_to_response(value, None, request=request)
 
     return result
+
 
 def get_renderer(renderer_name, package=None, registry=None):
     """ Return the renderer object for the renderer ``renderer_name``.
@@ -165,11 +158,14 @@ def get_renderer(renderer_name, package=None, registry=None):
     """
     if package is None:
         package = caller_package()
-    helper = RendererHelper(name=renderer_name, package=package,
-                            registry=registry)
+    helper = RendererHelper(
+        name=renderer_name, package=package, registry=registry
+    )
     return helper.renderer
 
+
 # concrete renderer factory implementations (also API)
+
 
 def string_renderer_factory(info):
     def _render(value, system):
@@ -182,9 +178,12 @@ def string_renderer_factory(info):
             if ct == response.default_content_type:
                 response.content_type = 'text/plain'
         return value
+
     return _render
 
+
 _marker = object()
+
 
 class JSON(object):
     """ Renderer that returns a JSON-encoded string.
@@ -265,13 +264,15 @@ class JSON(object):
         instances of the ``Foo`` class when they're encountered in your view
         results."""
 
-        self.components.registerAdapter(adapter, (type_or_iface,),
-                                        IJSONAdapter)
+        self.components.registerAdapter(
+            adapter, (type_or_iface,), IJSONAdapter
+        )
 
     def __call__(self, info):
         """ Returns a plain JSON-encoded string with content-type
         ``application/json``. The content-type may be overridden by
         setting ``request.response.content_type``."""
+
         def _render(value, system):
             request = system.get('request')
             if request is not None:
@@ -290,16 +291,20 @@ class JSON(object):
                 return obj.__json__(request)
             obj_iface = providedBy(obj)
             adapters = self.components.adapters
-            result = adapters.lookup((obj_iface,), IJSONAdapter,
-                                     default=_marker)
+            result = adapters.lookup(
+                (obj_iface,), IJSONAdapter, default=_marker
+            )
             if result is _marker:
                 raise TypeError('%r is not JSON serializable' % (obj,))
             return result(obj, request)
+
         return default
 
-json_renderer_factory = JSON() # bw compat
+
+json_renderer_factory = JSON()  # bw compat
 
 JSONP_VALID_CALLBACK = re.compile(r"^[$a-z_][$0-9a-z_\.\[\]]+[^.]$", re.I)
+
 
 class JSONP(JSON):
     """ `JSONP <https://en.wikipedia.org/wiki/JSONP>`_ renderer factory helper
@@ -373,6 +378,7 @@ class JSONP(JSON):
         ``application/javascript`` if query parameter matching
         ``self.param_name`` is present in request.GET; otherwise returns
         plain-JSON encoded string with content-type ``application/json``"""
+
         def _render(value, system):
             request = system.get('request')
             default = self._make_default(request)
@@ -384,7 +390,9 @@ class JSONP(JSON):
 
                 if callback is not None:
                     if not JSONP_VALID_CALLBACK.match(callback):
-                        raise HTTPBadRequest('Invalid JSONP callback function name.')
+                        raise HTTPBadRequest(
+                            'Invalid JSONP callback function name.'
+                        )
 
                     ct = 'application/javascript'
                     body = '/**/{0}({1});'.format(callback, val)
@@ -392,7 +400,9 @@ class JSONP(JSON):
                 if response.content_type == response.default_content_type:
                     response.content_type = ct
             return body
+
         return _render
+
 
 @implementer(IRendererInfo)
 class RendererHelper(object):
@@ -422,36 +432,36 @@ class RendererHelper(object):
     def renderer(self):
         factory = self.registry.queryUtility(IRendererFactory, name=self.type)
         if factory is None:
-            raise ValueError(
-                'No such renderer factory %s' % str(self.type))
+            raise ValueError('No such renderer factory %s' % str(self.type))
         return factory(self)
 
     def get_renderer(self):
         return self.renderer
 
     def render_view(self, request, response, view, context):
-        system = {'view':view,
-                  'renderer_name':self.name, # b/c
-                  'renderer_info':self,
-                  'context':context,
-                  'request':request,
-                  'req':request,
-                  'get_csrf_token':partial(get_csrf_token, request),
-                  }
+        system = {
+            'view': view,
+            'renderer_name': self.name,  # b/c
+            'renderer_info': self,
+            'context': context,
+            'request': request,
+            'req': request,
+            'get_csrf_token': partial(get_csrf_token, request),
+        }
         return self.render_to_response(response, system, request=request)
 
     def render(self, value, system_values, request=None):
         renderer = self.renderer
         if system_values is None:
             system_values = {
-                'view':None,
-                'renderer_name':self.name, # b/c
-                'renderer_info':self,
-                'context':getattr(request, 'context', None),
-                'request':request,
-                'req':request,
-                'get_csrf_token':partial(get_csrf_token, request),
-                }
+                'view': None,
+                'renderer_name': self.name,  # b/c
+                'renderer_info': self,
+                'context': getattr(request, 'context', None),
+                'request': request,
+                'req': request,
+                'get_csrf_token': partial(get_csrf_token, request),
+            }
 
         system_values = BeforeRender(system_values, value)
 
@@ -495,12 +505,14 @@ class RendererHelper(object):
             registry = self.registry
         return self.__class__(name=name, package=package, registry=registry)
 
+
 class NullRendererHelper(RendererHelper):
     """ Special renderer helper that has render_* methods which simply return
     the value they are fed rather than converting them to response objects;
     useful for testing purposes and special case view configuration
     registrations that want to use the view configuration machinery but do
     not want actual rendering to happen ."""
+
     def __init__(self, name=None, package=None, registry=None):
         # we override the initializer to avoid calling get_current_registry
         # (it will return a reference to the global registry when this
@@ -525,5 +537,6 @@ class NullRendererHelper(RendererHelper):
 
     def clone(self, name=None, package=None, registry=None):
         return self
+
 
 null_renderer = NullRendererHelper()

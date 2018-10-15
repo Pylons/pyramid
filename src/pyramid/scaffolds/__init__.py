@@ -6,11 +6,13 @@ from pyramid.compat import native_
 
 from pyramid.scaffolds.template import Template  # API
 
+
 class PyramidTemplate(Template):
     """
      A class that can be used as a base class for Pyramid scaffolding
      templates.
     """
+
     def pre(self, command, output_dir, vars):
         """ Overrides :meth:`pyramid.scaffolds.template.Template.pre`, adding
         several variables to the default variables list (including
@@ -26,7 +28,7 @@ class PyramidTemplate(Template):
         vars['package_logger'] = package_logger
         return Template.pre(self, command, output_dir, vars)
 
-    def post(self, command, output_dir, vars): # pragma: no cover
+    def post(self, command, output_dir, vars):  # pragma: no cover
         """ Overrides :meth:`pyramid.scaffolds.template.Template.post`, to
         print "Welcome to Pyramid.  Sorry for the convenience." after a
         successful scaffolding rendering."""
@@ -42,24 +44,29 @@ class PyramidTemplate(Template):
 
             Welcome to Pyramid.  Sorry for the convenience.
             %(separator)s
-        """ % {'separator': separator})
+        """  # noqa: E501
+            % {'separator': separator}
+        )
 
         self.out(msg)
         return Template.post(self, command, output_dir, vars)
 
-    def out(self, msg): # pragma: no cover (replaceable testing hook)
+    def out(self, msg):  # pragma: no cover (replaceable testing hook)
         print(msg)
+
 
 class StarterProjectTemplate(PyramidTemplate):
     _template_dir = 'starter'
     summary = 'Pyramid starter project using URL dispatch and Jinja2'
 
+
 class ZODBProjectTemplate(PyramidTemplate):
     _template_dir = 'zodb'
     summary = 'Pyramid project using ZODB, traversal, and Chameleon'
 
+
 class AlchemyProjectTemplate(PyramidTemplate):
     _template_dir = 'alchemy'
     summary = (
-        'Pyramid project using SQLAlchemy, SQLite, URL dispatch, and '
-        'Jinja2')
+        'Pyramid project using SQLAlchemy, SQLite, URL dispatch, and ' 'Jinja2'
+    )

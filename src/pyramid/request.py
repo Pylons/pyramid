@@ -11,31 +11,22 @@ from pyramid.interfaces import (
     IRequestExtensions,
     IResponse,
     ISessionFactory,
-    )
+)
 
-from pyramid.compat import (
-    text_,
-    bytes_,
-    native_,
-    iteritems_,
-    )
+from pyramid.compat import text_, bytes_, native_, iteritems_
 
 from pyramid.decorator import reify
 from pyramid.i18n import LocalizerRequestMixin
 from pyramid.response import Response, _get_response_factory
-from pyramid.security import (
-    AuthenticationAPIMixin,
-    AuthorizationAPIMixin,
-    )
+from pyramid.security import AuthenticationAPIMixin, AuthorizationAPIMixin
 from pyramid.url import URLMethodsMixin
-from pyramid.util import (
-    InstancePropertyHelper,
-    InstancePropertyMixin,
-)
+from pyramid.util import InstancePropertyHelper, InstancePropertyMixin
 from pyramid.view import ViewMethodsMixin
+
 
 class TemplateContext(object):
     pass
+
 
 class CallbackMethodsMixin(object):
     @reify
@@ -146,6 +137,7 @@ class CallbackMethodsMixin(object):
             callback = callbacks.popleft()
             callback(self)
 
+
 @implementer(IRequest)
 class Request(
     BaseRequest,
@@ -156,7 +148,7 @@ class Request(
     AuthenticationAPIMixin,
     AuthorizationAPIMixin,
     ViewMethodsMixin,
-    ):
+):
     """
     A subclass of the :term:`WebOb` Request class.  An instance of
     this class is created by the :term:`router` and is provided to a
@@ -177,6 +169,7 @@ class Request(
     release of this :app:`Pyramid` version.  See
     https://webob.org/ for further information.
     """
+
     exception = None
     exc_info = None
     matchdict = None
@@ -201,7 +194,8 @@ class Request(
         if factory is None:
             raise AttributeError(
                 'No session factory registered '
-                '(see the Sessions chapter of the Pyramid documentation)')
+                '(see the Sessions chapter of the Pyramid documentation)'
+            )
         return factory(self)
 
     @reify
@@ -244,13 +238,17 @@ def route_request_iface(name, bases=()):
     # zope.interface.interface.Element.__init__ and
     # https://github.com/Pylons/pyramid/issues/232; as a result, always pass
     # __doc__ to the InterfaceClass constructor.
-    iface = InterfaceClass('%s_IRequest' % name, bases=bases,
-                           __doc__="route_request_iface-generated interface")
+    iface = InterfaceClass(
+        '%s_IRequest' % name,
+        bases=bases,
+        __doc__="route_request_iface-generated interface",
+    )
     # for exception view lookups
     iface.combined = InterfaceClass(
         '%s_combined_IRequest' % name,
         bases=(iface, IRequest),
-        __doc__='route_request_iface-generated combined interface')
+        __doc__='route_request_iface-generated combined interface',
+    )
     return iface
 
 
@@ -258,7 +256,9 @@ def add_global_response_headers(request, headerlist):
     def add_headers(request, response):
         for k, v in headerlist:
             response.headerlist.append((k, v))
+
     request.add_response_callback(add_headers)
+
 
 def call_app_with_subpath_as_path_info(request, app):
     # Copy the request.  Use the source request's subpath (if it exists) as
@@ -280,11 +280,12 @@ def call_app_with_subpath_as_path_info(request, app):
     new_script_name = ''
 
     # compute new_path_info
-    new_path_info = '/' + '/'.join([native_(x.encode('utf-8'), 'latin-1')
-                                    for x in subpath])
+    new_path_info = '/' + '/'.join(
+        [native_(x.encode('utf-8'), 'latin-1') for x in subpath]
+    )
 
-    if new_path_info != '/': # don't want a sole double-slash
-        if path_info != '/': # if orig path_info is '/', we're already done
+    if new_path_info != '/':  # don't want a sole double-slash
+        if path_info != '/':  # if orig path_info is '/', we're already done
             if path_info.endswith('/'):
                 # readd trailing slash stripped by subpath (traversal)
                 # conversion
@@ -314,6 +315,7 @@ def call_app_with_subpath_as_path_info(request, app):
 
     return new_request.get_response(app)
 
+
 def apply_request_extensions(request, extensions=None):
     """Apply request extensions (methods and properties) to an instance of
     :class:`pyramid.interfaces.IRequest`. This method is dependent on the
@@ -331,4 +333,5 @@ def apply_request_extensions(request, extensions=None):
             setattr(request, name, method)
 
         InstancePropertyHelper.apply_properties(
-            request, extensions.descriptors)
+            request, extensions.descriptors
+        )

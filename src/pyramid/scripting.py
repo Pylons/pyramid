@@ -1,15 +1,13 @@
 from pyramid.config import global_registries
 from pyramid.exceptions import ConfigurationError
 
-from pyramid.interfaces import (
-    IRequestFactory,
-    IRootFactory,
-    )
+from pyramid.interfaces import IRequestFactory, IRootFactory
 from pyramid.request import Request
 from pyramid.request import apply_request_extensions
 
 from pyramid.threadlocal import RequestContext
 from pyramid.traversal import DefaultRootFactory
+
 
 def get_root(app, request=None):
     """ Return a tuple composed of ``(root, closer)`` when provided a
@@ -29,10 +27,13 @@ def get_root(app, request=None):
     request.registry = registry
     ctx = RequestContext(request)
     ctx.begin()
+
     def closer():
         ctx.end()
+
     root = app.root_factory(request)
     return root, closer
+
 
 def prepare(request=None, registry=None):
     """ This function pushes data onto the Pyramid threadlocal stack
@@ -80,9 +81,11 @@ def prepare(request=None, registry=None):
     if registry is None:
         registry = getattr(request, 'registry', global_registries.last)
     if registry is None:
-        raise ConfigurationError('No valid Pyramid applications could be '
-                                 'found, make sure one has been created '
-                                 'before trying to activate it.')
+        raise ConfigurationError(
+            'No valid Pyramid applications could be '
+            'found, make sure one has been created '
+            'before trying to activate it.'
+        )
     if request is None:
         request = _make_request('/', registry)
     # NB: even though _make_request might have already set registry on
@@ -92,10 +95,13 @@ def prepare(request=None, registry=None):
     ctx = RequestContext(request)
     ctx.begin()
     apply_request_extensions(request)
+
     def closer():
         ctx.end()
-    root_factory = registry.queryUtility(IRootFactory,
-                                         default=DefaultRootFactory)
+
+    root_factory = registry.queryUtility(
+        IRootFactory, default=DefaultRootFactory
+    )
     root = root_factory(request)
     if getattr(request, 'context', None) is None:
         request.context = root
@@ -107,12 +113,14 @@ def prepare(request=None, registry=None):
         root_factory=root_factory,
     )
 
+
 class AppEnvironment(dict):
     def __enter__(self):
         return self
 
     def __exit__(self, type, value, traceback):
         self['closer']()
+
 
 def _make_request(path, registry=None):
     """ Return a :meth:`pyramid.request.Request` object anchored at a

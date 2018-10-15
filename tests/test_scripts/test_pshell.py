@@ -6,10 +6,16 @@ from . import dummy
 class TestPShellCommand(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.scripts.pshell import PShellCommand
+
         return PShellCommand
 
-    def _makeOne(self, patch_bootstrap=True, patch_loader=True,
-                 patch_args=True, patch_options=True):
+    def _makeOne(
+        self,
+        patch_bootstrap=True,
+        patch_loader=True,
+        patch_args=True,
+        patch_options=True,
+    ):
         cmd = self._getTargetClass()([])
 
         if patch_bootstrap:
@@ -19,12 +25,18 @@ class TestPShellCommand(unittest.TestCase):
             self.loader = dummy.DummyLoader()
             cmd.get_config_loader = self.loader
         if patch_args:
-            class Args(object): pass
+
+            class Args(object):
+                pass
+
             self.args = Args()
             self.args.config_uri = '/foo/bar/myapp.ini#myapp'
             cmd.args.config_uri = self.args.config_uri
         if patch_options:
-            class Options(object): pass
+
+            class Options(object):
+                pass
+
             self.options = Options()
             self.options.python_shell = ''
             self.options.setup = None
@@ -47,12 +59,16 @@ class TestPShellCommand(unittest.TestCase):
         command.default_runner = shell
         command.run()
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(shell.env, {
-            'app':self.bootstrap.app, 'root':self.bootstrap.root,
-            'registry':self.bootstrap.registry,
-            'request':self.bootstrap.request,
-            'root_factory':self.bootstrap.root_factory,
-        })
+        self.assertEqual(
+            shell.env,
+            {
+                'app': self.bootstrap.app,
+                'root': self.bootstrap.root,
+                'registry': self.bootstrap.registry,
+                'request': self.bootstrap.request,
+                'root_factory': self.bootstrap.root_factory,
+            },
+        )
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
@@ -84,23 +100,23 @@ class TestPShellCommand(unittest.TestCase):
         shell = dummy.DummyShell()
         bad_shell = dummy.DummyShell()
         self._makeEntryPoints(
-            command,
-            {
-                'ipython': shell,
-                'bpython': bad_shell,
-            }
+            command, {'ipython': shell, 'bpython': bad_shell}
         )
 
         command.args.python_shell = 'ipython'
 
         command.run()
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(shell.env, {
-            'app':self.bootstrap.app, 'root':self.bootstrap.root,
-            'registry':self.bootstrap.registry,
-            'request':self.bootstrap.request,
-            'root_factory':self.bootstrap.root_factory,
-        })
+        self.assertEqual(
+            shell.env,
+            {
+                'app': self.bootstrap.app,
+                'root': self.bootstrap.root,
+                'registry': self.bootstrap.registry,
+                'request': self.bootstrap.request,
+                'root_factory': self.bootstrap.root_factory,
+            },
+        )
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
@@ -108,13 +124,7 @@ class TestPShellCommand(unittest.TestCase):
         command = self._makeOne()
         dshell = dummy.DummyShell()
 
-        self._makeEntryPoints(
-            command,
-            {
-                'ipython': dshell,
-                'bpython': dshell,
-            }
-        )
+        self._makeEntryPoints(command, {'ipython': dshell, 'bpython': dshell})
 
         command.default_runner = None
         shell = command.make_shell()
@@ -137,12 +147,7 @@ class TestPShellCommand(unittest.TestCase):
         self.assertRaises(ValueError, command.make_shell)
 
         self._makeEntryPoints(
-            command,
-            {
-                'ipython': ipshell,
-                'bpython': bpshell,
-                'python': dshell,
-            }
+            command, {'ipython': ipshell, 'bpython': bpshell, 'python': dshell}
         )
 
         command.args.python_shell = 'ipython'
@@ -164,12 +169,7 @@ class TestPShellCommand(unittest.TestCase):
         dshell = dummy.DummyShell()
 
         self._makeEntryPoints(
-            command,
-            {
-                'ipython': ipshell,
-                'bpython': bpshell,
-                'python': dshell,
-            }
+            command, {'ipython': ipshell, 'bpython': bpshell, 'python': dshell}
         )
 
         command.default_runner = dshell
@@ -194,41 +194,52 @@ class TestPShellCommand(unittest.TestCase):
         shell = dummy.DummyShell()
         command.run(shell)
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(shell.env, {
-            'app':self.bootstrap.app, 'root':self.bootstrap.root,
-            'registry':self.bootstrap.registry,
-            'request':self.bootstrap.request,
-            'root_factory':self.bootstrap.root_factory,
-            'm':model,
-            'User': user,
-        })
+        self.assertEqual(
+            shell.env,
+            {
+                'app': self.bootstrap.app,
+                'root': self.bootstrap.root,
+                'registry': self.bootstrap.registry,
+                'request': self.bootstrap.request,
+                'root_factory': self.bootstrap.root_factory,
+                'm': model,
+                'User': user,
+            },
+        )
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
     def test_command_setup(self):
         command = self._makeOne()
+
         def setup(env):
             env['a'] = 1
             env['root'] = 'root override'
             env['none'] = None
+
         self.loader.settings = {'pshell': {'setup': setup}}
         shell = dummy.DummyShell()
         command.run(shell)
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(shell.env, {
-            'app':self.bootstrap.app, 'root':'root override',
-            'registry':self.bootstrap.registry,
-            'request':self.bootstrap.request,
-            'root_factory':self.bootstrap.root_factory,
-            'a':1,
-            'none': None,
-        })
+        self.assertEqual(
+            shell.env,
+            {
+                'app': self.bootstrap.app,
+                'root': 'root override',
+                'registry': self.bootstrap.registry,
+                'request': self.bootstrap.request,
+                'root_factory': self.bootstrap.root_factory,
+                'a': 1,
+                'none': None,
+            },
+        )
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
     def test_command_setup_generator(self):
         command = self._makeOne()
         did_resume_after_yield = {}
+
         def setup(env):
             env['a'] = 1
             env['root'] = 'root override'
@@ -237,18 +248,23 @@ class TestPShellCommand(unittest.TestCase):
             yield
             did_resume_after_yield['result'] = True
             self.assertEqual(request.dummy_attr, 1)
+
         self.loader.settings = {'pshell': {'setup': setup}}
         shell = dummy.DummyShell()
         command.run(shell)
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(shell.env, {
-            'app':self.bootstrap.app, 'root':'root override',
-            'registry':self.bootstrap.registry,
-            'request':self.bootstrap.request,
-            'root_factory':self.bootstrap.root_factory,
-            'a':1,
-            'none': None,
-        })
+        self.assertEqual(
+            shell.env,
+            {
+                'app': self.bootstrap.app,
+                'root': 'root override',
+                'registry': self.bootstrap.registry,
+                'request': self.bootstrap.request,
+                'root_factory': self.bootstrap.root_factory,
+                'a': 1,
+                'none': None,
+            },
+        )
         self.assertTrue(did_resume_after_yield['result'])
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
@@ -257,15 +273,10 @@ class TestPShellCommand(unittest.TestCase):
         command = self._makeOne()
         ipshell = dummy.DummyShell()
         dshell = dummy.DummyShell()
-        self._makeEntryPoints(
-            command,
-            {
-                'ipython': ipshell,
-                'python': dshell,
-            }
-        )
-        self.loader.settings = {'pshell': {
-            'default_shell': 'bpython python\nipython'}}
+        self._makeEntryPoints(command, {'ipython': ipshell, 'python': dshell})
+        self.loader.settings = {
+            'pshell': {'default_shell': 'bpython python\nipython'}
+        }
         command.run()
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
         self.assertTrue(dshell.called)
@@ -273,78 +284,105 @@ class TestPShellCommand(unittest.TestCase):
     def test_command_loads_check_variable_override_order(self):
         command = self._makeOne()
         model = dummy.Dummy()
+
         def setup(env):
             env['a'] = 1
             env['m'] = 'model override'
             env['root'] = 'root override'
+
         self.loader.settings = {'pshell': {'setup': setup, 'm': model}}
         shell = dummy.DummyShell()
         command.run(shell)
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(shell.env, {
-            'app':self.bootstrap.app, 'root':'root override',
-            'registry':self.bootstrap.registry,
-            'request':self.bootstrap.request,
-            'root_factory':self.bootstrap.root_factory,
-            'a':1, 'm':'model override',
-        })
+        self.assertEqual(
+            shell.env,
+            {
+                'app': self.bootstrap.app,
+                'root': 'root override',
+                'registry': self.bootstrap.registry,
+                'request': self.bootstrap.request,
+                'root_factory': self.bootstrap.root_factory,
+                'a': 1,
+                'm': 'model override',
+            },
+        )
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
     def test_command_loads_setup_from_options(self):
         command = self._makeOne()
+
         def setup(env):
             env['a'] = 1
             env['root'] = 'root override'
+
         model = dummy.Dummy()
         self.loader.settings = {'pshell': {'setup': 'abc', 'm': model}}
         command.args.setup = setup
         shell = dummy.DummyShell()
         command.run(shell)
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(shell.env, {
-            'app':self.bootstrap.app, 'root':'root override',
-            'registry':self.bootstrap.registry,
-            'request':self.bootstrap.request,
-            'root_factory':self.bootstrap.root_factory,
-            'a':1, 'm':model,
-        })
+        self.assertEqual(
+            shell.env,
+            {
+                'app': self.bootstrap.app,
+                'root': 'root override',
+                'registry': self.bootstrap.registry,
+                'request': self.bootstrap.request,
+                'root_factory': self.bootstrap.root_factory,
+                'a': 1,
+                'm': model,
+            },
+        )
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
     def test_command_custom_section_override(self):
         command = self._makeOne()
         dummy_ = dummy.Dummy()
-        self.loader.settings = {'pshell': {
-            'app': dummy_, 'root': dummy_, 'registry': dummy_,
-            'request': dummy_}}
+        self.loader.settings = {
+            'pshell': {
+                'app': dummy_,
+                'root': dummy_,
+                'registry': dummy_,
+                'request': dummy_,
+            }
+        }
         shell = dummy.DummyShell()
         command.run(shell)
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(shell.env, {
-            'app':dummy_, 'root':dummy_, 'registry':dummy_, 'request':dummy_,
-            'root_factory':self.bootstrap.root_factory,
-        })
+        self.assertEqual(
+            shell.env,
+            {
+                'app': dummy_,
+                'root': dummy_,
+                'registry': dummy_,
+                'request': dummy_,
+                'root_factory': self.bootstrap.root_factory,
+            },
+        )
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
     def test_command_loads_pythonstartup(self):
         command = self._makeOne()
-        command.pystartup = (
-            os.path.abspath(
-                os.path.join(
-                    os.path.dirname(__file__),
-                    'pystartup.txt')))
+        command.pystartup = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), 'pystartup.txt')
+        )
         shell = dummy.DummyShell()
         command.run(shell)
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
-        self.assertEqual(shell.env, {
-            'app':self.bootstrap.app, 'root':self.bootstrap.root,
-            'registry':self.bootstrap.registry,
-            'request':self.bootstrap.request,
-            'root_factory':self.bootstrap.root_factory,
-            'foo':1,
-        })
+        self.assertEqual(
+            shell.env,
+            {
+                'app': self.bootstrap.app,
+                'root': self.bootstrap.root,
+                'registry': self.bootstrap.registry,
+                'request': self.bootstrap.request,
+                'root_factory': self.bootstrap.root_factory,
+                'foo': 1,
+            },
+        )
         self.assertTrue(self.bootstrap.closer.called)
         self.assertTrue(shell.help)
 
@@ -359,27 +397,20 @@ class TestPShellCommand(unittest.TestCase):
 
         command.out = out
 
-        self._makeEntryPoints(
-            command,
-            {
-                'ipython': dshell,
-                'python': dshell,
-            }
-        )
+        self._makeEntryPoints(command, {'ipython': dshell, 'python': dshell})
 
         command.args.list = True
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(out_calls, [
-            'Available shells:',
-            '  ipython',
-            '  python',
-        ])
+        self.assertEqual(
+            out_calls, ['Available shells:', '  ipython', '  python']
+        )
 
 
 class Test_python_shell_runner(unittest.TestCase):
     def _callFUT(self, env, help, interact):
         from pyramid.scripts.pshell import python_shell_runner
+
         return python_shell_runner(env, help, interact=interact)
 
     def test_it(self):
@@ -388,9 +419,11 @@ class Test_python_shell_runner(unittest.TestCase):
         self.assertEqual(interact.local, {'foo': 'bar'})
         self.assertTrue('a help message' in interact.banner)
 
+
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
         from pyramid.scripts.pshell import main
+
         return main(argv, quiet=True)
 
     def test_it(self):

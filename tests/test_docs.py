@@ -15,6 +15,7 @@ if 0:
             import manuel.codeblock
             import manuel.capture
             import manuel.ignore
+
             m = manuel.ignore.Manuel()
             m += manuel.codeblock.Manuel()
             m += manuel.capture.Manuel()

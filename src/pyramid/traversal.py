@@ -6,7 +6,7 @@ from pyramid.interfaces import (
     IRequestFactory,
     ITraverser,
     VH_ROOT_KEY,
-    )
+)
 
 from pyramid.compat import (
     PY2,
@@ -19,17 +19,18 @@ from pyramid.compat import (
     decode_path_info,
     unquote_bytes_to_wsgi,
     lru_cache,
-    )
+)
 
 from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
 from pyramid.location import lineage
 from pyramid.threadlocal import get_current_registry
 
-PATH_SEGMENT_SAFE = "~!$&'()*+,;=:@" # from webob
+PATH_SEGMENT_SAFE = "~!$&'()*+,;=:@"  # from webob
 PATH_SAFE = PATH_SEGMENT_SAFE + "/"
 
 empty = text_('')
+
 
 def find_root(resource):
     """ Find the root node in the resource tree to which ``resource``
@@ -42,6 +43,7 @@ def find_root(resource):
             resource = location
             break
     return resource
+
 
 def find_resource(resource, path):
     """ Given a resource object and a string or tuple representing a path
@@ -101,7 +103,9 @@ def find_resource(resource, path):
         raise KeyError('%r has no subelement %s' % (context, view_name))
     return context
 
-find_model = find_resource # b/w compat (forever)
+
+find_model = find_resource  # b/w compat (forever)
+
 
 def find_interface(resource, class_or_interface):
     """
@@ -120,6 +124,7 @@ def find_interface(resource, class_or_interface):
     for location in lineage(resource):
         if test(location):
             return location
+
 
 def resource_path(resource, *elements):
     """ Return a string object representing the absolute physical path of the
@@ -166,7 +171,9 @@ def resource_path(resource, *elements):
     # which caches the joined result for us
     return _join_path_tuple(resource_path_tuple(resource, *elements))
 
-model_path = resource_path # b/w compat (forever)
+
+model_path = resource_path  # b/w compat (forever)
+
 
 def traverse(resource, path):
     """Given a resource object as ``resource`` and a string or tuple
@@ -314,7 +321,8 @@ def traverse(resource, path):
 
     request_factory = reg.queryUtility(IRequestFactory)
     if request_factory is None:
-        from pyramid.request import Request # avoid circdep
+        from pyramid.request import Request  # avoid circdep
+
         request_factory = Request
 
     request = request_factory.blank(path)
@@ -324,6 +332,7 @@ def traverse(resource, path):
         traverser = ResourceTreeTraverser(resource)
 
     return traverser(request)
+
 
 def resource_path_tuple(resource, *elements):
     """
@@ -360,21 +369,26 @@ def resource_path_tuple(resource, *elements):
        The :term:`root` resource *must* have a ``__name__`` attribute with a
        value of either ``None`` or the empty string for path tuples to be
        generated properly.  If the root resource has a non-null ``__name__``
-       attribute, its name will be the first element in the generated path tuple
-       rather than the empty string.
+       attribute, its name will be the first element in the generated path
+       tuple rather than the empty string.
     """
     return tuple(_resource_path_list(resource, *elements))
 
+
 model_path_tuple = resource_path_tuple  # b/w compat (forever)
 
+
 def _resource_path_list(resource, *elements):
-    """ Implementation detail shared by resource_path and resource_path_tuple"""
+    """ Implementation detail shared by resource_path and
+    resource_path_tuple"""
     path = [loc.__name__ or '' for loc in lineage(resource)]
     path.reverse()
     path.extend(elements)
     return path
 
-_model_path_list = _resource_path_list # b/w compat, not an API
+
+_model_path_list = _resource_path_list  # b/w compat, not an API
+
 
 def virtual_root(resource, request):
     """
@@ -412,13 +426,14 @@ def virtual_root(resource, request):
 
     vpath, rpath = url_adapter.virtual_path, url_adapter.physical_path
     if rpath != vpath and rpath.endswith(vpath):
-        vroot_path = rpath[:-len(vpath)]
+        vroot_path = rpath[: -len(vpath)]
         return find_resource(resource, vroot_path)
 
     try:
         return request.root
     except AttributeError:
         return find_root(resource)
+
 
 def traversal_path(path):
     """ Variant of :func:`pyramid.traversal.traversal_path_info` suitable for
@@ -435,8 +450,9 @@ def traversal_path(path):
         # must not possess characters outside ascii
         path = path.encode('ascii')
     # we unquote this path exactly like a PEP 3333 server would
-    path = unquote_bytes_to_wsgi(path) # result will be a native string
-    return traversal_path_info(path) # result will be a tuple of unicode
+    path = unquote_bytes_to_wsgi(path)  # result will be a native string
+    return traversal_path_info(path)  # result will be a tuple of unicode
+
 
 @lru_cache(1000)
 def traversal_path_info(path):
@@ -501,19 +517,20 @@ def traversal_path_info(path):
 
       This function does not generate the same type of tuples that
       :func:`pyramid.traversal.resource_path_tuple` does.  In particular, the
-      leading empty string is not present in the tuple it returns, unlike tuples
-      returned by :func:`pyramid.traversal.resource_path_tuple`.  As a result,
-      tuples generated by ``traversal_path`` are not resolveable by the
-      :func:`pyramid.traversal.find_resource` API.  ``traversal_path`` is a
-      function mostly used by the internals of :app:`Pyramid` and by people
+      leading empty string is not present in the tuple it returns, unlike
+      tuples returned by :func:`pyramid.traversal.resource_path_tuple`.  As a
+      result, tuples generated by ``traversal_path`` are not resolveable by
+      the :func:`pyramid.traversal.find_resource` API.  ``traversal_path`` is
+      a function mostly used by the internals of :app:`Pyramid` and by people
       writing their own traversal machinery, as opposed to users writing
       applications in :app:`Pyramid`.
     """
     try:
-        path = decode_path_info(path) # result will be Unicode
+        path = decode_path_info(path)  # result will be Unicode
     except UnicodeDecodeError as e:
         raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
-    return split_path_info(path) # result will be tuple of Unicode
+    return split_path_info(path)  # result will be tuple of Unicode
+
 
 @lru_cache(1000)
 def split_path_info(path):
@@ -530,6 +547,7 @@ def split_path_info(path):
         else:
             clean.append(segment)
     return tuple(clean)
+
 
 _segment_cache = {}
 
@@ -574,7 +592,9 @@ if PY2:
         try:
             return _segment_cache[(segment, safe)]
         except KeyError:
-            if segment.__class__ is text_type: #isinstance slighly slower (~15%)
+            if (
+                segment.__class__ is text_type
+            ):  # isinstance slighly slower (~15%)
                 result = url_quote(segment.encode('utf-8'), safe)
             else:
                 result = url_quote(str(segment), safe)
@@ -582,7 +602,10 @@ if PY2:
             # will generate exactly one Python bytecode (STORE_SUBSCR)
             _segment_cache[(segment, safe)] = result
             return result
+
+
 else:
+
     def quote_path_segment(segment, safe=PATH_SEGMENT_SAFE):
         """ %s """ % quote_path_segment_doc
         # The bit of this code that deals with ``_segment_cache`` is an
@@ -601,7 +624,9 @@ else:
             _segment_cache[(segment, safe)] = result
             return result
 
+
 slash = text_('/')
+
 
 @implementer(ITraverser)
 class ResourceTreeTraverser(object):
@@ -609,7 +634,6 @@ class ResourceTreeTraverser(object):
     every resource in the tree supplies a ``__name__`` and
     ``__parent__`` attribute (ie. every resource in the tree is
     :term:`location` aware) ."""
-
 
     VH_ROOT_KEY = VH_ROOT_KEY
     VIEW_SELECTOR = '@@'
@@ -647,14 +671,17 @@ class ResourceTreeTraverser(object):
                 # if environ['PATH_INFO'] is just not there
                 path = slash
             except UnicodeDecodeError as e:
-                raise URLDecodeError(e.encoding, e.object, e.start, e.end,
-                                     e.reason)
+                raise URLDecodeError(
+                    e.encoding, e.object, e.start, e.end, e.reason
+                )
 
         if self.VH_ROOT_KEY in environ:
             # HTTP_X_VHM_ROOT
             vroot_path = decode_path_info(environ[self.VH_ROOT_KEY])
             vroot_tuple = split_path_info(vroot_path)
-            vpath = vroot_path + path # both will (must) be unicode or asciistr
+            vpath = (
+                vroot_path + path
+            )  # both will (must) be unicode or asciistr
             vroot_idx = len(vroot_tuple) - 1
         else:
             vroot_tuple = ()
@@ -664,7 +691,7 @@ class ResourceTreeTraverser(object):
         root = self.root
         ob = vroot = root
 
-        if vpath == slash: # invariant: vpath must not be empty
+        if vpath == slash:  # invariant: vpath must not be empty
             # prevent a call to traversal_path if we know it's going
             # to return the empty tuple
             vpath_tuple = ()
@@ -677,44 +704,60 @@ class ResourceTreeTraverser(object):
             vpath_tuple = split_path_info(vpath)
             for segment in vpath_tuple:
                 if segment[:2] == view_selector:
-                    return {'context': ob,
-                            'view_name': segment[2:],
-                            'subpath': vpath_tuple[i + 1:],
-                            'traversed': vpath_tuple[:vroot_idx + i + 1],
-                            'virtual_root': vroot,
-                            'virtual_root_path': vroot_tuple,
-                            'root': root}
+                    return {
+                        'context': ob,
+                        'view_name': segment[2:],
+                        'subpath': vpath_tuple[i + 1 :],
+                        'traversed': vpath_tuple[: vroot_idx + i + 1],
+                        'virtual_root': vroot,
+                        'virtual_root_path': vroot_tuple,
+                        'root': root,
+                    }
                 try:
                     getitem = ob.__getitem__
                 except AttributeError:
-                    return {'context': ob,
-                            'view_name': segment,
-                            'subpath': vpath_tuple[i + 1:],
-                            'traversed': vpath_tuple[:vroot_idx + i + 1],
-                            'virtual_root': vroot,
-                            'virtual_root_path': vroot_tuple,
-                            'root': root}
+                    return {
+                        'context': ob,
+                        'view_name': segment,
+                        'subpath': vpath_tuple[i + 1 :],
+                        'traversed': vpath_tuple[: vroot_idx + i + 1],
+                        'virtual_root': vroot,
+                        'virtual_root_path': vroot_tuple,
+                        'root': root,
+                    }
 
                 try:
                     next = getitem(segment)
                 except KeyError:
-                    return {'context': ob,
-                            'view_name': segment,
-                            'subpath': vpath_tuple[i + 1:],
-                            'traversed': vpath_tuple[:vroot_idx + i + 1],
-                            'virtual_root': vroot,
-                            'virtual_root_path': vroot_tuple,
-                            'root': root}
+                    return {
+                        'context': ob,
+                        'view_name': segment,
+                        'subpath': vpath_tuple[i + 1 :],
+                        'traversed': vpath_tuple[: vroot_idx + i + 1],
+                        'virtual_root': vroot,
+                        'virtual_root_path': vroot_tuple,
+                        'root': root,
+                    }
                 if i == vroot_idx:
                     vroot = next
                 ob = next
                 i += 1
 
-        return {'context':ob, 'view_name':empty, 'subpath':subpath,
-                'traversed':vpath_tuple, 'virtual_root':vroot,
-                'virtual_root_path':vroot_tuple, 'root':root}
+        return {
+            'context': ob,
+            'view_name': empty,
+            'subpath': subpath,
+            'traversed': vpath_tuple,
+            'virtual_root': vroot,
+            'virtual_root_path': vroot_tuple,
+            'root': root,
+        }
 
-ModelGraphTraverser = ResourceTreeTraverser # b/w compat, not API, used in wild
+
+ModelGraphTraverser = (
+    ResourceTreeTraverser
+)  # b/w compat, not API, used in wild
+
 
 @implementer(IResourceURL)
 class ResourceURL(object):
@@ -742,19 +785,24 @@ class ResourceURL(object):
                 vroot_path_tuple = tuple(vroot_path.split('/'))
                 numels = len(vroot_path_tuple)
                 virtual_path_tuple = ('',) + physical_path_tuple[numels:]
-                virtual_path = physical_path[len(vroot_path):]
+                virtual_path = physical_path[len(vroot_path) :]
 
-        self.virtual_path = virtual_path    # IResourceURL attr
+        self.virtual_path = virtual_path  # IResourceURL attr
         self.physical_path = physical_path  # IResourceURL attr
-        self.virtual_path_tuple = virtual_path_tuple # IResourceURL attr (1.5)
-        self.physical_path_tuple = physical_path_tuple # IResourceURL attr (1.5)
+        self.virtual_path_tuple = virtual_path_tuple  # IResourceURL attr (1.5)
+        self.physical_path_tuple = (
+            physical_path_tuple
+        )  # IResourceURL attr (1.5)
+
 
 @lru_cache(1000)
 def _join_path_tuple(tuple):
     return tuple and '/'.join([quote_path_segment(x) for x in tuple]) or '/'
 
+
 class DefaultRootFactory:
     __parent__ = None
     __name__ = None
+
     def __init__(self, request):
         pass

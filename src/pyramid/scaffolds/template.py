@@ -6,19 +6,18 @@ import re
 import sys
 import os
 
-from pyramid.compat import (
-    native_,
-    bytes_,
-    )
+from pyramid.compat import native_, bytes_
 
 from pyramid.scaffolds import copydir
 
 fsenc = sys.getfilesystemencoding()
 
+
 class Template(object):
     """ Inherit from this base class and override methods to use the Pyramid
     scaffolding system."""
-    copydir = copydir # for testing
+
+    copydir = copydir  # for testing
     _template_dir = None
 
     def __init__(self, name):
@@ -36,7 +35,10 @@ class Template(object):
         try:
             return bytes_(
                 substitute_escaped_double_braces(
-                    substitute_double_braces(content, TypeMapper(vars))), fsenc)
+                    substitute_double_braces(content, TypeMapper(vars))
+                ),
+                fsenc,
+            )
         except Exception as e:
             _add_except(e, ' in file %s' % filename)
             raise
@@ -54,7 +56,8 @@ class Template(object):
         construct a path.  If _template_dir is a tuple, it should be a
         2-element tuple: ``(package_name, package_relative_path)``."""
         assert self._template_dir is not None, (
-            "Template %r didn't set _template_dir" % self)
+            "Template %r didn't set _template_dir" % self
+        )
         if isinstance(self._template_dir, tuple):
             return self._template_dir
         else:
@@ -65,13 +68,13 @@ class Template(object):
         self.write_files(command, output_dir, vars)
         self.post(command, output_dir, vars)
 
-    def pre(self, command, output_dir, vars): # pragma: no cover
+    def pre(self, command, output_dir, vars):  # pragma: no cover
         """
         Called before template is applied.
         """
         pass
 
-    def post(self, command, output_dir, vars): # pragma: no cover
+    def post(self, command, output_dir, vars):  # pragma: no cover
         """
         Called after template is applied.
         """
@@ -95,15 +98,15 @@ class Template(object):
             overwrite=command.args.overwrite,
             indent=1,
             template_renderer=self.render_template,
-            )
+        )
 
-    def makedirs(self, dir): # pragma: no cover
+    def makedirs(self, dir):  # pragma: no cover
         return os.makedirs(dir)
 
-    def exists(self, path): # pragma: no cover
+    def exists(self, path):  # pragma: no cover
         return os.path.exists(path)
 
-    def out(self, msg): # pragma: no cover
+    def out(self, msg):  # pragma: no cover
         print(msg)
 
     # hair for exit with usage when paster create is used under 1.3 instead
@@ -113,13 +116,15 @@ class Template(object):
     # required_templates tuple is required to allow it to get as far as
     # calling check_vars.
     required_templates = ()
+
     def check_vars(self, vars, other):
         raise RuntimeError(
             'Under Pyramid 1.3, you should use the "pcreate" command rather '
-            'than "paster create"')
+            'than "paster create"'
+        )
+
 
 class TypeMapper(dict):
-
     def __getitem__(self, item):
         options = item.split('|')
         for op in options[:-1]:
@@ -135,6 +140,7 @@ class TypeMapper(dict):
         else:
             return str(value)
 
+
 def eval_with_catch(expr, vars):
     try:
         return eval(expr, vars)
@@ -142,23 +148,32 @@ def eval_with_catch(expr, vars):
         _add_except(e, 'in expression %r' % expr)
         raise
 
+
 double_brace_pattern = re.compile(r'{{(?P<braced>.*?)}}')
+
 
 def substitute_double_braces(content, values):
     def double_bracerepl(match):
         value = match.group('braced').strip()
         return values[value]
+
     return double_brace_pattern.sub(double_bracerepl, content)
 
-escaped_double_brace_pattern = re.compile(r'\\{\\{(?P<escape_braced>[^\\]*?)\\}\\}')
+
+escaped_double_brace_pattern = re.compile(
+    r'\\{\\{(?P<escape_braced>[^\\]*?)\\}\\}'
+)
+
 
 def substitute_escaped_double_braces(content):
     def escaped_double_bracerepl(match):
         value = match.group('escape_braced').strip()
         return "{{%(value)s}}" % locals()
+
     return escaped_double_brace_pattern.sub(escaped_double_bracerepl, content)
 
-def _add_except(exc, info): # pragma: no cover
+
+def _add_except(exc, info):  # pragma: no cover
     if not hasattr(exc, 'args') or exc.args is None:
         return
     args = list(exc.args)
@@ -168,5 +183,3 @@ def _add_except(exc, info): # pragma: no cover
         args = [info]
     exc.args = tuple(args)
     return
-
-

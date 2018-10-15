@@ -15,6 +15,7 @@ class DummyIntrospector(object):
 class TestPRoutesCommand(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.scripts.proutes import PRoutesCommand
+
         return PRoutesCommand
 
     def _makeOne(self):
@@ -27,12 +28,14 @@ class TestPRoutesCommand(unittest.TestCase):
 
     def _makeRegistry(self):
         from pyramid.registry import Registry
+
         registry = Registry()
         registry.introspector = DummyIntrospector()
         return registry
 
     def _makeConfig(self, *arg, **kw):
         from pyramid.config import Configurator
+
         config = Configurator(*arg, **kw)
         return config
 
@@ -76,7 +79,7 @@ class TestPRoutesCommand(unittest.TestCase):
 
     def test_no_mapper(self):
         command = self._makeOne()
-        command._get_mapper = lambda *arg:None
+        command._get_mapper = lambda *arg: None
         L = []
         command.out = L.append
         result = command.run()
@@ -115,11 +118,15 @@ class TestPRoutesCommand(unittest.TestCase):
     def test_single_route_no_views_registered(self):
         from zope.interface import Interface
         from pyramid.interfaces import IRouteRequest
+
         registry = self._makeRegistry()
 
-        def view():pass
+        def view():  # pragma: no cover
+            pass
+
         class IMyRoute(Interface):
             pass
+
         registry.registerUtility(IMyRoute, IRouteRequest, name='a')
         command = self._makeOne()
         route = dummy.DummyRoute('a', '/a')
@@ -138,14 +145,18 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IView
+
         registry = self._makeRegistry()
 
-        def view():pass
+        def view():  # pragma: no cover
+            pass
+
         class IMyRoute(Interface):
             pass
-        registry.registerAdapter(view,
-                                 (IViewClassifier, IMyRoute, Interface),
-                                 IView, '')
+
+        registry.registerAdapter(
+            view, (IViewClassifier, IMyRoute, Interface), IView, ''
+        )
         registry.registerUtility(IMyRoute, IRouteRequest, name='a')
         command = self._makeOne()
         route = dummy.DummyRoute('a', '/a')
@@ -159,8 +170,7 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()[:3]
         self.assertEqual(
-            compare_to,
-            ['a', '/a', 'tests.test_scripts.test_proutes.view']
+            compare_to, ['a', '/a', 'tests.test_scripts.test_proutes.view']
         )
 
     def test_one_route_with_long_name_one_view_registered(self):
@@ -168,26 +178,26 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IView
+
         registry = self._makeRegistry()
 
-        def view():pass
+        def view():  # pragma: no cover
+            pass
 
         class IMyRoute(Interface):
             pass
 
         registry.registerAdapter(
-            view,
-            (IViewClassifier, IMyRoute, Interface),
-            IView, ''
+            view, (IViewClassifier, IMyRoute, Interface), IView, ''
         )
 
-        registry.registerUtility(IMyRoute, IRouteRequest,
-                                 name='very_long_name_123')
+        registry.registerUtility(
+            IMyRoute, IRouteRequest, name='very_long_name_123'
+        )
 
         command = self._makeOne()
         route = dummy.DummyRoute(
-            'very_long_name_123',
-            '/and_very_long_pattern_as_well'
+            'very_long_name_123', '/and_very_long_pattern_as_well'
         )
         mapper = dummy.DummyMapper(route)
         command._get_mapper = lambda *arg: mapper
@@ -200,9 +210,11 @@ class TestPRoutesCommand(unittest.TestCase):
         compare_to = L[-1].split()[:3]
         self.assertEqual(
             compare_to,
-            ['very_long_name_123',
-             '/and_very_long_pattern_as_well',
-             'tests.test_scripts.test_proutes.view']
+            [
+                'very_long_name_123',
+                '/and_very_long_pattern_as_well',
+                'tests.test_scripts.test_proutes.view',
+            ],
         )
 
     def test_class_view(self):
@@ -215,7 +227,7 @@ class TestPRoutesCommand(unittest.TestCase):
             view=dummy.DummyView,
             attr='view',
             renderer=nr,
-            request_method='POST'
+            request_method='POST',
         )
 
         command = self._makeOne()
@@ -227,8 +239,10 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()
         expected = [
-            'foo', '/a/b',
-            'tests.test_scripts.dummy.DummyView.view', 'POST'
+            'foo',
+            '/a/b',
+            'tests.test_scripts.dummy.DummyView.view',
+            'POST',
         ]
         self.assertEqual(compare_to, expected)
 
@@ -237,19 +251,27 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.interfaces import IRouteRequest
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IView
+
         registry = self._makeRegistry()
 
-        def view():pass
+        def view():  # pragma: no cover
+            pass
+
         class IMyRoot(Interface):
             pass
+
         class IMyRoute(Interface):
             pass
-        registry.registerAdapter(view,
-                                 (IViewClassifier, IMyRoute, IMyRoot),
-                                 IView, '')
+
+        registry.registerAdapter(
+            view, (IViewClassifier, IMyRoute, IMyRoot), IView, ''
+        )
         registry.registerUtility(IMyRoute, IRouteRequest, name='a')
         command = self._makeOne()
-        def factory(request): pass
+
+        def factory(request):  # pragma: no cover
+            pass
+
         route = dummy.DummyRoute('a', '/a', factory=factory)
         mapper = dummy.DummyMapper(route)
         command._get_mapper = lambda *arg: mapper
@@ -269,20 +291,18 @@ class TestPRoutesCommand(unittest.TestCase):
 
         registry = self._makeRegistry()
 
-        def view(): pass
+        def view():  # pragma: no cover
+            pass
 
         class IMyRoute(Interface):
             pass
 
         multiview1 = dummy.DummyMultiView(
-            view, context='context',
-            view_name='a1'
+            view, context='context', view_name='a1'
         )
 
         registry.registerAdapter(
-            multiview1,
-            (IViewClassifier, IMyRoute, Interface),
-            IMultiView, ''
+            multiview1, (IViewClassifier, IMyRoute, Interface), IMultiView, ''
         )
         registry.registerUtility(IMyRoute, IRouteRequest, name='a')
         command = self._makeOne()
@@ -300,13 +320,11 @@ class TestPRoutesCommand(unittest.TestCase):
         view_str = '<tests.test_scripts.dummy.DummyMultiView'
         final = '%s.%s' % (view_module, view_str)
 
-        self.assertEqual(
-            compare_to,
-            ['a', '/a', final]
-        )
+        self.assertEqual(compare_to, ['a', '/a', final])
 
     def test__get_mapper(self):
         from pyramid.urldispatch import RoutesMapper
+
         command = self._makeOne()
         registry = self._makeRegistry()
 
@@ -316,15 +334,13 @@ class TestPRoutesCommand(unittest.TestCase):
     def test_one_route_all_methods_view_only_post(self):
         from pyramid.renderers import null_renderer as nr
 
-        def view1(context, request): return 'view1'
+        def view1(context, request):  # pragma: no cover
+            return 'view1'
 
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', '/a/b')
         config.add_view(
-            route_name='foo',
-            view=view1,
-            renderer=nr,
-            request_method='POST'
+            route_name='foo', view=view1, renderer=nr, request_method='POST'
         )
 
         command = self._makeOne()
@@ -336,23 +352,22 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()
         expected = [
-            'foo', '/a/b',
-            'tests.test_scripts.test_proutes.view1', 'POST'
+            'foo',
+            '/a/b',
+            'tests.test_scripts.test_proutes.view1',
+            'POST',
         ]
         self.assertEqual(compare_to, expected)
 
     def test_one_route_only_post_view_all_methods(self):
         from pyramid.renderers import null_renderer as nr
 
-        def view1(context, request): return 'view1'
+        def view1(context, request):  # pragma: no cover
+            return 'view1'
 
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', '/a/b', request_method='POST')
-        config.add_view(
-            route_name='foo',
-            view=view1,
-            renderer=nr,
-        )
+        config.add_view(route_name='foo', view=view1, renderer=nr)
 
         command = self._makeOne()
         L = []
@@ -363,15 +378,18 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()
         expected = [
-            'foo', '/a/b',
-            'tests.test_scripts.test_proutes.view1', 'POST'
+            'foo',
+            '/a/b',
+            'tests.test_scripts.test_proutes.view1',
+            'POST',
         ]
         self.assertEqual(compare_to, expected)
 
     def test_one_route_only_post_view_post_and_get(self):
         from pyramid.renderers import null_renderer as nr
 
-        def view1(context, request): return 'view1'
+        def view1(context, request):  # pragma: no cover
+            return 'view1'
 
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', '/a/b', request_method='POST')
@@ -379,7 +397,7 @@ class TestPRoutesCommand(unittest.TestCase):
             route_name='foo',
             view=view1,
             renderer=nr,
-            request_method=('POST', 'GET')
+            request_method=('POST', 'GET'),
         )
 
         command = self._makeOne()
@@ -391,23 +409,23 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()
         expected = [
-            'foo', '/a/b',
-            'tests.test_scripts.test_proutes.view1', 'POST'
+            'foo',
+            '/a/b',
+            'tests.test_scripts.test_proutes.view1',
+            'POST',
         ]
         self.assertEqual(compare_to, expected)
 
     def test_route_request_method_mismatch(self):
         from pyramid.renderers import null_renderer as nr
 
-        def view1(context, request): return 'view1'
+        def view1(context, request):  # pragma: no cover
+            return 'view1'
 
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', '/a/b', request_method='POST')
         config.add_view(
-            route_name='foo',
-            view=view1,
-            renderer=nr,
-            request_method='GET'
+            route_name='foo', view=view1, renderer=nr, request_method='GET'
         )
 
         command = self._makeOne()
@@ -419,21 +437,22 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()
         expected = [
-            'foo', '/a/b',
+            'foo',
+            '/a/b',
             'tests.test_scripts.test_proutes.view1',
-            '<route', 'mismatch>'
+            '<route',
+            'mismatch>',
         ]
         self.assertEqual(compare_to, expected)
 
     def test_route_static_views(self):
-        from pyramid.renderers import null_renderer as nr
         config = self._makeConfig(autocommit=True)
         config.add_static_view('static', 'static', cache_max_age=3600)
         path2 = os.path.normpath('/var/www/static')
         config.add_static_view(name='static2', path=path2)
         config.add_static_view(
             name='pyramid_scaffold',
-            path='pyramid:scaffolds/starter/+package+/static'
+            path='pyramid:scaffolds/starter/+package+/static',
         )
 
         command = self._makeOne()
@@ -445,11 +464,19 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(len(L), 5)
 
         expected = [
-            ['__static/', '/static/*subpath',
-             'tests.test_scripts:static/', '*'],
+            [
+                '__static/',
+                '/static/*subpath',
+                'tests.test_scripts:static/',
+                '*',
+            ],
             ['__static2/', '/static2/*subpath', path2 + os.sep, '*'],
-            ['__pyramid_scaffold/', '/pyramid_scaffold/*subpath',
-             'pyramid:scaffolds/starter/+package+/static/',  '*'],
+            [
+                '__pyramid_scaffold/',
+                '/pyramid_scaffold/*subpath',
+                'pyramid:scaffolds/starter/+package+/static/',
+                '*',
+            ],
         ]
 
         for index, line in enumerate(L[2:]):
@@ -457,7 +484,6 @@ class TestPRoutesCommand(unittest.TestCase):
             self.assertEqual(data, expected[index])
 
     def test_route_no_view(self):
-        from pyramid.renderers import null_renderer as nr
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', '/a/b', request_method='POST')
 
@@ -469,27 +495,23 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()
-        expected = [
-            'foo', '/a/b',
-            '<unknown>',
-            'POST',
-        ]
+        expected = ['foo', '/a/b', '<unknown>', 'POST']
         self.assertEqual(compare_to, expected)
 
     def test_route_as_wsgiapp(self):
         from pyramid.wsgi import wsgiapp2
 
         config1 = self._makeConfig(autocommit=True)
-        def view1(context, request): return 'view1'
+
+        def view1(context, request):  # pragma: no cover
+            return 'view1'
+
         config1.add_route('foo', '/a/b', request_method='POST')
         config1.add_view(view=view1, route_name='foo')
 
         config2 = self._makeConfig(autocommit=True)
         config2.add_route('foo', '/a/b', request_method='POST')
-        config2.add_view(
-            wsgiapp2(config1.make_wsgi_app()),
-            route_name='foo',
-        )
+        config2.add_view(wsgiapp2(config1.make_wsgi_app()), route_name='foo')
 
         command = self._makeOne()
         L = []
@@ -499,18 +521,15 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()
-        expected = [
-            'foo', '/a/b',
-            '<wsgiapp>',
-            'POST',
-        ]
+        expected = ['foo', '/a/b', '<wsgiapp>', 'POST']
         self.assertEqual(compare_to, expected)
 
     def test_route_is_get_view_request_method_not_post(self):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request): return 'view1'
+        def view1(context, request):  # pragma: no cover
+            return 'view1'
 
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', '/a/b', request_method='GET')
@@ -518,7 +537,7 @@ class TestPRoutesCommand(unittest.TestCase):
             route_name='foo',
             view=view1,
             renderer=nr,
-            request_method=not_('POST')
+            request_method=not_('POST'),
         )
 
         command = self._makeOne()
@@ -530,9 +549,10 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()
         expected = [
-            'foo', '/a/b',
+            'foo',
+            '/a/b',
             'tests.test_scripts.test_proutes.view1',
-            'GET'
+            'GET',
         ]
         self.assertEqual(compare_to, expected)
 
@@ -540,7 +560,8 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request): return 'view1'
+        def view1(context, request):  # pragma: no cover
+            return 'view1'
 
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', '/a/b')
@@ -548,7 +569,7 @@ class TestPRoutesCommand(unittest.TestCase):
             route_name='foo',
             view=view1,
             renderer=nr,
-            request_method=not_('POST')
+            request_method=not_('POST'),
         )
 
         command = self._makeOne()
@@ -560,9 +581,10 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()
         expected = [
-            'foo', '/a/b',
+            'foo',
+            '/a/b',
             'tests.test_scripts.test_proutes.view1',
-            '!POST,*'
+            '!POST,*',
         ]
         self.assertEqual(compare_to, expected)
 
@@ -570,8 +592,11 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request): return 'view1'
-        def view2(context, request): return 'view2'
+        def view1(context, request):  # pragma: no cover
+            return 'view1'
+
+        def view2(context, request):  # pragma: no cover
+            return 'view2'
 
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', '/a/b')
@@ -579,7 +604,7 @@ class TestPRoutesCommand(unittest.TestCase):
             route_name='foo',
             view=view1,
             renderer=nr,
-            request_method=not_('POST')
+            request_method=not_('POST'),
         )
 
         config.add_route('bar', '/b/a')
@@ -587,7 +612,7 @@ class TestPRoutesCommand(unittest.TestCase):
             route_name='bar',
             view=view2,
             renderer=nr,
-            request_method=not_('POST')
+            request_method=not_('POST'),
         )
 
         command = self._makeOne()
@@ -601,9 +626,10 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()
         expected = [
-            'foo', '/a/b',
+            'foo',
+            '/a/b',
             'tests.test_scripts.test_proutes.view1',
-            '!POST,*'
+            '!POST,*',
         ]
         self.assertEqual(compare_to, expected)
 
@@ -611,7 +637,8 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request): return 'view1'
+        def view1(context, request):  # pragma: no cover
+            return 'view1'
 
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', '/a/b')
@@ -619,7 +646,7 @@ class TestPRoutesCommand(unittest.TestCase):
             route_name='foo',
             view=view1,
             renderer=nr,
-            request_method=not_('POST')
+            request_method=not_('POST'),
         )
 
         command = self._makeOne()
@@ -641,7 +668,8 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request): return 'view1'
+        def view1(context, request):  # pragma: no cover
+            return 'view1'
 
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', '/a/b')
@@ -649,7 +677,7 @@ class TestPRoutesCommand(unittest.TestCase):
             route_name='foo',
             view=view1,
             renderer=nr,
-            request_method=not_('POST')
+            request_method=not_('POST'),
         )
 
         command = self._makeOne()
@@ -670,7 +698,8 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request): return 'view1'
+        def view1(context, request):  # pragma: no cover
+            return 'view1'
 
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', '/a/b')
@@ -678,7 +707,7 @@ class TestPRoutesCommand(unittest.TestCase):
             route_name='foo',
             view=view1,
             renderer=nr,
-            request_method=not_('POST')
+            request_method=not_('POST'),
         )
 
         command = self._makeOne()
@@ -687,7 +716,8 @@ class TestPRoutesCommand(unittest.TestCase):
         command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         command.get_config_loader = dummy.DummyLoader(
-            {'proutes': {'format': 'method\nname'}})
+            {'proutes': {'format': 'method\nname'}}
+        )
 
         result = command.run()
         self.assertEqual(result, 0)
@@ -702,7 +732,8 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request): return 'view1'
+        def view1(context, request):  # pragma: no cover
+            return 'view1'
 
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', '/a/b')
@@ -710,7 +741,7 @@ class TestPRoutesCommand(unittest.TestCase):
             route_name='foo',
             view=view1,
             renderer=nr,
-            request_method=not_('POST')
+            request_method=not_('POST'),
         )
 
         command = self._makeOne()
@@ -719,7 +750,8 @@ class TestPRoutesCommand(unittest.TestCase):
         command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         command.get_config_loader = dummy.DummyLoader(
-            {'proutes': {'format': 'method name'}})
+            {'proutes': {'format': 'method name'}}
+        )
 
         result = command.run()
         self.assertEqual(result, 0)
@@ -734,7 +766,8 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request): return 'view1'
+        def view1(context, request):  # pragma: no cover
+            return 'view1'
 
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', '/a/b')
@@ -742,7 +775,7 @@ class TestPRoutesCommand(unittest.TestCase):
             route_name='foo',
             view=view1,
             renderer=nr,
-            request_method=not_('POST')
+            request_method=not_('POST'),
         )
 
         command = self._makeOne()
@@ -751,7 +784,8 @@ class TestPRoutesCommand(unittest.TestCase):
         command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         command.get_config_loader = dummy.DummyLoader(
-            {'proutes': {'format': 'method,name'}})
+            {'proutes': {'format': 'method,name'}}
+        )
 
         result = command.run()
         self.assertEqual(result, 0)
@@ -763,8 +797,6 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(L[0].split(), ['Method', 'Name'])
 
     def test_static_routes_included_in_list(self):
-        from pyramid.renderers import null_renderer as nr
-
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', 'http://example.com/bar.aspx', static=True)
 
@@ -776,15 +808,14 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(result, 0)
         self.assertEqual(len(L), 3)
         compare_to = L[-1].split()
-        expected = [
-            'foo', 'http://example.com/bar.aspx',
-            '<unknown>', '*',
-        ]
+        expected = ['foo', 'http://example.com/bar.aspx', '<unknown>', '*']
         self.assertEqual(compare_to, expected)
+
 
 class Test_main(unittest.TestCase):
     def _callFUT(self, argv):
         from pyramid.scripts.proutes import main
+
         return main(argv, quiet=True)
 
     def test_it(self):

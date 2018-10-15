@@ -15,12 +15,12 @@ class TemplateTest(object):
     def make_venv(self, directory):  # pragma: no cover
         import virtualenv
         from virtualenv import Logger
+
         logger = Logger([(Logger.level_for_integer(2), sys.stdout)])
         virtualenv.logger = logger
-        virtualenv.create_environment(directory,
-                                      site_packages=False,
-                                      clear=False,
-                                      unzip_setuptools=True)
+        virtualenv.create_environment(
+            directory, site_packages=False, clear=False, unzip_setuptools=True
+        )
 
     def install(self, tmpl_name):  # pragma: no cover
         try:
@@ -36,14 +36,18 @@ class TemplateTest(object):
             os.chdir('Dingle')
             subprocess.check_call([pip, 'install', '.[testing]'])
             if tmpl_name == 'alchemy':
-                populate = os.path.join(self.directory, 'bin',
-                                        'initialize_Dingle_db')
+                populate = os.path.join(
+                    self.directory, 'bin', 'initialize_Dingle_db'
+                )
                 subprocess.check_call([populate, 'development.ini'])
-            subprocess.check_call([
-                os.path.join(self.directory, 'bin', 'py.test')])
+            subprocess.check_call(
+                [os.path.join(self.directory, 'bin', 'py.test')]
+            )
             pserve = os.path.join(self.directory, 'bin', 'pserve')
-            for ininame, hastoolbar in (('development.ini', True),
-                                        ('production.ini', False)):
+            for ininame, hastoolbar in (
+                ('development.ini', True),
+                ('production.ini', False),
+            ):
                 proc = subprocess.Popen([pserve, ininame])
                 try:
                     time.sleep(5)
@@ -66,10 +70,10 @@ class TemplateTest(object):
             shutil.rmtree(self.directory)
             os.chdir(self.old_cwd)
 
-if __name__ == '__main__':     # pragma: no cover
+
+if __name__ == '__main__':  # pragma: no cover
     templates = ['starter', 'alchemy', 'zodb']
 
     for name in templates:
         test = TemplateTest()
         test.install(name)
-    

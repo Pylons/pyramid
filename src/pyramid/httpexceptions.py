@@ -137,15 +137,11 @@ from zope.interface import implementer
 from webob import html_escape as _html_escape
 from webob.acceptparse import create_accept_header
 
-from pyramid.compat import (
-    class_types,
-    text_type,
-    binary_type,
-    text_,
-    )
+from pyramid.compat import class_types, text_type, binary_type, text_
 
 from pyramid.interfaces import IExceptionResponse
 from pyramid.response import Response
+
 
 def _no_escape(value):
     if value is None:
@@ -159,10 +155,10 @@ def _no_escape(value):
             value = text_type(value)
     return value
 
+
 @implementer(IExceptionResponse)
 class HTTPException(Response, Exception):
-
-    ## You should set in subclasses:
+    # You should set in subclasses:
     # code = 200
     # title = 'OK'
     # explanation = 'why this happens'
@@ -190,23 +186,29 @@ class HTTPException(Response, Exception):
     #   implies that this class' ``exception`` property always returns
     #   ``self`` (it exists only for bw compat at this point).
     #
-    # - documentation improvements (Pyramid-specific docstrings where necessary)
+    # - documentation improvements (Pyramid-specific docstrings where
+    #   necessary)
     #
     code = 520
     title = 'Unknown Error'
     explanation = ''
-    body_template_obj = Template('''\
+    body_template_obj = Template(
+        '''\
 ${explanation}${br}${br}
 ${detail}
 ${html_comment}
-''')
+'''
+    )
 
-    plain_template_obj = Template('''\
+    plain_template_obj = Template(
+        '''\
 ${status}
 
-${body}''')
+${body}'''
+    )
 
-    html_template_obj = Template('''\
+    html_template_obj = Template(
+        '''\
 <html>
  <head>
   <title>${status}</title>
@@ -215,13 +217,21 @@ ${body}''')
   <h1>${status}</h1>
   ${body}
  </body>
-</html>''')
+</html>'''
+    )
 
-    ## Set this to True for responses that should have no request body
+    # Set this to True for responses that should have no request body
     empty_body = False
 
-    def __init__(self, detail=None, headers=None, comment=None,
-                 body_template=None, json_formatter=None, **kw):
+    def __init__(
+        self,
+        detail=None,
+        headers=None,
+        comment=None,
+        body_template=None,
+        json_formatter=None,
+        **kw
+    ):
         status = '%s %s' % (self.code, self.title)
         Response.__init__(self, status=status, **kw)
         Exception.__init__(self, detail)
@@ -243,9 +253,7 @@ ${body}''')
         return str(self.detail) if self.detail else self.explanation
 
     def _json_formatter(self, status, body, title, environ):
-        return {'message': body,
-                'code': status,
-                'title': self.title}
+        return {'message': body, 'code': status, 'title': self.title}
 
     def prepare(self, environ):
         if not self.has_body and not self.empty_body:
@@ -255,7 +263,9 @@ ${body}''')
             accept = create_accept_header(accept_value)
             # Attempt to match text/html or application/json, if those don't
             # match, we will fall through to defaulting to text/plain
-            acceptable = accept.acceptable_offers(['text/html', 'application/json'])
+            acceptable = accept.acceptable_offers(
+                ['text/html', 'application/json']
+            )
             acceptable = [offer[0] for offer in acceptable] + ['text/plain']
             match = acceptable[0]
 
@@ -281,8 +291,10 @@ ${body}''')
                     def substitute(self, status, body):
                         jsonbody = self.excobj._json_formatter(
                             status=status,
-                            body=body, title=self.excobj.title,
-                            environ=environ)
+                            body=body,
+                            title=self.excobj.title,
+                            environ=environ,
+                        )
                         return json.dumps(jsonbody)
 
                 page_template = JsonPageTemplate(self)
@@ -299,7 +311,7 @@ ${body}''')
                 'detail': escape(self.detail or ''),
                 'comment': escape(comment),
                 'html_comment': html_comment,
-                }
+            }
             body_tmpl = self.body_template_obj
             if HTTPException.body_template_obj is not body_tmpl:
                 # Custom template; add headers to args
@@ -324,7 +336,7 @@ ${body}''')
         # bw compat only
         return self
 
-    exception = wsgi_response # bw compat only
+    exception = wsgi_response  # bw compat only
 
     def __call__(self, environ, start_response):
         # differences from webob.exc.WSGIHTTPException
@@ -337,7 +349,9 @@ ${body}''')
         self.prepare(environ)
         return Response.__call__(self, environ, start_response)
 
-WSGIHTTPException = HTTPException # b/c post 1.5
+
+WSGIHTTPException = HTTPException  # b/c post 1.5
+
 
 class HTTPError(HTTPException):
     """
@@ -346,6 +360,7 @@ class HTTPError(HTTPException):
     This is an exception which indicates that an error has occurred,
     and that any work in progress should not be committed.
     """
+
 
 class HTTPRedirection(HTTPException):
     """
@@ -357,15 +372,18 @@ class HTTPRedirection(HTTPException):
     condition.
     """
 
+
 class HTTPSuccessful(HTTPException):
     """
     Base class for exceptions with status codes in the 200s (successful
     responses)
     """
 
+
 ############################################################
-## 2xx success
+# 2xx success
 ############################################################
+
 
 class HTTPOk(HTTPSuccessful):
     """
@@ -375,8 +393,10 @@ class HTTPOk(HTTPSuccessful):
 
     code: 200, title: OK
     """
+
     code = 200
     title = 'OK'
+
 
 class HTTPCreated(HTTPSuccessful):
     """
@@ -387,8 +407,10 @@ class HTTPCreated(HTTPSuccessful):
 
     code: 201, title: Created
     """
+
     code = 201
     title = 'Created'
+
 
 class HTTPAccepted(HTTPSuccessful):
     """
@@ -399,9 +421,11 @@ class HTTPAccepted(HTTPSuccessful):
 
     code: 202, title: Accepted
     """
+
     code = 202
     title = 'Accepted'
     explanation = 'The request is accepted for processing.'
+
 
 class HTTPNonAuthoritativeInformation(HTTPSuccessful):
     """
@@ -413,8 +437,10 @@ class HTTPNonAuthoritativeInformation(HTTPSuccessful):
 
     code: 203, title: Non-Authoritative Information
     """
+
     code = 203
     title = 'Non-Authoritative Information'
+
 
 class HTTPNoContent(HTTPSuccessful):
     """
@@ -426,9 +452,11 @@ class HTTPNoContent(HTTPSuccessful):
 
     code: 204, title: No Content
     """
+
     code = 204
     title = 'No Content'
     empty_body = True
+
 
 class HTTPResetContent(HTTPSuccessful):
     """
@@ -440,9 +468,11 @@ class HTTPResetContent(HTTPSuccessful):
 
     code: 205, title: Reset Content
     """
+
     code = 205
     title = 'Reset Content'
     empty_body = True
+
 
 class HTTPPartialContent(HTTPSuccessful):
     """
@@ -453,14 +483,17 @@ class HTTPPartialContent(HTTPSuccessful):
 
     code: 206, title: Partial Content
     """
+
     code = 206
     title = 'Partial Content'
 
-## FIXME: add 207 Multi-Status (but it's complicated)
+
+# FIXME: add 207 Multi-Status (but it's complicated)
 
 ############################################################
-## 3xx redirection
+# 3xx redirection
 ############################################################
+
 
 class _HTTPMove(HTTPRedirection):
     """
@@ -472,6 +505,7 @@ class _HTTPMove(HTTPRedirection):
 
     You must provide a ``location`` keyword argument.
     """
+
     # differences from webob.exc._HTTPMove:
     #
     # - ${location} isn't wrapped in an <a> tag in body
@@ -486,18 +520,33 @@ class _HTTPMove(HTTPRedirection):
     # - ``add_slash`` argument is no longer accepted:  code that passes
     #   add_slash argument to the constructor will receive an exception.
     explanation = 'The resource has been moved to'
-    body_template_obj = Template('''\
+    body_template_obj = Template(
+        '''\
 ${explanation} ${location}; you should be redirected automatically.
 ${detail}
-${html_comment}''')
+${html_comment}'''
+    )
 
-    def __init__(self, location='', detail=None, headers=None, comment=None,
-                 body_template=None, **kw):
+    def __init__(
+        self,
+        location='',
+        detail=None,
+        headers=None,
+        comment=None,
+        body_template=None,
+        **kw
+    ):
         if location is None:
             raise ValueError("HTTP redirects need a location to redirect to.")
         super(_HTTPMove, self).__init__(
-            detail=detail, headers=headers, comment=comment,
-            body_template=body_template, location=location, **kw)
+            detail=detail,
+            headers=headers,
+            comment=comment,
+            body_template=body_template,
+            location=location,
+            **kw
+        )
+
 
 class HTTPMultipleChoices(_HTTPMove):
     """
@@ -511,8 +560,10 @@ class HTTPMultipleChoices(_HTTPMove):
 
     code: 300, title: Multiple Choices
     """
+
     code = 300
     title = 'Multiple Choices'
+
 
 class HTTPMovedPermanently(_HTTPMove):
     """
@@ -524,8 +575,10 @@ class HTTPMovedPermanently(_HTTPMove):
 
     code: 301, title: Moved Permanently
     """
+
     code = 301
     title = 'Moved Permanently'
+
 
 class HTTPFound(_HTTPMove):
     """
@@ -536,9 +589,11 @@ class HTTPFound(_HTTPMove):
 
     code: 302, title: Found
     """
+
     code = 302
     title = 'Found'
     explanation = 'The resource was found at'
+
 
 # This one is safe after a POST (the redirected location will be
 # retrieved with GET):
@@ -552,8 +607,10 @@ class HTTPSeeOther(_HTTPMove):
 
     code: 303, title: See Other
     """
+
     code = 303
     title = 'See Other'
+
 
 class HTTPNotModified(HTTPRedirection):
     """
@@ -565,10 +622,12 @@ class HTTPNotModified(HTTPRedirection):
 
     code: 304, title: Not Modified
     """
+
     # FIXME: this should include a date or etag header
     code = 304
     title = 'Not Modified'
     empty_body = True
+
 
 class HTTPUseProxy(_HTTPMove):
     """
@@ -579,11 +638,12 @@ class HTTPUseProxy(_HTTPMove):
 
     code: 305, title: Use Proxy
     """
+
     # Not a move, but looks a little like one
     code = 305
     title = 'Use Proxy'
-    explanation = (
-        'The resource must be accessed through a proxy located at')
+    explanation = 'The resource must be accessed through a proxy located at'
+
 
 class HTTPTemporaryRedirect(_HTTPMove):
     """
@@ -594,8 +654,10 @@ class HTTPTemporaryRedirect(_HTTPMove):
 
     code: 307, title: Temporary Redirect
     """
+
     code = 307
     title = 'Temporary Redirect'
+
 
 class HTTPPermanentRedirect(_HTTPMove):
     """
@@ -607,12 +669,15 @@ class HTTPPermanentRedirect(_HTTPMove):
 
     code: 308, title: Permanent Redirect
     """
+
     code = 308
     title = 'Permanent Redirect'
 
+
 ############################################################
-## 4xx client error
+# 4xx client error
 ############################################################
+
 
 class HTTPClientError(HTTPError):
     """
@@ -623,8 +688,10 @@ class HTTPClientError(HTTPError):
     a bug.  A server-side traceback is not warranted.  Unless specialized,
     this is a '400 Bad Request'
     """
+
     code = 400
     title = 'Bad Request'
+
 
 class HTTPBadRequest(HTTPClientError):
     """
@@ -635,8 +702,12 @@ class HTTPBadRequest(HTTPClientError):
 
     code: 400, title: Bad Request
     """
-    explanation = ('The server could not comply with the request since '
-                   'it is either malformed or otherwise incorrect.')
+
+    explanation = (
+        'The server could not comply with the request since '
+        'it is either malformed or otherwise incorrect.'
+    )
+
 
 class HTTPUnauthorized(HTTPClientError):
     """
@@ -646,13 +717,16 @@ class HTTPUnauthorized(HTTPClientError):
 
     code: 401, title: Unauthorized
     """
+
     code = 401
     title = 'Unauthorized'
     explanation = (
         'This server could not verify that you are authorized to '
         'access the document you requested.  Either you supplied the '
         'wrong credentials (e.g., bad password), or your browser '
-        'does not understand how to supply the credentials required.')
+        'does not understand how to supply the credentials required.'
+    )
+
 
 class HTTPPaymentRequired(HTTPClientError):
     """
@@ -660,9 +734,11 @@ class HTTPPaymentRequired(HTTPClientError):
 
     code: 402, title: Payment Required
     """
+
     code = 402
     title = 'Payment Required'
-    explanation = ('Access was denied for financial reasons.')
+    explanation = 'Access was denied for financial reasons.'
+
 
 class HTTPForbidden(HTTPClientError):
     """
@@ -693,6 +769,7 @@ class HTTPForbidden(HTTPClientError):
     exception as necessary to provide extended information in an error
     report shown to a user.
     """
+
     # differences from webob.exc.HTTPForbidden:
     #
     # - accepts a ``result`` keyword argument
@@ -705,13 +782,27 @@ class HTTPForbidden(HTTPClientError):
     #
     code = 403
     title = 'Forbidden'
-    explanation = ('Access was denied to this resource.')
-    def __init__(self, detail=None, headers=None, comment=None,
-                 body_template=None, result=None, **kw):
-        HTTPClientError.__init__(self, detail=detail, headers=headers,
-                                 comment=comment, body_template=body_template,
-                                 **kw)
+    explanation = 'Access was denied to this resource.'
+
+    def __init__(
+        self,
+        detail=None,
+        headers=None,
+        comment=None,
+        body_template=None,
+        result=None,
+        **kw
+    ):
+        HTTPClientError.__init__(
+            self,
+            detail=detail,
+            headers=headers,
+            comment=comment,
+            body_template=body_template,
+            **kw
+        )
         self.result = result
+
 
 class HTTPNotFound(HTTPClientError):
     """
@@ -732,9 +823,11 @@ class HTTPNotFound(HTTPClientError):
     string will be available as the ``message`` attribute of this exception,
     for availability to the :term:`Not Found View`.
     """
+
     code = 404
     title = 'Not Found'
-    explanation = ('The resource could not be found.')
+    explanation = 'The resource could not be found.'
+
 
 class HTTPMethodNotAllowed(HTTPClientError):
     """
@@ -745,14 +838,18 @@ class HTTPMethodNotAllowed(HTTPClientError):
 
     code: 405, title: Method Not Allowed
     """
+
     # differences from webob.exc.HTTPMethodNotAllowed:
     #
     # - body_template_obj uses ${br} instead of <br />
     code = 405
     title = 'Method Not Allowed'
-    body_template_obj = Template('''\
+    body_template_obj = Template(
+        '''\
 The method ${REQUEST_METHOD} is not allowed for this resource. ${br}${br}
-${detail}''')
+${detail}'''
+    )
+
 
 class HTTPNotAcceptable(HTTPClientError):
     """
@@ -765,11 +862,13 @@ class HTTPNotAcceptable(HTTPClientError):
 
     code: 406, title: Not Acceptable
     """
+
     # differences from webob.exc.HTTPNotAcceptable:
     #
     # - "template" attribute left off (useless, bug in webob?)
     code = 406
     title = 'Not Acceptable'
+
 
 class HTTPProxyAuthenticationRequired(HTTPClientError):
     """
@@ -780,9 +879,11 @@ class HTTPProxyAuthenticationRequired(HTTPClientError):
 
     code: 407, title: Proxy Authentication Required
     """
+
     code = 407
     title = 'Proxy Authentication Required'
-    explanation = ('Authentication with a local proxy is needed.')
+    explanation = 'Authentication with a local proxy is needed.'
+
 
 class HTTPRequestTimeout(HTTPClientError):
     """
@@ -793,10 +894,14 @@ class HTTPRequestTimeout(HTTPClientError):
 
     code: 408, title: Request Timeout
     """
+
     code = 408
     title = 'Request Timeout'
-    explanation = ('The server has waited too long for the request to '
-                   'be sent by the client.')
+    explanation = (
+        'The server has waited too long for the request to '
+        'be sent by the client.'
+    )
+
 
 class HTTPConflict(HTTPClientError):
     """
@@ -807,10 +912,13 @@ class HTTPConflict(HTTPClientError):
 
     code: 409, title: Conflict
     """
+
     code = 409
     title = 'Conflict'
-    explanation = ('There was a conflict when trying to complete '
-                   'your request.')
+    explanation = (
+        'There was a conflict when trying to complete ' 'your request.'
+    )
+
 
 class HTTPGone(HTTPClientError):
     """
@@ -821,10 +929,14 @@ class HTTPGone(HTTPClientError):
 
     code: 410, title: Gone
     """
+
     code = 410
     title = 'Gone'
-    explanation = ('This resource is no longer available.  No forwarding '
-                   'address is given.')
+    explanation = (
+        'This resource is no longer available.  No forwarding '
+        'address is given.'
+    )
+
 
 class HTTPLengthRequired(HTTPClientError):
     """
@@ -835,9 +947,11 @@ class HTTPLengthRequired(HTTPClientError):
 
     code: 411, title: Length Required
     """
+
     code = 411
     title = 'Length Required'
-    explanation = ('Content-Length header required.')
+    explanation = 'Content-Length header required.'
+
 
 class HTTPPreconditionFailed(HTTPClientError):
     """
@@ -849,9 +963,11 @@ class HTTPPreconditionFailed(HTTPClientError):
 
     code: 412, title: Precondition Failed
     """
+
     code = 412
     title = 'Precondition Failed'
-    explanation = ('Request precondition failed.')
+    explanation = 'Request precondition failed.'
+
 
 class HTTPRequestEntityTooLarge(HTTPClientError):
     """
@@ -863,9 +979,11 @@ class HTTPRequestEntityTooLarge(HTTPClientError):
 
     code: 413, title: Request Entity Too Large
     """
+
     code = 413
     title = 'Request Entity Too Large'
-    explanation = ('The body of your request was too large for this server.')
+    explanation = 'The body of your request was too large for this server.'
+
 
 class HTTPRequestURITooLong(HTTPClientError):
     """
@@ -877,9 +995,11 @@ class HTTPRequestURITooLong(HTTPClientError):
 
     code: 414, title: Request-URI Too Long
     """
+
     code = 414
     title = 'Request-URI Too Long'
-    explanation = ('The request URI was too long for this server.')
+    explanation = 'The request URI was too long for this server.'
+
 
 class HTTPUnsupportedMediaType(HTTPClientError):
     """
@@ -891,11 +1011,13 @@ class HTTPUnsupportedMediaType(HTTPClientError):
 
     code: 415, title: Unsupported Media Type
     """
+
     # differences from webob.exc.HTTPUnsupportedMediaType:
     #
     # - "template_obj" attribute left off (useless, bug in webob?)
     code = 415
     title = 'Unsupported Media Type'
+
 
 class HTTPRequestRangeNotSatisfiable(HTTPClientError):
     """
@@ -909,9 +1031,11 @@ class HTTPRequestRangeNotSatisfiable(HTTPClientError):
 
     code: 416, title: Request Range Not Satisfiable
     """
+
     code = 416
     title = 'Request Range Not Satisfiable'
-    explanation = ('The Range requested is not available.')
+    explanation = 'The Range requested is not available.'
+
 
 class HTTPExpectationFailed(HTTPClientError):
     """
@@ -922,9 +1046,11 @@ class HTTPExpectationFailed(HTTPClientError):
 
     code: 417, title: Expectation Failed
     """
+
     code = 417
     title = 'Expectation Failed'
-    explanation = ('Expectation failed.')
+    explanation = 'Expectation failed.'
+
 
 class HTTPUnprocessableEntity(HTTPClientError):
     """
@@ -940,10 +1066,12 @@ class HTTPUnprocessableEntity(HTTPClientError):
 
     code: 422, title: Unprocessable Entity
     """
-    ## Note: from WebDAV
+
+    # Note: from WebDAV
     code = 422
     title = 'Unprocessable Entity'
     explanation = 'Unable to process the contained instructions'
+
 
 class HTTPLocked(HTTPClientError):
     """
@@ -953,10 +1081,12 @@ class HTTPLocked(HTTPClientError):
 
     code: 423, title: Locked
     """
-    ## Note: from WebDAV
+
+    # Note: from WebDAV
     code = 423
     title = 'Locked'
-    explanation = ('The resource is locked')
+    explanation = 'The resource is locked'
+
 
 class HTTPFailedDependency(HTTPClientError):
     """
@@ -967,12 +1097,15 @@ class HTTPFailedDependency(HTTPClientError):
 
     code: 424, title: Failed Dependency
     """
-    ## Note: from WebDAV
+
+    # Note: from WebDAV
     code = 424
     title = 'Failed Dependency'
     explanation = (
         'The method could not be performed because the requested '
-        'action dependended on another action and that action failed')
+        'action dependended on another action and that action failed'
+    )
+
 
 class HTTPPreconditionRequired(HTTPClientError):
     """
@@ -991,10 +1124,11 @@ class HTTPPreconditionRequired(HTTPClientError):
 
     code: 428, title: Precondition Required
     """
+
     code = 428
     title = 'Precondition Required'
-    explanation = (
-        'The origin server requires the request to be conditional.')
+    explanation = 'The origin server requires the request to be conditional.'
+
 
 class HTTPTooManyRequests(HTTPClientError):
     """
@@ -1007,11 +1141,14 @@ class HTTPTooManyRequests(HTTPClientError):
 
     code: 429, title: Too Many Requests
     """
+
     code = 429
     title = 'Too Many Requests'
     explanation = (
         'The action could not be performed because there were too '
-        'many requests by the client.')
+        'many requests by the client.'
+    )
+
 
 class HTTPRequestHeaderFieldsTooLarge(HTTPClientError):
     """
@@ -1025,13 +1162,14 @@ class HTTPRequestHeaderFieldsTooLarge(HTTPClientError):
 
     code: 431, title: Request Header Fields Too Large
     """
+
     code = 431
     title = 'Request Header Fields Too Large'
-    explanation = (
-        'The requests header fields were too large.')
+    explanation = 'The requests header fields were too large.'
+
 
 ############################################################
-## 5xx Server Error
+# 5xx Server Error
 ############################################################
 #  Response status codes beginning with the digit "5" indicate cases in
 #  which the server is aware that it has erred or is incapable of
@@ -1041,6 +1179,7 @@ class HTTPRequestHeaderFieldsTooLarge(HTTPClientError):
 #  agents SHOULD display any included entity to the user. These response
 #  codes are applicable to any request method.
 
+
 class HTTPServerError(HTTPError):
     """
     base class for the 500s, where the server is in-error
@@ -1048,8 +1187,10 @@ class HTTPServerError(HTTPError):
     This is an error condition in which the server is presumed to be
     in-error.  Unless specialized, this is a '500 Internal Server Error'.
     """
+
     code = 500
     title = 'Internal Server Error'
+
 
 class HTTPInternalServerError(HTTPServerError):
     """
@@ -1060,9 +1201,12 @@ class HTTPInternalServerError(HTTPServerError):
 
     code: 500, title: Internal Server Error
     """
+
     explanation = (
         'The server has either erred or is incapable of performing '
-        'the requested operation.')
+        'the requested operation.'
+    )
+
 
 class HTTPNotImplemented(HTTPServerError):
     """
@@ -1073,11 +1217,13 @@ class HTTPNotImplemented(HTTPServerError):
 
     code: 501, title: Not Implemented
     """
+
     # differences from webob.exc.HTTPNotAcceptable:
     #
     # - "template" attr left off (useless, bug in webob?)
     code = 501
     title = 'Not Implemented'
+
 
 class HTTPBadGateway(HTTPServerError):
     """
@@ -1089,9 +1235,11 @@ class HTTPBadGateway(HTTPServerError):
 
     code: 502, title: Bad Gateway
     """
+
     code = 502
     title = 'Bad Gateway'
-    explanation = ('Bad gateway.')
+    explanation = 'Bad gateway.'
+
 
 class HTTPServiceUnavailable(HTTPServerError):
     """
@@ -1102,10 +1250,14 @@ class HTTPServiceUnavailable(HTTPServerError):
 
     code: 503, title: Service Unavailable
     """
+
     code = 503
     title = 'Service Unavailable'
-    explanation = ('The server is currently unavailable. '
-                   'Please try again at a later time.')
+    explanation = (
+        'The server is currently unavailable. '
+        'Please try again at a later time.'
+    )
+
 
 class HTTPGatewayTimeout(HTTPServerError):
     """
@@ -1118,9 +1270,11 @@ class HTTPGatewayTimeout(HTTPServerError):
 
     code: 504, title: Gateway Timeout
     """
+
     code = 504
     title = 'Gateway Timeout'
-    explanation = ('The gateway has timed out.')
+    explanation = 'The gateway has timed out.'
+
 
 class HTTPVersionNotSupported(HTTPServerError):
     """
@@ -1132,9 +1286,11 @@ class HTTPVersionNotSupported(HTTPServerError):
 
     code: 505, title: HTTP Version Not Supported
     """
+
     code = 505
     title = 'HTTP Version Not Supported'
-    explanation = ('The HTTP version is not supported.')
+    explanation = 'The HTTP version is not supported.'
+
 
 class HTTPInsufficientStorage(HTTPServerError):
     """
@@ -1145,9 +1301,11 @@ class HTTPInsufficientStorage(HTTPServerError):
 
     code: 507, title: Insufficient Storage
     """
+
     code = 507
     title = 'Insufficient Storage'
-    explanation = ('There was not enough space to save the resource')
+    explanation = 'There was not enough space to save the resource'
+
 
 def exception_response(status_code, **kw):
     """Creates an HTTP exception based on a status code. Example::
@@ -1159,22 +1317,24 @@ def exception_response(status_code, **kw):
     exc = status_map[status_code](**kw)
     return exc
 
+
 def default_exceptionresponse_view(context, request):
     if not isinstance(context, Exception):
         # backwards compat for an exception response view registered via
         # config.set_notfound_view or config.set_forbidden_view
         # instead of as a proper exception view
         context = request.exception or context
-    return context # assumed to be an IResponse
+    return context  # assumed to be an IResponse
+
 
 status_map = {}
 code = None
 for name, value in list(globals().items()):
     if (
-            isinstance(value, class_types) and
-            issubclass(value, HTTPException) and
-            value not in {HTTPClientError, HTTPServerError} and
-            not name.startswith('_')
+        isinstance(value, class_types)
+        and issubclass(value, HTTPException)
+        and value not in {HTTPClientError, HTTPServerError}
+        and not name.startswith('_')
     ):
         code = getattr(value, 'code', None)
         if code:

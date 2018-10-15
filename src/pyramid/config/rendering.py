@@ -1,7 +1,4 @@
-from pyramid.interfaces import (
-    IRendererFactory,
-    PHASE1_CONFIG,
-    )
+from pyramid.interfaces import IRendererFactory, PHASE1_CONFIG
 
 from pyramid import renderers
 from pyramid.config.util import action_method
@@ -9,13 +6,14 @@ from pyramid.config.util import action_method
 DEFAULT_RENDERERS = (
     ('json', renderers.json_renderer_factory),
     ('string', renderers.string_renderer_factory),
-    )
+)
+
 
 class RenderingConfiguratorMixin(object):
     def add_default_renderers(self):
         for name, renderer in DEFAULT_RENDERERS:
             self.add_renderer(name, renderer)
-    
+
     @action_method
     def add_renderer(self, name, factory):
         """
@@ -36,16 +34,23 @@ class RenderingConfiguratorMixin(object):
         # as a name
         if not name:
             name = ''
+
         def register():
             self.registry.registerUtility(factory, IRendererFactory, name=name)
-        intr = self.introspectable('renderer factories',
-                                   name,
-                                   self.object_description(factory),
-                                   'renderer factory')
+
+        intr = self.introspectable(
+            'renderer factories',
+            name,
+            self.object_description(factory),
+            'renderer factory',
+        )
         intr['factory'] = factory
         intr['name'] = name
         # we need to register renderers early (in phase 1) because they are
         # used during view configuration (which happens in phase 3)
-        self.action((IRendererFactory, name), register, order=PHASE1_CONFIG,
-                    introspectables=(intr,))
-
+        self.action(
+            (IRendererFactory, name),
+            register,
+            order=PHASE1_CONFIG,
+            introspectables=(intr,),
+        )

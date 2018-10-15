@@ -1,9 +1,5 @@
 import unittest
-from pyramid.compat import (
-    PY2,
-    text_,
-    bytes_,
-    )
+from pyramid.compat import PY2, text_, bytes_
 
 
 class Test_InstancePropertyHelper(unittest.TestCase):
@@ -13,11 +9,13 @@ class Test_InstancePropertyHelper(unittest.TestCase):
 
     def _getTargetClass(self):
         from pyramid.util import InstancePropertyHelper
+
         return InstancePropertyHelper
 
     def test_callable(self):
         def worker(obj):
             return obj.bar
+
         foo = Dummy()
         helper = self._getTargetClass()
         helper.set_property(foo, worker)
@@ -29,6 +27,7 @@ class Test_InstancePropertyHelper(unittest.TestCase):
     def test_callable_with_name(self):
         def worker(obj):
             return obj.bar
+
         foo = Dummy()
         helper = self._getTargetClass()
         helper.set_property(foo, worker, name='x')
@@ -40,6 +39,7 @@ class Test_InstancePropertyHelper(unittest.TestCase):
     def test_callable_with_reify(self):
         def worker(obj):
             return obj.bar
+
         foo = Dummy()
         helper = self._getTargetClass()
         helper.set_property(foo, worker, reify=True)
@@ -51,6 +51,7 @@ class Test_InstancePropertyHelper(unittest.TestCase):
     def test_callable_with_name_reify(self):
         def worker(obj):
             return obj.bar
+
         foo = Dummy()
         helper = self._getTargetClass()
         helper.set_property(foo, worker, name='x')
@@ -63,14 +64,19 @@ class Test_InstancePropertyHelper(unittest.TestCase):
         self.assertEqual(1, foo.y)
 
     def test_property_without_name(self):
-        def worker(obj): pass
+        def worker(obj):  # pragma: no cover
+            pass
+
         foo = Dummy()
         helper = self._getTargetClass()
-        self.assertRaises(ValueError, helper.set_property, foo, property(worker))
+        self.assertRaises(
+            ValueError, helper.set_property, foo, property(worker)
+        )
 
     def test_property_with_name(self):
         def worker(obj):
             return obj.bar
+
         foo = Dummy()
         helper = self._getTargetClass()
         helper.set_property(foo, property(worker), name='x')
@@ -80,23 +86,37 @@ class Test_InstancePropertyHelper(unittest.TestCase):
         self.assertEqual(2, foo.x)
 
     def test_property_with_reify(self):
-        def worker(obj): pass
+        def worker(obj):  # pragma: no cover
+            pass
+
         foo = Dummy()
         helper = self._getTargetClass()
-        self.assertRaises(ValueError, helper.set_property,
-                          foo, property(worker), name='x', reify=True)
+        self.assertRaises(
+            ValueError,
+            helper.set_property,
+            foo,
+            property(worker),
+            name='x',
+            reify=True,
+        )
 
     def test_override_property(self):
-        def worker(obj): pass
+        def worker(obj):  # pragma: no cover
+            pass
+
         foo = Dummy()
         helper = self._getTargetClass()
         helper.set_property(foo, worker, name='x')
+
         def doit():
             foo.x = 1
+
         self.assertRaises(AttributeError, doit)
 
     def test_override_reify(self):
-        def worker(obj): pass
+        def worker(obj):  # pragma: no cover
+            pass
+
         foo = Dummy()
         helper = self._getTargetClass()
         helper.set_property(foo, worker, name='x', reify=True)
@@ -125,6 +145,7 @@ class Test_InstancePropertyHelper(unittest.TestCase):
 
     def test_make_property(self):
         from pyramid.decorator import reify
+
         helper = self._getTargetClass()
         name, fn = helper.make_property(lambda x: 1, name='x', reify=True)
         self.assertEqual(name, 'x')
@@ -188,21 +209,25 @@ class Test_InstancePropertyHelper(unittest.TestCase):
         self.assertEqual(foo.x, 1)
         self.assertEqual(bar.x, 2)
 
+
 class Test_InstancePropertyMixin(unittest.TestCase):
     def _makeOne(self):
         cls = self._getTargetClass()
 
         class Foo(cls):
             pass
+
         return Foo()
 
     def _getTargetClass(self):
         from pyramid.util import InstancePropertyMixin
+
         return InstancePropertyMixin
 
     def test_callable(self):
         def worker(obj):
             return obj.bar
+
         foo = self._makeOne()
         foo.set_property(worker)
         foo.bar = 1
@@ -213,6 +238,7 @@ class Test_InstancePropertyMixin(unittest.TestCase):
     def test_callable_with_name(self):
         def worker(obj):
             return obj.bar
+
         foo = self._makeOne()
         foo.set_property(worker, name='x')
         foo.bar = 1
@@ -223,6 +249,7 @@ class Test_InstancePropertyMixin(unittest.TestCase):
     def test_callable_with_reify(self):
         def worker(obj):
             return obj.bar
+
         foo = self._makeOne()
         foo.set_property(worker, reify=True)
         foo.bar = 1
@@ -233,6 +260,7 @@ class Test_InstancePropertyMixin(unittest.TestCase):
     def test_callable_with_name_reify(self):
         def worker(obj):
             return obj.bar
+
         foo = self._makeOne()
         foo.set_property(worker, name='x')
         foo.set_property(worker, name='y', reify=True)
@@ -244,13 +272,16 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         self.assertEqual(1, foo.y)
 
     def test_property_without_name(self):
-        def worker(obj): pass
+        def worker(obj):  # pragma: no cover
+            pass
+
         foo = self._makeOne()
         self.assertRaises(ValueError, foo.set_property, property(worker))
 
     def test_property_with_name(self):
         def worker(obj):
             return obj.bar
+
         foo = self._makeOne()
         foo.set_property(property(worker), name='x')
         foo.bar = 1
@@ -259,21 +290,34 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         self.assertEqual(2, foo.x)
 
     def test_property_with_reify(self):
-        def worker(obj): pass
+        def worker(obj):  # pragma: no cover
+            pass
+
         foo = self._makeOne()
-        self.assertRaises(ValueError, foo.set_property,
-                          property(worker), name='x', reify=True)
+        self.assertRaises(
+            ValueError,
+            foo.set_property,
+            property(worker),
+            name='x',
+            reify=True,
+        )
 
     def test_override_property(self):
-        def worker(obj): pass
+        def worker(obj):  # pragma: no cover
+            pass
+
         foo = self._makeOne()
         foo.set_property(worker, name='x')
+
         def doit():
             foo.x = 1
+
         self.assertRaises(AttributeError, doit)
 
     def test_override_reify(self):
-        def worker(obj): pass
+        def worker(obj):  # pragma: no cover
+            pass
+
         foo = self._makeOne()
         foo.set_property(worker, name='x', reify=True)
         foo.x = 1
@@ -305,9 +349,11 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         self.assertEqual(foo.__module__, 'tests.test_util')
         self.assertEqual(foo.__class__.__module__, 'tests.test_util')
 
+
 class Test_WeakOrderedSet(unittest.TestCase):
     def _makeOne(self):
         from pyramid.config import WeakOrderedSet
+
         return WeakOrderedSet()
 
     def test_ctor(self):
@@ -376,9 +422,11 @@ class Test_WeakOrderedSet(unittest.TestCase):
         self.assertEqual(list(wos), [])
         self.assertEqual(wos.last, None)
 
+
 class Test_strings_differ(unittest.TestCase):
     def _callFUT(self, *args, **kw):
         from pyramid.util import strings_differ
+
         return strings_differ(*args, **kw)
 
     def test_it_bytes(self):
@@ -401,6 +449,7 @@ class Test_strings_differ(unittest.TestCase):
     def test_it_with_external_comparator(self):
         class DummyComparator(object):
             called = False
+
             def __init__(self, ret_val):
                 self.ret_val = ret_val
 
@@ -423,9 +472,11 @@ class Test_strings_differ(unittest.TestCase):
         self.assertTrue(dummy_compare.called)
         self.assertTrue(result)
 
+
 class Test_object_description(unittest.TestCase):
     def _callFUT(self, object):
         from pyramid.util import object_description
+
         return object_description(object)
 
     def test_string(self):
@@ -456,7 +507,7 @@ class Test_object_description(unittest.TestCase):
         self.assertEqual(self._callFUT(['a']), "['a']")
 
     def test_dict(self):
-        self.assertEqual(self._callFUT({'a':1}), "{'a': 1}")
+        self.assertEqual(self._callFUT({'a': 1}), "{'a': 1}")
 
     def test_nomodule(self):
         o = object()
@@ -464,39 +515,40 @@ class Test_object_description(unittest.TestCase):
 
     def test_module(self):
         import pyramid
+
         self.assertEqual(self._callFUT(pyramid), 'module pyramid')
 
     def test_method(self):
         self.assertEqual(
             self._callFUT(self.test_method),
             'method test_method of class tests.test_util.'
-            'Test_object_description')
+            'Test_object_description',
+        )
 
     def test_class(self):
         self.assertEqual(
             self._callFUT(self.__class__),
-            'class tests.test_util.Test_object_description')
+            'class tests.test_util.Test_object_description',
+        )
 
     def test_function(self):
         self.assertEqual(
-            self._callFUT(dummyfunc),
-            'function tests.test_util.dummyfunc')
+            self._callFUT(dummyfunc), 'function tests.test_util.dummyfunc'
+        )
 
     def test_instance(self):
         inst = Dummy()
-        self.assertEqual(
-            self._callFUT(inst),
-            "object %s" % str(inst))
+        self.assertEqual(self._callFUT(inst), "object %s" % str(inst))
 
     def test_shortened_repr(self):
         inst = ['1'] * 1000
-        self.assertEqual(
-            self._callFUT(inst),
-            str(inst)[:100] + ' ... ]')
+        self.assertEqual(self._callFUT(inst), str(inst)[:100] + ' ... ]')
+
 
 class TestTopologicalSorter(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.util import TopologicalSorter
+
         return TopologicalSorter(*arg, **kw)
 
     def test_remove(self):
@@ -520,71 +572,72 @@ class TestTopologicalSorter(unittest.TestCase):
 
     def test_add(self):
         from pyramid.util import LAST
+
         sorter = self._makeOne()
         sorter.add('name', 'factory')
         self.assertEqual(sorter.names, ['name'])
-        self.assertEqual(sorter.name2val,
-                         {'name':'factory'})
+        self.assertEqual(sorter.name2val, {'name': 'factory'})
         self.assertEqual(sorter.order, [('name', LAST)])
         sorter.add('name2', 'factory2')
-        self.assertEqual(sorter.names, ['name',  'name2'])
-        self.assertEqual(sorter.name2val,
-                         {'name':'factory', 'name2':'factory2'})
-        self.assertEqual(sorter.order,
-                         [('name', LAST), ('name2', LAST)])
+        self.assertEqual(sorter.names, ['name', 'name2'])
+        self.assertEqual(
+            sorter.name2val, {'name': 'factory', 'name2': 'factory2'}
+        )
+        self.assertEqual(sorter.order, [('name', LAST), ('name2', LAST)])
         sorter.add('name3', 'factory3', before='name2')
-        self.assertEqual(sorter.names,
-                         ['name',  'name2', 'name3'])
-        self.assertEqual(sorter.name2val,
-                         {'name':'factory', 'name2':'factory2',
-                          'name3':'factory3'})
-        self.assertEqual(sorter.order,
-                         [('name', LAST), ('name2', LAST),
-                          ('name3', 'name2')])
+        self.assertEqual(sorter.names, ['name', 'name2', 'name3'])
+        self.assertEqual(
+            sorter.name2val,
+            {'name': 'factory', 'name2': 'factory2', 'name3': 'factory3'},
+        )
+        self.assertEqual(
+            sorter.order, [('name', LAST), ('name2', LAST), ('name3', 'name2')]
+        )
 
     def test_sorted_ordering_1(self):
         sorter = self._makeOne()
         sorter.add('name1', 'factory1')
         sorter.add('name2', 'factory2')
-        self.assertEqual(sorter.sorted(),
-                         [
-                             ('name1', 'factory1'),
-                             ('name2', 'factory2'),
-                             ])
+        self.assertEqual(
+            sorter.sorted(), [('name1', 'factory1'), ('name2', 'factory2')]
+        )
 
     def test_sorted_ordering_2(self):
         from pyramid.util import FIRST
+
         sorter = self._makeOne()
         sorter.add('name1', 'factory1')
         sorter.add('name2', 'factory2', after=FIRST)
-        self.assertEqual(sorter.sorted(),
-                         [
-                             ('name2', 'factory2'),
-                             ('name1', 'factory1'),
-                             ])
+        self.assertEqual(
+            sorter.sorted(), [('name2', 'factory2'), ('name1', 'factory1')]
+        )
 
     def test_sorted_ordering_3(self):
         from pyramid.util import FIRST
+
         sorter = self._makeOne()
         add = sorter.add
         add('auth', 'auth_factory', after='browserid')
-        add('dbt', 'dbt_factory') 
+        add('dbt', 'dbt_factory')
         add('retry', 'retry_factory', before='txnmgr', after='exceptionview')
         add('browserid', 'browserid_factory')
         add('txnmgr', 'txnmgr_factory', after='exceptionview')
         add('exceptionview', 'excview_factory', after=FIRST)
-        self.assertEqual(sorter.sorted(),
-                         [
-                             ('exceptionview', 'excview_factory'),
-                             ('retry', 'retry_factory'),
-                             ('txnmgr', 'txnmgr_factory'),
-                             ('dbt', 'dbt_factory'),
-                             ('browserid', 'browserid_factory'),
-                             ('auth', 'auth_factory'),
-                             ])
+        self.assertEqual(
+            sorter.sorted(),
+            [
+                ('exceptionview', 'excview_factory'),
+                ('retry', 'retry_factory'),
+                ('txnmgr', 'txnmgr_factory'),
+                ('dbt', 'dbt_factory'),
+                ('browserid', 'browserid_factory'),
+                ('auth', 'auth_factory'),
+            ],
+        )
 
     def test_sorted_ordering_4(self):
         from pyramid.util import FIRST
+
         sorter = self._makeOne()
         add = sorter.add
         add('exceptionview', 'excview_factory', after=FIRST)
@@ -592,19 +645,22 @@ class TestTopologicalSorter(unittest.TestCase):
         add('retry', 'retry_factory', before='txnmgr', after='exceptionview')
         add('browserid', 'browserid_factory')
         add('txnmgr', 'txnmgr_factory', after='exceptionview')
-        add('dbt', 'dbt_factory') 
-        self.assertEqual(sorter.sorted(),
-                         [
-                             ('exceptionview', 'excview_factory'),
-                             ('retry', 'retry_factory'),
-                             ('txnmgr', 'txnmgr_factory'),
-                             ('browserid', 'browserid_factory'),
-                             ('auth', 'auth_factory'),
-                             ('dbt', 'dbt_factory'),
-                             ])
+        add('dbt', 'dbt_factory')
+        self.assertEqual(
+            sorter.sorted(),
+            [
+                ('exceptionview', 'excview_factory'),
+                ('retry', 'retry_factory'),
+                ('txnmgr', 'txnmgr_factory'),
+                ('browserid', 'browserid_factory'),
+                ('auth', 'auth_factory'),
+                ('dbt', 'dbt_factory'),
+            ],
+        )
 
     def test_sorted_ordering_5(self):
         from pyramid.util import LAST, FIRST
+
         sorter = self._makeOne()
         add = sorter.add
         add('exceptionview', 'excview_factory')
@@ -612,19 +668,22 @@ class TestTopologicalSorter(unittest.TestCase):
         add('retry', 'retry_factory', before='txnmgr', after='exceptionview')
         add('browserid', 'browserid_factory', after=FIRST)
         add('txnmgr', 'txnmgr_factory', after='exceptionview', before=LAST)
-        add('dbt', 'dbt_factory') 
-        self.assertEqual(sorter.sorted(),
-                         [
-                             ('browserid', 'browserid_factory'),
-                             ('auth', 'auth_factory'),
-                             ('exceptionview', 'excview_factory'),
-                             ('retry', 'retry_factory'),
-                             ('txnmgr', 'txnmgr_factory'), 
-                             ('dbt', 'dbt_factory'),
-                             ])
+        add('dbt', 'dbt_factory')
+        self.assertEqual(
+            sorter.sorted(),
+            [
+                ('browserid', 'browserid_factory'),
+                ('auth', 'auth_factory'),
+                ('exceptionview', 'excview_factory'),
+                ('retry', 'retry_factory'),
+                ('txnmgr', 'txnmgr_factory'),
+                ('dbt', 'dbt_factory'),
+            ],
+        )
 
     def test_sorted_ordering_missing_before_partial(self):
         from pyramid.exceptions import ConfigurationError
+
         sorter = self._makeOne()
         add = sorter.add
         add('dbt', 'dbt_factory')
@@ -635,6 +694,7 @@ class TestTopologicalSorter(unittest.TestCase):
 
     def test_sorted_ordering_missing_after_partial(self):
         from pyramid.exceptions import ConfigurationError
+
         sorter = self._makeOne()
         add = sorter.add
         add('dbt', 'dbt_factory')
@@ -645,6 +705,7 @@ class TestTopologicalSorter(unittest.TestCase):
 
     def test_sorted_ordering_missing_before_and_after_partials(self):
         from pyramid.exceptions import ConfigurationError
+
         sorter = self._makeOne()
         add = sorter.add
         add('dbt', 'dbt_factory')
@@ -655,72 +716,93 @@ class TestTopologicalSorter(unittest.TestCase):
 
     def test_sorted_ordering_missing_before_partial_with_fallback(self):
         from pyramid.util import LAST
+
         sorter = self._makeOne()
         add = sorter.add
         add('exceptionview', 'excview_factory', before=LAST)
         add('auth', 'auth_factory', after='browserid')
-        add('retry', 'retry_factory', before=('txnmgr', LAST),
-                                      after='exceptionview')
+        add(
+            'retry',
+            'retry_factory',
+            before=('txnmgr', LAST),
+            after='exceptionview',
+        )
         add('browserid', 'browserid_factory')
-        add('dbt', 'dbt_factory') 
-        self.assertEqual(sorter.sorted(),
-                         [
-                             ('exceptionview', 'excview_factory'),
-                             ('retry', 'retry_factory'),
-                             ('browserid', 'browserid_factory'),
-                             ('auth', 'auth_factory'),
-                             ('dbt', 'dbt_factory'),
-                             ])
+        add('dbt', 'dbt_factory')
+        self.assertEqual(
+            sorter.sorted(),
+            [
+                ('exceptionview', 'excview_factory'),
+                ('retry', 'retry_factory'),
+                ('browserid', 'browserid_factory'),
+                ('auth', 'auth_factory'),
+                ('dbt', 'dbt_factory'),
+            ],
+        )
 
     def test_sorted_ordering_missing_after_partial_with_fallback(self):
         from pyramid.util import FIRST
+
         sorter = self._makeOne()
         add = sorter.add
         add('exceptionview', 'excview_factory', after=FIRST)
-        add('auth', 'auth_factory', after=('txnmgr','browserid'))
+        add('auth', 'auth_factory', after=('txnmgr', 'browserid'))
         add('retry', 'retry_factory', after='exceptionview')
         add('browserid', 'browserid_factory')
         add('dbt', 'dbt_factory')
-        self.assertEqual(sorter.sorted(),
-                         [
-                             ('exceptionview', 'excview_factory'),
-                             ('retry', 'retry_factory'),
-                             ('browserid', 'browserid_factory'),
-                             ('auth', 'auth_factory'),
-                             ('dbt', 'dbt_factory'),
-                             ])
+        self.assertEqual(
+            sorter.sorted(),
+            [
+                ('exceptionview', 'excview_factory'),
+                ('retry', 'retry_factory'),
+                ('browserid', 'browserid_factory'),
+                ('auth', 'auth_factory'),
+                ('dbt', 'dbt_factory'),
+            ],
+        )
 
     def test_sorted_ordering_with_partial_fallbacks(self):
         from pyramid.util import LAST
+
         sorter = self._makeOne()
         add = sorter.add
         add('exceptionview', 'excview_factory', before=('wontbethere', LAST))
         add('retry', 'retry_factory', after='exceptionview')
-        add('browserid', 'browserid_factory', before=('wont2', 'exceptionview'))
-        self.assertEqual(sorter.sorted(),
-                         [
-                             ('browserid', 'browserid_factory'),
-                             ('exceptionview', 'excview_factory'),
-                             ('retry', 'retry_factory'),
-                             ])
+        add(
+            'browserid', 'browserid_factory', before=('wont2', 'exceptionview')
+        )
+        self.assertEqual(
+            sorter.sorted(),
+            [
+                ('browserid', 'browserid_factory'),
+                ('exceptionview', 'excview_factory'),
+                ('retry', 'retry_factory'),
+            ],
+        )
 
     def test_sorted_ordering_with_multiple_matching_fallbacks(self):
         from pyramid.util import LAST
+
         sorter = self._makeOne()
         add = sorter.add
         add('exceptionview', 'excview_factory', before=LAST)
         add('retry', 'retry_factory', after='exceptionview')
-        add('browserid', 'browserid_factory', before=('retry', 'exceptionview'))
-        self.assertEqual(sorter.sorted(),
-                         [
-                             ('browserid', 'browserid_factory'),
-                             ('exceptionview', 'excview_factory'),
-                             ('retry', 'retry_factory'),
-                             ])
+        add(
+            'browserid', 'browserid_factory', before=('retry', 'exceptionview')
+        )
+        self.assertEqual(
+            sorter.sorted(),
+            [
+                ('browserid', 'browserid_factory'),
+                ('exceptionview', 'excview_factory'),
+                ('retry', 'retry_factory'),
+            ],
+        )
 
     def test_sorted_ordering_with_missing_fallbacks(self):
         from pyramid.exceptions import ConfigurationError
         from pyramid.util import LAST
+
         sorter = self._makeOne()
         add = sorter.add
         add('exceptionview', 'excview_factory', before=LAST)
@@ -730,6 +812,7 @@ class TestTopologicalSorter(unittest.TestCase):
 
     def test_sorted_ordering_conflict_direct(self):
         from pyramid.exceptions import CyclicDependencyError
+
         sorter = self._makeOne()
         add = sorter.add
         add('browserid', 'browserid_factory')
@@ -738,6 +821,7 @@ class TestTopologicalSorter(unittest.TestCase):
 
     def test_sorted_ordering_conflict_indirect(self):
         from pyramid.exceptions import CyclicDependencyError
+
         sorter = self._makeOne()
         add = sorter.add
         add('browserid', 'browserid_factory')
@@ -745,9 +829,11 @@ class TestTopologicalSorter(unittest.TestCase):
         add('dbt', 'dbt_factory', after='browserid', before='auth')
         self.assertRaises(CyclicDependencyError, sorter.sorted)
 
+
 class TestSentinel(unittest.TestCase):
     def test_repr(self):
         from pyramid.util import Sentinel
+
         r = repr(Sentinel('ABC'))
         self.assertEqual(r, 'ABC')
 
@@ -783,16 +869,19 @@ class TestCallableName(unittest.TestCase):
 class Test_hide_attrs(unittest.TestCase):
     def _callFUT(self, obj, *attrs):
         from pyramid.util import hide_attrs
+
         return hide_attrs(obj, *attrs)
 
     def _makeDummy(self):
         from pyramid.decorator import reify
+
         class Dummy(object):
             x = 1
 
             @reify
             def foo(self):
                 return self.x
+
         return Dummy()
 
     def test_restores_attrs(self):
@@ -814,7 +903,7 @@ class Test_hide_attrs(unittest.TestCase):
                 raise RuntimeError()
         except RuntimeError:
             self.assertEqual(obj.foo, orig_foo)
-        else:                   # pragma: no cover
+        else:  # pragma: no cover
             self.fail("RuntimeError not raised")
 
     def test_restores_attrs_to_none(self):
@@ -837,7 +926,8 @@ class Test_hide_attrs(unittest.TestCase):
         self.assertTrue('foo' not in obj.__dict__)
 
 
-def dummyfunc(): pass
+def dummyfunc():  # pragma: no cover
+    pass
 
 
 class Dummy(object):
@@ -847,6 +937,7 @@ class Dummy(object):
 class Test_is_same_domain(unittest.TestCase):
     def _callFUT(self, *args, **kw):
         from pyramid.util import is_same_domain
+
         return is_same_domain(*args, **kw)
 
     def test_it(self):
@@ -868,6 +959,7 @@ class Test_is_same_domain(unittest.TestCase):
 class Test_make_contextmanager(unittest.TestCase):
     def _callFUT(self, *args, **kw):
         from pyramid.util import make_contextmanager
+
         return make_contextmanager(*args, **kw)
 
     def test_with_None(self):
@@ -878,6 +970,7 @@ class Test_make_contextmanager(unittest.TestCase):
     def test_with_generator(self):
         def mygen(ctx):
             yield ctx
+
         mgr = self._callFUT(mygen)
         with mgr('a') as ctx:
             self.assertEqual(ctx, 'a')
@@ -886,6 +979,7 @@ class Test_make_contextmanager(unittest.TestCase):
         def mygen():
             yield 'a'
             yield 'b'
+
         mgr = self._callFUT(mygen)
         try:
             with mgr() as ctx:
@@ -898,6 +992,7 @@ class Test_make_contextmanager(unittest.TestCase):
     def test_with_regular_fn(self):
         def mygen():
             return 'a'
+
         mgr = self._callFUT(mygen)
         with mgr() as ctx:
             self.assertEqual(ctx, 'a')
@@ -906,146 +1001,173 @@ class Test_make_contextmanager(unittest.TestCase):
 class Test_takes_one_arg(unittest.TestCase):
     def _callFUT(self, view, attr=None, argname=None):
         from pyramid.util import takes_one_arg
+
         return takes_one_arg(view, attr=attr, argname=argname)
 
     def test_requestonly_newstyle_class_no_init(self):
         class foo(object):
             """ """
+
         self.assertFalse(self._callFUT(foo))
 
     def test_requestonly_newstyle_class_init_toomanyargs(self):
         class foo(object):
             def __init__(self, context, request):
                 """ """
+
         self.assertFalse(self._callFUT(foo))
 
     def test_requestonly_newstyle_class_init_onearg_named_request(self):
         class foo(object):
             def __init__(self, request):
                 """ """
+
         self.assertTrue(self._callFUT(foo))
 
     def test_newstyle_class_init_onearg_named_somethingelse(self):
         class foo(object):
             def __init__(self, req):
                 """ """
+
         self.assertTrue(self._callFUT(foo))
 
     def test_newstyle_class_init_defaultargs_firstname_not_request(self):
         class foo(object):
             def __init__(self, context, request=None):
                 """ """
+
         self.assertFalse(self._callFUT(foo))
 
     def test_newstyle_class_init_defaultargs_firstname_request(self):
         class foo(object):
             def __init__(self, request, foo=1, bar=2):
                 """ """
+
         self.assertTrue(self._callFUT(foo, argname='request'))
 
     def test_newstyle_class_init_firstname_request_with_secondname(self):
         class foo(object):
             def __init__(self, request, two):
                 """ """
+
         self.assertFalse(self._callFUT(foo))
 
     def test_newstyle_class_init_noargs(self):
         class foo(object):
             def __init__():
                 """ """
+
         self.assertFalse(self._callFUT(foo))
 
     def test_oldstyle_class_no_init(self):
         class foo:
             """ """
+
         self.assertFalse(self._callFUT(foo))
 
     def test_oldstyle_class_init_toomanyargs(self):
         class foo:
             def __init__(self, context, request):
                 """ """
+
         self.assertFalse(self._callFUT(foo))
 
     def test_oldstyle_class_init_onearg_named_request(self):
         class foo:
             def __init__(self, request):
                 """ """
+
         self.assertTrue(self._callFUT(foo))
 
     def test_oldstyle_class_init_onearg_named_somethingelse(self):
         class foo:
             def __init__(self, req):
                 """ """
+
         self.assertTrue(self._callFUT(foo))
 
     def test_oldstyle_class_init_defaultargs_firstname_not_request(self):
         class foo:
             def __init__(self, context, request=None):
                 """ """
+
         self.assertFalse(self._callFUT(foo))
 
     def test_oldstyle_class_init_defaultargs_firstname_request(self):
         class foo:
             def __init__(self, request, foo=1, bar=2):
                 """ """
+
         self.assertTrue(self._callFUT(foo, argname='request'), True)
 
     def test_oldstyle_class_init_noargs(self):
         class foo:
             def __init__():
                 """ """
+
         self.assertFalse(self._callFUT(foo))
 
     def test_function_toomanyargs(self):
         def foo(context, request):
             """ """
+
         self.assertFalse(self._callFUT(foo))
 
     def test_function_with_attr_false(self):
         def bar(context, request):
             """ """
+
         def foo(context, request):
             """ """
+
         foo.bar = bar
         self.assertFalse(self._callFUT(foo, 'bar'))
 
     def test_function_with_attr_true(self):
         def bar(context, request):
             """ """
+
         def foo(request):
             """ """
+
         foo.bar = bar
         self.assertTrue(self._callFUT(foo, 'bar'))
 
     def test_function_onearg_named_request(self):
         def foo(request):
             """ """
+
         self.assertTrue(self._callFUT(foo))
 
     def test_function_onearg_named_somethingelse(self):
         def foo(req):
             """ """
+
         self.assertTrue(self._callFUT(foo))
 
     def test_function_defaultargs_firstname_not_request(self):
         def foo(context, request=None):
             """ """
+
         self.assertFalse(self._callFUT(foo))
 
     def test_function_defaultargs_firstname_request(self):
         def foo(request, foo=1, bar=2):
             """ """
+
         self.assertTrue(self._callFUT(foo, argname='request'))
 
     def test_function_noargs(self):
         def foo():
             """ """
+
         self.assertFalse(self._callFUT(foo))
 
     def test_instance_toomanyargs(self):
         class Foo:
             def __call__(self, context, request):
                 """ """
+
         foo = Foo()
         self.assertFalse(self._callFUT(foo))
 
@@ -1053,6 +1175,7 @@ class Test_takes_one_arg(unittest.TestCase):
         class Foo:
             def __call__(self, request):
                 """ """
+
         foo = Foo()
         self.assertTrue(self._callFUT(foo))
 
@@ -1060,6 +1183,7 @@ class Test_takes_one_arg(unittest.TestCase):
         class Foo:
             def __call__(self, req):
                 """ """
+
         foo = Foo()
         self.assertTrue(self._callFUT(foo))
 
@@ -1067,6 +1191,7 @@ class Test_takes_one_arg(unittest.TestCase):
         class Foo:
             def __call__(self, context, request=None):
                 """ """
+
         foo = Foo()
         self.assertFalse(self._callFUT(foo))
 
@@ -1074,11 +1199,14 @@ class Test_takes_one_arg(unittest.TestCase):
         class Foo:
             def __call__(self, request, foo=1, bar=2):
                 """ """
+
         foo = Foo()
         self.assertTrue(self._callFUT(foo, argname='request'), True)
 
     def test_instance_nocall(self):
-        class Foo: pass
+        class Foo:
+            pass
+
         foo = Foo()
         self.assertFalse(self._callFUT(foo))
 
@@ -1086,12 +1214,14 @@ class Test_takes_one_arg(unittest.TestCase):
         class Foo:
             def method(self, request):
                 """ """
+
         foo = Foo()
         self.assertTrue(self._callFUT(foo.method))
 
     def test_function_annotations(self):
         def foo(bar):
             """ """
+
         # avoid SyntaxErrors in python2, this if effectively nop
         getattr(foo, '__annotations__', {}).update({'bar': 'baz'})
         self.assertTrue(self._callFUT(foo))
@@ -1100,6 +1230,7 @@ class Test_takes_one_arg(unittest.TestCase):
 class TestSimpleSerializer(unittest.TestCase):
     def _makeOne(self):
         from pyramid.util import SimpleSerializer
+
         return SimpleSerializer()
 
     def test_loads(self):

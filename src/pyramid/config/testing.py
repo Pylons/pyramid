@@ -5,22 +5,25 @@ from pyramid.interfaces import (
     IAuthorizationPolicy,
     IAuthenticationPolicy,
     IRendererFactory,
-    )
+)
 
 from pyramid.renderers import RendererHelper
 
-from pyramid.traversal import (
-    decode_path_info,
-    split_path_info,
-    )
+from pyramid.traversal import decode_path_info, split_path_info
 
 from pyramid.config.util import action_method
 
+
 class TestingConfiguratorMixin(object):
     # testing API
-    def testing_securitypolicy(self, userid=None, groupids=(),
-                               permissive=True, remember_result=None,
-                               forget_result=None):
+    def testing_securitypolicy(
+        self,
+        userid=None,
+        groupids=(),
+        permissive=True,
+        remember_result=None,
+        forget_result=None,
+    ):
         """Unit/integration testing helper: Registers a pair of faux
         :app:`Pyramid` security policies: a :term:`authentication
         policy` and a :term:`authorization policy`.
@@ -64,9 +67,10 @@ class TestingConfiguratorMixin(object):
            The ``forget_result`` argument.
         """
         from pyramid.testing import DummySecurityPolicy
+
         policy = DummySecurityPolicy(
             userid, groupids, permissive, remember_result, forget_result
-            )
+        )
         self.registry.registerUtility(policy, IAuthorizationPolicy)
         self.registry.registerUtility(policy, IAuthenticationPolicy)
         return policy
@@ -85,6 +89,7 @@ class TestingConfiguratorMixin(object):
         :func:`pyramid.traversal.find_resource` is called with an
         equivalent path string or tuple.
         """
+
         class DummyTraverserFactory:
             def __init__(self, context):
                 self.context = context
@@ -93,14 +98,22 @@ class TestingConfiguratorMixin(object):
                 path = decode_path_info(request.environ['PATH_INFO'])
                 ob = resources[path]
                 traversed = split_path_info(path)
-                return {'context':ob, 'view_name':'','subpath':(),
-                        'traversed':traversed, 'virtual_root':ob,
-                        'virtual_root_path':(), 'root':ob}
-        self.registry.registerAdapter(DummyTraverserFactory, (Interface,),
-                                      ITraverser)
+                return {
+                    'context': ob,
+                    'view_name': '',
+                    'subpath': (),
+                    'traversed': traversed,
+                    'virtual_root': ob,
+                    'virtual_root_path': (),
+                    'root': ob,
+                }
+
+        self.registry.registerAdapter(
+            DummyTraverserFactory, (Interface,), ITraverser
+        )
         return resources
 
-    testing_models = testing_resources # b/w compat
+    testing_models = testing_resources  # b/w compat
 
     @action_method
     def testing_add_subscriber(self, event_iface=None):
@@ -122,8 +135,10 @@ class TestingConfiguratorMixin(object):
         """
         event_iface = self.maybe_dotted(event_iface)
         L = []
+
         def subscriber(*event):
             L.extend(event)
+
         self.add_subscriber(subscriber, event_iface)
         return L
 
@@ -149,19 +164,22 @@ class TestingConfiguratorMixin(object):
 
         """
         from pyramid.testing import DummyRendererFactory
+
         helper = RendererHelper(name=path, registry=self.registry)
-        factory = self.registry.queryUtility(IRendererFactory, name=helper.type)
+        factory = self.registry.queryUtility(
+            IRendererFactory, name=helper.type
+        )
         if not isinstance(factory, DummyRendererFactory):
             factory = DummyRendererFactory(helper.type, factory)
-            self.registry.registerUtility(factory, IRendererFactory,
-                                          name=helper.type)
+            self.registry.registerUtility(
+                factory, IRendererFactory, name=helper.type
+            )
 
         from pyramid.testing import DummyTemplateRenderer
+
         if renderer is None:
             renderer = DummyTemplateRenderer()
         factory.add(path, renderer)
         return renderer
 
     testing_add_template = testing_add_renderer
-
-

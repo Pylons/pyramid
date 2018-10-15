@@ -4,15 +4,13 @@ import sys
 
 from zope.interface import implementer
 
-from pyramid.interfaces import (
-    IPackageOverrides,
-    PHASE1_CONFIG,
-)
+from pyramid.interfaces import IPackageOverrides, PHASE1_CONFIG
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.threadlocal import get_current_registry
 
 from pyramid.config.util import action_method
+
 
 class OverrideProvider(pkg_resources.DefaultProvider):
     def __init__(self, module):
@@ -35,7 +33,8 @@ class OverrideProvider(pkg_resources.DefaultProvider):
             if filename is not None:
                 return filename
         return pkg_resources.DefaultProvider.get_resource_filename(
-            self, manager, resource_name)
+            self, manager, resource_name
+        )
 
     def get_resource_stream(self, manager, resource_name):
         """ Return a readable file-like object for resource_name."""
@@ -45,7 +44,8 @@ class OverrideProvider(pkg_resources.DefaultProvider):
             if stream is not None:
                 return stream
         return pkg_resources.DefaultProvider.get_resource_stream(
-            self, manager, resource_name)
+            self, manager, resource_name
+        )
 
     def get_resource_string(self, manager, resource_name):
         """ Return a string containing the contents of resource_name."""
@@ -55,7 +55,8 @@ class OverrideProvider(pkg_resources.DefaultProvider):
             if string is not None:
                 return string
         return pkg_resources.DefaultProvider.get_resource_string(
-            self, manager, resource_name)
+            self, manager, resource_name
+        )
 
     def has_resource(self, resource_name):
         overrides = self._get_overrides()
@@ -63,8 +64,7 @@ class OverrideProvider(pkg_resources.DefaultProvider):
             result = overrides.has_resource(resource_name)
             if result is not None:
                 return result
-        return pkg_resources.DefaultProvider.has_resource(
-            self, resource_name)
+        return pkg_resources.DefaultProvider.has_resource(self, resource_name)
 
     def resource_isdir(self, resource_name):
         overrides = self._get_overrides()
@@ -73,7 +73,8 @@ class OverrideProvider(pkg_resources.DefaultProvider):
             if result is not None:
                 return result
         return pkg_resources.DefaultProvider.resource_isdir(
-            self, resource_name)
+            self, resource_name
+        )
 
     def resource_listdir(self, resource_name):
         overrides = self._get_overrides()
@@ -82,7 +83,8 @@ class OverrideProvider(pkg_resources.DefaultProvider):
             if result is not None:
                 return result
         return pkg_resources.DefaultProvider.resource_listdir(
-            self, resource_name)
+            self, resource_name
+        )
 
 
 @implementer(IPackageOverrides)
@@ -193,8 +195,9 @@ class DirectoryOverride:
 
     def __call__(self, resource_name):
         if resource_name.startswith(self.path):
-            new_path = resource_name[self.pathlen:]
+            new_path = resource_name[self.pathlen :]
             return self.source, new_path
+
 
 class FileOverride:
     def __init__(self, path, source):
@@ -215,6 +218,7 @@ class PackageAssetSource(object):
     the empty string, as returned by the ``FileOverride``.
 
     """
+
     def __init__(self, package, prefix):
         self.package = package
         if hasattr(package, '__name__'):
@@ -262,6 +266,7 @@ class FSAssetSource(object):
     An asset source relative to a path in the filesystem.
 
     """
+
     def __init__(self, prefix):
         self.prefix = prefix
 
@@ -305,14 +310,16 @@ class FSAssetSource(object):
 
 
 class AssetsConfiguratorMixin(object):
-    def _override(self, package, path, override_source,
-                  PackageOverrides=PackageOverrides):
+    def _override(
+        self, package, path, override_source, PackageOverrides=PackageOverrides
+    ):
         pkg_name = package.__name__
         override = self.registry.queryUtility(IPackageOverrides, name=pkg_name)
         if override is None:
             override = PackageOverrides(package)
-            self.registry.registerUtility(override, IPackageOverrides,
-                                          name=pkg_name)
+            self.registry.registerUtility(
+                override, IPackageOverrides, name=pkg_name
+            )
         override.insert(path, override_source)
 
     @action_method
@@ -331,7 +338,8 @@ class AssetsConfiguratorMixin(object):
         information about asset overrides."""
         if to_override == override_with:
             raise ConfigurationError(
-                'You cannot override an asset with itself')
+                'You cannot override an asset with itself'
+            )
 
         package = to_override
         path = ''
@@ -346,7 +354,8 @@ class AssetsConfiguratorMixin(object):
             if not os.path.exists(override_with):
                 raise ConfigurationError(
                     'Cannot override asset with an absolute path that does '
-                    'not exist')
+                    'not exist'
+                )
             override_isdir = os.path.isdir(override_with)
             override_package = None
             override_prefix = override_with
@@ -360,22 +369,23 @@ class AssetsConfiguratorMixin(object):
             to_package = sys.modules[override_package]
             override_source = PackageAssetSource(to_package, override_prefix)
 
-            override_isdir = (
-                override_prefix == '' or
-                override_with.endswith('/')
+            override_isdir = override_prefix == '' or override_with.endswith(
+                '/'
             )
 
         if overridden_isdir and (not override_isdir):
             raise ConfigurationError(
                 'A directory cannot be overridden with a file (put a '
-                'slash at the end of override_with if necessary)')
+                'slash at the end of override_with if necessary)'
+            )
 
         if (not overridden_isdir) and override_isdir:
             raise ConfigurationError(
                 'A file cannot be overridden with a directory (put a '
-                'slash at the end of to_override if necessary)')
+                'slash at the end of to_override if necessary)'
+            )
 
-        override = _override or self._override # test jig
+        override = _override or self._override  # test jig
 
         def register():
             __import__(package)
@@ -387,10 +397,11 @@ class AssetsConfiguratorMixin(object):
             (package, override_package, path, override_prefix),
             '%s -> %s' % (to_override, override_with),
             'asset override',
-            )
+        )
         intr['to_override'] = to_override
         intr['override_with'] = override_with
-        self.action(None, register, introspectables=(intr,),
-                    order=PHASE1_CONFIG)
+        self.action(
+            None, register, introspectables=(intr,), order=PHASE1_CONFIG
+        )
 
-    override_resource = override_asset # bw compat
+    override_resource = override_asset  # bw compat

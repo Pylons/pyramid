@@ -2,21 +2,10 @@
 
 import os
 
-from pyramid.interfaces import (
-    IResourceURL,
-    IRoutesMapper,
-    IStaticURLInfo,
-    )
+from pyramid.interfaces import IResourceURL, IRoutesMapper, IStaticURLInfo
 
-from pyramid.compat import (
-    bytes_,
-    lru_cache,
-    string_types,
-    )
-from pyramid.encode import (
-    url_quote,
-    urlencode,
-)
+from pyramid.compat import bytes_, lru_cache, string_types
+from pyramid.encode import url_quote, urlencode
 from pyramid.path import caller_package
 from pyramid.threadlocal import get_current_registry
 
@@ -25,10 +14,11 @@ from pyramid.traversal import (
     quote_path_segment,
     PATH_SAFE,
     PATH_SEGMENT_SAFE,
-    )
+)
 
-QUERY_SAFE = "/?:@!$&'()*+,;=" # RFC 3986
+QUERY_SAFE = "/?:@!$&'()*+,;="  # RFC 3986
 ANCHOR_SAFE = QUERY_SAFE
+
 
 def parse_url_overrides(request, kw):
     """
@@ -48,7 +38,7 @@ def parse_url_overrides(request, kw):
     anchor = kw.pop('_anchor', '')
 
     if app_url is None:
-        if (scheme is not None or host is not None or port is not None):
+        if scheme is not None or host is not None or port is not None:
             app_url = request._partial_application_url(scheme, host, port)
         else:
             app_url = request.application_url
@@ -65,6 +55,7 @@ def parse_url_overrides(request, kw):
         frag = '#' + url_quote(anchor, ANCHOR_SAFE)
 
     return app_url, qs, frag
+
 
 class URLMethodsMixin(object):
     """ Request methods mixin for BaseRequest having to do with URL
@@ -115,7 +106,7 @@ class URLMethodsMixin(object):
         if port:
             url += ':%s' % port
 
-        url_encoding = getattr(self, 'url_encoding', 'utf-8') # webob 1.2b3+
+        url_encoding = getattr(self, 'url_encoding', 'utf-8')  # webob 1.2b3+
         bscript_name = bytes_(self.script_name, url_encoding)
         return url + url_quote(bscript_name, PATH_SAFE)
 
@@ -181,10 +172,10 @@ class URLMethodsMixin(object):
 
            Python data structures that are passed as ``_query`` which are
            sequences or dictionaries are turned into a string under the same
-           rules as when run through :func:`urllib.urlencode` with the ``doseq``
-           argument equal to ``True``.  This means that sequences can be passed
-           as values, and a k=v pair will be placed into the query string for
-           each value.
+           rules as when run through :func:`urllib.urlencode` with the
+           ``doseq`` argument equal to ``True``.  This means that sequences can
+           be passed as values, and a k=v pair will be placed into the query
+           string for each value.
 
         If a keyword argument ``_anchor`` is present, its string
         representation will be quoted per :rfc:`3986#section-3.5` and used as
@@ -209,7 +200,7 @@ class URLMethodsMixin(object):
         ``_host='foo.com'``, and the URL that would have been generated
         without the host replacement is ``http://example.com/a``, the result
         will be ``http://foo.com/a``.
-        
+
         Note that if ``_scheme`` is passed as ``https``, and ``_port`` is not
         passed, the ``_port`` value is assumed to have been passed as
         ``443``.  Likewise, if ``_scheme`` is passed as ``http`` and
@@ -255,7 +246,7 @@ class URLMethodsMixin(object):
         try:
             reg = self.registry
         except AttributeError:
-            reg = get_current_registry() # b/c
+            reg = get_current_registry()  # b/c
         mapper = reg.getUtility(IRoutesMapper)
         route = mapper.get_route(route_name)
 
@@ -267,7 +258,7 @@ class URLMethodsMixin(object):
 
         app_url, qs, anchor = parse_url_overrides(self, kw)
 
-        path = route.generate(kw) # raises KeyError if generate fails
+        path = route.generate(kw)  # raises KeyError if generate fails
 
         if elements:
             suffix = _join_elements(elements)
@@ -372,10 +363,10 @@ class URLMethodsMixin(object):
 
            Python data structures that are passed as ``query`` which are
            sequences or dictionaries are turned into a string under the same
-           rules as when run through :func:`urllib.urlencode` with the ``doseq``
-           argument equal to ``True``.  This means that sequences can be passed
-           as values, and a k=v pair will be placed into the query string for
-           each value.
+           rules as when run through :func:`urllib.urlencode` with the
+           ``doseq`` argument equal to ``True``.  This means that sequences can
+           be passed as values, and a k=v pair will be placed into the query
+           string for each value.
 
         If a keyword argument ``anchor`` is present, its string
         representation will be used as a named anchor in the generated URL
@@ -399,7 +390,7 @@ class URLMethodsMixin(object):
         ``host='foo.com'``, and the URL that would have been generated
         without the host replacement is ``http://example.com/a``, the result
         will be ``http://foo.com/a``.
-        
+
         If ``scheme`` is passed as ``https``, and an explicit ``port`` is not
         passed, the ``port`` value is assumed to have been passed as ``443``.
         Likewise, if ``scheme`` is passed as ``http`` and ``port`` is not
@@ -424,11 +415,11 @@ class URLMethodsMixin(object):
         If the ``resource`` passed in has a ``__resource_url__`` method, it
         will be used to generate the URL (scheme, host, port, path) for the
         base resource which is operated upon by this function.
-        
+
         .. seealso::
 
             See also :ref:`overriding_resource_url_generation`.
-           
+
         If ``route_name`` is passed, this function will delegate its URL
         production to the ``route_url`` function.  Calling
         ``resource_url(someresource, 'element1', 'element2', query={'a':1},
@@ -481,21 +472,21 @@ class URLMethodsMixin(object):
         is passed, the ``__resource_url__`` method of the resource passed is
         ignored unconditionally.  This feature is incompatible with
         resources which generate their own URLs.
-        
+
         .. note::
 
-           If the :term:`resource` used is the result of a :term:`traversal`, it
-           must be :term:`location`-aware.  The resource can also be the context
-           of a :term:`URL dispatch`; contexts found this way do not need to be
-           location-aware.
+           If the :term:`resource` used is the result of a :term:`traversal`,
+           it must be :term:`location`-aware.  The resource can also be the
+           context of a :term:`URL dispatch`; contexts found this way do not
+           need to be location-aware.
 
         .. note::
 
            If a 'virtual root path' is present in the request environment (the
            value of the WSGI environ key ``HTTP_X_VHM_ROOT``), and the resource
-           was obtained via :term:`traversal`, the URL path will not include the
-           virtual root prefix (it will be stripped off the left hand side of
-           the generated URL).
+           was obtained via :term:`traversal`, the URL path will not include
+           the virtual root prefix (it will be stripped off the left hand side
+           of the generated URL).
 
         .. note::
 
@@ -522,7 +513,7 @@ class URLMethodsMixin(object):
         try:
             reg = self.registry
         except AttributeError:
-            reg = get_current_registry() # b/c
+            reg = get_current_registry()  # b/c
 
         url_adapter = reg.queryMultiAdapter((resource, self), IResourceURL)
         if url_adapter is None:
@@ -531,9 +522,7 @@ class URLMethodsMixin(object):
         virtual_path = getattr(url_adapter, 'virtual_path', None)
 
         urlkw = {}
-        for name in (
-            'app_url', 'scheme', 'host', 'port', 'query', 'anchor'
-        ):
+        for name in ('app_url', 'scheme', 'host', 'port', 'query', 'anchor'):
             val = kw.get(name, None)
             if val is not None:
                 urlkw['_' + name] = val
@@ -583,7 +572,7 @@ class URLMethodsMixin(object):
 
         return resource_url + suffix + qs + anchor
 
-    model_url = resource_url # b/w compat forever
+    model_url = resource_url  # b/w compat forever
 
     def resource_path(self, resource, *elements, **kw):
         """
@@ -651,7 +640,7 @@ class URLMethodsMixin(object):
         try:
             reg = self.registry
         except AttributeError:
-            reg = get_current_registry() # b/c
+            reg = get_current_registry()  # b/c
 
         info = reg.queryUtility(IStaticURLInfo)
         if info is None:
@@ -803,6 +792,7 @@ def route_url(route_name, request, *elements, **kw):
     """
     return request.route_url(route_name, *elements, **kw)
 
+
 def route_path(route_name, request, *elements, **kw):
     """
     This is a backwards compatibility function.  Its result is the same as
@@ -813,6 +803,7 @@ def route_path(route_name, request, *elements, **kw):
     See :meth:`pyramid.request.Request.route_path` for more information.
     """
     return request.route_path(route_name, *elements, **kw)
+
 
 def resource_url(resource, request, *elements, **kw):
     """
@@ -825,7 +816,8 @@ def resource_url(resource, request, *elements, **kw):
     """
     return request.resource_url(resource, *elements, **kw)
 
-model_url = resource_url # b/w compat (forever)
+
+model_url = resource_url  # b/w compat (forever)
 
 
 def static_url(path, request, **kw):
@@ -865,6 +857,7 @@ def static_path(path, request, **kw):
             path = '%s:%s' % (package.__name__, path)
     return request.static_path(path, **kw)
 
+
 def current_route_url(request, *elements, **kw):
     """
     This is a backwards compatibility function.  Its result is the same as
@@ -876,6 +869,7 @@ def current_route_url(request, *elements, **kw):
     information.
     """
     return request.current_route_url(*elements, **kw)
+
 
 def current_route_path(request, *elements, **kw):
     """
@@ -889,6 +883,9 @@ def current_route_path(request, *elements, **kw):
     """
     return request.current_route_path(*elements, **kw)
 
+
 @lru_cache(1000)
 def _join_elements(elements):
-    return '/'.join([quote_path_segment(s, safe=PATH_SEGMENT_SAFE) for s in elements])
+    return '/'.join(
+        [quote_path_segment(s, safe=PATH_SEGMENT_SAFE) for s in elements]
+    )

@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 import functools
+
 try:
     # py2.7.7+ and py3.3+ have native comparison support
     from hmac import compare_digest
@@ -8,10 +9,7 @@ except ImportError:  # pragma: no cover
 import inspect
 import weakref
 
-from pyramid.exceptions import (
-    ConfigurationError,
-    CyclicDependencyError,
-    )
+from pyramid.exceptions import ConfigurationError, CyclicDependencyError
 
 from pyramid.compat import (
     getargspec,
@@ -22,8 +20,8 @@ from pyramid.compat import (
     bytes_,
     text_,
     PY2,
-    native_
-    )
+    native_,
+)
 
 from pyramid.path import DottedNameResolver as _DottedNameResolver
 
@@ -31,8 +29,11 @@ _marker = object()
 
 
 class DottedNameResolver(_DottedNameResolver):
-    def __init__(self, package=None): # default to package = None for bw compat
+    def __init__(
+        self, package=None
+    ):  # default to package = None for bw compat
         _DottedNameResolver.__init__(self, package)
+
 
 def is_string_or_iterable(v):
     if isinstance(v, string_types):
@@ -40,11 +41,13 @@ def is_string_or_iterable(v):
     if hasattr(v, '__iter__'):
         return True
 
+
 def as_sorted_tuple(val):
     if not is_nonstr_iter(val):
         val = (val,)
     val = tuple(sorted(val))
     return val
+
 
 class InstancePropertyHelper(object):
     """A helper object for assigning properties and descriptors to instances.
@@ -56,6 +59,7 @@ class InstancePropertyHelper(object):
     per-property and then invoking :meth:`.apply` on target objects.
 
     """
+
     def __init__(self):
         self.properties = {}
 
@@ -81,7 +85,8 @@ class InstancePropertyHelper(object):
             name = callable.__name__
             fn = callable
         if reify:
-            import pyramid.decorator # avoid circular import
+            import pyramid.decorator  # avoid circular import
+
             fn = pyramid.decorator.reify(fn)
         elif not is_property:
             fn = property(fn)
@@ -140,6 +145,7 @@ class InstancePropertyHelper(object):
         """ Apply all configured properties to the ``target`` instance."""
         if self.properties:
             self.apply_properties(target, self.properties)
+
 
 class InstancePropertyMixin(object):
     """ Mixin that will allow an instance to add properties at
@@ -200,7 +206,9 @@ class InstancePropertyMixin(object):
            1
         """
         InstancePropertyHelper.set_property(
-            self, callable, name=name, reify=reify)
+            self, callable, name=name, reify=reify
+        )
+
 
 class WeakOrderedSet(object):
     """ Maintain a set of items.
@@ -268,6 +276,7 @@ class WeakOrderedSet(object):
             oid = self._order[-1]
             return self._items[oid]()
 
+
 def strings_differ(string1, string2, compare_digest=compare_digest):
     """Check whether two strings differ while avoiding timing attacks.
 
@@ -298,6 +307,7 @@ def strings_differ(string1, string2, compare_digest=compare_digest):
         for a, b in zip(left, right):
             invalid_bits += a != b
     return invalid_bits != 0
+
 
 def object_description(object):
     """ Produce a human-consumable text description of ``object``,
@@ -345,11 +355,12 @@ def object_description(object):
         return text_('module %s' % modulename)
     if inspect.ismethod(object):
         oself = getattr(object, '__self__', None)
-        if oself is None: # pragma: no cover
+        if oself is None:  # pragma: no cover
             oself = getattr(object, 'im_self', None)
-        return text_('method %s of class %s.%s' %
-                     (object.__name__, modulename,
-                      oself.__class__.__name__))
+        return text_(
+            'method %s of class %s.%s'
+            % (object.__name__, modulename, oself.__class__.__name__)
+        )
 
     if inspect.isclass(object):
         dottedname = '%s.%s' % (modulename, object.__name__)
@@ -359,11 +370,13 @@ def object_description(object):
         return text_('function %s' % dottedname)
     return text_('object %s' % str(object))
 
+
 def shortrepr(object, closer):
     r = str(object)
     if len(r) > 100:
         r = r[:100] + ' ... %s' % closer
     return r
+
 
 class Sentinel(object):
     def __init__(self, repr):
@@ -372,19 +385,18 @@ class Sentinel(object):
     def __repr__(self):
         return self.repr
 
+
 FIRST = Sentinel('FIRST')
 LAST = Sentinel('LAST')
+
 
 class TopologicalSorter(object):
     """ A utility class which can be used to perform topological sorts against
     tuple-like data."""
+
     def __init__(
-        self,
-        default_before=LAST,
-        default_after=None,
-        first=FIRST,
-        last=LAST,
-        ):
+        self, default_before=LAST, default_after=None, first=FIRST, last=LAST
+    ):
         self.names = []
         self.req_before = set()
         self.req_after = set()
@@ -414,7 +426,7 @@ class TopologicalSorter(object):
             self.req_before.remove(name)
             for u in before:
                 self.order.remove((name, u))
-                
+
     def add(self, name, val, after=None, before=None):
         """ Add a node to the sort input.  The ``name`` should be a string or
         any other hashable object, the ``val`` should be the sortable (doesn't
@@ -454,7 +466,6 @@ class TopologicalSorter(object):
             self.order += [(name, o) for o in before]
             self.req_before.add(name)
 
-
     def sorted(self):
         """ Returns the sort input values in topologically sorted order"""
         order = [(self.first, self.last)]
@@ -469,7 +480,7 @@ class TopologicalSorter(object):
         def add_node(node):
             if node not in graph:
                 roots.append(node)
-                graph[node] = [0] # 0 = number of arcs coming into this node
+                graph[node] = [0]  # 0 = number of arcs coming into this node
 
         def add_arc(fromnode, tonode):
             graph[fromnode].append(tonode)
@@ -482,7 +493,7 @@ class TopologicalSorter(object):
 
         has_before, has_after = set(), set()
         for a, b in order:
-            if a in names and b in names: # deal with missing dependencies
+            if a in names and b in names:  # deal with missing dependencies
                 add_arc(a, b)
                 has_before.add(a)
                 has_after.add(b)
@@ -507,7 +518,7 @@ class TopologicalSorter(object):
             for child in children:
                 arcs = graph[child][0]
                 arcs -= 1
-                graph[child][0] = arcs 
+                graph[child][0] = arcs
                 if arcs == 0:
                     roots.insert(0, child)
             del graph[root]
@@ -542,6 +553,7 @@ def get_callable_name(name):
         )
         raise ConfigurationError(msg % name)
 
+
 @contextmanager
 def hide_attrs(obj, *attrs):
     """
@@ -574,9 +586,11 @@ def is_same_domain(host, pattern):
         return False
 
     pattern = pattern.lower()
-    return (pattern[0] == "." and
-            (host.endswith(pattern) or host == pattern[1:]) or
-            pattern == host)
+    return (
+        pattern[0] == "."
+        and (host.endswith(pattern) or host == pattern[1:])
+        or pattern == host
+    )
 
 
 def make_contextmanager(fn):
@@ -590,6 +604,7 @@ def make_contextmanager(fn):
     @functools.wraps(fn)
     def wrapper(*a, **kw):
         yield fn(*a, **kw)
+
     return wrapper
 
 

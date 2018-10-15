@@ -4,15 +4,18 @@ from .test_scripts.dummy import DummyLoader
 
 here = os.path.dirname(__file__)
 
+
 class Test_get_app(unittest.TestCase):
     def _callFUT(self, config_file, section_name, options=None, _loader=None):
         import pyramid.paster
+
         old_loader = pyramid.paster.get_config_loader
         try:
             if _loader is not None:
                 pyramid.paster.get_config_loader = _loader
-            return pyramid.paster.get_app(config_file, section_name,
-                                          options=options)
+            return pyramid.paster.get_app(
+                config_file, section_name, options=options
+            )
         finally:
             pyramid.paster.get_config_loader = old_loader
 
@@ -20,8 +23,8 @@ class Test_get_app(unittest.TestCase):
         app = DummyApp()
         loader = DummyLoader(app=app)
         result = self._callFUT(
-            '/foo/bar/myapp.ini', 'myapp', options={'a': 'b'},
-            _loader=loader)
+            '/foo/bar/myapp.ini', 'myapp', options={'a': 'b'}, _loader=loader
+        )
         self.assertEqual(loader.uri.path, '/foo/bar/myapp.ini')
         self.assertEqual(len(loader.calls), 1)
         self.assertEqual(loader.calls[0]['op'], 'app')
@@ -33,18 +36,23 @@ class Test_get_app(unittest.TestCase):
         options = {'bar': 'baz'}
         app = self._callFUT(
             os.path.join(here, 'fixtures', 'dummy.ini'),
-            'myapp', options=options)
+            'myapp',
+            options=options,
+        )
         self.assertEqual(app.settings['foo'], 'baz')
+
 
 class Test_get_appsettings(unittest.TestCase):
     def _callFUT(self, config_file, section_name, options=None, _loader=None):
         import pyramid.paster
+
         old_loader = pyramid.paster.get_config_loader
         try:
             if _loader is not None:
                 pyramid.paster.get_config_loader = _loader
-            return pyramid.paster.get_appsettings(config_file, section_name,
-                                                  options=options)
+            return pyramid.paster.get_appsettings(
+                config_file, section_name, options=options
+            )
         finally:
             pyramid.paster.get_config_loader = old_loader
 
@@ -52,8 +60,8 @@ class Test_get_appsettings(unittest.TestCase):
         values = {'a': 1}
         loader = DummyLoader(app_settings=values)
         result = self._callFUT(
-            '/foo/bar/myapp.ini', 'myapp', options={'a': 'b'},
-            _loader=loader)
+            '/foo/bar/myapp.ini', 'myapp', options={'a': 'b'}, _loader=loader
+        )
         self.assertEqual(loader.uri.path, '/foo/bar/myapp.ini')
         self.assertEqual(len(loader.calls), 1)
         self.assertEqual(loader.calls[0]['op'], 'app_settings')
@@ -65,12 +73,16 @@ class Test_get_appsettings(unittest.TestCase):
         options = {'bar': 'baz'}
         result = self._callFUT(
             os.path.join(here, 'fixtures', 'dummy.ini'),
-            'myapp', options=options)
+            'myapp',
+            options=options,
+        )
         self.assertEqual(result['foo'], 'baz')
+
 
 class Test_setup_logging(unittest.TestCase):
     def _callFUT(self, config_file, global_conf=None, _loader=None):
         import pyramid.paster
+
         old_loader = pyramid.paster.get_config_loader
         try:
             if _loader is not None:
@@ -103,13 +115,16 @@ class Test_setup_logging(unittest.TestCase):
         self.assertEqual(loader.calls[0]['op'], 'logging')
         self.assertEqual(loader.calls[0]['defaults'], {'key': 'val'})
 
+
 class Test_bootstrap(unittest.TestCase):
     def _callFUT(self, config_uri, request=None):
         from pyramid.paster import bootstrap
+
         return bootstrap(config_uri, request)
 
     def setUp(self):
         import pyramid.paster
+
         self.original_get_app = pyramid.paster.get_app
         self.original_prepare = pyramid.paster.prepare
         self.app = app = DummyApp()
@@ -120,17 +135,20 @@ class Test_bootstrap(unittest.TestCase):
                 self.a = a
                 self.kw = kw
                 return app
+
         self.get_app = pyramid.paster.get_app = DummyGetApp()
 
         class DummyPrepare(object):
             def __call__(self, *a, **kw):
                 self.a = a
                 self.kw = kw
-                return {'root':root, 'closer':lambda: None}
+                return {'root': root, 'closer': lambda: None}
+
         self.getroot = pyramid.paster.prepare = DummyPrepare()
 
     def tearDown(self):
         import pyramid.paster
+
         pyramid.paster.get_app = self.original_get_app
         pyramid.paster.prepare = self.original_prepare
 
@@ -142,17 +160,22 @@ class Test_bootstrap(unittest.TestCase):
         self.assertEqual(result['root'], self.root)
         self.assertTrue('closer' in result)
 
+
 class Dummy:
     pass
+
 
 class DummyRegistry(object):
     settings = {}
 
+
 dummy_registry = DummyRegistry()
+
 
 class DummyApp:
     def __init__(self):
         self.registry = dummy_registry
+
 
 def make_dummyapp(global_conf, **settings):
     app = DummyApp()
@@ -160,9 +183,11 @@ def make_dummyapp(global_conf, **settings):
     app.global_conf = global_conf
     return app
 
+
 class DummyRequest:
     application_url = 'http://example.com:5432'
     script_name = ''
+
     def __init__(self, environ):
         self.environ = environ
         self.matchdict = {}

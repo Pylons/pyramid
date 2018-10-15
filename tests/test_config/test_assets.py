@@ -5,48 +5,66 @@ from pyramid.testing import cleanUp
 # we use this folder
 here = os.path.dirname(os.path.abspath(__file__))
 
+
 class TestAssetsConfiguratorMixin(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
+
         config = Configurator(*arg, **kw)
         return config
 
     def test_override_asset_samename(self):
         from pyramid.exceptions import ConfigurationError
+
         config = self._makeOne()
         self.assertRaises(ConfigurationError, config.override_asset, 'a', 'a')
 
     def test_override_asset_directory_with_file(self):
         from pyramid.exceptions import ConfigurationError
+
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.override_asset,
-                          'a:foo/',
-                          'tests.test_config.pkgs.asset:foo.pt')
+        self.assertRaises(
+            ConfigurationError,
+            config.override_asset,
+            'a:foo/',
+            'tests.test_config.pkgs.asset:foo.pt',
+        )
 
     def test_override_asset_file_with_directory(self):
         from pyramid.exceptions import ConfigurationError
+
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.override_asset,
-                          'a:foo.pt',
-                          'tests.test_config.pkgs.asset:templates/')
+        self.assertRaises(
+            ConfigurationError,
+            config.override_asset,
+            'a:foo.pt',
+            'tests.test_config.pkgs.asset:templates/',
+        )
 
     def test_override_asset_file_with_package(self):
         from pyramid.exceptions import ConfigurationError
+
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.override_asset,
-                          'a:foo.pt',
-                          'tests.test_config.pkgs.asset')
+        self.assertRaises(
+            ConfigurationError,
+            config.override_asset,
+            'a:foo.pt',
+            'tests.test_config.pkgs.asset',
+        )
 
     def test_override_asset_file_with_file(self):
         from pyramid.config.assets import PackageAssetSource
+
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
             'tests.test_config.pkgs.asset:templates/foo.pt',
             'tests.test_config.pkgs.asset.subpackage:templates/bar.pt',
-            _override=override)
+            _override=override,
+        )
         from tests.test_config.pkgs import asset
         from tests.test_config.pkgs.asset import subpackage
+
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, 'templates/foo.pt')
         source = override.source
@@ -55,21 +73,24 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(source.prefix, 'templates/bar.pt')
 
         resource_name = ''
-        expected = os.path.join(here, 'pkgs', 'asset',
-                                'subpackage', 'templates', 'bar.pt')
-        self.assertEqual(override.source.get_filename(resource_name),
-                         expected)
+        expected = os.path.join(
+            here, 'pkgs', 'asset', 'subpackage', 'templates', 'bar.pt'
+        )
+        self.assertEqual(override.source.get_filename(resource_name), expected)
 
     def test_override_asset_package_with_package(self):
         from pyramid.config.assets import PackageAssetSource
+
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
             'tests.test_config.pkgs.asset',
             'tests.test_config.pkgs.asset.subpackage',
-            _override=override)
+            _override=override,
+        )
         from tests.test_config.pkgs import asset
         from tests.test_config.pkgs.asset import subpackage
+
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, '')
         source = override.source
@@ -78,21 +99,24 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(source.prefix, '')
 
         resource_name = 'templates/bar.pt'
-        expected = os.path.join(here, 'pkgs', 'asset',
-                                'subpackage', 'templates', 'bar.pt')
-        self.assertEqual(override.source.get_filename(resource_name),
-                         expected)
+        expected = os.path.join(
+            here, 'pkgs', 'asset', 'subpackage', 'templates', 'bar.pt'
+        )
+        self.assertEqual(override.source.get_filename(resource_name), expected)
 
     def test_override_asset_directory_with_directory(self):
         from pyramid.config.assets import PackageAssetSource
+
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
             'tests.test_config.pkgs.asset:templates/',
             'tests.test_config.pkgs.asset.subpackage:templates/',
-            _override=override)
+            _override=override,
+        )
         from tests.test_config.pkgs import asset
         from tests.test_config.pkgs.asset import subpackage
+
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, 'templates/')
         source = override.source
@@ -101,21 +125,24 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(source.prefix, 'templates/')
 
         resource_name = 'bar.pt'
-        expected = os.path.join(here, 'pkgs', 'asset',
-                                'subpackage', 'templates', 'bar.pt')
-        self.assertEqual(override.source.get_filename(resource_name),
-                         expected)
+        expected = os.path.join(
+            here, 'pkgs', 'asset', 'subpackage', 'templates', 'bar.pt'
+        )
+        self.assertEqual(override.source.get_filename(resource_name), expected)
 
     def test_override_asset_directory_with_package(self):
         from pyramid.config.assets import PackageAssetSource
+
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
             'tests.test_config.pkgs.asset:templates/',
             'tests.test_config.pkgs.asset.subpackage',
-            _override=override)
+            _override=override,
+        )
         from tests.test_config.pkgs import asset
         from tests.test_config.pkgs.asset import subpackage
+
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, 'templates/')
         source = override.source
@@ -124,21 +151,24 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(source.prefix, '')
 
         resource_name = 'templates/bar.pt'
-        expected = os.path.join(here, 'pkgs', 'asset',
-                                'subpackage', 'templates', 'bar.pt')
-        self.assertEqual(override.source.get_filename(resource_name),
-                         expected)
+        expected = os.path.join(
+            here, 'pkgs', 'asset', 'subpackage', 'templates', 'bar.pt'
+        )
+        self.assertEqual(override.source.get_filename(resource_name), expected)
 
     def test_override_asset_package_with_directory(self):
         from pyramid.config.assets import PackageAssetSource
+
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
         config.override_asset(
             'tests.test_config.pkgs.asset',
             'tests.test_config.pkgs.asset.subpackage:templates/',
-            _override=override)
+            _override=override,
+        )
         from tests.test_config.pkgs import asset
         from tests.test_config.pkgs.asset import subpackage
+
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, '')
         source = override.source
@@ -147,44 +177,59 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(source.prefix, 'templates/')
 
         resource_name = 'bar.pt'
-        expected = os.path.join(here, 'pkgs', 'asset',
-                                'subpackage', 'templates', 'bar.pt')
-        self.assertEqual(override.source.get_filename(resource_name),
-                         expected)
+        expected = os.path.join(
+            here, 'pkgs', 'asset', 'subpackage', 'templates', 'bar.pt'
+        )
+        self.assertEqual(override.source.get_filename(resource_name), expected)
 
     def test_override_asset_directory_with_absfile(self):
         from pyramid.exceptions import ConfigurationError
+
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.override_asset,
-                          'a:foo/',
-                          os.path.join(here, 'pkgs', 'asset', 'foo.pt'))
+        self.assertRaises(
+            ConfigurationError,
+            config.override_asset,
+            'a:foo/',
+            os.path.join(here, 'pkgs', 'asset', 'foo.pt'),
+        )
 
     def test_override_asset_file_with_absdirectory(self):
         from pyramid.exceptions import ConfigurationError
+
         config = self._makeOne()
-        abspath = os.path.join(here, 'pkgs', 'asset', 'subpackage', 'templates')
-        self.assertRaises(ConfigurationError, config.override_asset,
-                          'a:foo.pt',
-                          abspath)
+        abspath = os.path.join(
+            here, 'pkgs', 'asset', 'subpackage', 'templates'
+        )
+        self.assertRaises(
+            ConfigurationError, config.override_asset, 'a:foo.pt', abspath
+        )
 
     def test_override_asset_file_with_missing_abspath(self):
         from pyramid.exceptions import ConfigurationError
+
         config = self._makeOne()
-        self.assertRaises(ConfigurationError, config.override_asset,
-                          'a:foo.pt',
-                          os.path.join(here, 'wont_exist'))
+        self.assertRaises(
+            ConfigurationError,
+            config.override_asset,
+            'a:foo.pt',
+            os.path.join(here, 'wont_exist'),
+        )
 
     def test_override_asset_file_with_absfile(self):
         from pyramid.config.assets import FSAssetSource
+
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
-        abspath = os.path.join(here, 'pkgs', 'asset', 'subpackage',
-                               'templates', 'bar.pt')
+        abspath = os.path.join(
+            here, 'pkgs', 'asset', 'subpackage', 'templates', 'bar.pt'
+        )
         config.override_asset(
             'tests.test_config.pkgs.asset:templates/foo.pt',
             abspath,
-            _override=override)
+            _override=override,
+        )
         from tests.test_config.pkgs import asset
+
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, 'templates/foo.pt')
         source = override.source
@@ -192,21 +237,26 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(source.prefix, abspath)
 
         resource_name = ''
-        expected = os.path.join(here, 'pkgs', 'asset',
-                                'subpackage', 'templates', 'bar.pt')
-        self.assertEqual(override.source.get_filename(resource_name),
-                         expected)
+        expected = os.path.join(
+            here, 'pkgs', 'asset', 'subpackage', 'templates', 'bar.pt'
+        )
+        self.assertEqual(override.source.get_filename(resource_name), expected)
 
     def test_override_asset_directory_with_absdirectory(self):
         from pyramid.config.assets import FSAssetSource
+
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
-        abspath = os.path.join(here, 'pkgs', 'asset', 'subpackage', 'templates')
+        abspath = os.path.join(
+            here, 'pkgs', 'asset', 'subpackage', 'templates'
+        )
         config.override_asset(
             'tests.test_config.pkgs.asset:templates/',
             abspath,
-            _override=override)
+            _override=override,
+        )
         from tests.test_config.pkgs import asset
+
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, 'templates/')
         source = override.source
@@ -214,21 +264,24 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(source.prefix, abspath)
 
         resource_name = 'bar.pt'
-        expected = os.path.join(here, 'pkgs', 'asset',
-                                'subpackage', 'templates', 'bar.pt')
-        self.assertEqual(override.source.get_filename(resource_name),
-                         expected)
+        expected = os.path.join(
+            here, 'pkgs', 'asset', 'subpackage', 'templates', 'bar.pt'
+        )
+        self.assertEqual(override.source.get_filename(resource_name), expected)
 
     def test_override_asset_package_with_absdirectory(self):
         from pyramid.config.assets import FSAssetSource
+
         config = self._makeOne(autocommit=True)
         override = DummyUnderOverride()
-        abspath = os.path.join(here, 'pkgs', 'asset', 'subpackage', 'templates')
+        abspath = os.path.join(
+            here, 'pkgs', 'asset', 'subpackage', 'templates'
+        )
         config.override_asset(
-            'tests.test_config.pkgs.asset',
-            abspath,
-            _override=override)
+            'tests.test_config.pkgs.asset', abspath, _override=override
+        )
         from tests.test_config.pkgs import asset
+
         self.assertEqual(override.package, asset)
         self.assertEqual(override.path, '')
         source = override.source
@@ -236,33 +289,39 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(source.prefix, abspath)
 
         resource_name = 'bar.pt'
-        expected = os.path.join(here, 'pkgs', 'asset',
-                                'subpackage', 'templates', 'bar.pt')
-        self.assertEqual(override.source.get_filename(resource_name),
-                         expected)
+        expected = os.path.join(
+            here, 'pkgs', 'asset', 'subpackage', 'templates', 'bar.pt'
+        )
+        self.assertEqual(override.source.get_filename(resource_name), expected)
 
     def test__override_not_yet_registered(self):
         from pyramid.interfaces import IPackageOverrides
+
         package = DummyPackage('package')
         source = DummyAssetSource()
         config = self._makeOne()
-        config._override(package, 'path', source,
-                         PackageOverrides=DummyPackageOverrides)
-        overrides = config.registry.queryUtility(IPackageOverrides,
-                                                 name='package')
+        config._override(
+            package, 'path', source, PackageOverrides=DummyPackageOverrides
+        )
+        overrides = config.registry.queryUtility(
+            IPackageOverrides, name='package'
+        )
         self.assertEqual(overrides.inserted, [('path', source)])
         self.assertEqual(overrides.package, package)
 
     def test__override_already_registered(self):
         from pyramid.interfaces import IPackageOverrides
+
         package = DummyPackage('package')
         source = DummyAssetSource()
         overrides = DummyPackageOverrides(package)
         config = self._makeOne()
-        config.registry.registerUtility(overrides, IPackageOverrides,
-                                        name='package')
-        config._override(package, 'path', source,
-                         PackageOverrides=DummyPackageOverrides)
+        config.registry.registerUtility(
+            overrides, IPackageOverrides, name='package'
+        )
+        config._override(
+            package, 'path', source, PackageOverrides=DummyPackageOverrides
+        )
         self.assertEqual(overrides.inserted, [('path', source)])
         self.assertEqual(overrides.package, package)
 
@@ -276,6 +335,7 @@ class TestOverrideProvider(unittest.TestCase):
 
     def _getTargetClass(self):
         from pyramid.config.assets import OverrideProvider
+
         return OverrideProvider
 
     def _makeOne(self, module):
@@ -285,12 +345,14 @@ class TestOverrideProvider(unittest.TestCase):
     def _registerOverrides(self, overrides, name='tests.test_config'):
         from pyramid.interfaces import IPackageOverrides
         from pyramid.threadlocal import get_current_registry
+
         reg = get_current_registry()
         reg.registerUtility(overrides, IPackageOverrides, name=name)
 
     def test_get_resource_filename_no_overrides(self):
         resource_name = 'test_assets.py'
         import tests.test_config
+
         provider = self._makeOne(tests.test_config)
         expected = os.path.join(here, resource_name)
         result = provider.get_resource_filename(None, resource_name)
@@ -299,6 +361,7 @@ class TestOverrideProvider(unittest.TestCase):
     def test_get_resource_stream_no_overrides(self):
         resource_name = 'test_assets.py'
         import tests.test_config
+
         provider = self._makeOne(tests.test_config)
         with provider.get_resource_stream(None, resource_name) as result:
             _assertBody(result.read(), os.path.join(here, resource_name))
@@ -306,6 +369,7 @@ class TestOverrideProvider(unittest.TestCase):
     def test_get_resource_string_no_overrides(self):
         resource_name = 'test_assets.py'
         import tests.test_config
+
         provider = self._makeOne(tests.test_config)
         result = provider.get_resource_string(None, resource_name)
         _assertBody(result, os.path.join(here, resource_name))
@@ -313,6 +377,7 @@ class TestOverrideProvider(unittest.TestCase):
     def test_has_resource_no_overrides(self):
         resource_name = 'test_assets.py'
         import tests.test_config
+
         provider = self._makeOne(tests.test_config)
         result = provider.has_resource(resource_name)
         self.assertEqual(result, True)
@@ -321,6 +386,7 @@ class TestOverrideProvider(unittest.TestCase):
         file_resource_name = 'test_assets.py'
         directory_resource_name = 'files'
         import tests.test_config
+
         provider = self._makeOne(tests.test_config)
         result = provider.resource_isdir(file_resource_name)
         self.assertEqual(result, False)
@@ -330,6 +396,7 @@ class TestOverrideProvider(unittest.TestCase):
     def test_resource_listdir_no_overrides(self):
         resource_name = 'files'
         import tests.test_config
+
         provider = self._makeOne(tests.test_config)
         result = provider.resource_listdir(resource_name)
         self.assertTrue(result)
@@ -339,16 +406,18 @@ class TestOverrideProvider(unittest.TestCase):
         self._registerOverrides(overrides)
         resource_name = 'test_assets.py'
         import tests.test_config
+
         provider = self._makeOne(tests.test_config)
         expected = os.path.join(here, resource_name)
         result = provider.get_resource_filename(None, resource_name)
         self.assertEqual(result, expected)
-        
+
     def test_get_resource_stream_override_returns_None(self):
         overrides = DummyOverrides(None)
         self._registerOverrides(overrides)
         resource_name = 'test_assets.py'
         import tests.test_config
+
         provider = self._makeOne(tests.test_config)
         with provider.get_resource_stream(None, resource_name) as result:
             _assertBody(result.read(), os.path.join(here, resource_name))
@@ -358,6 +427,7 @@ class TestOverrideProvider(unittest.TestCase):
         self._registerOverrides(overrides)
         resource_name = 'test_assets.py'
         import tests.test_config
+
         provider = self._makeOne(tests.test_config)
         result = provider.get_resource_string(None, resource_name)
         _assertBody(result, os.path.join(here, resource_name))
@@ -367,6 +437,7 @@ class TestOverrideProvider(unittest.TestCase):
         self._registerOverrides(overrides)
         resource_name = 'test_assets.py'
         import tests.test_config
+
         provider = self._makeOne(tests.test_config)
         result = provider.has_resource(resource_name)
         self.assertEqual(result, True)
@@ -376,6 +447,7 @@ class TestOverrideProvider(unittest.TestCase):
         self._registerOverrides(overrides)
         resource_name = 'files'
         import tests.test_config
+
         provider = self._makeOne(tests.test_config)
         result = provider.resource_isdir(resource_name)
         self.assertEqual(result, True)
@@ -385,6 +457,7 @@ class TestOverrideProvider(unittest.TestCase):
         self._registerOverrides(overrides)
         resource_name = 'files'
         import tests.test_config
+
         provider = self._makeOne(tests.test_config)
         result = provider.resource_listdir(resource_name)
         self.assertTrue(result)
@@ -392,6 +465,7 @@ class TestOverrideProvider(unittest.TestCase):
     def test_get_resource_filename_override_returns_value(self):
         overrides = DummyOverrides('value')
         import tests.test_config
+
         self._registerOverrides(overrides)
         provider = self._makeOne(tests.test_config)
         result = provider.get_resource_filename(None, 'test_assets.py')
@@ -399,8 +473,10 @@ class TestOverrideProvider(unittest.TestCase):
 
     def test_get_resource_stream_override_returns_value(self):
         from io import BytesIO
+
         overrides = DummyOverrides(BytesIO(b'value'))
         import tests.test_config
+
         self._registerOverrides(overrides)
         provider = self._makeOne(tests.test_config)
         with provider.get_resource_stream(None, 'test_assets.py') as stream:
@@ -409,6 +485,7 @@ class TestOverrideProvider(unittest.TestCase):
     def test_get_resource_string_override_returns_value(self):
         overrides = DummyOverrides('value')
         import tests.test_config
+
         self._registerOverrides(overrides)
         provider = self._makeOne(tests.test_config)
         result = provider.get_resource_string(None, 'test_assets.py')
@@ -417,6 +494,7 @@ class TestOverrideProvider(unittest.TestCase):
     def test_has_resource_override_returns_True(self):
         overrides = DummyOverrides(True)
         import tests.test_config
+
         self._registerOverrides(overrides)
         provider = self._makeOne(tests.test_config)
         result = provider.has_resource('test_assets.py')
@@ -425,6 +503,7 @@ class TestOverrideProvider(unittest.TestCase):
     def test_resource_isdir_override_returns_False(self):
         overrides = DummyOverrides(False)
         import tests.test_config
+
         self._registerOverrides(overrides)
         provider = self._makeOne(tests.test_config)
         result = provider.resource_isdir('files')
@@ -433,14 +512,17 @@ class TestOverrideProvider(unittest.TestCase):
     def test_resource_listdir_override_returns_values(self):
         overrides = DummyOverrides(['a'])
         import tests.test_config
+
         self._registerOverrides(overrides)
         provider = self._makeOne(tests.test_config)
         result = provider.resource_listdir('files')
         self.assertEqual(result, ['a'])
 
+
 class TestPackageOverrides(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.config.assets import PackageOverrides
+
         return PackageOverrides
 
     def _makeOne(self, package=None, pkg_resources=None):
@@ -454,21 +536,25 @@ class TestPackageOverrides(unittest.TestCase):
     def test_class_conforms_to_IPackageOverrides(self):
         from zope.interface.verify import verifyClass
         from pyramid.interfaces import IPackageOverrides
+
         verifyClass(IPackageOverrides, self._getTargetClass())
 
     def test_instance_conforms_to_IPackageOverrides(self):
         from zope.interface.verify import verifyObject
         from pyramid.interfaces import IPackageOverrides
+
         verifyObject(IPackageOverrides, self._makeOne())
 
     def test_class_conforms_to_IPEP302Loader(self):
         from zope.interface.verify import verifyClass
         from pyramid.interfaces import IPEP302Loader
+
         verifyClass(IPEP302Loader, self._getTargetClass())
 
     def test_instance_conforms_to_IPEP302Loader(self):
         from zope.interface.verify import verifyObject
         from pyramid.interfaces import IPEP302Loader
+
         verifyObject(IPEP302Loader, self._makeOne())
 
     def test_ctor_package_already_has_loader_of_different_type(self):
@@ -491,11 +577,13 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_ctor_registers_loader_type(self):
         from pyramid.config.assets import OverrideProvider
+
         dummy_pkg_resources = DummyPkgResources()
         package = DummyPackage('package')
         po = self._makeOne(package, dummy_pkg_resources)
-        self.assertEqual(dummy_pkg_resources.registered, [(po.__class__,
-                         OverrideProvider)])
+        self.assertEqual(
+            dummy_pkg_resources.registered, [(po.__class__, OverrideProvider)]
+        )
 
     def test_ctor_sets_local_state(self):
         package = DummyPackage('package')
@@ -505,6 +593,7 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_insert_directory(self):
         from pyramid.config.assets import DirectoryOverride
+
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides = [None]
@@ -515,6 +604,7 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_insert_file(self):
         from pyramid.config.assets import FileOverride
+
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides = [None]
@@ -526,6 +616,7 @@ class TestPackageOverrides(unittest.TestCase):
     def test_insert_emptystring(self):
         # XXX is this a valid case for a directory?
         from pyramid.config.assets import DirectoryOverride
+
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides = [None]
@@ -536,7 +627,7 @@ class TestPackageOverrides(unittest.TestCase):
         self.assertEqual(override.__class__, DirectoryOverride)
 
     def test_filtered_sources(self):
-        overrides = [ DummyOverride(None), DummyOverride('foo')]
+        overrides = [DummyOverride(None), DummyOverride('foo')]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides = overrides
@@ -544,7 +635,7 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_get_filename(self):
         source = DummyAssetSource(filename='foo.pt')
-        overrides = [ DummyOverride(None), DummyOverride((source, ''))]
+        overrides = [DummyOverride(None), DummyOverride((source, ''))]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides = overrides
@@ -554,7 +645,10 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_get_filename_file_doesnt_exist(self):
         source = DummyAssetSource(filename=None)
-        overrides = [DummyOverride(None), DummyOverride((source, 'wont_exist'))]
+        overrides = [
+            DummyOverride(None),
+            DummyOverride((source, 'wont_exist')),
+        ]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides = overrides
@@ -569,10 +663,13 @@ class TestPackageOverrides(unittest.TestCase):
         po.overrides = overrides
         self.assertEqual(po.get_stream('whatever'), 'a stream?')
         self.assertEqual(source.resource_name, 'foo.pt')
-        
+
     def test_get_stream_file_doesnt_exist(self):
         source = DummyAssetSource(stream=None)
-        overrides = [DummyOverride(None), DummyOverride((source, 'wont_exist'))]
+        overrides = [
+            DummyOverride(None),
+            DummyOverride((source, 'wont_exist')),
+        ]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides = overrides
@@ -587,10 +684,13 @@ class TestPackageOverrides(unittest.TestCase):
         po.overrides = overrides
         self.assertEqual(po.get_string('whatever'), 'a string')
         self.assertEqual(source.resource_name, 'foo.pt')
-        
+
     def test_get_string_file_doesnt_exist(self):
         source = DummyAssetSource(string=None)
-        overrides = [DummyOverride(None), DummyOverride((source, 'wont_exist'))]
+        overrides = [
+            DummyOverride(None),
+            DummyOverride((source, 'wont_exist')),
+        ]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides = overrides
@@ -608,7 +708,10 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_has_resource_file_doesnt_exist(self):
         source = DummyAssetSource(exists=None)
-        overrides = [DummyOverride(None), DummyOverride((source, 'wont_exist'))]
+        overrides = [
+            DummyOverride(None),
+            DummyOverride((source, 'wont_exist')),
+        ]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides = overrides
@@ -635,7 +738,10 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_isdir_doesnt_exist(self):
         source = DummyAssetSource(isdir=None)
-        overrides = [DummyOverride(None), DummyOverride((source, 'wont_exist'))]
+        overrides = [
+            DummyOverride(None),
+            DummyOverride((source, 'wont_exist')),
+        ]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides = overrides
@@ -653,7 +759,10 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_listdir_doesnt_exist(self):
         source = DummyAssetSource(listdir=None)
-        overrides = [DummyOverride(None), DummyOverride((source, 'wont_exist'))]
+        overrides = [
+            DummyOverride(None),
+            DummyOverride((source, 'wont_exist')),
+        ]
         package = DummyPackage('package')
         po = self._makeOne(package)
         po.overrides = overrides
@@ -668,7 +777,7 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_get_data_pkg_has___loader__(self):
         package = DummyPackage('package')
-        loader = package.__loader__  = DummyLoader()
+        loader = package.__loader__ = DummyLoader()
         po = self._makeOne(package)
         self.assertEqual(po.get_data('whatever'), b'DEADBEEF')
         self.assertEqual(loader._got_data, 'whatever')
@@ -680,7 +789,7 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_is_package_pkg_has___loader__(self):
         package = DummyPackage('package')
-        loader = package.__loader__  = DummyLoader()
+        loader = package.__loader__ = DummyLoader()
         po = self._makeOne(package)
         self.assertTrue(po.is_package('whatever'))
         self.assertEqual(loader._is_package, 'whatever')
@@ -692,7 +801,7 @@ class TestPackageOverrides(unittest.TestCase):
 
     def test_get_code_pkg_has___loader__(self):
         package = DummyPackage('package')
-        loader = package.__loader__  = DummyLoader()
+        loader = package.__loader__ = DummyLoader()
         po = self._makeOne(package)
         self.assertEqual(po.get_code('whatever'), b'DEADBEEF')
         self.assertEqual(loader._got_code, 'whatever')
@@ -709,17 +818,20 @@ class TestPackageOverrides(unittest.TestCase):
         self.assertEqual(po.get_source('whatever'), 'def foo():\n    pass')
         self.assertEqual(loader._got_source, 'whatever')
 
-class AssetSourceIntegrationTests(object):
 
+class AssetSourceIntegrationTests(object):
     def test_get_filename(self):
         source = self._makeOne('')
-        self.assertEqual(source.get_filename('test_assets.py'),
-                         os.path.join(here, 'test_assets.py'))
+        self.assertEqual(
+            source.get_filename('test_assets.py'),
+            os.path.join(here, 'test_assets.py'),
+        )
 
     def test_get_filename_with_prefix(self):
         source = self._makeOne('test_assets.py')
-        self.assertEqual(source.get_filename(''),
-                         os.path.join(here, 'test_assets.py'))
+        self.assertEqual(
+            source.get_filename(''), os.path.join(here, 'test_assets.py')
+        )
 
     def test_get_filename_file_doesnt_exist(self):
         source = self._makeOne('')
@@ -741,13 +853,16 @@ class AssetSourceIntegrationTests(object):
 
     def test_get_string(self):
         source = self._makeOne('')
-        _assertBody(source.get_string('test_assets.py'),
-                    os.path.join(here, 'test_assets.py'))
+        _assertBody(
+            source.get_string('test_assets.py'),
+            os.path.join(here, 'test_assets.py'),
+        )
 
     def test_get_string_with_prefix(self):
         source = self._makeOne('test_assets.py')
-        _assertBody(source.get_string(''),
-                    os.path.join(here, 'test_assets.py'))
+        _assertBody(
+            source.get_string(''), os.path.join(here, 'test_assets.py')
+        )
 
     def test_get_string_file_doesnt_exist(self):
         source = self._makeOne('')
@@ -785,28 +900,33 @@ class AssetSourceIntegrationTests(object):
         source = self._makeOne('')
         self.assertEqual(source.listdir('wont_exist'), None)
 
-class TestPackageAssetSource(AssetSourceIntegrationTests, unittest.TestCase):
 
+class TestPackageAssetSource(AssetSourceIntegrationTests, unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.config.assets import PackageAssetSource
+
         return PackageAssetSource
 
     def _makeOne(self, prefix, package='tests.test_config'):
         klass = self._getTargetClass()
         return klass(package, prefix)
 
+
 class TestFSAssetSource(AssetSourceIntegrationTests, unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.config.assets import FSAssetSource
+
         return FSAssetSource
 
     def _makeOne(self, prefix, base_prefix=here):
         klass = self._getTargetClass()
         return klass(os.path.join(base_prefix, prefix))
 
+
 class TestDirectoryOverride(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.config.assets import DirectoryOverride
+
         return DirectoryOverride
 
     def _makeOne(self, path, source):
@@ -818,16 +938,18 @@ class TestDirectoryOverride(unittest.TestCase):
         o = self._makeOne('foo/', source)
         result = o('foo/something.pt')
         self.assertEqual(result, (source, 'something.pt'))
-        
+
     def test_it_no_match(self):
         source = DummyAssetSource()
         o = self._makeOne('foo/', source)
         result = o('baz/notfound.pt')
         self.assertEqual(result, None)
 
+
 class TestFileOverride(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.config.assets import FileOverride
+
         return FileOverride
 
     def _makeOne(self, path, source):
@@ -839,12 +961,13 @@ class TestFileOverride(unittest.TestCase):
         o = self._makeOne('foo.pt', source)
         result = o('foo.pt')
         self.assertEqual(result, (source, ''))
-        
+
     def test_it_no_match(self):
         source = DummyAssetSource()
         o = self._makeOne('foo.pt', source)
         result = o('notfound.pt')
         self.assertEqual(result, None)
+
 
 class DummyOverride:
     def __init__(self, result):
@@ -852,6 +975,7 @@ class DummyOverride:
 
     def __call__(self, resource_name):
         return self.result
+
 
 class DummyOverrides:
     def __init__(self, result):
@@ -862,6 +986,7 @@ class DummyOverrides:
 
     listdir = isdir = has_resource = get_stream = get_string = get_filename
 
+
 class DummyPackageOverrides:
     def __init__(self, package):
         self.package = package
@@ -869,7 +994,8 @@ class DummyPackageOverrides:
 
     def insert(self, path, source):
         self.inserted.append((path, source))
-    
+
+
 class DummyPkgResources:
     def __init__(self):
         self.registered = []
@@ -877,9 +1003,11 @@ class DummyPkgResources:
     def register_loader_type(self, typ, inst):
         self.registered.append((typ, inst))
 
+
 class DummyPackage:
     def __init__(self, name):
         self.__name__ = name
+
 
 class DummyAssetSource:
     def __init__(self, **kw):
@@ -908,21 +1036,27 @@ class DummyAssetSource:
     def listdir(self, resource_name):
         self.resource_name = resource_name
         return self.kw['listdir']
- 
+
+
 class DummyLoader:
     _got_data = _is_package = None
+
     def get_data(self, path):
         self._got_data = path
         return b'DEADBEEF'
+
     def is_package(self, fullname):
         self._is_package = fullname
         return True
+
     def get_code(self, fullname):
         self._got_code = fullname
         return b'DEADBEEF'
+
     def get_source(self, fullname):
         self._got_source = fullname
         return 'def foo():\n    pass'
+
 
 class DummyUnderOverride:
     def __call__(self, package, path, source, _info=''):
@@ -930,10 +1064,12 @@ class DummyUnderOverride:
         self.path = path
         self.source = source
 
+
 def read_(src):
     with open(src, 'rb') as f:
         contents = f.read()
     return contents
+
 
 def _assertBody(body, filename):
     # strip both \n and \r for windows
@@ -942,4 +1078,4 @@ def _assertBody(body, filename):
     data = read_(filename)
     data = data.replace(b'\r', b'')
     data = data.replace(b'\n', b'')
-    assert(body == data)
+    assert body == data

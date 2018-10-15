@@ -3,9 +3,11 @@ import os
 
 here = os.path.abspath(os.path.dirname(__file__))
 
+
 class Test_resolve_asset_spec(unittest.TestCase):
     def _callFUT(self, spec, package_name='__main__'):
         from pyramid.resource import resolve_asset_spec
+
         return resolve_asset_spec(spec, package_name)
 
     def test_abspath(self):
@@ -19,7 +21,7 @@ class Test_resolve_asset_spec(unittest.TestCase):
         package_name, filename = self._callFUT(path, pkg)
         self.assertEqual(package_name, 'tests')
         self.assertEqual(filename, 'test_asset.py')
-        
+
     def test_abs_spec(self):
         pkg = 'tests'
         path = 'pyramid.nottests:test_asset.py'
@@ -36,6 +38,7 @@ class Test_resolve_asset_spec(unittest.TestCase):
 
     def test_package_name_is_package_object(self):
         import tests
+
         pkg = tests
         path = 'test_asset.py'
         package_name, filename = self._callFUT(path, pkg)
@@ -46,6 +49,7 @@ class Test_resolve_asset_spec(unittest.TestCase):
 class Test_abspath_from_asset_spec(unittest.TestCase):
     def _callFUT(self, spec, pname='__main__'):
         from pyramid.resource import abspath_from_asset_spec
+
         return abspath_from_asset_spec(spec, pname)
 
     def test_pname_is_None_before_resolve_asset_spec(self):
@@ -60,9 +64,11 @@ class Test_abspath_from_asset_spec(unittest.TestCase):
         result = self._callFUT('abc', 'tests')
         self.assertEqual(result, os.path.join(here, 'abc'))
 
+
 class Test_asset_spec_from_abspath(unittest.TestCase):
     def _callFUT(self, abspath, package):
         from pyramid.asset import asset_spec_from_abspath
+
         return asset_spec_from_abspath(abspath, package)
 
     def test_package_name_is_main(self):
@@ -82,7 +88,7 @@ class Test_asset_spec_from_abspath(unittest.TestCase):
         result = self._callFUT(here, pkg)
         self.assertEqual(result, here)
 
+
 class DummyPackage:
     def __init__(self, name):
         self.__name__ = name
-    
