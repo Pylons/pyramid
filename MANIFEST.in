@@ -11,7 +11,6 @@ include tox.ini appveyor.yml .travis.yml rtd.txt
 graft .github
 
 include HACKING.txt hacking-tox.ini
-include builddocs.sh coverage.sh scaffoldtests.sh
 include TODO.txt
 
 global-exclude __pycache__ *.py[cod]
