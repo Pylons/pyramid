@@ -10,9 +10,11 @@ from pyramid.paster import bootstrap
 from pyramid.paster import setup_logging
 from pyramid.scripts.common import parse_vars
 
+
 def main(argv=sys.argv, quiet=False):
     command = PTweensCommand(argv, quiet)
     return command.run()
+
 
 class PTweensCommand(object):
     description = """\
@@ -31,25 +33,27 @@ class PTweensCommand(object):
     parser = argparse.ArgumentParser(
         description=textwrap.dedent(description),
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        )
+    )
 
-    parser.add_argument('config_uri',
-                        nargs='?',
-                        default=None,
-                        help='The URI to the configuration file.')
+    parser.add_argument(
+        'config_uri',
+        nargs='?',
+        default=None,
+        help='The URI to the configuration file.',
+    )
 
     parser.add_argument(
         'config_vars',
         nargs='*',
         default=(),
         help="Variables required by the config file. For example, "
-             "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
-             "passed here.",
-        )
+        "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
+        "passed here.",
+    )
 
     stdout = sys.stdout
-    bootstrap = staticmethod(bootstrap) # testing
-    setup_logging = staticmethod(setup_logging) # testing
+    bootstrap = staticmethod(bootstrap)  # testing
+    setup_logging = staticmethod(setup_logging)  # testing
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
@@ -57,10 +61,11 @@ class PTweensCommand(object):
 
     def _get_tweens(self, registry):
         from pyramid.config import Configurator
+
         config = Configurator(registry=registry)
         return config.registry.queryUtility(ITweens)
 
-    def out(self, msg): # pragma: no cover
+    def out(self, msg):  # pragma: no cover
         if not self.quiet:
             print(msg)
 
@@ -86,8 +91,10 @@ class PTweensCommand(object):
         if tweens is not None:
             explicit = tweens.explicit
             if explicit:
-                self.out('"pyramid.tweens" config value set '
-                         '(explicitly ordered tweens used)')
+                self.out(
+                    '"pyramid.tweens" config value set '
+                    '(explicitly ordered tweens used)'
+                )
                 self.out('')
                 self.out('Explicit Tween Chain (used)')
                 self.out('')
@@ -97,13 +104,16 @@ class PTweensCommand(object):
                 self.out('')
                 self.show_chain(tweens.implicit())
             else:
-                self.out('"pyramid.tweens" config value NOT set '
-                         '(implicitly ordered tweens used)')
+                self.out(
+                    '"pyramid.tweens" config value NOT set '
+                    '(implicitly ordered tweens used)'
+                )
                 self.out('')
                 self.out('Implicit Tween Chain')
                 self.out('')
                 self.show_chain(tweens.implicit())
         return 0
 
-if __name__ == '__main__': # pragma: no cover
+
+if __name__ == '__main__':  # pragma: no cover
     sys.exit(main() or 0)

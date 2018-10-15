@@ -110,7 +110,7 @@ def _get_view_module(view_callable):
             if original_view.package_name is not None:
                 return '%s:%s' % (
                     original_view.package_name,
-                    original_view.docroot
+                    original_view.docroot,
                 )
             else:
                 return original_view.docroot
@@ -122,10 +122,7 @@ def _get_view_module(view_callable):
         # for them and remove this logic
         view_name = str(view_callable)
 
-    view_module = '%s.%s' % (
-        view_callable.__module__,
-        view_name,
-    )
+    view_module = '%s.%s' % (view_callable.__module__, view_name)
 
     # If pyramid wraps something in wsgiapp or wsgiapp2 decorators
     # that is currently returned as pyramid.router.decorator, lets
@@ -139,24 +136,17 @@ def _get_view_module(view_callable):
 def get_route_data(route, registry):
     pattern = _get_pattern(route)
 
-    request_iface = registry.queryUtility(
-        IRouteRequest,
-        name=route.name
-    )
+    request_iface = registry.queryUtility(IRouteRequest, name=route.name)
 
     route_request_methods = None
     view_request_methods_order = []
     view_request_methods = {}
     view_callable = None
 
-    route_intr = registry.introspector.get(
-        'routes', route.name
-    )
+    route_intr = registry.introspector.get('routes', route.name)
 
     if request_iface is None:
-        return [
-            (route.name, _get_pattern(route), UNKNOWN_KEY, ANY_KEY)
-        ]
+        return [(route.name, _get_pattern(route), UNKNOWN_KEY, ANY_KEY)]
 
     view_callables = _find_views(registry, request_iface, Interface, '')
     if view_callables:
@@ -188,7 +178,7 @@ def get_route_data(route, registry):
                         view_callable = getattr(view['callable'], view['attr'])
                         view_module = '%s.%s' % (
                             _get_view_module(view['callable']),
-                            view['attr']
+                            view['attr'],
                         )
                     else:
                         view_callable = view['callable']
@@ -217,17 +207,11 @@ def get_route_data(route, registry):
 
     for view_module in view_request_methods_order:
         methods = view_request_methods[view_module]
-        request_methods = _get_request_methods(
-            route_request_methods,
-            methods
-        )
+        request_methods = _get_request_methods(route_request_methods, methods)
 
-        final_routes.append((
-            route.name,
-            pattern,
-            view_module,
-            request_methods,
-        ))
+        final_routes.append(
+            (route.name, pattern, view_module, request_methods)
+        )
 
     return final_routes
 
@@ -251,43 +235,49 @@ class PRoutesCommand(object):
     parser = argparse.ArgumentParser(
         description=textwrap.dedent(description),
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        )
-    parser.add_argument('-g', '--glob',
-                        action='store',
-                        dest='glob',
-                        default='',
-                        help='Display routes matching glob pattern')
+    )
+    parser.add_argument(
+        '-g',
+        '--glob',
+        action='store',
+        dest='glob',
+        default='',
+        help='Display routes matching glob pattern',
+    )
 
-    parser.add_argument('-f', '--format',
-                        action='store',
-                        dest='format',
-                        default='',
-                        help=('Choose which columns to display, this will '
-                              'override the format key in the [proutes] ini '
-                              'section'))
+    parser.add_argument(
+        '-f',
+        '--format',
+        action='store',
+        dest='format',
+        default='',
+        help=(
+            'Choose which columns to display, this will '
+            'override the format key in the [proutes] ini '
+            'section'
+        ),
+    )
 
     parser.add_argument(
         'config_uri',
         nargs='?',
         default=None,
         help='The URI to the configuration file.',
-        )
+    )
 
     parser.add_argument(
         'config_vars',
         nargs='*',
         default=(),
         help="Variables required by the config file. For example, "
-             "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
-             "passed here.",
-        )
+        "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
+        "passed here.",
+    )
 
     def __init__(self, argv, quiet=False):
         self.args = self.parser.parse_args(argv[1:])
         self.quiet = quiet
-        self.available_formats = [
-            'name', 'pattern', 'view', 'method'
-        ]
+        self.available_formats = ['name', 'pattern', 'view', 'method']
         self.column_format = self.available_formats
 
     def validate_formats(self, formats):
@@ -296,10 +286,7 @@ class PRoutesCommand(object):
             if fmt not in self.available_formats:
                 invalid_formats.append(fmt)
 
-        msg = (
-            'You provided invalid formats %s, '
-            'Available formats are %s'
-        )
+        msg = 'You provided invalid formats %s, ' 'Available formats are %s'
 
         if invalid_formats:
             msg = msg % (invalid_formats, self.available_formats)
@@ -321,6 +308,7 @@ class PRoutesCommand(object):
 
     def _get_mapper(self, registry):
         from pyramid.config import Configurator
+
         config = Configurator(registry=registry)
         return config.get_routes_mapper()
 
@@ -361,25 +349,29 @@ class PRoutesCommand(object):
         if len(routes) == 0:
             return 0
 
-        mapped_routes = [{
-            'name': 'Name',
-            'pattern': 'Pattern',
-            'view': 'View',
-            'method': 'Method'
-        },{
-            'name': '----',
-            'pattern': '-------',
-            'view': '----',
-            'method': '------'
-        }]
+        mapped_routes = [
+            {
+                'name': 'Name',
+                'pattern': 'Pattern',
+                'view': 'View',
+                'method': 'Method',
+            },
+            {
+                'name': '----',
+                'pattern': '-------',
+                'view': '----',
+                'method': '------',
+            },
+        ]
 
         for route in routes:
             route_data = get_route_data(route, registry)
 
             for name, pattern, view, method in route_data:
                 if self.args.glob:
-                    match = (fnmatch.fnmatch(name, self.args.glob) or
-                             fnmatch.fnmatch(pattern, self.args.glob))
+                    match = fnmatch.fnmatch(
+                        name, self.args.glob
+                    ) or fnmatch.fnmatch(pattern, self.args.glob)
                     if not match:
                         continue
 
@@ -395,12 +387,14 @@ class PRoutesCommand(object):
                 if len(method) > max_method:
                     max_method = len(method)
 
-                mapped_routes.append({
-                    'name': name,
-                    'pattern': pattern,
-                    'view': view,
-                    'method': method
-                })
+                mapped_routes.append(
+                    {
+                        'name': name,
+                        'pattern': pattern,
+                        'view': view,
+                        'method': method,
+                    }
+                )
 
         fmt = _get_print_format(
             self.column_format, max_name, max_pattern, max_view, max_method

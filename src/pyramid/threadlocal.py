@@ -2,6 +2,7 @@ import threading
 
 from pyramid.registry import global_registry
 
+
 class ThreadLocalManager(threading.local):
     def __init__(self, default=None):
         # http://code.google.com/p/google-app-engine-django/issues/detail?id=119
@@ -15,7 +16,7 @@ class ThreadLocalManager(threading.local):
     def push(self, info):
         self.stack.append(info)
 
-    set = push # b/c
+    set = push  # b/c
 
     def pop(self):
         if self.stack:
@@ -30,10 +31,13 @@ class ThreadLocalManager(threading.local):
     def clear(self):
         self.stack[:] = []
 
+
 def defaults():
     return {'request': None, 'registry': global_registry}
 
+
 manager = ThreadLocalManager(default=defaults)
+
 
 def get_current_request():
     """
@@ -49,7 +53,10 @@ def get_current_request():
     """
     return manager.get()['request']
 
-def get_current_registry(context=None): # context required by getSiteManager API
+
+def get_current_registry(
+    context=None
+):  # context required by getSiteManager API
     """
     Return the currently active :term:`application registry` or the
     global application registry if no request is currently active.
@@ -62,6 +69,7 @@ def get_current_registry(context=None): # context required by getSiteManager API
 
     """
     return manager.get()['registry']
+
 
 class RequestContext(object):
     def __init__(self, request):

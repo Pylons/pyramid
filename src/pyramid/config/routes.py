@@ -7,16 +7,13 @@ from pyramid.interfaces import (
     IRouteRequest,
     IRoutesMapper,
     PHASE2_CONFIG,
-    )
+)
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.request import route_request_iface
 from pyramid.urldispatch import RoutesMapper
 
-from pyramid.util import (
-    as_sorted_tuple,
-    is_nonstr_iter,
-)
+from pyramid.util import as_sorted_tuple, is_nonstr_iter
 
 import pyramid.predicates
 
@@ -26,26 +23,29 @@ from pyramid.config.util import (
     predvalseq,
 )
 
+
 class RoutesConfiguratorMixin(object):
     @action_method
-    def add_route(self,
-                  name,
-                  pattern=None,
-                  factory=None,
-                  for_=None,
-                  header=None,
-                  xhr=None,
-                  accept=None,
-                  path_info=None,
-                  request_method=None,
-                  request_param=None,
-                  traverse=None,
-                  custom_predicates=(),
-                  use_global_views=False,
-                  path=None,
-                  pregenerator=None,
-                  static=False,
-                  **predicates):
+    def add_route(
+        self,
+        name,
+        pattern=None,
+        factory=None,
+        for_=None,
+        header=None,
+        xhr=None,
+        accept=None,
+        path_info=None,
+        request_method=None,
+        request_param=None,
+        traverse=None,
+        custom_predicates=(),
+        use_global_views=False,
+        path=None,
+        pregenerator=None,
+        static=False,
+        **predicates
+    ):
         """ Add a :term:`route configuration` to the current
         configuration state, as well as possibly a :term:`view
         configuration` to be used to specify a :term:`view callable`
@@ -297,27 +297,31 @@ class RoutesConfiguratorMixin(object):
         """
         if custom_predicates:
             warnings.warn(
-                ('The "custom_predicates" argument to Configurator.add_route '
-                 'is deprecated as of Pyramid 1.5.  Use '
-                 '"config.add_route_predicate" and use the registered '
-                 'route predicate as a predicate argument to add_route '
-                 'instead. See "Adding A Third Party View, Route, or '
-                 'Subscriber Predicate" in the "Hooks" chapter of the '
-                 'documentation for more information.'),
+                (
+                    'The "custom_predicates" argument to Configurator.add_route '
+                    'is deprecated as of Pyramid 1.5.  Use '
+                    '"config.add_route_predicate" and use the registered '
+                    'route predicate as a predicate argument to add_route '
+                    'instead. See "Adding A Third Party View, Route, or '
+                    'Subscriber Predicate" in the "Hooks" chapter of the '
+                    'documentation for more information.'
+                ),
                 DeprecationWarning,
-                stacklevel=3
-                )
+                stacklevel=3,
+            )
 
         if accept is not None:
             if not is_nonstr_iter(accept):
                 if '*' in accept:
                     warnings.warn(
-                        ('Passing a media range to the "accept" argument of '
-                         'Configurator.add_route is deprecated as of Pyramid '
-                         '1.10. Use a list of explicit media types.'),
+                        (
+                            'Passing a media range to the "accept" argument of '
+                            'Configurator.add_route is deprecated as of Pyramid '
+                            '1.10. Use a list of explicit media types.'
+                        ),
                         DeprecationWarning,
                         stacklevel=3,
-                        )
+                    )
                 # XXX switch this to False when range support is dropped
                 accept = [normalize_accept_offer(accept, allow_range=True)]
 
@@ -347,15 +351,16 @@ class RoutesConfiguratorMixin(object):
             pattern = parsed.path
 
             original_pregenerator = pregenerator
+
             def external_url_pregenerator(request, elements, kw):
                 if '_app_url' in kw:
                     raise ValueError(
                         'You cannot generate a path to an external route '
                         'pattern via request.route_path nor pass an _app_url '
                         'to request.route_url when generating a URL for an '
-                        'external route pattern (pattern was "%s") ' %
-                        (pattern,)
-                        )
+                        'external route pattern (pattern was "%s") '
+                        % (pattern,)
+                    )
                 if '_scheme' in kw:
                     scheme = kw['_scheme']
                 elif parsed.scheme:
@@ -365,8 +370,7 @@ class RoutesConfiguratorMixin(object):
                 kw['_app_url'] = '{0}://{1}'.format(scheme, parsed.netloc)
 
                 if original_pregenerator:
-                    elements, kw = original_pregenerator(
-                        request, elements, kw)
+                    elements, kw = original_pregenerator(request, elements, kw)
                 return elements, kw
 
             pregenerator = external_url_pregenerator
@@ -379,10 +383,9 @@ class RoutesConfiguratorMixin(object):
 
         introspectables = []
 
-        intr = self.introspectable('routes',
-                                   name,
-                                   '%s (pattern: %r)' % (name, pattern),
-                                   'route')
+        intr = self.introspectable(
+            'routes', name, '%s (pattern: %r)' % (name, pattern), 'route'
+        )
         intr['name'] = name
         intr['pattern'] = pattern
         intr['factory'] = factory
@@ -404,17 +407,21 @@ class RoutesConfiguratorMixin(object):
         introspectables.append(intr)
 
         if factory:
-            factory_intr = self.introspectable('root factories',
-                                               name,
-                                               self.object_description(factory),
-                                               'root factory')
+            factory_intr = self.introspectable(
+                'root factories',
+                name,
+                self.object_description(factory),
+                'root factory',
+            )
             factory_intr['factory'] = factory
             factory_intr['route_name'] = name
             factory_intr.relate('routes', name)
             introspectables.append(factory_intr)
 
         def register_route_request_iface():
-            request_iface = self.registry.queryUtility(IRouteRequest, name=name)
+            request_iface = self.registry.queryUtility(
+                IRouteRequest, name=name
+            )
             if request_iface is None:
                 if use_global_views:
                     bases = (IRequest,)
@@ -422,7 +429,8 @@ class RoutesConfiguratorMixin(object):
                     bases = ()
                 request_iface = route_request_iface(name, bases)
                 self.registry.registerUtility(
-                    request_iface, IRouteRequest, name=name)
+                    request_iface, IRouteRequest, name=name
+                )
 
         def register_connect():
             pvals = predicates.copy()
@@ -436,15 +444,19 @@ class RoutesConfiguratorMixin(object):
                     accept=accept,
                     traverse=traverse,
                     custom=predvalseq(custom_predicates),
-                    )
                 )
+            )
 
             predlist = self.get_predlist('route')
             _, preds, _ = predlist.make(self, **pvals)
             route = mapper.connect(
-                name, pattern, factory, predicates=preds,
-                pregenerator=pregenerator, static=static
-                )
+                name,
+                pattern,
+                factory,
+                predicates=preds,
+                pregenerator=pregenerator,
+                static=static,
+            )
             intr['object'] = route
             return route
 
@@ -455,12 +467,17 @@ class RoutesConfiguratorMixin(object):
 
         # But IRouteRequest interfaces must be registered before we begin to
         # process view registrations (in phase 3)
-        self.action(('route', name), register_route_request_iface,
-                    order=PHASE2_CONFIG, introspectables=introspectables)
+        self.action(
+            ('route', name),
+            register_route_request_iface,
+            order=PHASE2_CONFIG,
+            introspectables=introspectables,
+        )
 
     @action_method
-    def add_route_predicate(self, name, factory, weighs_more_than=None,
-                            weighs_less_than=None):
+    def add_route_predicate(
+        self, name, factory, weighs_more_than=None, weighs_less_than=None
+    ):
         """ Adds a route predicate factory.  The view predicate can later be
         named as a keyword argument to
         :meth:`pyramid.config.Configurator.add_route`.
@@ -481,8 +498,8 @@ class RoutesConfiguratorMixin(object):
             name,
             factory,
             weighs_more_than=weighs_more_than,
-            weighs_less_than=weighs_less_than
-            )
+            weighs_less_than=weighs_less_than,
+        )
 
     def add_default_route_predicates(self):
         p = pyramid.predicates
@@ -496,7 +513,7 @@ class RoutesConfiguratorMixin(object):
             ('effective_principals', p.EffectivePrincipalsPredicate),
             ('custom', p.CustomPredicate),
             ('traverse', p.TraversePredicate),
-            ):
+        ):
             self.add_route_predicate(name, factory)
 
     def get_routes_mapper(self):
@@ -541,8 +558,7 @@ class RoutesConfiguratorMixin(object):
             old_route_prefix = ''
 
         route_prefix = '{}/{}'.format(
-            old_route_prefix.rstrip('/'),
-            route_prefix.lstrip('/'),
+            old_route_prefix.rstrip('/'), route_prefix.lstrip('/')
         )
 
         route_prefix = route_prefix.strip('/')

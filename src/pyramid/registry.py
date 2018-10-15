@@ -7,18 +7,12 @@ from zope.interface.registry import Components
 from pyramid.compat import text_
 from pyramid.decorator import reify
 
-from pyramid.interfaces import (
-    IIntrospector,
-    IIntrospectable,
-    ISettings,
-)
+from pyramid.interfaces import IIntrospector, IIntrospectable, ISettings
 
-from pyramid.path import (
-    CALLER_PACKAGE,
-    caller_package,
-)
+from pyramid.path import CALLER_PACKAGE, caller_package
 
 empty = text_('')
+
 
 class Registry(Components, dict):
     """ A registry object is an :term:`application registry`.
@@ -82,13 +76,19 @@ class Registry(Components, dict):
         self.has_listeners = True
         return result
 
-    def registerSelfAdapter(self, required=None, provided=None, name=empty,
-                            info=empty, event=True):
+    def registerSelfAdapter(
+        self, required=None, provided=None, name=empty, info=empty, event=True
+    ):
         # registerAdapter analogue which always returns the object itself
         # when required is matched
-        return self.registerAdapter(lambda x: x, required=required,
-                                    provided=provided, name=name,
-                                    info=info, event=event)
+        return self.registerAdapter(
+            lambda x: x,
+            required=required,
+            provided=provided,
+            name=name,
+            info=info,
+            event=event,
+        )
 
     def queryAdapterOrSelf(self, object, interface, default=None):
         # queryAdapter analogue which returns the object if it implements
@@ -106,7 +106,7 @@ class Registry(Components, dict):
     def notify(self, *events):
         if self.has_listeners:
             # iterating over subscribers assures they get executed
-            [ _ for _ in self.subscribers(events, None) ]
+            [_ for _ in self.subscribers(events, None)]
 
     # backwards compatibility for code that wants to look up a settings
     # object via ``registry.getUtility(ISettings)``
@@ -118,6 +118,7 @@ class Registry(Components, dict):
         self._settings = settings
 
     settings = property(_get_settings, _set_settings)
+
 
 @implementer(IIntrospector)
 class Introspector(object):
@@ -147,16 +148,19 @@ class Introspector(object):
         values = category.values()
         values = sorted(set(values), key=sort_key)
         return [
-            {'introspectable': intr,
-             'related': self.related(intr)}
+            {'introspectable': intr, 'related': self.related(intr)}
             for intr in values
         ]
 
     def categorized(self, sort_key=None):
         L = []
         for category_name in self.categories():
-            L.append((category_name, self.get_category(category_name,
-                                                       sort_key=sort_key)))
+            L.append(
+                (
+                    category_name,
+                    self.get_category(category_name, sort_key=sort_key),
+                )
+            )
         return L
 
     def categories(self):
@@ -186,7 +190,7 @@ class Introspector(object):
 
     def relate(self, *pairs):
         introspectables = self._get_intrs_by_pairs(pairs)
-        relatable = ((x,y) for x in introspectables for y in introspectables)
+        relatable = ((x, y) for x in introspectables for y in introspectables)
         for x, y in relatable:
             L = self._refs.setdefault(x, [])
             if x is not y and y not in L:
@@ -194,7 +198,7 @@ class Introspector(object):
 
     def unrelate(self, *pairs):
         introspectables = self._get_intrs_by_pairs(pairs)
-        relatable = ((x,y) for x in introspectables for y in introspectables)
+        relatable = ((x, y) for x in introspectables for y in introspectables)
         for x, y in relatable:
             L = self._refs.get(x, [])
             if y in L:
@@ -207,11 +211,12 @@ class Introspector(object):
             raise KeyError((category_name, discriminator))
         return self._refs.get(intr, [])
 
+
 @implementer(IIntrospectable)
 class Introspectable(dict):
 
-    order = 0 # mutated by introspector.add
-    action_info = None # mutated by self.register
+    order = 0  # mutated by introspector.add
+    action_info = None  # mutated by self.register
 
     def __init__(self, category_name, discriminator, title, type_name):
         self.category_name = category_name
@@ -240,14 +245,16 @@ class Introspectable(dict):
 
     def __repr__(self):
         self._assert_resolved()
-        return '<%s category %r, discriminator %r>' % (self.__class__.__name__,
-                                                       self.category_name,
-                                                       self.discriminator)
+        return '<%s category %r, discriminator %r>' % (
+            self.__class__.__name__,
+            self.category_name,
+            self.discriminator,
+        )
 
     def __nonzero__(self):
         return True
 
-    __bool__ = __nonzero__ # py3
+    __bool__ = __nonzero__  # py3
 
     def register(self, introspector, action_info):
         self.discriminator = undefer(self.discriminator)
@@ -261,8 +268,9 @@ class Introspectable(dict):
                 method = introspector.unrelate
             method(
                 (self.category_name, self.discriminator),
-                (category_name, discriminator)
-                )
+                (category_name, discriminator),
+            )
+
 
 class Deferred(object):
     """ Can be used by a third-party configuration extender to wrap a
@@ -270,6 +278,7 @@ class Deferred(object):
     discriminator cannot be computed because it relies on unresolved values.
     The function should accept no arguments and should return a hashable
     discriminator."""
+
     def __init__(self, func):
         self.func = func
 
@@ -282,6 +291,7 @@ class Deferred(object):
     def resolve(self):
         return self.value
 
+
 def undefer(v):
     """ Function which accepts an object and returns it unless it is a
     :class:`pyramid.registry.Deferred` instance.  If it is an instance of
@@ -291,7 +301,9 @@ def undefer(v):
         v = v.resolve()
     return v
 
+
 class predvalseq(tuple):
     """ A subtype of tuple used to represent a sequence of predicate values """
+
 
 global_registry = Registry('global')

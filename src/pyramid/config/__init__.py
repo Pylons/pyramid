@@ -17,17 +17,13 @@ from pyramid.interfaces import (
     PHASE1_CONFIG,
     PHASE2_CONFIG,
     PHASE3_CONFIG,
-    )
+)
 
 from pyramid.asset import resolve_asset_spec
 
 from pyramid.authorization import ACLAuthorizationPolicy
 
-from pyramid.compat import (
-    text_,
-    reraise,
-    string_types,
-    )
+from pyramid.compat import text_, reraise, string_types
 
 from pyramid.events import ApplicationCreated
 
@@ -35,21 +31,13 @@ from pyramid.exceptions import (
     ConfigurationConflictError,
     ConfigurationError,
     ConfigurationExecutionError,
-    )
+)
 
 from pyramid.httpexceptions import default_exceptionresponse_view
 
-from pyramid.path import (
-    caller_package,
-    package_of,
-    )
+from pyramid.path import caller_package, package_of
 
-from pyramid.registry import (
-    Introspectable,
-    Introspector,
-    Registry,
-    undefer,
-    )
+from pyramid.registry import Introspectable, Introspector, Registry, undefer
 
 from pyramid.router import Router
 
@@ -57,17 +45,9 @@ from pyramid.settings import aslist
 
 from pyramid.threadlocal import manager
 
-from pyramid.util import (
-    WeakOrderedSet,
-    object_description,
-    )
+from pyramid.util import WeakOrderedSet, object_description
 
-from pyramid.config.util import (
-    ActionInfo,
-    PredicateList,
-    action_method,
-    not_,
-)
+from pyramid.config.util import ActionInfo, PredicateList, action_method, not_
 
 from pyramid.config.adapters import AdaptersConfiguratorMixin
 from pyramid.config.assets import AssetsConfiguratorMixin
@@ -94,6 +74,7 @@ PHASE1_CONFIG = PHASE1_CONFIG  # api
 PHASE2_CONFIG = PHASE2_CONFIG  # api
 PHASE3_CONFIG = PHASE3_CONFIG  # api
 
+
 class Configurator(
     TestingConfiguratorMixin,
     TweensConfiguratorMixin,
@@ -107,7 +88,7 @@ class Configurator(
     SettingsConfiguratorMixin,
     FactoriesConfiguratorMixin,
     AdaptersConfiguratorMixin,
-    ):
+):
     """
     A Configurator is used to configure a :app:`Pyramid`
     :term:`application registry`.
@@ -284,8 +265,9 @@ class Configurator(
        ``with``-statement to make threadlocal configuration available for
        further configuration with an implicit commit.
     """
-    manager = manager # for testing injection
-    venusian = venusian # for testing injection
+
+    manager = manager  # for testing injection
+    venusian = venusian  # for testing injection
     _ainfo = None
     basepath = None
     includepath = ()
@@ -294,27 +276,28 @@ class Configurator(
     introspectable = Introspectable
     inspect = inspect
 
-    def __init__(self,
-                 registry=None,
-                 package=None,
-                 settings=None,
-                 root_factory=None,
-                 authentication_policy=None,
-                 authorization_policy=None,
-                 renderers=None,
-                 debug_logger=None,
-                 locale_negotiator=None,
-                 request_factory=None,
-                 response_factory=None,
-                 default_permission=None,
-                 session_factory=None,
-                 default_view_mapper=None,
-                 autocommit=False,
-                 exceptionresponse_view=default_exceptionresponse_view,
-                 route_prefix=None,
-                 introspection=True,
-                 root_package=None,
-                 ):
+    def __init__(
+        self,
+        registry=None,
+        package=None,
+        settings=None,
+        root_factory=None,
+        authentication_policy=None,
+        authorization_policy=None,
+        renderers=None,
+        debug_logger=None,
+        locale_negotiator=None,
+        request_factory=None,
+        response_factory=None,
+        default_permission=None,
+        session_factory=None,
+        default_view_mapper=None,
+        autocommit=False,
+        exceptionresponse_view=default_exceptionresponse_view,
+        route_prefix=None,
+        introspection=True,
+        root_package=None,
+    ):
         if package is None:
             package = caller_package()
         if root_package is None:
@@ -345,23 +328,24 @@ class Configurator(
                 session_factory=session_factory,
                 default_view_mapper=default_view_mapper,
                 exceptionresponse_view=exceptionresponse_view,
-                )
+            )
 
-    def setup_registry(self,
-                       settings=None,
-                       root_factory=None,
-                       authentication_policy=None,
-                       authorization_policy=None,
-                       renderers=None,
-                       debug_logger=None,
-                       locale_negotiator=None,
-                       request_factory=None,
-                       response_factory=None,
-                       default_permission=None,
-                       session_factory=None,
-                       default_view_mapper=None,
-                       exceptionresponse_view=default_exceptionresponse_view,
-                       ):
+    def setup_registry(
+        self,
+        settings=None,
+        root_factory=None,
+        authentication_policy=None,
+        authorization_policy=None,
+        renderers=None,
+        debug_logger=None,
+        locale_negotiator=None,
+        request_factory=None,
+        response_factory=None,
+        default_permission=None,
+        session_factory=None,
+        default_view_mapper=None,
+        exceptionresponse_view=default_exceptionresponse_view,
+    ):
         """ When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial setup is performed
         against the registry.  This is because the registry you pass in may
@@ -404,7 +388,9 @@ class Configurator(
         if exceptionresponse_view is not None:
             exceptionresponse_view = self.maybe_dotted(exceptionresponse_view)
             self.add_view(exceptionresponse_view, context=IExceptionResponse)
-            self.add_view(exceptionresponse_view,context=WebobWSGIHTTPException)
+            self.add_view(
+                exceptionresponse_view, context=WebobWSGIHTTPException
+            )
 
         # commit below because:
         #
@@ -424,7 +410,7 @@ class Configurator(
         # automatic conflict resolution.
 
         if authentication_policy and not authorization_policy:
-            authorization_policy = ACLAuthorizationPolicy() # default
+            authorization_policy = ACLAuthorizationPolicy()  # default
 
         if authorization_policy:
             self.set_authorization_policy(authorization_policy)
@@ -468,7 +454,7 @@ class Configurator(
     def _make_spec(self, path_or_spec):
         package, filename = resolve_asset_spec(path_or_spec, self.package_name)
         if package is None:
-            return filename # absolute filename
+            return filename  # absolute filename
         return '%s:%s' % (package, filename)
 
     def _fix_registry(self):
@@ -480,38 +466,55 @@ class Configurator(
         _registry = self.registry
 
         if not hasattr(_registry, 'notify'):
+
             def notify(*events):
-                [ _ for _ in _registry.subscribers(events, None) ]
+                [_ for _ in _registry.subscribers(events, None)]
+
             _registry.notify = notify
 
         if not hasattr(_registry, 'has_listeners'):
             _registry.has_listeners = True
 
         if not hasattr(_registry, 'queryAdapterOrSelf'):
+
             def queryAdapterOrSelf(object, interface, default=None):
                 if not interface.providedBy(object):
-                    return _registry.queryAdapter(object, interface,
-                                                  default=default)
+                    return _registry.queryAdapter(
+                        object, interface, default=default
+                    )
                 return object
+
             _registry.queryAdapterOrSelf = queryAdapterOrSelf
 
         if not hasattr(_registry, 'registerSelfAdapter'):
-            def registerSelfAdapter(required=None, provided=None,
-                                    name=empty, info=empty, event=True):
-                return _registry.registerAdapter(lambda x: x,
-                                                 required=required,
-                                                 provided=provided, name=name,
-                                                 info=info, event=event)
+
+            def registerSelfAdapter(
+                required=None,
+                provided=None,
+                name=empty,
+                info=empty,
+                event=True,
+            ):
+                return _registry.registerAdapter(
+                    lambda x: x,
+                    required=required,
+                    provided=provided,
+                    name=name,
+                    info=info,
+                    event=event,
+                )
+
             _registry.registerSelfAdapter = registerSelfAdapter
 
         if not hasattr(_registry, '_lock'):
             _registry._lock = threading.Lock()
 
         if not hasattr(_registry, '_clear_view_lookup_cache'):
+
             def _clear_view_lookup_cache():
                 _registry._view_lookup_cache = {}
-            _registry._clear_view_lookup_cache = _clear_view_lookup_cache
 
+            _registry._clear_view_lookup_cache = _clear_view_lookup_cache
 
     # API
 
@@ -530,7 +533,7 @@ class Configurator(
 
     introspector = property(
         _get_introspector, _set_introspector, _del_introspector
-        )
+    )
 
     def get_predlist(self, name):
         predlist = self.registry.queryUtility(IPredicateList, name=name)
@@ -539,30 +542,41 @@ class Configurator(
             self.registry.registerUtility(predlist, IPredicateList, name=name)
         return predlist
 
-
-    def _add_predicate(self, type, name, factory, weighs_more_than=None,
-                       weighs_less_than=None):
+    def _add_predicate(
+        self, type, name, factory, weighs_more_than=None, weighs_less_than=None
+    ):
         factory = self.maybe_dotted(factory)
         discriminator = ('%s option' % type, name)
         intr = self.introspectable(
             '%s predicates' % type,
             discriminator,
             '%s predicate named %s' % (type, name),
-            '%s predicate' % type)
+            '%s predicate' % type,
+        )
         intr['name'] = name
         intr['factory'] = factory
         intr['weighs_more_than'] = weighs_more_than
         intr['weighs_less_than'] = weighs_less_than
+
         def register():
             predlist = self.get_predlist(type)
-            predlist.add(name, factory, weighs_more_than=weighs_more_than,
-                         weighs_less_than=weighs_less_than)
-        self.action(discriminator, register, introspectables=(intr,),
-                    order=PHASE1_CONFIG) # must be registered early
+            predlist.add(
+                name,
+                factory,
+                weighs_more_than=weighs_more_than,
+                weighs_less_than=weighs_less_than,
+            )
+
+        self.action(
+            discriminator,
+            register,
+            introspectables=(intr,),
+            order=PHASE1_CONFIG,
+        )  # must be registered early
 
     @property
     def action_info(self):
-        info = self.info # usually a ZCML action (ParserInfo) if self.info
+        info = self.info  # usually a ZCML action (ParserInfo) if self.info
         if not info:
             # Try to provide more accurate info for conflict reports
             if self._ainfo:
@@ -571,8 +585,16 @@ class Configurator(
                 info = ActionInfo(None, 0, '', '')
         return info
 
-    def action(self, discriminator, callable=None, args=(), kw=None, order=0,
-               introspectables=(), **extra):
+    def action(
+        self,
+        discriminator,
+        callable=None,
+        args=(),
+        kw=None,
+        order=0,
+        introspectables=(),
+        **extra
+    ):
         """ Register an action which will be executed when
         :meth:`pyramid.config.Configurator.commit` is called (or executed
         immediately if ``autocommit`` is ``True``).
@@ -607,7 +629,7 @@ class Configurator(
         """
         # catch nonhashable discriminators here; most unit tests use
         # autocommit=False, which won't catch unhashable discriminators
-        assert hash(discriminator) 
+        assert hash(discriminator)
 
         if kw is None:
             kw = {}
@@ -645,8 +667,8 @@ class Configurator(
                     info=action_info,
                     includepath=self.includepath,
                     introspectables=introspectables,
-                    )
                 )
+            )
             self.action_state.action(**action)
 
     def _get_action_state(self):
@@ -663,7 +685,7 @@ class Configurator(
 
     action_state = property(_get_action_state, _set_action_state)
 
-    _ctx = action_state # bw compat
+    _ctx = action_state  # bw compat
 
     def commit(self):
         """
@@ -687,7 +709,7 @@ class Configurator(
             self.action_state.execute_actions(introspector=self.introspector)
         finally:
             self.end()
-        self.action_state = ActionState() # old actions have been processed
+        self.action_state = ActionState()  # old actions have been processed
 
     def include(self, callable, route_prefix=None):
         """Include a configuration callable, to support imperative
@@ -800,17 +822,18 @@ class Configurator(
                 c = getattr(module, 'includeme')
             except AttributeError:
                 raise ConfigurationError(
-                    "module %r has no attribute 'includeme'" % (module.__name__)
-                    )
-                                                       
+                    "module %r has no attribute 'includeme'"
+                    % (module.__name__)
+                )
+
         spec = module.__name__ + ':' + c.__name__
         sourcefile = self.inspect.getsourcefile(c)
 
         if sourcefile is None:
             raise ConfigurationError(
                 'No source file for module %r (.py file must exist, '
-                'refusing to use orphan .pyc or .pyo file).' % module.__name__)
-            
+                'refusing to use orphan .pyc or .pyo file).' % module.__name__
+            )
 
         if action_state.processSpec(spec):
             with self.route_prefix_context(route_prefix):
@@ -820,7 +843,7 @@ class Configurator(
                     root_package=self.root_package,
                     autocommit=self.autocommit,
                     route_prefix=self.route_prefix,
-                    )
+                )
                 configurator.basepath = os.path.dirname(sourcefile)
                 configurator.includepath = self.includepath + (spec,)
 
@@ -886,7 +909,7 @@ class Configurator(
             autocommit=self.autocommit,
             route_prefix=self.route_prefix,
             introspection=self.introspection,
-            )
+        )
         configurator.basepath = self.basepath
         configurator.includepath = self.includepath
         configurator.info = self.info
@@ -914,7 +937,7 @@ class Configurator(
             return relative_spec
         return self._make_spec(relative_spec)
 
-    absolute_resource_spec = absolute_asset_spec # b/w compat forever
+    absolute_resource_spec = absolute_asset_spec  # b/w compat forever
 
     def begin(self, request=_marker):
         """ Indicate that application or test configuration has begun.
@@ -940,7 +963,7 @@ class Configurator(
                 request = current['request']
             else:
                 request = None
-        self.manager.push({'registry':self.registry, 'request':request})
+        self.manager.push({'registry': self.registry, 'request': request})
 
     def end(self):
         """ Indicate that application or test configuration has ended.
@@ -961,8 +984,9 @@ class Configurator(
             self.commit()
 
     # this is *not* an action method (uses caller_package)
-    def scan(self, package=None, categories=None, onerror=None, ignore=None,
-             **kw):
+    def scan(
+        self, package=None, categories=None, onerror=None, ignore=None, **kw
+    ):
         """Scan a Python package and any of its subpackages for objects
         marked with :term:`configuration decoration` such as
         :class:`pyramid.view.view_config`.  Any decorated object found will
@@ -1021,7 +1045,7 @@ class Configurator(
 
         """
         package = self.maybe_dotted(package)
-        if package is None: # pragma: no cover
+        if package is None:  # pragma: no cover
             package = caller_package()
 
         ctorkw = {'config': self}
@@ -1029,8 +1053,9 @@ class Configurator(
 
         scanner = self.venusian.Scanner(**ctorkw)
 
-        scanner.scan(package, categories=categories, onerror=onerror,
-                     ignore=ignore)
+        scanner.scan(
+            package, categories=categories, onerror=onerror, ignore=ignore
+        )
 
     def make_wsgi_app(self):
         """ Commits any pending configuration statements, sends a
@@ -1079,8 +1104,18 @@ class ActionState(object):
         self._seen_files.add(spec)
         return True
 
-    def action(self, discriminator, callable=None, args=(), kw=None, order=0,
-               includepath=(), info=None, introspectables=(), **extra):
+    def action(
+        self,
+        discriminator,
+        callable=None,
+        args=(),
+        kw=None,
+        order=0,
+        includepath=(),
+        info=None,
+        introspectables=(),
+        **extra
+    ):
         """Add an action with the given discriminator, callable and arguments
         """
         if kw is None:
@@ -1096,8 +1131,8 @@ class ActionState(object):
                 info=info,
                 order=order,
                 introspectables=introspectables,
-                )
             )
+        )
         self.actions.append(action)
 
     def execute_actions(self, clear=True, introspector=None):
@@ -1179,8 +1214,7 @@ class ActionState(object):
                 if self.actions:
                     all_actions.extend(self.actions)
                     action_iter = resolveConflicts(
-                        self.actions,
-                        state=conflict_state,
+                        self.actions, state=conflict_state
                     )
                     self.actions = []
 
@@ -1203,9 +1237,11 @@ class ActionState(object):
                 except Exception:
                     t, v, tb = sys.exc_info()
                     try:
-                        reraise(ConfigurationExecutionError,
-                                ConfigurationExecutionError(t, v, info),
-                                tb)
+                        reraise(
+                            ConfigurationExecutionError,
+                            ConfigurationExecutionError(t, v, info),
+                            tb,
+                        )
                     finally:
                         del t, v, tb
 
@@ -1290,9 +1326,12 @@ def resolveConflicts(actions, state=None):
 
         # error out if we went backward in order
         if state.min_order is not None and order < state.min_order:
-            r = ['Actions were added to order={0} after execution had moved '
-                 'on to order={1}. Conflicting actions: '
-                 .format(order, state.min_order)]
+            r = [
+                'Actions were added to order={0} after execution had moved '
+                'on to order={1}. Conflicting actions: '.format(
+                    order, state.min_order
+                )
+            ]
             for i, action in actiongroup:
                 for line in str(action['info']).rstrip().split('\n'):
                     r.append("  " + line)
@@ -1348,8 +1387,10 @@ def resolveConflicts(actions, state=None):
                 # if the new action conflicts with the resolved action then
                 # note the conflict, otherwise drop the action as it's
                 # effectively overriden by the previous action
-                if (includepath[:len(basepath)] != basepath or
-                        includepath == basepath):
+                if (
+                    includepath[: len(basepath)] != basepath
+                    or includepath == basepath
+                ):
                     L = conflicts.setdefault(discriminator, [baseinfo])
                     L.append(action['info'])
 
@@ -1360,8 +1401,10 @@ def resolveConflicts(actions, state=None):
             for _, action in rest:
                 includepath = action['includepath']
                 # Test whether path is a prefix of opath
-                if (includepath[:len(basepath)] != basepath or  # not a prefix
-                        includepath == basepath):
+                if (
+                    includepath[: len(basepath)] != basepath
+                    or includepath == basepath  # not a prefix
+                ):
                     L = conflicts.setdefault(discriminator, [baseinfo])
                     L.append(action['info'])
 
@@ -1389,8 +1432,14 @@ def normalize_actions(actions):
 
 
 def expand_action_tuple(
-    discriminator, callable=None, args=(), kw=None, includepath=(),
-    info=None, order=0, introspectables=(),
+    discriminator,
+    callable=None,
+    args=(),
+    kw=None,
+    includepath=(),
+    info=None,
+    order=0,
+    introspectables=(),
 ):
     if kw is None:
         kw = {}
@@ -1403,7 +1452,7 @@ def expand_action_tuple(
         info=info,
         order=order,
         introspectables=introspectables,
-        )
+    )
 
 
 global_registries = WeakOrderedSet()

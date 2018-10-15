@@ -1,13 +1,11 @@
 from zope.deprecation import deprecated
 
-from zope.interface import (
-    Attribute,
-    Interface,
-    )
+from zope.interface import Attribute, Interface
 
 from pyramid.compat import PY2
 
 # public API interfaces
+
 
 class IContextFound(Interface):
     """ An event type that is emitted after :app:`Pyramid` finds a
@@ -21,9 +19,12 @@ class IContextFound(Interface):
        :app:`Pyramid` before 1.0, this event interface can also be
        imported as :class:`pyramid.interfaces.IAfterTraversal`.
     """
+
     request = Attribute('The request object')
 
+
 IAfterTraversal = IContextFound
+
 
 class IBeforeTraversal(Interface):
     """
@@ -31,21 +32,27 @@ class IBeforeTraversal(Interface):
     route but before it calls any traversal or view code. See the documentation
     attached to :class:`pyramid.events.Routefound` for more information.
     """
+
     request = Attribute('The request object')
+
 
 class INewRequest(Interface):
     """ An event type that is emitted whenever :app:`Pyramid`
     begins to process a new request.  See the documentation attached
     to :class:`pyramid.events.NewRequest` for more information."""
+
     request = Attribute('The request object')
+
 
 class INewResponse(Interface):
     """ An event type that is emitted whenever any :app:`Pyramid`
     view returns a response. See the
     documentation attached to :class:`pyramid.events.NewResponse`
     for more information."""
+
     request = Attribute('The request object')
     response = Attribute('The response object')
+
 
 class IApplicationCreated(Interface):
     """ Event issued when the
@@ -60,9 +67,12 @@ class IApplicationCreated(Interface):
        versions before 1.0, this interface can also be imported as
        :class:`pyramid.interfaces.IWSGIApplicationCreatedEvent`.
     """
+
     app = Attribute("Created application")
 
-IWSGIApplicationCreatedEvent = IApplicationCreated # b /c
+
+IWSGIApplicationCreatedEvent = IApplicationCreated  # b /c
+
 
 class IResponse(Interface):
     """ Represents a WSGI response using the WebOb response interface.
@@ -74,7 +84,8 @@ class IResponse(Interface):
     :mod:`pyramid.httpexceptions`."""
 
     RequestClass = Attribute(
-        """ Alias for :class:`pyramid.request.Request` """)
+        """ Alias for :class:`pyramid.request.Request` """
+    )
 
     def __call__(environ, start_response):
         """ :term:`WSGI` call interface, should call the start_response
@@ -82,21 +93,25 @@ class IResponse(Interface):
 
     accept_ranges = Attribute(
         """Gets and sets and deletes the Accept-Ranges header. For more
-        information on Accept-Ranges see RFC 2616, section 14.5""")
+        information on Accept-Ranges see RFC 2616, section 14.5"""
+    )
 
     age = Attribute(
         """Gets and sets and deletes the Age header. Converts using int.
-        For more information on Age see RFC 2616, section 14.6.""")
+        For more information on Age see RFC 2616, section 14.6."""
+    )
 
     allow = Attribute(
         """Gets and sets and deletes the Allow header. Converts using
-        list. For more information on Allow see RFC 2616, Section 14.7.""")
+        list. For more information on Allow see RFC 2616, Section 14.7."""
+    )
 
     app_iter = Attribute(
         """Returns the app_iter of the response.
 
         If body was set, this will create an app_iter from that body
-        (a single-item list)""")
+        (a single-item list)"""
+    )
 
     def app_iter_range(start, stop):
         """ Return a new app_iter built from the response app_iter that
@@ -104,21 +119,24 @@ class IResponse(Interface):
 
     body = Attribute(
         """The body of the response, as a str. This will read in the entire
-        app_iter if necessary.""")
+        app_iter if necessary."""
+    )
 
     body_file = Attribute(
         """A file-like object that can be used to write to the body. If you
-        passed in a list app_iter, that app_iter will be modified by writes.""")
+        passed in a list app_iter, that app_iter will be modified by writes."""
+    )
 
     cache_control = Attribute(
-        """Get/set/modify the Cache-Control header (RFC 2616 section 14.9)""")
+        """Get/set/modify the Cache-Control header (RFC 2616 section 14.9)"""
+    )
 
     cache_expires = Attribute(
         """ Get/set the Cache-Control and Expires headers. This sets the
-            response to expire in the number of seconds passed when set. """)
+            response to expire in the number of seconds passed when set. """
+    )
 
-    charset = Attribute(
-        """Get/set the charset (in the Content-Type)""")
+    charset = Attribute("""Get/set the charset (in the Content-Type)""")
 
     def conditional_response_app(environ, start_response):
         """ Like the normal __call__ interface, but checks conditional
@@ -133,52 +151,62 @@ class IResponse(Interface):
     content_disposition = Attribute(
         """Gets and sets and deletes the Content-Disposition header.
         For more information on Content-Disposition see RFC 2616 section
-        19.5.1.""")
+        19.5.1."""
+    )
 
     content_encoding = Attribute(
         """Gets and sets and deletes the Content-Encoding header.  For more
-        information about Content-Encoding see RFC 2616 section 14.11.""")
+        information about Content-Encoding see RFC 2616 section 14.11."""
+    )
 
     content_language = Attribute(
         """Gets and sets and deletes the Content-Language header. Converts
         using list.  For more information about Content-Language see RFC 2616
-        section 14.12.""")
+        section 14.12."""
+    )
 
     content_length = Attribute(
         """Gets and sets and deletes the Content-Length header. For more
         information on Content-Length see RFC 2616 section 14.17.
-        Converts using int. """)
+        Converts using int. """
+    )
 
     content_location = Attribute(
         """Gets and sets and deletes the Content-Location header. For more
-        information on Content-Location see RFC 2616 section 14.14.""")
+        information on Content-Location see RFC 2616 section 14.14."""
+    )
 
     content_md5 = Attribute(
         """Gets and sets and deletes the Content-MD5 header. For more
-        information on Content-MD5 see RFC 2616 section 14.14.""")
+        information on Content-MD5 see RFC 2616 section 14.14."""
+    )
 
     content_range = Attribute(
         """Gets and sets and deletes the Content-Range header. For more
         information on Content-Range see section 14.16. Converts using
-        ContentRange object.""")
+        ContentRange object."""
+    )
 
     content_type = Attribute(
         """Get/set the Content-Type header (or None), without the charset
         or any parameters. If you include parameters (or ; at all) when
         setting the content_type, any existing parameters will be deleted;
-        otherwise they will be preserved.""")
+        otherwise they will be preserved."""
+    )
 
     content_type_params = Attribute(
         """A dictionary of all the parameters in the content type.  This is
         not a view, set to change, modifications of the dict would not
-        be applied otherwise.""")
+        be applied otherwise."""
+    )
 
     def copy():
         """ Makes a copy of the response and returns the copy. """
 
     date = Attribute(
         """Gets and sets and deletes the Date header. For more information on
-        Date see RFC 2616 section 14.18. Converts using HTTP date.""")
+        Date see RFC 2616 section 14.18. Converts using HTTP date."""
+    )
 
     def delete_cookie(name, path='/', domain=None):
         """ Delete a cookie from the client. Note that path and domain must
@@ -191,31 +219,34 @@ class IResponse(Interface):
 
     environ = Attribute(
         """Get/set the request environ associated with this response,
-        if any.""")
+        if any."""
+    )
 
     etag = Attribute(
         """ Gets and sets and deletes the ETag header. For more information
-        on ETag see RFC 2616 section 14.19. Converts using Entity tag.""")
+        on ETag see RFC 2616 section 14.19. Converts using Entity tag."""
+    )
 
     expires = Attribute(
         """ Gets and sets and deletes the Expires header. For more
         information on Expires see RFC 2616 section 14.21. Converts using
-        HTTP date.""")
+        HTTP date."""
+    )
 
-    headerlist = Attribute(
-        """ The list of response headers. """)
+    headerlist = Attribute(""" The list of response headers. """)
 
-    headers = Attribute(
-        """ The headers in a dictionary-like object """)
+    headers = Attribute(""" The headers in a dictionary-like object """)
 
     last_modified = Attribute(
         """ Gets and sets and deletes the Last-Modified header. For more
         information on Last-Modified see RFC 2616 section 14.29. Converts
-        using HTTP date.""")
+        using HTTP date."""
+    )
 
     location = Attribute(
         """ Gets and sets and deletes the Location header. For more
-        information on Location see RFC 2616 section 14.30.""")
+        information on Location see RFC 2616 section 14.30."""
+    )
 
     def md5_etag(body=None, set_content_md5=False):
         """ Generate an etag for the response object using an MD5 hash of the
@@ -230,34 +261,46 @@ class IResponse(Interface):
 
     pragma = Attribute(
         """ Gets and sets and deletes the Pragma header. For more information
-        on Pragma see RFC 2616 section 14.32. """)
+        on Pragma see RFC 2616 section 14.32. """
+    )
 
     request = Attribute(
-        """ Return the request associated with this response if any. """)
+        """ Return the request associated with this response if any. """
+    )
 
     retry_after = Attribute(
         """ Gets and sets and deletes the Retry-After header. For more
         information on Retry-After see RFC 2616 section 14.37. Converts
-        using HTTP date or delta seconds.""")
+        using HTTP date or delta seconds."""
+    )
 
     server = Attribute(
         """ Gets and sets and deletes the Server header. For more information
-        on Server see RFC216 section 14.38. """)
+        on Server see RFC216 section 14.38. """
+    )
 
-    def set_cookie(name, value='', max_age=None, path='/', domain=None,
-                   secure=False, httponly=False, comment=None, expires=None,
-                   overwrite=False):
+    def set_cookie(
+        name,
+        value='',
+        max_age=None,
+        path='/',
+        domain=None,
+        secure=False,
+        httponly=False,
+        comment=None,
+        expires=None,
+        overwrite=False,
+    ):
         """ Set (add) a cookie for the response """
 
-    status = Attribute(
-        """ The status string. """)
+    status = Attribute(""" The status string. """)
 
-    status_int = Attribute(
-        """ The status as an integer """)
+    status_int = Attribute(""" The status as an integer """)
 
     unicode_body = Attribute(
         """ Get/set the unicode value of the body (using the charset of
-        the Content-Type)""")
+        the Content-Type)"""
+    )
 
     def unset_cookie(name, strict=True):
         """ Unset a cookie with the given name (remove it from the
@@ -265,15 +308,19 @@ class IResponse(Interface):
 
     vary = Attribute(
         """Gets and sets and deletes the Vary header. For more information
-        on Vary see section 14.44. Converts using list.""")
+        on Vary see section 14.44. Converts using list."""
+    )
 
     www_authenticate = Attribute(
         """ Gets and sets and deletes the WWW-Authenticate header. For more
         information on WWW-Authenticate see RFC 2616 section 14.47. Converts
-        using 'parse_auth' and 'serialize_auth'. """)
+        using 'parse_auth' and 'serialize_auth'. """
+    )
 
-class IException(Interface): # not an API
+
+class IException(Interface):  # not an API
     """ An interface representing a generic exception """
+
 
 class IExceptionResponse(IException, IResponse):
     """ An interface representing a WSGI response which is also an exception
@@ -283,8 +330,10 @@ class IExceptionResponse(IException, IResponse):
     :class:`pyramid.response.Response`, including
     :class:`pyramid.httpexceptions.HTTPNotFound` and
     :class:`pyramid.httpexceptions.HTTPForbidden`)."""
+
     def prepare(environ):
         """ Prepares the response for being called as a WSGI application """
+
 
 class IDict(Interface):
     # Documentation-only interface
@@ -354,6 +403,7 @@ class IDict(Interface):
     def clear():
         """ Clear all values from the dictionary """
 
+
 class IBeforeRender(IDict):
     """
     Subscribers to this event may introspect and modify the set of
@@ -373,25 +423,36 @@ class IBeforeRender(IDict):
 
         See also :ref:`beforerender_event`.
     """
-    rendering_val = Attribute('The value returned by a view or passed to a '
-                              '``render`` method for this rendering. '
-                              'This feature is new in Pyramid 1.2.')
+
+    rendering_val = Attribute(
+        'The value returned by a view or passed to a '
+        '``render`` method for this rendering. '
+        'This feature is new in Pyramid 1.2.'
+    )
+
 
 class IRendererInfo(Interface):
     """ An object implementing this interface is passed to every
     :term:`renderer factory` constructor as its only argument (conventionally
     named ``info``)"""
+
     name = Attribute('The value passed by the user as the renderer name')
-    package = Attribute('The "current package" when the renderer '
-                        'configuration statement was found')
+    package = Attribute(
+        'The "current package" when the renderer '
+        'configuration statement was found'
+    )
     type = Attribute('The renderer type name')
-    registry = Attribute('The "current" application registry when the '
-                         'renderer was created')
-    settings = Attribute('The deployment settings dictionary related '
-                         'to the current application')
+    registry = Attribute(
+        'The "current" application registry when the ' 'renderer was created'
+    )
+    settings = Attribute(
+        'The deployment settings dictionary related '
+        'to the current application'
+    )
 
     def clone():
         """ Return a shallow copy that does not share any mutable state."""
+
 
 class IRendererFactory(Interface):
     def __call__(info):
@@ -399,6 +460,7 @@ class IRendererFactory(Interface):
         :class:`pyramid.interfaces.IRenderer`. ``info`` is an
         object that implements :class:`pyramid.interfaces.IRendererInfo`.
         """
+
 
 class IRenderer(Interface):
     def __call__(value, system):
@@ -413,6 +475,7 @@ class IRenderer(Interface):
         view), and ``request`` (the request object passed to the
         view)."""
 
+
 class ITemplateRenderer(IRenderer):
     def implementation():
         """ Return the object that the underlying templating system
@@ -420,12 +483,14 @@ class ITemplateRenderer(IRenderer):
         accepts arbitrary keyword arguments and returns a string or
         unicode object """
 
+
 deprecated(
     'ITemplateRenderer',
     'As of Pyramid 1.5 the, "pyramid.interfaces.ITemplateRenderer" interface '
     'is scheduled to be removed. It was used by the Mako and Chameleon '
-    'renderers which have been split into their own packages.'
-    )
+    'renderers which have been split into their own packages.',
+)
+
 
 class IViewMapper(Interface):
     def __call__(self, object):
@@ -434,6 +499,7 @@ class IViewMapper(Interface):
         request)``.  The callable returned should itself return a Response
         object.  An IViewMapper is returned by
         :class:`pyramid.interfaces.IViewMapperFactory`."""
+
 
 class IViewMapperFactory(Interface):
     def __call__(self, **kw):
@@ -447,6 +513,7 @@ class IViewMapperFactory(Interface):
         to extension developers who want to modify potential view callable
         invocation signatures and response values.
         """
+
 
 class IAuthenticationPolicy(Interface):
     """ An object representing a Pyramid authentication policy. """
@@ -500,8 +567,10 @@ class IAuthenticationPolicy(Interface):
 
         """
 
+
 class IAuthorizationPolicy(Interface):
     """ An object representing a Pyramid authorization policy. """
+
     def permits(context, principals, permission):
         """ Return an instance of :class:`pyramid.security.Allowed` if any
         of the ``principals`` is allowed the ``permission`` in the current
@@ -518,7 +587,8 @@ class IAuthorizationPolicy(Interface):
         ``pyramid.security.principals_allowed_by_permission`` API is
         used."""
 
-class IMultiDict(IDict): # docs-only interface
+
+class IMultiDict(IDict):  # docs-only interface
     """
     An ordered dictionary that can have multiple values for each key. A
     multidict adds the methods ``getall``, ``getone``, ``mixed``, ``extend``,
@@ -556,35 +626,45 @@ class IMultiDict(IDict): # docs-only interface
         dictionary. This is similar to the kind of dictionary often used to
         represent the variables in a web request. """
 
+
 # internal interfaces
+
 
 class IRequest(Interface):
     """ Request type interface attached to all request objects """
+
 
 class ITweens(Interface):
     """ Marker interface for utility registration representing the ordered
     set of a configuration's tween factories"""
 
+
 class IRequestHandler(Interface):
     """ """
+
     def __call__(self, request):
         """ Must return a tuple of IReqest, IResponse or raise an exception.
         The ``request`` argument will be an instance of an object that
         provides IRequest."""
 
-IRequest.combined = IRequest # for exception view lookups
+
+IRequest.combined = IRequest  # for exception view lookups
+
 
 class IRequestExtensions(Interface):
     """ Marker interface for storing request extensions (properties and
     methods) which will be added to the request object."""
+
     descriptors = Attribute(
-        """A list of descriptors that will be added to each request.""")
-    methods = Attribute(
-        """A list of methods to be added to each request.""")
+        """A list of descriptors that will be added to each request."""
+    )
+    methods = Attribute("""A list of methods to be added to each request.""")
+
 
 class IRouteRequest(Interface):
     """ *internal only* interface used as in a utility lookup to find
     route-specific interfaces.  Not an API."""
+
 
 class IAcceptOrder(Interface):
     """
@@ -593,8 +673,10 @@ class IAcceptOrder(Interface):
 
     """
 
+
 class IStaticURLInfo(Interface):
     """ A policy for generating URLs to static assets """
+
     def add(config, name, spec, **extra):
         """ Add a new static info registration """
 
@@ -604,15 +686,19 @@ class IStaticURLInfo(Interface):
     def add_cache_buster(config, spec, cache_buster):
         """ Add a new cache buster to a particular set of assets """
 
+
 class IResponseFactory(Interface):
     """ A utility which generates a response """
+
     def __call__(request):
         """ Return a response object implementing IResponse,
         e.g. :class:`pyramid.response.Response`). It should handle the
         case when ``request`` is ``None``."""
 
+
 class IRequestFactory(Interface):
     """ A utility which generates a request """
+
     def __call__(environ):
         """ Return an instance of ``pyramid.request.Request``"""
 
@@ -620,18 +706,23 @@ class IRequestFactory(Interface):
         """ Return an empty request object (see
         :meth:`pyramid.request.Request.blank`)"""
 
+
 class IViewClassifier(Interface):
     """ *Internal only* marker interface for views."""
 
+
 class IExceptionViewClassifier(Interface):
     """ *Internal only* marker interface for exception views."""
+
 
 class IView(Interface):
     def __call__(context, request):
         """ Must return an object that implements IResponse. """
 
+
 class ISecuredView(IView):
     """ *Internal only* interface.  Not an API. """
+
     def __call_permissive__(context, request):
         """ Guaranteed-permissive version of __call__ """
 
@@ -639,20 +730,25 @@ class ISecuredView(IView):
         """ Return True if view execution will be permitted using the
         context and request, False otherwise"""
 
+
 class IMultiView(ISecuredView):
     """ *internal only*.  A multiview is a secured view that is a
     collection of other views.  Each of the views is associated with
     zero or more predicates.  Not an API."""
+
     def add(view, predicates, order, accept=None, phash=None):
         """ Add a view to the multiview. """
+
 
 class IRootFactory(Interface):
     def __call__(request):
         """ Return a root object based on the request """
 
+
 class IDefaultRootFactory(Interface):
     def __call__(request):
         """ Return the *default* root object for an application """
+
 
 class ITraverser(Interface):
     def __call__(request):
@@ -678,12 +774,15 @@ class ITraverser(Interface):
         as attributes of the ``request`` object by the :term:`router`.
         """
 
-ITraverserFactory = ITraverser # b / c for 1.0 code
+
+ITraverserFactory = ITraverser  # b / c for 1.0 code
+
 
 class IViewPermission(Interface):
     def __call__(context, request):
         """ Return True if the permission allows, return False if it denies.
         """
+
 
 class IRouter(Interface):
     """
@@ -691,8 +790,10 @@ class IRouter(Interface):
     a view registry.
 
     """
+
     registry = Attribute(
-        """Component architecture registry local to this application.""")
+        """Component architecture registry local to this application."""
+    )
 
     def request_context(environ):
         """
@@ -734,6 +835,7 @@ class IRouter(Interface):
 
         """
 
+
 class IExecutionPolicy(Interface):
     def __call__(environ, router):
         """
@@ -762,22 +864,28 @@ class IExecutionPolicy(Interface):
                         return request.invoke_exception_view(reraise=True)
         """
 
+
 class ISettings(IDict):
     """ Runtime settings utility for pyramid; represents the
     deployment settings for the application.  Implements a mapping
     interface."""
 
+
 # this interface, even if it becomes unused within Pyramid, is
 # imported by other packages (such as traversalwrapper)
 class ILocation(Interface):
     """Objects that have a structural location"""
+
     __parent__ = Attribute("The parent in the location hierarchy")
     __name__ = Attribute("The name within the parent")
+
 
 class IDebugLogger(Interface):
     """ Interface representing a PEP 282 logger """
 
-ILogger = IDebugLogger # b/c
+
+ILogger = IDebugLogger  # b/c
+
 
 class IRoutePregenerator(Interface):
     def __call__(request, elements, kw):
@@ -804,21 +912,27 @@ class IRoutePregenerator(Interface):
 
         """
 
+
 class IRoute(Interface):
     """ Interface representing the type of object returned from
     ``IRoutesMapper.get_route``"""
+
     name = Attribute('The route name')
     pattern = Attribute('The route pattern')
     factory = Attribute(
         'The :term:`root factory` used by the :app:`Pyramid` router '
-        'when this route matches (or ``None``)')
+        'when this route matches (or ``None``)'
+    )
     predicates = Attribute(
         'A sequence of :term:`route predicate` objects used to '
         'determine if a request matches this route or not after '
-        'basic pattern matching has been completed.')
-    pregenerator = Attribute('This attribute should either be ``None`` or '
-                             'a callable object implementing the '
-                             '``IRoutePregenerator`` interface')
+        'basic pattern matching has been completed.'
+    )
+    pregenerator = Attribute(
+        'This attribute should either be ``None`` or '
+        'a callable object implementing the '
+        '``IRoutePregenerator`` interface'
+    )
 
     def match(path):
         """
@@ -831,14 +945,17 @@ class IRoute(Interface):
         If the ``path`` passed to this function cannot be matched by
         the ``pattern`` of this route, return ``None``.
         """
+
     def generate(kw):
         """
         Generate a URL based on filling in the dynamic segment markers
         in the pattern using the ``kw`` dictionary provided.
         """
 
+
 class IRoutesMapper(Interface):
     """ Interface representing a Routes ``Mapper`` object """
+
     def get_routes():
         """ Return a sequence of Route objects registered in the mapper.
         Static routes will not be returned in this sequence."""
@@ -850,8 +967,14 @@ class IRoutesMapper(Interface):
         """ Returns an ``IRoute`` object if a route with the name ``name``
         was registered, otherwise return ``None``."""
 
-    def connect(name, pattern, factory=None, predicates=(), pregenerator=None,
-                static=True):
+    def connect(
+        name,
+        pattern,
+        factory=None,
+        predicates=(),
+        pregenerator=None,
+        static=True,
+    ):
         """ Add a new route. """
 
     def generate(name, kw):
@@ -865,23 +988,26 @@ class IRoutesMapper(Interface):
         ``match`` key will be the matchdict or ``None`` if no route
         matched.  Static routes will not be considered for matching.  """
 
+
 class IResourceURL(Interface):
     virtual_path = Attribute(
         'The virtual url path of the resource as a string.'
-        )
+    )
     physical_path = Attribute(
         'The physical url path of the resource as a string.'
-        )
+    )
     virtual_path_tuple = Attribute(
         'The virtual url path of the resource as a tuple.  (New in 1.5)'
-        )
+    )
     physical_path_tuple = Attribute(
         'The physical url path of the resource as a tuple. (New in 1.5)'
-        )
+    )
+
 
 class IPEP302Loader(Interface):
     """ See http://www.python.org/dev/peps/pep-0302/#id30.
     """
+
     def get_data(path):
         """ Retrieve data for and arbitrary "files" from storage backend.
 
@@ -924,42 +1050,53 @@ class IPEP302Loader(Interface):
 class IPackageOverrides(IPEP302Loader):
     """ Utility for pkg_resources overrides """
 
+
 # VH_ROOT_KEY is an interface; its imported from other packages (e.g.
 # traversalwrapper)
 VH_ROOT_KEY = 'HTTP_X_VHM_ROOT'
 
+
 class ILocalizer(Interface):
     """ Localizer for a specific language """
+
 
 class ILocaleNegotiator(Interface):
     def __call__(request):
         """ Return a locale name """
 
+
 class ITranslationDirectories(Interface):
     """ A list object representing all known translation directories
     for an application"""
+
 
 class IDefaultPermission(Interface):
     """ A string object representing the default permission to be used
     for all view configurations which do not explicitly declare their
     own."""
 
+
 class IDefaultCSRFOptions(Interface):
     """ An object representing the default CSRF settings to be used for
     all view configurations which do not explicitly declare their own."""
+
     require_csrf = Attribute(
         'Boolean attribute. If ``True``, then CSRF checks will be enabled by '
-        'default for the view unless overridden.')
+        'default for the view unless overridden.'
+    )
     token = Attribute('The key to be matched in the body of the request.')
     header = Attribute('The header to be matched with the CSRF token.')
     safe_methods = Attribute('A set of safe methods that skip CSRF checks.')
     callback = Attribute('A callback to disable CSRF checks per-request.')
 
+
 class ISessionFactory(Interface):
     """ An interface representing a factory which accepts a request object and
     returns an ISession object """
+
     def __call__(request):
         """ Return an ISession object """
+
 
 class ISession(IDict):
     """ An interface representing a session (a web session object,
@@ -1158,16 +1295,21 @@ class IIntrospectable(Interface):
 
     title = Attribute('Text title describing this introspectable')
     type_name = Attribute('Text type name describing this introspectable')
-    order = Attribute('integer order in which registered with introspector '
-                      '(managed by introspector, usually)')
+    order = Attribute(
+        'integer order in which registered with introspector '
+        '(managed by introspector, usually)'
+    )
     category_name = Attribute('introspection category name')
-    discriminator = Attribute('introspectable discriminator (within category) '
-                              '(must be hashable)')
+    discriminator = Attribute(
+        'introspectable discriminator (within category) ' '(must be hashable)'
+    )
     discriminator_hash = Attribute('an integer hash of the discriminator')
-    action_info = Attribute('An IActionInfo object representing the caller '
-                            'that invoked the creation of this introspectable '
-                            '(usually a sentinel until updated during '
-                            'self.register)')
+    action_info = Attribute(
+        'An IActionInfo object representing the caller '
+        'that invoked the creation of this introspectable '
+        '(usually a sentinel until updated during '
+        'self.register)'
+    )
 
     def relate(category_name, discriminator):
         """ Indicate an intent to relate this IIntrospectable with another
@@ -1209,18 +1351,21 @@ class IIntrospectable(Interface):
           return hash((self.category_name,) + (self.discriminator,))
         """
 
+
 class IActionInfo(Interface):
     """ Class which provides code introspection capability associated with an
     action.  The ParserInfo class used by ZCML implements the same interface."""
-    file = Attribute(
-        'Filename of action-invoking code as a string')
+
+    file = Attribute('Filename of action-invoking code as a string')
     line = Attribute(
         'Starting line number in file (as an integer) of action-invoking code.'
-        'This will be ``None`` if the value could not be determined.')
+        'This will be ``None`` if the value could not be determined.'
+    )
 
     def __str__():
         """ Return a representation of the action information (including
         source code from file, if possible) """
+
 
 class IAssetDescriptor(Interface):
     """
@@ -1260,19 +1405,24 @@ class IAssetDescriptor(Interface):
         Returns True if asset exists, otherwise returns False.
         """
 
+
 class IJSONAdapter(Interface):
     """
     Marker interface for objects that can convert an arbitrary object
     into a JSON-serializable primitive.
     """
 
+
 class IPredicateList(Interface):
     """ Interface representing a predicate list """
 
+
 class IViewDeriver(Interface):
-    options = Attribute('A list of supported options to be passed to '
-                        ':meth:`pyramid.config.Configurator.add_view`. '
-                        'This attribute is optional.')
+    options = Attribute(
+        'A list of supported options to be passed to '
+        ':meth:`pyramid.config.Configurator.add_view`. '
+        'This attribute is optional.'
+    )
 
     def __call__(view, info):
         """
@@ -1285,23 +1435,34 @@ class IViewDeriver(Interface):
 
         """
 
+
 class IViewDeriverInfo(Interface):
     """ An object implementing this interface is passed to every
     :term:`view deriver` during configuration."""
-    registry = Attribute('The "current" application registry where the '
-                         'view was created')
-    package = Attribute('The "current package" where the view '
-                        'configuration statement was found')
-    settings = Attribute('The deployment settings dictionary related '
-                         'to the current application')
-    options = Attribute('The view options passed to the view, including any '
-                        'default values that were not overriden')
+
+    registry = Attribute(
+        'The "current" application registry where the ' 'view was created'
+    )
+    package = Attribute(
+        'The "current package" where the view '
+        'configuration statement was found'
+    )
+    settings = Attribute(
+        'The deployment settings dictionary related '
+        'to the current application'
+    )
+    options = Attribute(
+        'The view options passed to the view, including any '
+        'default values that were not overriden'
+    )
     predicates = Attribute('The list of predicates active on the view')
     original_view = Attribute('The original view object being wrapped')
     exception_only = Attribute('The view will only be invoked for exceptions')
 
+
 class IViewDerivers(Interface):
     """ Interface for view derivers list """
+
 
 class ICacheBuster(Interface):
     """
@@ -1310,6 +1471,7 @@ class ICacheBuster(Interface):
 
     .. versionadded:: 1.6
     """
+
     def __call__(request, subpath, kw):
         """
         Modifies a subpath and/or keyword arguments from which a static asset
@@ -1343,6 +1505,7 @@ class ICacheBuster(Interface):
         be ``themepkg:bar.png``, assuming a call to
         ``config.override_asset('myapp:static/foo.png', 'themepkg:bar.png')``.
         """
+
 
 # configuration phases: a lower phase number means the actions associated
 # with this phase will be executed earlier than those with later phase

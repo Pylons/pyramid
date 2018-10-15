@@ -55,46 +55,47 @@ testing_extras = tests_require + [
     'virtualenv',  # for scaffolding tests
 ]
 
-setup(name='pyramid',
-      version='1.10.dev0',
-      description='The Pyramid Web Framework, a Pylons project',
-      long_description=README + '\n\n' + CHANGES,
-      classifiers=[
-          "Development Status :: 6 - Mature",
-          "Intended Audience :: Developers",
-          "Programming Language :: Python",
-          "Programming Language :: Python :: 2.7",
-          "Programming Language :: Python :: 3",
-          "Programming Language :: Python :: 3.4",
-          "Programming Language :: Python :: 3.5",
-          "Programming Language :: Python :: 3.6",
-          "Programming Language :: Python :: 3.7",
-          "Programming Language :: Python :: Implementation :: CPython",
-          "Programming Language :: Python :: Implementation :: PyPy",
-          "Framework :: Pyramid",
-          "Topic :: Internet :: WWW/HTTP",
-          "Topic :: Internet :: WWW/HTTP :: WSGI",
-          "License :: Repoze Public License",
-      ],
-      keywords='web wsgi pylons pyramid',
-      author="Chris McDonough, Agendaless Consulting",
-      author_email="pylons-discuss@googlegroups.com",
-      url="https://trypyramid.com",
-      license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
-      packages=find_packages('src', exclude=['tests']),
-      package_dir={'': 'src'},
-      include_package_data=True,
-      zip_safe=False,
-      python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
-      install_requires=install_requires,
-      extras_require={
-          ':python_version<"3.2"': ['repoze.lru >= 0.4'],
-          'testing': testing_extras,
-          'docs': docs_extras,
-      },
-      tests_require=tests_require,
-      test_suite="tests",
-      entry_points="""\
+setup(
+    name='pyramid',
+    version='1.10.dev0',
+    description='The Pyramid Web Framework, a Pylons project',
+    long_description=README + '\n\n' + CHANGES,
+    classifiers=[
+        "Development Status :: 6 - Mature",
+        "Intended Audience :: Developers",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
+        "Framework :: Pyramid",
+        "Topic :: Internet :: WWW/HTTP",
+        "Topic :: Internet :: WWW/HTTP :: WSGI",
+        "License :: Repoze Public License",
+    ],
+    keywords='web wsgi pylons pyramid',
+    author="Chris McDonough, Agendaless Consulting",
+    author_email="pylons-discuss@googlegroups.com",
+    url="https://trypyramid.com",
+    license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
+    packages=find_packages('src', exclude=['tests']),
+    package_dir={'': 'src'},
+    include_package_data=True,
+    zip_safe=False,
+    python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
+    install_requires=install_requires,
+    extras_require={
+        ':python_version<"3.2"': ['repoze.lru >= 0.4'],
+        'testing': testing_extras,
+        'docs': docs_extras,
+    },
+    tests_require=tests_require,
+    test_suite="tests",
+    entry_points="""\
         [pyramid.scaffold]
         starter=pyramid.scaffolds:StarterProjectTemplate
         zodb=pyramid.scaffolds:ZODBProjectTemplate
@@ -113,5 +114,5 @@ setup(name='pyramid',
         [paste.server_runner]
         wsgiref = pyramid.scripts.pserve:wsgiref_server_runner
         cherrypy = pyramid.scripts.pserve:cherrypy_server_runner
-      """
-      )
+      """,
+)

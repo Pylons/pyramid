@@ -9,22 +9,10 @@ import warnings
 from zope.deprecation import deprecated
 from zope.interface import implementer
 
-from webob.cookies import (
-    JSONSerializer,
-    SignedSerializer,
-)
+from webob.cookies import JSONSerializer, SignedSerializer
 
-from pyramid.compat import (
-    pickle,
-    PY2,
-    text_,
-    bytes_,
-    native_,
-    )
-from pyramid.csrf import (
-    check_csrf_origin,
-    check_csrf_token,
-)
+from pyramid.compat import pickle, PY2, text_, bytes_, native_
+from pyramid.csrf import check_csrf_origin, check_csrf_token
 
 from pyramid.interfaces import ISession
 from pyramid.util import strings_differ
@@ -33,24 +21,30 @@ from pyramid.util import strings_differ
 def manage_accessed(wrapped):
     """ Decorator which causes a cookie to be renewed when an accessor
     method is called."""
+
     def accessed(session, *arg, **kw):
         session.accessed = now = int(time.time())
         if session._reissue_time is not None:
             if now - session.renewed > session._reissue_time:
                 session.changed()
         return wrapped(session, *arg, **kw)
+
     accessed.__doc__ = wrapped.__doc__
     return accessed
+
 
 def manage_changed(wrapped):
     """ Decorator which causes a cookie to be set when a setter method
     is called."""
+
     def changed(session, *arg, **kw):
         session.accessed = int(time.time())
         session.changed()
         return wrapped(session, *arg, **kw)
+
     changed.__doc__ = wrapped.__doc__
     return changed
+
 
 def signed_serialize(data, secret):
     """ Serialize any pickleable structure (``data``) and sign it
@@ -82,12 +76,14 @@ def signed_serialize(data, secret):
     sig = hmac.new(secret, pickled, hashlib.sha1).hexdigest()
     return sig + native_(base64.b64encode(pickled))
 
+
 deprecated(
     'signed_serialize',
     'This function will be removed in Pyramid 2.0. It is using pickle-based '
     'serialization, which is considered vulnerable to remote code execution '
     'attacks.',
 )
+
 
 def signed_deserialize(serialized, secret, hmac=hmac):
     """ Deserialize the value returned from ``signed_serialize``.  If
@@ -111,8 +107,10 @@ def signed_deserialize(serialized, secret, hmac=hmac):
     """
     # hmac parameterized only for unit tests
     try:
-        input_sig, pickled = (bytes_(serialized[:40]),
-                              base64.b64decode(bytes_(serialized[40:])))
+        input_sig, pickled = (
+            bytes_(serialized[:40]),
+            base64.b64decode(bytes_(serialized[40:])),
+        )
     except (binascii.Error, TypeError) as e:
         # Badly formed data can make base64 die
         raise ValueError('Badly formed base64 data: %s' % e)
@@ -130,6 +128,7 @@ def signed_deserialize(serialized, secret, hmac=hmac):
         raise ValueError('Invalid signature')
 
     return pickle.loads(pickled)
+
 
 deprecated(
     'signed_deserialize',
@@ -149,6 +148,7 @@ class PickleSerializer(object):
     Defaults to :attr:`pickle.HIGHEST_PROTOCOL`.
 
     """
+
     def __init__(self, protocol=pickle.HIGHEST_PROTOCOL):
         self.protocol = protocol
 
@@ -180,7 +180,7 @@ def BaseCookieSessionFactory(
     timeout=1200,
     reissue_time=0,
     set_on_exception=True,
-    ):
+):
     """
     Configure a :term:`session factory` which will provide cookie-based
     sessions.  The return value of this function is a :term:`session factory`,
@@ -280,7 +280,9 @@ def BaseCookieSessionFactory(
         _cookie_samesite = samesite
         _cookie_on_exception = set_on_exception
         _timeout = timeout if timeout is None else int(timeout)
-        _reissue_time = reissue_time if reissue_time is None else int(reissue_time)
+        _reissue_time = (
+            reissue_time if reissue_time is None else int(reissue_time)
+        )
 
         # dirty flag
         _dirty = False
@@ -330,13 +332,15 @@ def BaseCookieSessionFactory(
         def changed(self):
             if not self._dirty:
                 self._dirty = True
+
                 def set_cookie_callback(request, response):
                     self._set_cookie(response)
-                    self.request = None # explicitly break cycle for gc
+                    self.request = None  # explicitly break cycle for gc
+
                 self.request.add_response_callback(set_cookie_callback)
 
         def invalidate(self):
-            self.clear() # XXX probably needs to unset cookie
+            self.clear()  # XXX probably needs to unset cookie
 
         # non-modifying dictionary methods
         get = manage_accessed(dict.get)
@@ -398,16 +402,18 @@ def BaseCookieSessionFactory(
         def _set_cookie(self, response):
             if not self._cookie_on_exception:
                 exception = getattr(self.request, 'exception', None)
-                if exception is not None: # dont set a cookie during exceptions
+                if (
+                    exception is not None
+                ):  # dont set a cookie during exceptions
                     return False
-            cookieval = native_(serializer.dumps(
-                (self.accessed, self.created, dict(self))
-                ))
+            cookieval = native_(
+                serializer.dumps((self.accessed, self.created, dict(self)))
+            )
             if len(cookieval) > 4064:
                 raise ValueError(
-                    'Cookie value is too long to store (%s bytes)' %
-                    len(cookieval)
-                    )
+                    'Cookie value is too long to store (%s bytes)'
+                    % len(cookieval)
+                )
             response.set_cookie(
                 self._cookie_name,
                 value=cookieval,
@@ -417,7 +423,7 @@ def BaseCookieSessionFactory(
                 secure=self._cookie_secure,
                 httponly=self._cookie_httponly,
                 samesite=self._cookie_samesite,
-                )
+            )
             return True
 
     return CookieSession
@@ -436,7 +442,7 @@ def UnencryptedCookieSessionFactoryConfig(
     cookie_on_exception=True,
     signed_serialize=signed_serialize,
     signed_deserialize=signed_deserialize,
-    ):
+):
     """
     .. deprecated:: 1.5
         Use :func:`pyramid.session.SignedCookieSessionFactory` instead.
@@ -530,9 +536,10 @@ def UnencryptedCookieSessionFactoryConfig(
         httponly=cookie_httponly,
         samesite=cookie_samesite,
         timeout=timeout,
-        reissue_time=0, # to keep session.accessed == session.renewed
+        reissue_time=0,  # to keep session.accessed == session.renewed
         set_on_exception=cookie_on_exception,
     )
+
 
 deprecated(
     'UnencryptedCookieSessionFactoryConfig',
@@ -540,8 +547,8 @@ deprecated(
     'Pyramid 1.5.  Use ``pyramid.session.SignedCookieSessionFactory`` instead.'
     ' Caveat: Cookies generated using SignedCookieSessionFactory are not '
     'compatible with cookies generated using UnencryptedCookieSessionFactory, '
-    'so existing user session data will be destroyed if you switch to it.'
-    )
+    'so existing user session data will be destroyed if you switch to it.',
+)
 
 
 def SignedCookieSessionFactory(
@@ -559,7 +566,7 @@ def SignedCookieSessionFactory(
     hashalg='sha512',
     salt='pyramid.session.',
     serializer=None,
-    ):
+):
     """
     .. versionadded:: 1.5
 
@@ -681,11 +688,8 @@ def SignedCookieSessionFactory(
         )
 
     signed_serializer = SignedSerializer(
-        secret,
-        salt,
-        hashalg,
-        serializer=serializer,
-        )
+        secret, salt, hashalg, serializer=serializer
+    )
 
     return BaseCookieSessionFactory(
         signed_serializer,
@@ -701,12 +705,17 @@ def SignedCookieSessionFactory(
         set_on_exception=set_on_exception,
     )
 
+
 check_csrf_origin = check_csrf_origin  # api
-deprecated('check_csrf_origin',
-           'pyramid.session.check_csrf_origin is deprecated as of Pyramid '
-           '1.9. Use pyramid.csrf.check_csrf_origin instead.')
+deprecated(
+    'check_csrf_origin',
+    'pyramid.session.check_csrf_origin is deprecated as of Pyramid '
+    '1.9. Use pyramid.csrf.check_csrf_origin instead.',
+)
 
 check_csrf_token = check_csrf_token  # api
-deprecated('check_csrf_token',
-           'pyramid.session.check_csrf_token is deprecated as of Pyramid '
-           '1.9. Use pyramid.csrf.check_csrf_token instead.')
+deprecated(
+    'check_csrf_token',
+    'pyramid.session.check_csrf_token is deprecated as of Pyramid '
+    '1.9. Use pyramid.csrf.check_csrf_token instead.',
+)

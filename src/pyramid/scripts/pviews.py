@@ -9,9 +9,11 @@ from pyramid.request import Request
 from pyramid.scripts.common import parse_vars
 from pyramid.view import _find_views
 
+
 def main(argv=sys.argv, quiet=False):
     command = PViewsCommand(argv, quiet)
     return command.run()
+
 
 class PViewsCommand(object):
     description = """\
@@ -31,38 +33,41 @@ class PViewsCommand(object):
     parser = argparse.ArgumentParser(
         description=textwrap.dedent(description),
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        )
+    )
 
-    parser.add_argument('config_uri',
-                        nargs='?',
-                        default=None,
-                        help='The URI to the configuration file.')
+    parser.add_argument(
+        'config_uri',
+        nargs='?',
+        default=None,
+        help='The URI to the configuration file.',
+    )
 
-    parser.add_argument('url',
-                        nargs='?',
-                        default=None,
-                        help='The path info portion of the URL.')
+    parser.add_argument(
+        'url',
+        nargs='?',
+        default=None,
+        help='The path info portion of the URL.',
+    )
     parser.add_argument(
         'config_vars',
         nargs='*',
         default=(),
         help="Variables required by the config file. For example, "
-             "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
-             "passed here.",
-        )
+        "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
+        "passed here.",
+    )
 
-
-    bootstrap = staticmethod(bootstrap) # testing
-    setup_logging = staticmethod(setup_logging) # testing
+    bootstrap = staticmethod(bootstrap)  # testing
+    setup_logging = staticmethod(setup_logging)  # testing
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
         self.args = self.parser.parse_args(argv[1:])
 
-    def out(self, msg): # pragma: no cover
+    def out(self, msg):  # pragma: no cover
         if not self.quiet:
             print(msg)
-    
+
     def _find_multi_routes(self, mapper, request):
         infos = []
         path = request.environ['PATH_INFO']
@@ -70,7 +75,7 @@ class PViewsCommand(object):
         for route in mapper.get_routes():
             match = route.match(path)
             if match is not None:
-                info = {'match':match, 'route':route}
+                info = {'match': match, 'route': route}
                 infos.append(info)
         return infos
 
@@ -99,22 +104,17 @@ class PViewsCommand(object):
 
         @implementer(IMultiView)
         class RoutesMultiView(object):
-
             def __init__(self, infos, context_iface, root_factory, request):
                 self.views = []
                 for info in infos:
                     match, route = info['match'], info['route']
                     if route is not None:
                         request_iface = registry.queryUtility(
-                            IRouteRequest,
-                            name=route.name,
-                            default=IRequest)
+                            IRouteRequest, name=route.name, default=IRequest
+                        )
                         views = _find_views(
-                            request.registry,
-                            request_iface,
-                            context_iface,
-                            ''
-                            )
+                            request.registry, request_iface, context_iface, ''
+                        )
                         if not views:
                             continue
                         view = views[0]
@@ -148,9 +148,8 @@ class PViewsCommand(object):
                     attrs['matched_route'] = route
                     request.environ['bfg.routes.matchdict'] = match
                     request_iface = registry.queryUtility(
-                        IRouteRequest,
-                        name=route.name,
-                        default=IRequest)
+                        IRouteRequest, name=route.name, default=IRequest
+                    )
                     root_factory = route.factory or root_factory
             if len(infos) > 1:
                 routes_multiview = infos
@@ -171,11 +170,8 @@ class PViewsCommand(object):
         context_iface = providedBy(context)
         if routes_multiview is None:
             views = _find_views(
-                request.registry,
-                request_iface,
-                context_iface,
-                view_name,
-                )
+                request.registry, request_iface, context_iface, view_name
+            )
             if views:
                 view = views[0]
             else:
@@ -186,11 +182,8 @@ class PViewsCommand(object):
         # routes are not registered with a view name
         if view is None:
             views = _find_views(
-                request.registry,
-                request_iface,
-                context_iface,
-                '',
-                )
+                request.registry, request_iface, context_iface, ''
+            )
             if views:
                 view = views[0]
             else:
@@ -285,5 +278,6 @@ class PViewsCommand(object):
         env['closer']()
         return 0
 
-if __name__ == '__main__': # pragma: no cover
+
+if __name__ == '__main__':  # pragma: no cover
     sys.exit(main() or 0)

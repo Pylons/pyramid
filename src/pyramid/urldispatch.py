@@ -1,10 +1,7 @@
 import re
 from zope.interface import implementer
 
-from pyramid.interfaces import (
-    IRoutesMapper,
-    IRoute,
-    )
+from pyramid.interfaces import IRoutesMapper, IRoute
 
 from pyramid.compat import (
     PY2,
@@ -15,29 +12,28 @@ from pyramid.compat import (
     binary_type,
     is_nonstr_iter,
     decode_path_info,
-    )
+)
 
 from pyramid.exceptions import URLDecodeError
 
-from pyramid.traversal import (
-    quote_path_segment,
-    split_path_info,
-    PATH_SAFE,
-    )
+from pyramid.traversal import quote_path_segment, split_path_info, PATH_SAFE
 
 _marker = object()
 
+
 @implementer(IRoute)
 class Route(object):
-    def __init__(self, name, pattern, factory=None, predicates=(),
-                 pregenerator=None):
+    def __init__(
+        self, name, pattern, factory=None, predicates=(), pregenerator=None
+    ):
         self.pattern = pattern
-        self.path = pattern # indefinite b/w compat, not in interface
+        self.path = pattern  # indefinite b/w compat, not in interface
         self.match, self.generate = _compile_route(pattern)
         self.name = name
         self.factory = factory
         self.predicates = predicates
         self.pregenerator = pregenerator
+
 
 @implementer(IRoutesMapper)
 class RoutesMapper(object):
@@ -59,8 +55,15 @@ class RoutesMapper(object):
     def get_route(self, name):
         return self.routes.get(name)
 
-    def connect(self, name, pattern, factory=None, predicates=(),
-                pregenerator=None, static=False):
+    def connect(
+        self,
+        name,
+        pattern,
+        factory=None,
+        predicates=(),
+        pregenerator=None,
+        static=False,
+    ):
         if name in self.routes:
             oldroute = self.routes[name]
             if oldroute in self.routelist:
@@ -86,18 +89,21 @@ class RoutesMapper(object):
         except KeyError:
             path = '/'
         except UnicodeDecodeError as e:
-            raise URLDecodeError(e.encoding, e.object, e.start, e.end, e.reason)
+            raise URLDecodeError(
+                e.encoding, e.object, e.start, e.end, e.reason
+            )
 
         for route in self.routelist:
             match = route.match(path)
             if match is not None:
                 preds = route.predicates
-                info = {'match':match, 'route':route}
+                info = {'match': match, 'route': route}
                 if preds and not all((p(info, request) for p in preds)):
                     continue
                 return info
 
-        return {'route':None, 'match':None}
+        return {'route': None, 'match': None}
+
 
 # stolen from bobo and modified
 old_route_re = re.compile(r'(\:[_a-zA-Z]\w*)')
@@ -109,9 +115,11 @@ star_at_end = re.compile(r'\*(\w*)$')
 # (\{[a-zA-Z][^\}]*\}) but that choked when supplied with e.g. {foo:\d{4}}.
 route_re = re.compile(r'(\{[_a-zA-Z][^{}]*(?:\{[^{}]*\}[^{}]*)*\})')
 
+
 def update_pattern(matchobj):
     name = matchobj.group(0)
     return '{%s}' % name[1:]
+
 
 def _compile_route(route):
     # This function really wants to consume Unicode patterns natively, but if
@@ -126,7 +134,8 @@ def _compile_route(route):
             raise ValueError(
                 'The pattern value passed to add_route must be '
                 'either a Unicode string or a plain string without '
-                'any non-ASCII characters (you provided %r).' % route)
+                'any non-ASCII characters (you provided %r).' % route
+            )
 
     if old_route_re.search(route) and not route_re.search(route):
         route = old_route_re.sub(update_pattern, route)
@@ -145,17 +154,19 @@ def _compile_route(route):
     pat.reverse()
     rpat = []
     gen = []
-    prefix = pat.pop() # invar: always at least one element (route='/'+route)
+    prefix = pat.pop()  # invar: always at least one element (route='/'+route)
 
     # We want to generate URL-encoded URLs, so we url-quote the prefix, being
     # careful not to quote any embedded slashes.  We have to replace '%' with
     # '%%' afterwards, as the strings that go into "gen" are used as string
     # replacement targets.
-    gen.append(quote_path_segment(prefix, safe='/').replace('%', '%%')) # native
-    rpat.append(re.escape(prefix)) # unicode
+    gen.append(
+        quote_path_segment(prefix, safe='/').replace('%', '%%')
+    )  # native
+    rpat.append(re.escape(prefix))  # unicode
 
     while pat:
-        name = pat.pop() # unicode
+        name = pat.pop()  # unicode
         name = name[1:-1]
         if ':' in name:
             # reg may contain colons as well,
@@ -163,12 +174,12 @@ def _compile_route(route):
             name, reg = name.split(':', 1)
         else:
             reg = '[^/]+'
-        gen.append('%%(%s)s' % native_(name)) # native
-        name = '(?P<%s>%s)' % (name, reg) # unicode
+        gen.append('%%(%s)s' % native_(name))  # native
+        name = '(?P<%s>%s)' % (name, reg)  # unicode
         rpat.append(name)
-        s = pat.pop() # unicode
+        s = pat.pop()  # unicode
         if s:
-            rpat.append(re.escape(s)) # unicode
+            rpat.append(re.escape(s))  # unicode
             # We want to generate URL-encoded URLs, so we url-quote this
             # literal in the pattern, being careful not to quote the embedded
             # slashes.  We have to replace '%' with '%%' afterwards, as the
@@ -177,12 +188,13 @@ def _compile_route(route):
             gen.append(quote_path_segment(s, safe='/').replace('%', '%%'))
 
     if remainder:
-        rpat.append('(?P<%s>.*?)' % remainder) # unicode
-        gen.append('%%(%s)s' % native_(remainder)) # native
+        rpat.append('(?P<%s>.*?)' % remainder)  # unicode
+        gen.append('%%(%s)s' % native_(remainder))  # native
 
-    pattern = ''.join(rpat) + '$' # unicode
+    pattern = ''.join(rpat) + '$'  # unicode
 
     match = re.compile(pattern).match
+
     def matcher(path):
         # This function really wants to consume Unicode patterns natively,
         # but if someone passes us a bytestring, we allow it by converting it
@@ -227,9 +239,7 @@ def _compile_route(route):
             if k == remainder:
                 # a stararg argument
                 if is_nonstr_iter(v):
-                    v = '/'.join(
-                        [q(x) for x in v]
-                        ) # native
+                    v = '/'.join([q(x) for x in v])  # native
                 else:
                     if v.__class__ not in string_types:
                         v = str(v)
@@ -243,7 +253,7 @@ def _compile_route(route):
             # at this point, the value will be a native string
             newdict[k] = v
 
-        result = gen % newdict # native string result
+        result = gen % newdict  # native string result
         return result
 
     return matcher, generator

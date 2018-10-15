@@ -8,17 +8,15 @@ from pyramid.interfaces import (
     IRequestExtensions,
     IRootFactory,
     ISessionFactory,
-    )
+)
 
 from pyramid.router import default_execution_policy
 from pyramid.traversal import DefaultRootFactory
 
-from pyramid.util import (
-    get_callable_name,
-    InstancePropertyHelper,
-    )
+from pyramid.util import get_callable_name, InstancePropertyHelper
 
 from pyramid.config.util import action_method
+
 
 class FactoriesConfiguratorMixin(object):
     @action_method
@@ -41,10 +39,12 @@ class FactoriesConfiguratorMixin(object):
             self.registry.registerUtility(factory, IRootFactory)
             self.registry.registerUtility(factory, IDefaultRootFactory)  # b/c
 
-        intr = self.introspectable('root factories',
-                                   None,
-                                   self.object_description(factory),
-                                   'root factory')
+        intr = self.introspectable(
+            'root factories',
+            None,
+            self.object_description(factory),
+            'root factory',
+        )
         intr['factory'] = factory
         self.action(IRootFactory, register, introspectables=(intr,))
 
@@ -67,9 +67,13 @@ class FactoriesConfiguratorMixin(object):
 
         def register():
             self.registry.registerUtility(factory, ISessionFactory)
-        intr = self.introspectable('session factory', None,
-                                   self.object_description(factory),
-                                   'session factory')
+
+        intr = self.introspectable(
+            'session factory',
+            None,
+            self.object_description(factory),
+            'session factory',
+        )
         intr['factory'] = factory
         self.action(ISessionFactory, register, introspectables=(intr,))
 
@@ -97,9 +101,13 @@ class FactoriesConfiguratorMixin(object):
 
         def register():
             self.registry.registerUtility(factory, IRequestFactory)
-        intr = self.introspectable('request factory', None,
-                                   self.object_description(factory),
-                                   'request factory')
+
+        intr = self.introspectable(
+            'request factory',
+            None,
+            self.object_description(factory),
+            'request factory',
+        )
         intr['factory'] = factory
         self.action(IRequestFactory, register, introspectables=(intr,))
 
@@ -122,18 +130,19 @@ class FactoriesConfiguratorMixin(object):
         def register():
             self.registry.registerUtility(factory, IResponseFactory)
 
-        intr = self.introspectable('response factory', None,
-                                   self.object_description(factory),
-                                   'response factory')
+        intr = self.introspectable(
+            'response factory',
+            None,
+            self.object_description(factory),
+            'response factory',
+        )
         intr['factory'] = factory
         self.action(IResponseFactory, register, introspectables=(intr,))
 
     @action_method
-    def add_request_method(self,
-                           callable=None,
-                           name=None,
-                           property=False,
-                           reify=False):
+    def add_request_method(
+        self, callable=None, name=None, property=False, reify=False
+    ):
         """ Add a property or method to the request object.
 
         When adding a method to the request, ``callable`` may be any
@@ -177,7 +186,8 @@ class FactoriesConfiguratorMixin(object):
         property = property or reify
         if property:
             name, callable = InstancePropertyHelper.make_property(
-                callable, name=name, reify=reify)
+                callable, name=name, reify=reify
+            )
         elif name is None:
             name = callable.__name__
         else:
@@ -196,23 +206,31 @@ class FactoriesConfiguratorMixin(object):
         if callable is None:
             self.action(('request extensions', name), None)
         elif property:
-            intr = self.introspectable('request extensions', name,
-                                       self.object_description(callable),
-                                       'request property')
+            intr = self.introspectable(
+                'request extensions',
+                name,
+                self.object_description(callable),
+                'request property',
+            )
             intr['callable'] = callable
             intr['property'] = True
             intr['reify'] = reify
-            self.action(('request extensions', name), register,
-                        introspectables=(intr,))
+            self.action(
+                ('request extensions', name), register, introspectables=(intr,)
+            )
         else:
-            intr = self.introspectable('request extensions', name,
-                                       self.object_description(callable),
-                                       'request method')
+            intr = self.introspectable(
+                'request extensions',
+                name,
+                self.object_description(callable),
+                'request method',
+            )
             intr['callable'] = callable
             intr['property'] = False
             intr['reify'] = False
-            self.action(('request extensions', name), register,
-                        introspectables=(intr,))
+            self.action(
+                ('request extensions', name), register, introspectables=(intr,)
+            )
 
     @action_method
     def set_execution_policy(self, policy):
@@ -231,9 +249,12 @@ class FactoriesConfiguratorMixin(object):
         def register():
             self.registry.registerUtility(policy, IExecutionPolicy)
 
-        intr = self.introspectable('execution policy', None,
-                                   self.object_description(policy),
-                                   'execution policy')
+        intr = self.introspectable(
+            'execution policy',
+            None,
+            self.object_description(policy),
+            'execution policy',
+        )
         intr['policy'] = policy
         self.action(IExecutionPolicy, register, introspectables=(intr,))
 

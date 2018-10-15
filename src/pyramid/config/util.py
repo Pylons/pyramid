@@ -4,22 +4,17 @@ import traceback
 from webob.acceptparse import Accept
 from zope.interface import implementer
 
-from pyramid.compat import (
-    bytes_,
-    is_nonstr_iter
-)
+from pyramid.compat import bytes_, is_nonstr_iter
 from pyramid.interfaces import IActionInfo
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.predicates import Notted
 from pyramid.registry import predvalseq
-from pyramid.util import (
-    TopologicalSorter,
-    takes_one_arg,
-)
+from pyramid.util import TopologicalSorter, takes_one_arg
 
 TopologicalSorter = TopologicalSorter  # support bw-compat imports
 takes_one_arg = takes_one_arg  # support bw-compat imports
+
 
 @implementer(IActionInfo)
 class ActionInfo(object):
@@ -34,10 +29,12 @@ class ActionInfo(object):
         src = '\n'.join('    %s' % x for x in srclines)
         return 'Line %s of file %s:\n%s' % (self.line, self.file, src)
 
+
 def action_method(wrapped):
     """ Wrapper to provide the right conflict info report data when a method
     that calls Configurator.action calls another that does the same.  Not a
     documented API but used by some external systems."""
+
     def wrapper(self, *arg, **kw):
         if self._ainfo is None:
             self._ainfo = []
@@ -55,10 +52,10 @@ def action_method(wrapped):
                 # extra stack frame. This should no longer be necessary in
                 # Python 3.5.1
                 last_frame = ActionInfo(*f[-1])
-                if last_frame.function == 'extract_stack': # pragma: no cover
+                if last_frame.function == 'extract_stack':  # pragma: no cover
                     f.pop()
                 info = ActionInfo(*f[-backframes])
-            except Exception: # pragma: no cover
+            except Exception:  # pragma: no cover
                 info = ActionInfo(None, 0, '', '')
         self._ainfo.append(info)
         try:
@@ -112,6 +109,7 @@ class not_(object):
 
     .. versionadded:: 1.5
     """
+
     def __init__(self, value):
         self.value = value
 
@@ -119,8 +117,8 @@ class not_(object):
 # under = after
 # over = before
 
-class PredicateList(object):
 
+class PredicateList(object):
     def __init__(self):
         self.sorter = TopologicalSorter()
         self.last_added = None
@@ -133,11 +131,8 @@ class PredicateList(object):
         ##     weighs_less_than = LAST
         self.last_added = name
         self.sorter.add(
-            name,
-            factory,
-            after=weighs_more_than,
-            before=weighs_less_than,
-            )
+            name, factory, after=weighs_more_than, before=weighs_less_than
+        )
 
     def names(self):
         # Return the list of valid predicate names.
@@ -161,7 +156,7 @@ class PredicateList(object):
         preds = []
         for n, (name, predicate_factory) in enumerate(ordered):
             vals = kw.pop(name, None)
-            if vals is None: # XXX should this be a sentinel other than None?
+            if vals is None:  # XXX should this be a sentinel other than None?
                 continue
             if not isinstance(vals, predvalseq):
                 vals = (vals,)
@@ -183,8 +178,9 @@ class PredicateList(object):
                 preds.append(pred)
         if kw:
             from difflib import get_close_matches
+
             closest = []
-            names = [ name for name, _ in ordered ]
+            names = [name for name, _ in ordered]
             for name in kw:
                 closest.extend(get_close_matches(name, names, 3))
 
@@ -266,8 +262,7 @@ def sort_accept_offers(offers, order=None):
         parsed = Accept.parse_offer(value)
 
         type_w = find_order_index(
-            parsed.type + '/' + parsed.subtype,
-            max_weight,
+            parsed.type + '/' + parsed.subtype, max_weight
         )
 
         if parsed.params:

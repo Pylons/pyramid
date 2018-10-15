@@ -1,6 +1,7 @@
 from functools import wraps
 from pyramid.request import call_app_with_subpath_as_path_info
 
+
 def wsgiapp(wrapped):
     """ Decorator to turn a WSGI application into a :app:`Pyramid`
     :term:`view callable`.  This decorator differs from the
@@ -40,6 +41,7 @@ def wsgiapp(wrapped):
     if getattr(wrapped, '__name__', None):
         return wraps(wrapped)(decorator)
     return wraps(wrapped, ('__module__', '__doc__'))(decorator)
+
 
 def wsgiapp2(wrapped):
     """ Decorator to turn a WSGI application into a :app:`Pyramid`

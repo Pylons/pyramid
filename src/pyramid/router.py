@@ -1,7 +1,4 @@
-from zope.interface import (
-    implementer,
-    providedBy,
-    )
+from zope.interface import implementer, providedBy
 
 from pyramid.interfaces import (
     IDebugLogger,
@@ -15,14 +12,14 @@ from pyramid.interfaces import (
     IRoutesMapper,
     ITraverser,
     ITweens,
-    )
+)
 
 from pyramid.events import (
     ContextFound,
     NewRequest,
     NewResponse,
     BeforeTraversal,
-    )
+)
 
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.request import Request
@@ -30,10 +27,8 @@ from pyramid.view import _call_view
 from pyramid.request import apply_request_extensions
 from pyramid.threadlocal import RequestContext
 
-from pyramid.traversal import (
-    DefaultRootFactory,
-    ResourceTreeTraverser,
-    )
+from pyramid.traversal import DefaultRootFactory, ResourceTreeTraverser
+
 
 @implementer(IRouter)
 class Router(object):
@@ -49,12 +44,13 @@ class Router(object):
         self.request_factory = q(IRequestFactory, default=Request)
         self.request_extensions = q(IRequestExtensions)
         self.execution_policy = q(
-            IExecutionPolicy, default=default_execution_policy)
+            IExecutionPolicy, default=default_execution_policy
+        )
         self.orig_handle_request = self.handle_request
         tweens = q(ITweens)
         if tweens is not None:
             self.handle_request = tweens(self.handle_request, registry)
-        self.root_policy = self.root_factory # b/w compat
+        self.root_policy = self.root_factory  # b/w compat
         self.registry = registry
         settings = registry.settings
         if settings is not None:
@@ -82,8 +78,7 @@ class Router(object):
             match, route = info['match'], info['route']
             if route is None:
                 if debug_routematch:
-                    msg = ('no route matched for url %s' %
-                           request.url)
+                    msg = 'no route matched for url %s' % request.url
                     logger and logger.debug(msg)
             else:
                 attrs['matchdict'] = match
@@ -96,20 +91,21 @@ class Router(object):
                         'path_info: %r, '
                         'pattern: %r, '
                         'matchdict: %r, '
-                        'predicates: %r' % (
+                        'predicates: %r'
+                        % (
                             request.url,
                             route.name,
                             request.path_info,
                             route.pattern,
                             match,
-                            ', '.join([p.text() for p in route.predicates]))
+                            ', '.join([p.text() for p in route.predicates]),
                         )
+                    )
                     logger and logger.debug(msg)
 
                 request.request_iface = registry.queryUtility(
-                    IRouteRequest,
-                    name=route.name,
-                    default=IRequest)
+                    IRouteRequest, name=route.name, default=IRequest
+                )
 
                 root_factory = route.factory or self.root_factory
 
@@ -137,8 +133,8 @@ class Router(object):
             tdict['subpath'],
             tdict['traversed'],
             tdict['virtual_root'],
-            tdict['virtual_root_path']
-            )
+            tdict['virtual_root_path'],
+        )
 
         attrs.update(tdict)
 
@@ -149,12 +145,8 @@ class Router(object):
         # find a view callable
         context_iface = providedBy(context)
         response = _call_view(
-            registry,
-            request,
-            context,
-            context_iface,
-            view_name
-            )
+            registry, request, context, context_iface, view_name
+        )
 
         if response is None:
             if self.debug_notfound:
@@ -162,11 +154,19 @@ class Router(object):
                     'debug_notfound of url %s; path_info: %r, '
                     'context: %r, view_name: %r, subpath: %r, '
                     'traversed: %r, root: %r, vroot: %r, '
-                    'vroot_path: %r' % (
-                        request.url, request.path_info, context,
-                        view_name, subpath, traversed, root, vroot,
-                        vroot_path)
+                    'vroot_path: %r'
+                    % (
+                        request.url,
+                        request.path_info,
+                        context,
+                        view_name,
+                        subpath,
+                        traversed,
+                        root,
+                        vroot,
+                        vroot_path,
                     )
+                )
                 logger and logger.debug(msg)
             else:
                 msg = request.path_info
@@ -269,6 +269,7 @@ class Router(object):
         """
         response = self.execution_policy(environ, self)
         return response(environ, start_response)
+
 
 def default_execution_policy(environ, router):
     with router.request_context(environ) as request:

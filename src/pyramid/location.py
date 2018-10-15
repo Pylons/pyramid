@@ -12,6 +12,7 @@
 #
 ##############################################################################
 
+
 def inside(resource1, resource2):
     """Is ``resource1`` 'inside' ``resource2``?  Return ``True`` if so, else
     ``False``.
@@ -27,6 +28,7 @@ def inside(resource1, resource2):
         resource1 = resource1.__parent__
 
     return False
+
 
 def lineage(resource):
     """
@@ -63,4 +65,3 @@ def lineage(resource):
             resource = resource.__parent__
         except AttributeError:
             resource = None
-

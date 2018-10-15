@@ -4,9 +4,9 @@ import os
 from translationstring import (
     Translator,
     Pluralizer,
-    TranslationString, # API
-    TranslationStringFactory, # API
-    )
+    TranslationString,  # API
+    TranslationStringFactory,  # API
+)
 
 from pyramid.compat import PY2
 from pyramid.decorator import reify
@@ -15,7 +15,7 @@ from pyramid.interfaces import (
     ILocalizer,
     ITranslationDirectories,
     ILocaleNegotiator,
-    )
+)
 
 from pyramid.threadlocal import get_current_registry
 
@@ -24,6 +24,7 @@ TranslationStringFactory = TranslationStringFactory  # PyFlakes
 
 DEFAULT_PLURAL = lambda n: int(n != 1)
 
+
 class Localizer(object):
     """
     An object providing translation and pluralizations related to
@@ -31,6 +32,7 @@ class Localizer(object):
     :class:`pyramid.i18n.Localizer` object is created using the
     :func:`pyramid.i18n.get_localizer` function.
     """
+
     def __init__(self, locale_name, translations):
         self.locale_name = locale_name
         self.translations = translations
@@ -112,8 +114,9 @@ class Localizer(object):
         """
         if self.pluralizer is None:
             self.pluralizer = Pluralizer(self.translations)
-        return self.pluralizer(singular, plural, n, domain=domain,
-                               mapping=mapping)
+        return self.pluralizer(
+            singular, plural, n, domain=domain, mapping=mapping
+        )
 
 
 def default_locale_negotiator(request):
@@ -142,6 +145,7 @@ def default_locale_negotiator(request):
             locale_name = request.cookies.get(name)
     return locale_name
 
+
 def negotiate_locale_name(request):
     """ Negotiate and return the :term:`locale name` associated with
     the current request."""
@@ -149,8 +153,9 @@ def negotiate_locale_name(request):
         registry = request.registry
     except AttributeError:
         registry = get_current_registry()
-    negotiator = registry.queryUtility(ILocaleNegotiator,
-                                       default=default_locale_negotiator)
+    negotiator = registry.queryUtility(
+        ILocaleNegotiator, default=default_locale_negotiator
+    )
     locale_name = negotiator(request)
 
     if locale_name is None:
@@ -159,6 +164,7 @@ def negotiate_locale_name(request):
 
     return locale_name
 
+
 def get_locale_name(request):
     """
     .. deprecated:: 1.5
@@ -166,6 +172,7 @@ def get_locale_name(request):
         Return the :term:`locale name` associated with the current request.
     """
     return request.locale_name
+
 
 def make_localizer(current_locale_name, translation_directories):
     """ Create a :class:`pyramid.i18n.Localizer` object
@@ -199,16 +206,17 @@ def make_localizer(current_locale_name, translation_directories):
             if not os.path.isdir(os.path.realpath(messages_dir)):
                 continue
             for mofile in os.listdir(messages_dir):
-                mopath = os.path.realpath(os.path.join(messages_dir,
-                                                       mofile))
+                mopath = os.path.realpath(os.path.join(messages_dir, mofile))
                 if mofile.endswith('.mo') and os.path.isfile(mopath):
                     with open(mopath, 'rb') as mofp:
                         domain = mofile[:-3]
                         dtrans = Translations(mofp, domain)
                         translations.add(dtrans)
 
-    return Localizer(locale_name=current_locale_name,
-                          translations=translations)
+    return Localizer(
+        locale_name=current_locale_name, translations=translations
+    )
+
 
 def get_localizer(request):
     """
@@ -218,6 +226,7 @@ def get_localizer(request):
         corresponding to the current request's locale name.
     """
     return request.localizer
+
 
 class Translations(gettext.GNUTranslations, object):
     """An extended translation catalog class (ripped off from Babel) """
@@ -272,8 +281,10 @@ class Translations(gettext.GNUTranslations, object):
             return cls(fileobj=fp, domain=domain)
 
     def __repr__(self):
-        return '<%s: "%s">' % (type(self).__name__,
-                               self._info.get('project-id-version'))
+        return '<%s: "%s">' % (
+            type(self).__name__,
+            self._info.get('project-id-version'),
+        )
 
     def add(self, translations, merge=True):
         """Add the given translations to the catalog.
@@ -331,13 +342,13 @@ class Translations(gettext.GNUTranslations, object):
         domain.
         """
         return self._domains.get(domain, self).gettext(message)
-    
+
     def ldgettext(self, domain, message):
         """Like ``lgettext()``, but look the message up in the specified 
         domain.
-        """ 
+        """
         return self._domains.get(domain, self).lgettext(message)
-    
+
     def dugettext(self, domain, message):
         """Like ``ugettext()``, but look the message up in the specified
         domain.
@@ -346,29 +357,32 @@ class Translations(gettext.GNUTranslations, object):
             return self._domains.get(domain, self).ugettext(message)
         else:
             return self._domains.get(domain, self).gettext(message)
-    
+
     def dngettext(self, domain, singular, plural, num):
         """Like ``ngettext()``, but look the message up in the specified
         domain.
         """
         return self._domains.get(domain, self).ngettext(singular, plural, num)
-    
+
     def ldngettext(self, domain, singular, plural, num):
         """Like ``lngettext()``, but look the message up in the specified
         domain.
         """
         return self._domains.get(domain, self).lngettext(singular, plural, num)
-    
+
     def dungettext(self, domain, singular, plural, num):
         """Like ``ungettext()`` but look the message up in the specified
         domain.
         """
         if PY2:
             return self._domains.get(domain, self).ungettext(
-                singular, plural, num)
+                singular, plural, num
+            )
         else:
             return self._domains.get(domain, self).ngettext(
-                singular, plural, num)
+                singular, plural, num
+            )
+
 
 class LocalizerRequestMixin(object):
     @reify
@@ -384,8 +398,9 @@ class LocalizerRequestMixin(object):
             tdirs = registry.queryUtility(ITranslationDirectories, default=[])
             localizer = make_localizer(current_locale_name, tdirs)
 
-            registry.registerUtility(localizer, ILocalizer,
-                                     name=current_locale_name)
+            registry.registerUtility(
+                localizer, ILocalizer, name=current_locale_name
+            )
 
         return localizer
 
@@ -393,5 +408,3 @@ class LocalizerRequestMixin(object):
     def locale_name(self):
         locale_name = negotiate_locale_name(self)
         return locale_name
-        
-    

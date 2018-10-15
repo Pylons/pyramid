@@ -11,7 +11,7 @@ from pyramid.compat import (
     native_,
     url_quote as compat_url_quote,
     escape,
-    )
+)
 
 fsenc = sys.getfilesystemencoding()
 
@@ -22,9 +22,20 @@ class SkipTemplate(Exception):
     Raise this exception during the substitution of your template
     """
 
-def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
-             sub_vars=True, interactive=False, overwrite=True,
-             template_renderer=None, out_=sys.stdout):
+
+def copy_dir(
+    source,
+    dest,
+    vars,
+    verbosity,
+    simulate,
+    indent=0,
+    sub_vars=True,
+    interactive=False,
+    overwrite=True,
+    template_renderer=None,
+    out_=sys.stdout,
+):
     """
     Copies the ``source`` directory to the ``dest`` directory.
 
@@ -49,10 +60,12 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
     ``template_renderer(content_as_string, vars_as_dict,
     filename=filename)``.
     """
+
     def out(msg):
         out_.write(msg)
         out_.write('\n')
         out_.flush()
+
     # This allows you to use a leading +dot+ in filenames which would
     # otherwise be skipped because leading dots make the file hidden:
     vars.setdefault('dot', '.')
@@ -80,7 +93,7 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
             if verbosity >= 2:
                 reason = pad + reason % {'filename': full}
                 out(reason)
-            continue # pragma: no cover
+            continue  # pragma: no cover
         if sub_vars:
             dest_full = os.path.join(dest, substitute_filename(name, vars))
         sub_file = False
@@ -90,18 +103,36 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
         if use_pkg_resources and pkg_resources.resource_isdir(source[0], full):
             if verbosity:
                 out('%sRecursing into %s' % (pad, os.path.basename(full)))
-            copy_dir((source[0], full), dest_full, vars, verbosity, simulate,
-                     indent=indent + 1, sub_vars=sub_vars,
-                     interactive=interactive, overwrite=overwrite,
-                     template_renderer=template_renderer, out_=out_)
+            copy_dir(
+                (source[0], full),
+                dest_full,
+                vars,
+                verbosity,
+                simulate,
+                indent=indent + 1,
+                sub_vars=sub_vars,
+                interactive=interactive,
+                overwrite=overwrite,
+                template_renderer=template_renderer,
+                out_=out_,
+            )
             continue
         elif not use_pkg_resources and os.path.isdir(full):
             if verbosity:
                 out('%sRecursing into %s' % (pad, os.path.basename(full)))
-            copy_dir(full, dest_full, vars, verbosity, simulate,
-                     indent=indent + 1, sub_vars=sub_vars,
-                     interactive=interactive, overwrite=overwrite,
-                     template_renderer=template_renderer, out_=out_)
+            copy_dir(
+                full,
+                dest_full,
+                vars,
+                verbosity,
+                simulate,
+                indent=indent + 1,
+                sub_vars=sub_vars,
+                interactive=interactive,
+                overwrite=overwrite,
+                template_renderer=template_renderer,
+                out_=out_,
+            )
             continue
         elif use_pkg_resources:
             content = pkg_resources.resource_string(source[0], full)
@@ -111,12 +142,14 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
         if sub_file:
             try:
                 content = substitute_content(
-                    content, vars, filename=full,
-                    template_renderer=template_renderer
-                    )
-            except SkipTemplate: 
-                continue # pragma: no cover
-            if content is None:  
+                    content,
+                    vars,
+                    filename=full,
+                    template_renderer=template_renderer,
+                )
+            except SkipTemplate:
+                continue  # pragma: no cover
+            if content is None:
                 continue  # pragma: no cover
         already_exists = os.path.exists(dest_full)
         if already_exists:
@@ -124,26 +157,32 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
                 old_content = f.read()
             if old_content == content:
                 if verbosity:
-                    out('%s%s already exists (same content)' %
-                          (pad, dest_full))
-                continue # pragma: no cover
+                    out(
+                        '%s%s already exists (same content)' % (pad, dest_full)
+                    )
+                continue  # pragma: no cover
             if interactive:
                 if not query_interactive(
-                    native_(full, fsenc), native_(dest_full, fsenc),
-                    native_(content, fsenc), native_(old_content, fsenc),
-                    simulate=simulate, out_=out_):
+                    native_(full, fsenc),
+                    native_(dest_full, fsenc),
+                    native_(content, fsenc),
+                    native_(old_content, fsenc),
+                    simulate=simulate,
+                    out_=out_,
+                ):
                     continue
             elif not overwrite:
-                continue # pragma: no cover 
+                continue  # pragma: no cover
         if verbosity and use_pkg_resources:
             out('%sCopying %s to %s' % (pad, full, dest_full))
         elif verbosity:
             out(
-                '%sCopying %s to %s' % (pad, os.path.basename(full),
-                                        dest_full))
+                '%sCopying %s to %s' % (pad, os.path.basename(full), dest_full)
+            )
         if not simulate:
             with open(dest_full, 'wb') as f:
                 f.write(content)
+
 
 def should_skip_file(name):
     """
@@ -164,38 +203,60 @@ def should_skip_file(name):
         return 'Skipping version control directory %(filename)s'
     return None
 
+
 # Overridden on user's request:
 all_answer = None
 
-def query_interactive(src_fn, dest_fn, src_content, dest_content,
-                      simulate, out_=sys.stdout):
+
+def query_interactive(
+    src_fn, dest_fn, src_content, dest_content, simulate, out_=sys.stdout
+):
     def out(msg):
         out_.write(msg)
         out_.write('\n')
         out_.flush()
+
     global all_answer
     from difflib import unified_diff, context_diff
-    u_diff = list(unified_diff(
-        dest_content.splitlines(),
-        src_content.splitlines(),
-        dest_fn, src_fn))
-    c_diff = list(context_diff(
-        dest_content.splitlines(),
-        src_content.splitlines(),
-        dest_fn, src_fn))
-    added = len([l for l in u_diff if l.startswith('+') and
-                 not l.startswith('+++')])
-    removed = len([l for l in u_diff if l.startswith('-') and
-                   not l.startswith('---')])
+
+    u_diff = list(
+        unified_diff(
+            dest_content.splitlines(),
+            src_content.splitlines(),
+            dest_fn,
+            src_fn,
+        )
+    )
+    c_diff = list(
+        context_diff(
+            dest_content.splitlines(),
+            src_content.splitlines(),
+            dest_fn,
+            src_fn,
+        )
+    )
+    added = len(
+        [l for l in u_diff if l.startswith('+') and not l.startswith('+++')]
+    )
+    removed = len(
+        [l for l in u_diff if l.startswith('-') and not l.startswith('---')]
+    )
     if added > removed:
         msg = '; %i lines added' % (added - removed)
     elif removed > added:
         msg = '; %i lines removed' % (removed - added)
     else:
         msg = ''
-    out('Replace %i bytes with %i bytes (%i/%i lines changed%s)' % (
-        len(dest_content), len(src_content),
-        removed, len(dest_content.splitlines()), msg))
+    out(
+        'Replace %i bytes with %i bytes (%i/%i lines changed%s)'
+        % (
+            len(dest_content),
+            len(src_content),
+            removed,
+            len(dest_content.splitlines()),
+            msg,
+        )
+    )
     prompt = 'Overwrite %s [y/n/d/B/?] ' % dest_fn
     while 1:
         if all_answer is None:
@@ -204,6 +265,7 @@ def query_interactive(src_fn, dest_fn, src_content, dest_content,
             response = all_answer
         if not response or response[0] == 'b':
             import shutil
+
             new_dest_fn = dest_fn + '.bak'
             n = 0
             while os.path.exists(new_dest_fn):
@@ -230,6 +292,7 @@ def query_interactive(src_fn, dest_fn, src_content, dest_content,
         else:
             out(query_usage)
 
+
 query_usage = """\
 Responses:
   Y(es):    Overwrite the file with the new content.
@@ -240,38 +303,46 @@ Responses:
   Type "all Y/N/B" to use Y/N/B for answer to all future questions
 """
 
+
 def makedirs(dir, verbosity, pad):
     parent = os.path.dirname(os.path.abspath(dir))
     if not os.path.exists(parent):
         makedirs(parent, verbosity, pad)  # pragma: no cover
     os.mkdir(dir)
 
+
 def substitute_filename(fn, vars):
     for var, value in vars.items():
         fn = fn.replace('+%s+' % var, str(value))
     return fn
 
-def substitute_content(content, vars, filename='<string>',
-                       template_renderer=None):
+
+def substitute_content(
+    content, vars, filename='<string>', template_renderer=None
+):
     v = standard_vars.copy()
     v.update(vars)
     return template_renderer(content, v, filename=filename)
+
 
 def html_quote(s):
     if s is None:
         return ''
     return escape(str(s), 1)
 
+
 def url_quote(s):
     if s is None:
         return ''
     return compat_url_quote(str(s))
+
 
 def test(conf, true_cond, false_cond=None):
     if conf:
         return true_cond
     else:
         return false_cond
+
 
 def skip_template(condition=True, *args):
     """
@@ -286,6 +357,7 @@ def skip_template(condition=True, *args):
     if condition:
         raise SkipTemplate(*args)
 
+
 standard_vars = {
     'nothing': None,
     'html_quote': html_quote,
@@ -297,5 +369,4 @@ standard_vars = {
     'bool': bool,
     'SkipTemplate': SkipTemplate,
     'skip_template': skip_template,
-    }
-
+}

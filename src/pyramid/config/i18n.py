@@ -1,12 +1,10 @@
-from pyramid.interfaces import (
-    ILocaleNegotiator,
-    ITranslationDirectories,
-    )
+from pyramid.interfaces import ILocaleNegotiator, ITranslationDirectories
 
 from pyramid.exceptions import ConfigurationError
 from pyramid.path import AssetResolver
 
 from pyramid.config.util import action_method
+
 
 class I18NConfiguratorMixin(object):
     @action_method
@@ -30,11 +28,16 @@ class I18NConfiguratorMixin(object):
            :class:`pyramid.config.Configurator` constructor can be used to
            achieve the same purpose.
         """
+
         def register():
             self._set_locale_negotiator(negotiator)
-        intr = self.introspectable('locale negotiator', None,
-                                   self.object_description(negotiator),
-                                   'locale negotiator')
+
+        intr = self.introspectable(
+            'locale negotiator',
+            None,
+            self.object_description(negotiator),
+            'locale negotiator',
+        )
         intr['negotiator'] = negotiator
         self.action(ILocaleNegotiator, register, introspectables=(intr,))
 
@@ -97,10 +100,15 @@ class I18NConfiguratorMixin(object):
                 asset = resolver.resolve(spec)
                 directory = asset.abspath()
                 if not asset.isdir():
-                    raise ConfigurationError('"%s" is not a directory' %
-                                            directory)
-                intr = self.introspectable('translation directories', directory,
-                                        spec, 'translation directory')
+                    raise ConfigurationError(
+                        '"%s" is not a directory' % directory
+                    )
+                intr = self.introspectable(
+                    'translation directories',
+                    directory,
+                    spec,
+                    'translation directory',
+                )
                 intr['directory'] = directory
                 intr['spec'] = spec
                 introspectables.append(intr)
@@ -117,4 +125,3 @@ class I18NConfiguratorMixin(object):
                     tdirs.insert(0, directory)
 
         self.action(None, register, introspectables=introspectables)
-

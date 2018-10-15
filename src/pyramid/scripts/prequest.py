@@ -8,9 +8,11 @@ from pyramid.request import Request
 from pyramid.scripts.common import get_config_loader
 from pyramid.scripts.common import parse_vars
 
+
 def main(argv=sys.argv, quiet=False):
     command = PRequestCommand(argv, quiet)
     return command.run()
+
 
 class PRequestCommand(object):
     description = """\
@@ -48,15 +50,16 @@ class PRequestCommand(object):
     parser = argparse.ArgumentParser(
         description=textwrap.dedent(description),
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        )
+    )
     parser.add_argument(
-        '-n', '--app-name',
+        '-n',
+        '--app-name',
         dest='app_name',
         metavar='NAME',
         help=(
             "Load the named application from the config file (default 'main')"
         ),
-        )
+    )
     parser.add_argument(
         '--header',
         dest='headers',
@@ -67,47 +70,55 @@ class PRequestCommand(object):
         ),
     )
     parser.add_argument(
-        '-d', '--display-headers',
+        '-d',
+        '--display-headers',
         dest='display_headers',
         action='store_true',
-        help='Display status and headers before the response body'
-        )
+        help='Display status and headers before the response body',
+    )
     parser.add_argument(
-        '-m', '--method',
+        '-m',
+        '--method',
         dest='method',
-        choices=['GET', 'HEAD', 'POST', 'PUT', 'PATCH','DELETE',
-                 'PROPFIND', 'OPTIONS'],
+        choices=[
+            'GET',
+            'HEAD',
+            'POST',
+            'PUT',
+            'PATCH',
+            'DELETE',
+            'PROPFIND',
+            'OPTIONS',
+        ],
         help='Request method type (GET, POST, PUT, PATCH, DELETE, '
-             'PROPFIND, OPTIONS)',
-        )
+        'PROPFIND, OPTIONS)',
+    )
     parser.add_argument(
-        '-l', '--login',
+        '-l',
+        '--login',
         dest='login',
         help='HTTP basic auth username:password pair',
-        )
+    )
 
     parser.add_argument(
         'config_uri',
         nargs='?',
         default=None,
         help='The URI to the configuration file.',
-        )
+    )
 
     parser.add_argument(
-        'path_info',
-        nargs='?',
-        default=None,
-        help='The path of the request.',
-        )
+        'path_info', nargs='?', default=None, help='The path of the request.'
+    )
 
     parser.add_argument(
         'config_vars',
         nargs='*',
         default=(),
         help="Variables required by the config file. For example, "
-             "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
-             "passed here.",
-        )
+        "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
+        "passed here.",
+    )
 
     _get_config_loader = staticmethod(get_config_loader)
     stdin = sys.stdin
@@ -116,7 +127,7 @@ class PRequestCommand(object):
         self.quiet = quiet
         self.args = self.parser.parse_args(argv[1:])
 
-    def out(self, msg): # pragma: no cover
+    def out(self, msg):  # pragma: no cover
         if not self.quiet:
             print(msg)
 
@@ -153,7 +164,8 @@ class PRequestCommand(object):
                 if ':' not in item:
                     self.out(
                         "Bad --header=%s option, value must be in the form "
-                        "'name:value'" % item)
+                        "'name:value'" % item
+                    )
                     return 2
                 name, value = item.split(':', 1)
                 headers[name] = value.strip()
@@ -162,13 +174,13 @@ class PRequestCommand(object):
 
         environ = {
             'REQUEST_METHOD': request_method,
-            'SCRIPT_NAME': '',           # may be empty if app is at the root
+            'SCRIPT_NAME': '',  # may be empty if app is at the root
             'PATH_INFO': path,
             'SERVER_NAME': 'localhost',  # always mandatory
-            'SERVER_PORT': '80',         # always mandatory
+            'SERVER_PORT': '80',  # always mandatory
             'SERVER_PROTOCOL': 'HTTP/1.0',
             'CONTENT_TYPE': 'text/plain',
-            'REMOTE_ADDR':'127.0.0.1',
+            'REMOTE_ADDR': '127.0.0.1',
             'wsgi.run_once': True,
             'wsgi.multithread': False,
             'wsgi.multiprocess': False,
@@ -178,7 +190,7 @@ class PRequestCommand(object):
             'QUERY_STRING': qs,
             'HTTP_ACCEPT': 'text/plain;q=1.0, */*;q=0.1',
             'paste.command_request': True,
-            }
+        }
 
         if request_method in ('POST', 'PUT', 'PATCH'):
             environ['wsgi.input'] = self.stdin
@@ -203,5 +215,6 @@ class PRequestCommand(object):
             self.out(response.body)
         return 0
 
-if __name__ == '__main__': # pragma: no cover
+
+if __name__ == '__main__':  # pragma: no cover
     sys.exit(main() or 0)

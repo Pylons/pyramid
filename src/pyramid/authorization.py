@@ -6,13 +6,8 @@ from pyramid.location import lineage
 
 from pyramid.compat import is_nonstr_iter
 
-from pyramid.security import (
-    ACLAllowed,
-    ACLDenied,
-    Allow,
-    Deny,
-    Everyone,
-    )
+from pyramid.security import ACLAllowed, ACLDenied, Allow, Deny, Everyone
+
 
 @implementer(IAuthorizationPolicy)
 class ACLAuthorizationPolicy(object):
@@ -90,20 +85,19 @@ class ACLAuthorizationPolicy(object):
                         ace_permissions = [ace_permissions]
                     if permission in ace_permissions:
                         if ace_action == Allow:
-                            return ACLAllowed(ace, acl, permission,
-                                              principals, location)
+                            return ACLAllowed(
+                                ace, acl, permission, principals, location
+                            )
                         else:
-                            return ACLDenied(ace, acl, permission,
-                                             principals, location)
+                            return ACLDenied(
+                                ace, acl, permission, principals, location
+                            )
 
         # default deny (if no ACL in lineage at all, or if none of the
         # principals were mentioned in any ACE we found)
         return ACLDenied(
-            '<default deny>',
-            acl,
-            permission,
-            principals,
-            context)
+            '<default deny>', acl, permission, principals, context
+        )
 
     def principals_allowed_by_permission(self, context, permission):
         """ Return the set of principals explicitly granted the
@@ -132,14 +126,14 @@ class ACLAuthorizationPolicy(object):
                     if ace_principal not in denied_here:
                         allowed_here.add(ace_principal)
                 if (ace_action == Deny) and (permission in ace_permissions):
-                        denied_here.add(ace_principal)
-                        if ace_principal == Everyone:
-                            # clear the entire allowed set, as we've hit a
-                            # deny of Everyone ala (Deny, Everyone, ALL)
-                            allowed = set()
-                            break
-                        elif ace_principal in allowed:
-                            allowed.remove(ace_principal)
+                    denied_here.add(ace_principal)
+                    if ace_principal == Everyone:
+                        # clear the entire allowed set, as we've hit a
+                        # deny of Everyone ala (Deny, Everyone, ALL)
+                        allowed = set()
+                        break
+                    elif ace_principal in allowed:
+                        allowed.remove(ace_principal)
 
             allowed.update(allowed_here)
 

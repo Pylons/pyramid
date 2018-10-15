@@ -1,6 +1,7 @@
 from pyramid.scripting import prepare
 from pyramid.scripts.common import get_config_loader
 
+
 def setup_logging(config_uri, global_conf=None):
     """
     Set up Python logging with the filename specified via ``config_uri``
@@ -10,6 +11,7 @@ def setup_logging(config_uri, global_conf=None):
     """
     loader = get_config_loader(config_uri)
     loader.setup_logging(global_conf)
+
 
 def get_app(config_uri, name=None, options=None):
     """ Return the WSGI application named ``name`` in the PasteDeploy
@@ -27,6 +29,7 @@ def get_app(config_uri, name=None, options=None):
     loader = get_config_loader(config_uri)
     return loader.get_wsgi_app(name, options)
 
+
 def get_appsettings(config_uri, name=None, options=None):
     """ Return a dictionary representing the key/value pairs in an ``app``
     section within the file represented by ``config_uri``.
@@ -42,6 +45,7 @@ def get_appsettings(config_uri, name=None, options=None):
     """
     loader = get_config_loader(config_uri)
     return loader.get_wsgi_app_settings(name, options)
+
 
 def bootstrap(config_uri, request=None, options=None):
     """ Load a WSGI application from the PasteDeploy config file specified
@@ -108,4 +112,3 @@ def bootstrap(config_uri, request=None, options=None):
     env = prepare(request)
     env['app'] = app
     return env
-

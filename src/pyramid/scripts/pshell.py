@@ -16,6 +16,7 @@ from pyramid.settings import aslist
 from pyramid.scripts.common import get_config_loader
 from pyramid.scripts.common import parse_vars
 
+
 def main(argv=sys.argv, quiet=False):
     command = PShellCommand(argv, quiet)
     return command.run()
@@ -49,38 +50,52 @@ class PShellCommand(object):
     parser = argparse.ArgumentParser(
         description=textwrap.dedent(description),
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        )
-    parser.add_argument('-p', '--python-shell',
-                        action='store',
-                        dest='python_shell',
-                        default='',
-                        help=('Select the shell to use. A list of possible '
-                              'shells is available using the --list-shells '
-                              'option.'))
-    parser.add_argument('-l', '--list-shells',
-                        dest='list',
-                        action='store_true',
-                        help='List all available shells.')
-    parser.add_argument('--setup',
-                        dest='setup',
-                        help=("A callable that will be passed the environment "
-                              "before it is made available to the shell. This "
-                              "option will override the 'setup' key in the "
-                              "[pshell] ini section."))
-    parser.add_argument('config_uri',
-                        nargs='?',
-                        default=None,
-                        help='The URI to the configuration file.')
+    )
+    parser.add_argument(
+        '-p',
+        '--python-shell',
+        action='store',
+        dest='python_shell',
+        default='',
+        help=(
+            'Select the shell to use. A list of possible '
+            'shells is available using the --list-shells '
+            'option.'
+        ),
+    )
+    parser.add_argument(
+        '-l',
+        '--list-shells',
+        dest='list',
+        action='store_true',
+        help='List all available shells.',
+    )
+    parser.add_argument(
+        '--setup',
+        dest='setup',
+        help=(
+            "A callable that will be passed the environment "
+            "before it is made available to the shell. This "
+            "option will override the 'setup' key in the "
+            "[pshell] ini section."
+        ),
+    )
+    parser.add_argument(
+        'config_uri',
+        nargs='?',
+        default=None,
+        help='The URI to the configuration file.',
+    )
     parser.add_argument(
         'config_vars',
         nargs='*',
         default=(),
         help="Variables required by the config file. For example, "
-             "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
-             "passed here.",
-        )
+        "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
+        "passed here.",
+    )
 
-    default_runner = python_shell_runner # testing
+    default_runner = python_shell_runner  # testing
 
     loaded_objects = {}
     object_help = {}
@@ -107,7 +122,7 @@ class PShellCommand(object):
                 self.loaded_objects[k] = self.resolver.maybe_resolve(v)
                 self.object_help[k] = v
 
-    def out(self, msg): # pragma: no cover
+    def out(self, msg):  # pragma: no cover
         if not self.quiet:
             print(msg)
 
@@ -152,8 +167,9 @@ class PShellCommand(object):
         env_help['root'] = 'Root of the default resource tree.'
         env_help['registry'] = 'Active Pyramid registry.'
         env_help['request'] = 'Active request object.'
-        env_help['root_factory'] = (
-            'Default root factory used to create `root`.')
+        env_help[
+            'root_factory'
+        ] = 'Default root factory used to create `root`.'
 
         # load the pshell section of the ini file
         env.update(self.loaded_objects)
@@ -236,6 +252,7 @@ class PShellCommand(object):
                 # by default prioritize all shells above python
                 preferred_shells = [k for k in shells.keys() if k != 'python']
             max_weight = len(preferred_shells)
+
             def order(x):
                 # invert weight to reverse sort the list
                 # (closer to the front is higher priority)
@@ -243,6 +260,7 @@ class PShellCommand(object):
                     return preferred_shells.index(x[0].lower()) - max_weight
                 except ValueError:
                     return 1
+
             sorted_shells = sorted(shells.items(), key=order)
 
             if len(sorted_shells) > 0:
@@ -266,5 +284,5 @@ class PShellCommand(object):
         return shell
 
 
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     sys.exit(main() or 0)

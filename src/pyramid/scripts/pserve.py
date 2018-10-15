@@ -46,67 +46,86 @@ class PServeCommand(object):
     parser = argparse.ArgumentParser(
         description=textwrap.dedent(description),
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        )
+    )
     parser.add_argument(
-        '-n', '--app-name',
+        '-n',
+        '--app-name',
         dest='app_name',
         metavar='NAME',
-        help="Load the named application (default main)")
+        help="Load the named application (default main)",
+    )
     parser.add_argument(
-        '-s', '--server',
+        '-s',
+        '--server',
         dest='server',
         metavar='SERVER_TYPE',
-        help="Use the named server.")
+        help="Use the named server.",
+    )
     parser.add_argument(
         '--server-name',
         dest='server_name',
         metavar='SECTION_NAME',
-        help=("Use the named server as defined in the configuration file "
-              "(default: main)"))
+        help=(
+            "Use the named server as defined in the configuration file "
+            "(default: main)"
+        ),
+    )
     parser.add_argument(
         '--reload',
         dest='reload',
         action='store_true',
-        help="Use auto-restart file monitor")
+        help="Use auto-restart file monitor",
+    )
     parser.add_argument(
         '--reload-interval',
         dest='reload_interval',
         default=1,
-        help=("Seconds between checking files (low number can cause "
-              "significant CPU usage)"))
+        help=(
+            "Seconds between checking files (low number can cause "
+            "significant CPU usage)"
+        ),
+    )
     parser.add_argument(
-        '-b', '--browser',
+        '-b',
+        '--browser',
         dest='browser',
         action='store_true',
-        help=("Open a web browser to the server url. The server url is "
-              "determined from the 'open_url' setting in the 'pserve' "
-              "section of the configuration file."))
+        help=(
+            "Open a web browser to the server url. The server url is "
+            "determined from the 'open_url' setting in the 'pserve' "
+            "section of the configuration file."
+        ),
+    )
     parser.add_argument(
-        '-v', '--verbose',
+        '-v',
+        '--verbose',
         default=default_verbosity,
         dest='verbose',
         action='count',
-        help="Set verbose level (default " + str(default_verbosity) + ")")
+        help="Set verbose level (default " + str(default_verbosity) + ")",
+    )
     parser.add_argument(
-        '-q', '--quiet',
+        '-q',
+        '--quiet',
         action='store_const',
         const=0,
         dest='verbose',
-        help="Suppress verbose output")
+        help="Suppress verbose output",
+    )
     parser.add_argument(
         'config_uri',
         nargs='?',
         default=None,
         help='The URI to the configuration file.',
-        )
+    )
     parser.add_argument(
         'config_vars',
         nargs='*',
         default=(),
         help="Variables required by the config file. For example, "
-             "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
-             "passed here.",
-        )
+        "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
+        "passed here.",
+    )
 
     _get_config_loader = staticmethod(get_config_loader)  # for testing
 
@@ -187,18 +206,23 @@ class PServeCommand(object):
 
             if not url:
                 url = self.guess_server_url(
-                    server_loader, server_name, config_vars)
+                    server_loader, server_name, config_vars
+                )
 
             if not url:
-                self.out('WARNING: could not determine the server\'s url to '
-                         'open the browser. To fix this set the "open_url" '
-                         'setting in the [pserve] section of the '
-                         'configuration file.')
+                self.out(
+                    'WARNING: could not determine the server\'s url to '
+                    'open the browser. To fix this set the "open_url" '
+                    'setting in the [pserve] section of the '
+                    'configuration file.'
+                )
 
             else:
+
                 def open_browser():
                     time.sleep(1)
                     webbrowser.open(url)
+
                 t = threading.Thread(target=open_browser)
                 t.setDaemon(True)
                 t.start()
@@ -210,7 +234,7 @@ class PServeCommand(object):
                 'pyramid.scripts.pserve.main',
                 reload_interval=int(self.args.reload_interval),
                 verbose=self.args.verbose,
-                worker_kwargs=self.worker_kwargs
+                worker_kwargs=self.worker_kwargs,
             )
             return 0
 
@@ -250,6 +274,7 @@ class PServeCommand(object):
 # For paste.deploy server instantiation (egg:pyramid#wsgiref)
 def wsgiref_server_runner(wsgi_app, global_conf, **kw):  # pragma: no cover
     from wsgiref.simple_server import make_server
+
     host = kw.get('host', '0.0.0.0')
     port = int(kw.get('port', 8080))
     server = make_server(host, port, wsgi_app)
@@ -259,11 +284,18 @@ def wsgiref_server_runner(wsgi_app, global_conf, **kw):  # pragma: no cover
 
 # For paste.deploy server instantiation (egg:pyramid#cherrypy)
 def cherrypy_server_runner(
-        app, global_conf=None, host='127.0.0.1', port=None,
-        ssl_pem=None, protocol_version=None, numthreads=None,
-        server_name=None, max=None, request_queue_size=None,
-        timeout=None
-        ):  # pragma: no cover
+    app,
+    global_conf=None,
+    host='127.0.0.1',
+    port=None,
+    ssl_pem=None,
+    protocol_version=None,
+    numthreads=None,
+    server_name=None,
+    max=None,
+    request_queue_size=None,
+    timeout=None,
+):  # pragma: no cover
     """
     Entry point for CherryPy's WSGI server
 
@@ -346,8 +378,7 @@ def cherrypy_server_runner(
     except ImportError:
         from cherrypy.wsgiserver import CherryPyWSGIServer as WSGIServer
 
-    server = WSGIServer(bind_addr, app,
-                        server_name=server_name, **kwargs)
+    server = WSGIServer(bind_addr, app, server_name=server_name, **kwargs)
     if ssl_pem is not None:
         if PY2:
             server.ssl_certificate = server.ssl_private_key = ssl_pem
@@ -368,8 +399,10 @@ def cherrypy_server_runner(
     try:
         protocol = is_ssl and 'https' or 'http'
         if host == '0.0.0.0':
-            print('serving on 0.0.0.0:%s view at %s://127.0.0.1:%s' %
-                  (port, protocol, port))
+            print(
+                'serving on 0.0.0.0:%s view at %s://127.0.0.1:%s'
+                % (port, protocol, port)
+            )
         else:
             print('serving on %s://%s:%s' % (protocol, host, port))
         server.start()

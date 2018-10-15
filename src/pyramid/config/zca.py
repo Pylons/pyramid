@@ -1,5 +1,6 @@
 from pyramid.threadlocal import get_current_registry
 
+
 class ZCAConfiguratorMixin(object):
     def hook_zca(self):
         """ Call :func:`zope.component.getSiteManager.sethook` with the
@@ -10,11 +11,12 @@ class ZCAConfiguratorMixin(object):
         :app:`Pyramid` :term:`application registry` rather than the Zope
         'global' registry."""
         from zope.component import getSiteManager
+
         getSiteManager.sethook(get_current_registry)
 
     def unhook_zca(self):
         """ Call :func:`zope.component.getSiteManager.reset` to undo the
         action of :meth:`pyramid.config.Configurator.hook_zca`."""
         from zope.component import getSiteManager
-        getSiteManager.reset()
 
+        getSiteManager.reset()

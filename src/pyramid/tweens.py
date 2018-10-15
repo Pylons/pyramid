@@ -3,6 +3,7 @@ import sys
 from pyramid.compat import reraise
 from pyramid.httpexceptions import HTTPNotFound
 
+
 def _error_handler(request, exc):
     # NOTE: we do not need to delete exc_info because this function
     # should never be in the call stack of the exception
@@ -16,6 +17,7 @@ def _error_handler(request, exc):
         reraise(*exc_info)
 
     return response
+
 
 def excview_tween_factory(handler, registry):
     """ A :term:`tween` factory which produces a tween that catches an
@@ -42,6 +44,7 @@ def excview_tween_factory(handler, registry):
         return response
 
     return excview_tween
+
 
 MAIN = 'MAIN'
 INGRESS = 'INGRESS'

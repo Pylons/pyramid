@@ -2,25 +2,16 @@ from zope.interface import implementer
 
 from pyramid.interfaces import ITweens
 
-from pyramid.compat import (
-    string_types,
-    is_nonstr_iter,
-    )
+from pyramid.compat import string_types, is_nonstr_iter
 
 from pyramid.exceptions import ConfigurationError
 
-from pyramid.tweens import (
-    MAIN,
-    INGRESS,
-    EXCVIEW,
-    )
+from pyramid.tweens import MAIN, INGRESS, EXCVIEW
 
-from pyramid.util import (
-    is_string_or_iterable,
-    TopologicalSorter,
-    )
+from pyramid.util import is_string_or_iterable, TopologicalSorter
 
 from pyramid.config.util import action_method
+
 
 class TweensConfiguratorMixin(object):
     def add_tween(self, tween_factory, under=None, over=None):
@@ -104,8 +95,9 @@ class TweensConfiguratorMixin(object):
         For more information, see :ref:`registering_tweens`.
 
         """
-        return self._add_tween(tween_factory, under=under, over=over,
-                               explicit=False)
+        return self._add_tween(
+            tween_factory, under=under, over=over, explicit=False
+        )
 
     def add_default_tweens(self):
         self.add_tween(EXCVIEW)
@@ -116,8 +108,9 @@ class TweensConfiguratorMixin(object):
         if not isinstance(tween_factory, string_types):
             raise ConfigurationError(
                 'The "tween_factory" argument to add_tween must be a '
-                'dotted name to a globally importable object, not %r' %
-                tween_factory)
+                'dotted name to a globally importable object, not %r'
+                % tween_factory
+            )
 
         name = tween_factory
 
@@ -130,7 +123,8 @@ class TweensConfiguratorMixin(object):
             if p is not None:
                 if not is_string_or_iterable(p):
                     raise ConfigurationError(
-                        '"%s" must be a string or iterable, not %s' % (t, p))
+                        '"%s" must be a string or iterable, not %s' % (t, p)
+                    )
 
         if over is INGRESS or is_nonstr_iter(over) and INGRESS in over:
             raise ConfigurationError('%s cannot be over INGRESS' % name)
@@ -150,15 +144,16 @@ class TweensConfiguratorMixin(object):
             if explicit:
                 tweens.add_explicit(name, tween_factory)
             else:
-                tweens.add_implicit(name, tween_factory, under=under, over=over)
+                tweens.add_implicit(
+                    name, tween_factory, under=under, over=over
+                )
 
         discriminator = ('tween', name, explicit)
         tween_type = explicit and 'explicit' or 'implicit'
 
-        intr = self.introspectable('tweens',
-                                   discriminator,
-                                   name,
-                                   '%s tween' % tween_type)
+        intr = self.introspectable(
+            'tweens', discriminator, name, '%s tween' % tween_type
+        )
         intr['name'] = name
         intr['factory'] = tween_factory
         intr['type'] = tween_type
@@ -167,6 +162,7 @@ class TweensConfiguratorMixin(object):
         introspectables.append(intr)
         self.action(discriminator, register, introspectables=introspectables)
 
+
 @implementer(ITweens)
 class Tweens(object):
     def __init__(self):
@@ -174,7 +170,8 @@ class Tweens(object):
             default_before=None,
             default_after=INGRESS,
             first=INGRESS,
-            last=MAIN)
+            last=MAIN,
+        )
         self.explicit = []
 
     def add_explicit(self, name, factory):

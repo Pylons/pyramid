@@ -8,7 +8,7 @@ from pyramid.interfaces import (
     IDefaultPermission,
     PHASE1_CONFIG,
     PHASE2_CONFIG,
-    )
+)
 
 from pyramid.csrf import LegacySessionCSRFStoragePolicy
 from pyramid.exceptions import ConfigurationError
@@ -16,8 +16,8 @@ from pyramid.util import as_sorted_tuple
 
 from pyramid.config.util import action_method
 
-class SecurityConfiguratorMixin(object):
 
+class SecurityConfiguratorMixin(object):
     def add_default_security(self):
         self.set_csrf_storage_policy(LegacySessionCSRFStoragePolicy())
 
@@ -35,20 +35,30 @@ class SecurityConfiguratorMixin(object):
            achieve the same purpose.
 
         """
+
         def register():
             self._set_authentication_policy(policy)
             if self.registry.queryUtility(IAuthorizationPolicy) is None:
                 raise ConfigurationError(
                     'Cannot configure an authentication policy without '
                     'also configuring an authorization policy '
-                    '(use the set_authorization_policy method)')
-        intr = self.introspectable('authentication policy', None,
-                                   self.object_description(policy),
-                                   'authentication policy')
+                    '(use the set_authorization_policy method)'
+                )
+
+        intr = self.introspectable(
+            'authentication policy',
+            None,
+            self.object_description(policy),
+            'authentication policy',
+        )
         intr['policy'] = policy
         # authentication policy used by view config (phase 3)
-        self.action(IAuthenticationPolicy, register, order=PHASE2_CONFIG,
-                    introspectables=(intr,))
+        self.action(
+            IAuthenticationPolicy,
+            register,
+            order=PHASE2_CONFIG,
+            introspectables=(intr,),
+        )
 
     def _set_authentication_policy(self, policy):
         policy = self.maybe_dotted(policy)
@@ -67,8 +77,10 @@ class SecurityConfiguratorMixin(object):
            :class:`pyramid.config.Configurator` constructor can be used to
            achieve the same purpose.
         """
+
         def register():
             self._set_authorization_policy(policy)
+
         def ensure():
             if self.autocommit:
                 return
@@ -76,16 +88,24 @@ class SecurityConfiguratorMixin(object):
                 raise ConfigurationError(
                     'Cannot configure an authorization policy without '
                     'also configuring an authentication policy '
-                    '(use the set_authorization_policy method)')
+                    '(use the set_authorization_policy method)'
+                )
 
-        intr = self.introspectable('authorization policy', None,
-                                   self.object_description(policy),
-                                   'authorization policy')
+        intr = self.introspectable(
+            'authorization policy',
+            None,
+            self.object_description(policy),
+            'authorization policy',
+        )
         intr['policy'] = policy
         # authorization policy used by view config (phase 3) and
         # authentication policy (phase 2)
-        self.action(IAuthorizationPolicy, register, order=PHASE1_CONFIG,
-                    introspectables=(intr,))
+        self.action(
+            IAuthorizationPolicy,
+            register,
+            order=PHASE1_CONFIG,
+            introspectables=(intr,),
+        )
         self.action(None, ensure)
 
     def _set_authorization_policy(self, policy):
@@ -133,21 +153,25 @@ class SecurityConfiguratorMixin(object):
            :class:`pyramid.config.Configurator` constructor can be used to
            achieve the same purpose.
         """
+
         def register():
             self.registry.registerUtility(permission, IDefaultPermission)
-        intr = self.introspectable('default permission',
-                                   None,
-                                   permission,
-                                   'default permission')
+
+        intr = self.introspectable(
+            'default permission', None, permission, 'default permission'
+        )
         intr['value'] = permission
-        perm_intr = self.introspectable('permissions',
-                                        permission,
-                                        permission,
-                                        'permission')
+        perm_intr = self.introspectable(
+            'permissions', permission, permission, 'permission'
+        )
         perm_intr['value'] = permission
         # default permission used during view registration (phase 3)
-        self.action(IDefaultPermission, register, order=PHASE1_CONFIG,
-                    introspectables=(intr, perm_intr,))
+        self.action(
+            IDefaultPermission,
+            register,
+            order=PHASE1_CONFIG,
+            introspectables=(intr, perm_intr),
+        )
 
     def add_permission(self, permission_name):
         """
@@ -161,11 +185,8 @@ class SecurityConfiguratorMixin(object):
           config.add_permission('view')
         """
         intr = self.introspectable(
-            'permissions',
-            permission_name,
-            permission_name,
-            'permission'
-            )
+            'permissions', permission_name, permission_name, 'permission'
+        )
         intr['value'] = permission_name
         self.action(None, introspectables=(intr,))
 
@@ -217,22 +238,30 @@ class SecurityConfiguratorMixin(object):
 
         """
         options = DefaultCSRFOptions(
-            require_csrf, token, header, safe_methods, callback,
+            require_csrf, token, header, safe_methods, callback
         )
+
         def register():
             self.registry.registerUtility(options, IDefaultCSRFOptions)
-        intr = self.introspectable('default csrf view options',
-                                   None,
-                                   options,
-                                   'default csrf view options')
+
+        intr = self.introspectable(
+            'default csrf view options',
+            None,
+            options,
+            'default csrf view options',
+        )
         intr['require_csrf'] = require_csrf
         intr['token'] = token
         intr['header'] = header
         intr['safe_methods'] = as_sorted_tuple(safe_methods)
         intr['callback'] = callback
 
-        self.action(IDefaultCSRFOptions, register, order=PHASE1_CONFIG,
-                    introspectables=(intr,))
+        self.action(
+            IDefaultCSRFOptions,
+            register,
+            order=PHASE1_CONFIG,
+            introspectables=(intr,),
+        )
 
     @action_method
     def set_csrf_storage_policy(self, policy):
@@ -245,12 +274,13 @@ class SecurityConfiguratorMixin(object):
         how to generate and persist CSRF tokens.
 
         """
+
         def register():
             self.registry.registerUtility(policy, ICSRFStoragePolicy)
-        intr = self.introspectable('csrf storage policy',
-                                   None,
-                                   policy,
-                                   'csrf storage policy')
+
+        intr = self.introspectable(
+            'csrf storage policy', None, policy, 'csrf storage policy'
+        )
         intr['policy'] = policy
         self.action(ICSRFStoragePolicy, register, introspectables=(intr,))
 

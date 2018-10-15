@@ -1,8 +1,5 @@
 import mimetypes
-from os.path import (
-    getmtime,
-    getsize,
-    )
+from os.path import getmtime, getsize
 
 import venusian
 
@@ -18,16 +15,19 @@ def init_mimetypes(mimetypes):
         return True
     return False
 
+
 # See http://bugs.python.org/issue5853 which is a recursion bug
 # that seems to effect Python 2.6, Python 2.6.1, and 2.6.2 (a fix
 # has been applied on the Python 2 trunk).
 init_mimetypes(mimetypes)
 
-_BLOCK_SIZE = 4096 * 64 # 256K
+_BLOCK_SIZE = 4096 * 64  # 256K
+
 
 @implementer(IResponse)
 class Response(_Response):
     pass
+
 
 class FileResponse(Response):
     """
@@ -51,14 +51,21 @@ class FileResponse(Response):
     binary file.  This argument will be ignored if you also leave
     ``content-type`` as ``None``.
     """
-    def __init__(self, path, request=None, cache_max_age=None,
-                 content_type=None, content_encoding=None):
+
+    def __init__(
+        self,
+        path,
+        request=None,
+        cache_max_age=None,
+        content_type=None,
+        content_encoding=None,
+    ):
         if content_type is None:
             content_type, content_encoding = _guess_type(path)
         super(FileResponse, self).__init__(
             conditional_response=True,
             content_type=content_type,
-            content_encoding=content_encoding
+            content_encoding=content_encoding,
         )
         self.last_modified = getmtime(path)
         content_length = getsize(path)
@@ -76,6 +83,7 @@ class FileResponse(Response):
         if cache_max_age is not None:
             self.cache_expires = cache_max_age
 
+
 class FileIter(object):
     """ A fixed-block-size iterator for use as a WSGI app_iter.
 
@@ -84,6 +92,7 @@ class FileIter(object):
 
     ``block_size`` is an optional block size for iteration.
     """
+
     def __init__(self, file, block_size=_BLOCK_SIZE):
         self.file = file
         self.block_size = block_size
@@ -97,7 +106,7 @@ class FileIter(object):
             raise StopIteration
         return val
 
-    __next__ = next # py3
+    __next__ = next  # py3
 
     def close(self):
         self.file.close()
@@ -166,7 +175,8 @@ class response_adapter(object):
        Added the ``_depth`` and ``_category`` arguments.
 
     """
-    venusian = venusian # for unit testing
+
+    venusian = venusian  # for unit testing
 
     def __init__(self, *types_or_ifaces, **kwargs):
         self.types_or_ifaces = types_or_ifaces
@@ -180,8 +190,12 @@ class response_adapter(object):
             config.add_response_adapter(wrapped, type_or_iface, **self.kwargs)
 
     def __call__(self, wrapped):
-        self.venusian.attach(wrapped, self.register, category=self.category,
-                             depth=self.depth + 1)
+        self.venusian.attach(
+            wrapped,
+            self.register,
+            category=self.category,
+            depth=self.depth + 1,
+        )
         return wrapped
 
 
@@ -190,18 +204,14 @@ def _get_response_factory(registry):
     `pyramid.interfaces.IResponseFactory`.
     """
     response_factory = registry.queryUtility(
-        IResponseFactory,
-        default=lambda r: Response()
+        IResponseFactory, default=lambda r: Response()
     )
 
     return response_factory
 
 
 def _guess_type(path):
-    content_type, content_encoding = mimetypes.guess_type(
-        path,
-        strict=False
-        )
+    content_type, content_encoding = mimetypes.guess_type(path, strict=False)
     if content_type is None:
         content_type = 'application/octet-stream'
     # str-ifying content_type is a workaround for a bug in Python 2.7.7

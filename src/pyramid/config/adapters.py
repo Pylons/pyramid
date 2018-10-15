@@ -4,11 +4,7 @@ from functools import update_wrapper
 
 from zope.interface import Interface
 
-from pyramid.interfaces import (
-    IResponse,
-    ITraverser,
-    IResourceURL,
-    )
+from pyramid.interfaces import IResponse, ITraverser, IResourceURL
 
 from pyramid.util import takes_one_arg
 
@@ -53,33 +49,33 @@ class AdaptersConfiguratorMixin(object):
             predlist = self.get_predlist('subscriber')
             order, preds, phash = predlist.make(self, **predicates)
 
-            derived_predicates = [ self._derive_predicate(p) for p in preds ]
+            derived_predicates = [self._derive_predicate(p) for p in preds]
             derived_subscriber = self._derive_subscriber(
-                subscriber,
-                derived_predicates,
-                )
+                subscriber, derived_predicates
+            )
 
             intr.update(
-                {'phash':phash,
-                 'order':order,
-                 'predicates':preds,
-                 'derived_predicates':derived_predicates,
-                 'derived_subscriber':derived_subscriber,
-                 }
-                )
+                {
+                    'phash': phash,
+                    'order': order,
+                    'predicates': preds,
+                    'derived_predicates': derived_predicates,
+                    'derived_subscriber': derived_subscriber,
+                }
+            )
 
             self.registry.registerHandler(derived_subscriber, iface)
-            
+
         intr = self.introspectable(
             'subscribers',
             id(subscriber),
             self.object_description(subscriber),
-            'subscriber'
-            )
-        
+            'subscriber',
+        )
+
         intr['subscriber'] = subscriber
         intr['interfaces'] = iface
-        
+
         self.action(None, register, introspectables=(intr,))
         return subscriber
 
@@ -87,8 +83,10 @@ class AdaptersConfiguratorMixin(object):
         derived_predicate = predicate
 
         if eventonly(predicate):
+
             def derived_predicate(*arg):
                 return predicate(arg[0])
+
             # seems pointless to try to fix __doc__, __module__, etc as
             # predicate will invariably be an instance
 
@@ -98,8 +96,10 @@ class AdaptersConfiguratorMixin(object):
         derived_subscriber = subscriber
 
         if eventonly(subscriber):
+
             def derived_subscriber(*arg):
                 return subscriber(arg[0])
+
             if hasattr(subscriber, '__name__'):
                 update_wrapper(derived_subscriber, subscriber)
 
@@ -132,10 +132,11 @@ class AdaptersConfiguratorMixin(object):
             update_wrapper(subscriber_wrapper, subscriber)
 
         return subscriber_wrapper
-        
+
     @action_method
-    def add_subscriber_predicate(self, name, factory, weighs_more_than=None,
-                                 weighs_less_than=None):
+    def add_subscriber_predicate(
+        self, name, factory, weighs_more_than=None, weighs_less_than=None
+    ):
         """
         .. versionadded:: 1.4
 
@@ -159,8 +160,8 @@ class AdaptersConfiguratorMixin(object):
             name,
             factory,
             weighs_more_than=weighs_more_than,
-            weighs_less_than=weighs_less_than
-            )
+            weighs_less_than=weighs_less_than,
+        )
 
     @action_method
     def add_response_adapter(self, adapter, type_or_iface):
@@ -178,18 +179,21 @@ class AdaptersConfiguratorMixin(object):
         See :ref:`using_iresponse` for more information."""
         adapter = self.maybe_dotted(adapter)
         type_or_iface = self.maybe_dotted(type_or_iface)
+
         def register():
             reg = self.registry
             if adapter is None:
                 reg.registerSelfAdapter((type_or_iface,), IResponse)
             else:
                 reg.registerAdapter(adapter, (type_or_iface,), IResponse)
+
         discriminator = (IResponse, type_or_iface)
         intr = self.introspectable(
             'response adapters',
             discriminator,
             self.object_description(adapter),
-            'response adapter')
+            'response adapter',
+        )
         intr['adapter'] = adapter
         intr['type'] = type_or_iface
         self.action(discriminator, register, introspectables=(intr,))
@@ -255,17 +259,19 @@ class AdaptersConfiguratorMixin(object):
         """
         iface = self.maybe_dotted(iface)
         adapter = self.maybe_dotted(adapter)
+
         def register(iface=iface):
             if iface is None:
                 iface = Interface
             self.registry.registerAdapter(adapter, (iface,), ITraverser)
+
         discriminator = ('traverser', iface)
         intr = self.introspectable(
-            'traversers', 
+            'traversers',
             discriminator,
             'traverser for %r' % iface,
             'traverser',
-            )
+        )
         intr['adapter'] = adapter
         intr['iface'] = iface
         self.action(discriminator, register, introspectables=(intr,))
@@ -303,24 +309,25 @@ class AdaptersConfiguratorMixin(object):
         """
         adapter = self.maybe_dotted(adapter)
         resource_iface = self.maybe_dotted(resource_iface)
+
         def register(resource_iface=resource_iface):
             if resource_iface is None:
                 resource_iface = Interface
             self.registry.registerAdapter(
-                adapter,
-                (resource_iface, Interface),
-                IResourceURL,
-                )
+                adapter, (resource_iface, Interface), IResourceURL
+            )
+
         discriminator = ('resource url adapter', resource_iface)
         intr = self.introspectable(
-            'resource url adapters', 
+            'resource url adapters',
             discriminator,
             'resource url adapter for resource iface %r' % resource_iface,
             'resource url adapter',
-            )
+        )
         intr['adapter'] = adapter
         intr['resource_iface'] = resource_iface
         self.action(discriminator, register, introspectables=(intr,))
+
 
 def eventonly(callee):
     return takes_one_arg(callee, argname='event')

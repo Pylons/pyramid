@@ -1,10 +1,12 @@
 import unittest
 
+
 class TestRegistry(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.registry import Registry
+
         return Registry
-    
+
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
 
@@ -35,8 +37,10 @@ class TestRegistry(unittest.TestCase):
         registry = self._makeOne()
         self.assertEqual(registry.has_listeners, False)
         L = []
+
         def f(event):
             L.append(event)
+
         registry.registerHandler(f, [IDummyEvent])
         self.assertEqual(registry.has_listeners, True)
         event = DummyEvent()
@@ -47,8 +51,10 @@ class TestRegistry(unittest.TestCase):
         registry = self._makeOne()
         self.assertEqual(registry.has_listeners, False)
         from zope.interface import Interface
-        registry.registerSubscriptionAdapter(DummyEvent,
-                                             [IDummyEvent], Interface)
+
+        registry.registerSubscriptionAdapter(
+            DummyEvent, [IDummyEvent], Interface
+        )
         self.assertEqual(registry.has_listeners, True)
 
     def test__get_settings(self):
@@ -64,6 +70,7 @@ class TestRegistry(unittest.TestCase):
     def test_init_forwards_args(self):
         from zope.interface import Interface
         from zope.interface.registry import Components
+
         dummy = object()
         c = Components()
         c.registerUtility(dummy, Interface)
@@ -74,17 +81,20 @@ class TestRegistry(unittest.TestCase):
     def test_init_forwards_kw(self):
         from zope.interface import Interface
         from zope.interface.registry import Components
+
         dummy = object()
         c = Components()
         c.registerUtility(dummy, Interface)
         registry = self._makeOne(bases=(c,))
         self.assertEqual(registry.getUtility(Interface), dummy)
 
+
 class TestIntrospector(unittest.TestCase):
     def _getTargetClass(slf):
         from pyramid.registry import Introspector
+
         return Introspector
-        
+
     def _makeOne(self):
         return self._getTargetClass()()
 
@@ -92,6 +102,7 @@ class TestIntrospector(unittest.TestCase):
         from zope.interface.verify import verifyClass
         from zope.interface.verify import verifyObject
         from pyramid.interfaces import IIntrospector
+
         verifyClass(IIntrospector, self._getTargetClass())
         verifyObject(IIntrospector, self._makeOne())
 
@@ -100,8 +111,8 @@ class TestIntrospector(unittest.TestCase):
         intr = DummyIntrospectable()
         inst.add(intr)
         self.assertEqual(intr.order, 0)
-        category = {'discriminator':intr, 'discriminator_hash':intr}
-        self.assertEqual(inst._categories, {'category':category})
+        category = {'discriminator': intr, 'discriminator_hash': intr}
+        self.assertEqual(inst._categories, {'category': category})
 
     def test_get_success(self):
         inst = self._makeOne()
@@ -130,9 +141,9 @@ class TestIntrospector(unittest.TestCase):
         inst.add(intr2)
         inst.add(intr)
         expected = [
-            {'introspectable':intr2, 'related':[]},
-            {'introspectable':intr,  'related':[]},
-            ]
+            {'introspectable': intr2, 'related': []},
+            {'introspectable': intr, 'related': []},
+        ]
         self.assertEqual(inst.get_category('category'), expected)
 
     def test_get_category_returns_default_on_miss(self):
@@ -141,6 +152,7 @@ class TestIntrospector(unittest.TestCase):
 
     def test_get_category_with_sortkey(self):
         import operator
+
         inst = self._makeOne()
         intr = DummyIntrospectable()
         intr.foo = 2
@@ -151,15 +163,17 @@ class TestIntrospector(unittest.TestCase):
         inst.add(intr)
         inst.add(intr2)
         expected = [
-            {'introspectable':intr2, 'related':[]},
-            {'introspectable':intr,  'related':[]},
-            ]
+            {'introspectable': intr2, 'related': []},
+            {'introspectable': intr, 'related': []},
+        ]
         self.assertEqual(
             inst.get_category('category', sort_key=operator.attrgetter('foo')),
-                              expected)
+            expected,
+        )
 
     def test_categorized(self):
         import operator
+
         inst = self._makeOne()
         intr = DummyIntrospectable()
         intr.foo = 2
@@ -169,12 +183,18 @@ class TestIntrospector(unittest.TestCase):
         intr2.foo = 1
         inst.add(intr)
         inst.add(intr2)
-        expected = [('category', [
-            {'introspectable':intr2, 'related':[]},
-            {'introspectable':intr,  'related':[]},
-            ])]
+        expected = [
+            (
+                'category',
+                [
+                    {'introspectable': intr2, 'related': []},
+                    {'introspectable': intr, 'related': []},
+                ],
+            )
+        ]
         self.assertEqual(
-            inst.categorized(sort_key=operator.attrgetter('foo')), expected)
+            inst.categorized(sort_key=operator.attrgetter('foo')), expected
+        )
 
     def test_categories(self):
         inst = self._makeOne()
@@ -191,16 +211,20 @@ class TestIntrospector(unittest.TestCase):
         intr2.discriminator_hash = 'discriminator2_hash'
         inst.add(intr)
         inst.add(intr2)
-        inst.relate(('category', 'discriminator'),
-                    ('category2', 'discriminator2'))
+        inst.relate(
+            ('category', 'discriminator'), ('category2', 'discriminator2')
+        )
         inst.remove('category', 'discriminator')
-        self.assertEqual(inst._categories,
-                         {'category':
-                              {},
-                          'category2':
-                              {'discriminator2': intr2,
-                               'discriminator2_hash': intr2}
-                         })
+        self.assertEqual(
+            inst._categories,
+            {
+                'category': {},
+                'category2': {
+                    'discriminator2': intr2,
+                    'discriminator2_hash': intr2,
+                },
+            },
+        )
         self.assertEqual(inst._refs.get(intr), None)
         self.assertEqual(inst._refs[intr2], [])
 
@@ -217,16 +241,22 @@ class TestIntrospector(unittest.TestCase):
         intr2.discriminator_hash = 'discriminator2_hash'
         inst.add(intr)
         inst.add(intr2)
-        inst.relate(('category', 'discriminator'),
-                    ('category2', 'discriminator2'))
-        self.assertEqual(inst._categories,
-                         {'category':
-                              {'discriminator':intr,
-                               'discriminator_hash':intr},
-                          'category2':
-                              {'discriminator2': intr2,
-                               'discriminator2_hash': intr2}
-                         })
+        inst.relate(
+            ('category', 'discriminator'), ('category2', 'discriminator2')
+        )
+        self.assertEqual(
+            inst._categories,
+            {
+                'category': {
+                    'discriminator': intr,
+                    'discriminator_hash': intr,
+                },
+                'category2': {
+                    'discriminator2': intr2,
+                    'discriminator2_hash': intr2,
+                },
+            },
+        )
         self.assertEqual(inst._refs[intr], [intr2])
         self.assertEqual(inst._refs[intr2], [intr])
 
@@ -238,8 +268,8 @@ class TestIntrospector(unittest.TestCase):
             KeyError,
             inst.relate,
             ('category', 'discriminator'),
-            ('category2', 'discriminator2')
-            )
+            ('category2', 'discriminator2'),
+        )
 
     def test_unrelate(self):
         inst = self._makeOne()
@@ -250,18 +280,25 @@ class TestIntrospector(unittest.TestCase):
         intr2.discriminator_hash = 'discriminator2_hash'
         inst.add(intr)
         inst.add(intr2)
-        inst.relate(('category', 'discriminator'),
-                    ('category2', 'discriminator2'))
-        inst.unrelate(('category', 'discriminator'),
-                    ('category2', 'discriminator2'))
-        self.assertEqual(inst._categories,
-                         {'category':
-                              {'discriminator':intr,
-                               'discriminator_hash':intr},
-                          'category2':
-                              {'discriminator2': intr2,
-                               'discriminator2_hash': intr2}
-                         })
+        inst.relate(
+            ('category', 'discriminator'), ('category2', 'discriminator2')
+        )
+        inst.unrelate(
+            ('category', 'discriminator'), ('category2', 'discriminator2')
+        )
+        self.assertEqual(
+            inst._categories,
+            {
+                'category': {
+                    'discriminator': intr,
+                    'discriminator_hash': intr,
+                },
+                'category2': {
+                    'discriminator2': intr2,
+                    'discriminator2_hash': intr2,
+                },
+            },
+        )
         self.assertEqual(inst._refs[intr], [])
         self.assertEqual(inst._refs[intr2], [])
 
@@ -274,8 +311,9 @@ class TestIntrospector(unittest.TestCase):
         intr2.discriminator_hash = 'discriminator2_hash'
         inst.add(intr)
         inst.add(intr2)
-        inst.relate(('category', 'discriminator'),
-                    ('category2', 'discriminator2'))
+        inst.relate(
+            ('category', 'discriminator'), ('category2', 'discriminator2')
+        )
         self.assertEqual(inst.related(intr), [intr2])
 
     def test_related_fail(self):
@@ -287,16 +325,19 @@ class TestIntrospector(unittest.TestCase):
         intr2.discriminator_hash = 'discriminator2_hash'
         inst.add(intr)
         inst.add(intr2)
-        inst.relate(('category', 'discriminator'),
-                    ('category2', 'discriminator2'))
+        inst.relate(
+            ('category', 'discriminator'), ('category2', 'discriminator2')
+        )
         del inst._categories['category']
         self.assertRaises(KeyError, inst.related, intr)
+
 
 class TestIntrospectable(unittest.TestCase):
     def _getTargetClass(slf):
         from pyramid.registry import Introspectable
+
         return Introspectable
-        
+
     def _makeOne(self, *arg, **kw):
         return self._getTargetClass()(*arg, **kw)
 
@@ -307,6 +348,7 @@ class TestIntrospectable(unittest.TestCase):
         from zope.interface.verify import verifyClass
         from zope.interface.verify import verifyObject
         from pyramid.interfaces import IIntrospectable
+
         verifyClass(IIntrospectable, self._getTargetClass())
         verifyObject(IIntrospectable, self._makeOnePopulated())
 
@@ -326,14 +368,16 @@ class TestIntrospectable(unittest.TestCase):
 
     def test___hash__(self):
         inst = self._makeOnePopulated()
-        self.assertEqual(hash(inst),
-                         hash((inst.category_name,) + (inst.discriminator,)))
+        self.assertEqual(
+            hash(inst), hash((inst.category_name,) + (inst.discriminator,))
+        )
 
     def test___repr__(self):
         inst = self._makeOnePopulated()
         self.assertEqual(
             repr(inst),
-            "<Introspectable category 'category', discriminator 'discrim'>")
+            "<Introspectable category 'category', discriminator 'discrim'>",
+        )
 
     def test___nonzero__(self):
         inst = self._makeOnePopulated()
@@ -352,17 +396,22 @@ class TestIntrospectable(unittest.TestCase):
         inst.register(introspector, action_info)
         self.assertEqual(inst.action_info, action_info)
         self.assertEqual(introspector.intrs, [inst])
-        self.assertEqual(introspector.relations,
-                         [(('category', 'discrim'), ('category1', 'discrim1'))])
-        self.assertEqual(introspector.unrelations,
-                         [(('category', 'discrim'), ('category2', 'discrim2'))])
+        self.assertEqual(
+            introspector.relations,
+            [(('category', 'discrim'), ('category1', 'discrim1'))],
+        )
+        self.assertEqual(
+            introspector.unrelations,
+            [(('category', 'discrim'), ('category2', 'discrim2'))],
+        )
+
 
 class DummyIntrospector(object):
     def __init__(self):
         self.intrs = []
         self.relations = []
         self.unrelations = []
-            
+
     def add(self, intr):
         self.intrs.append(intr)
 
@@ -372,10 +421,12 @@ class DummyIntrospector(object):
     def unrelate(self, *pairs):
         self.unrelations.append(pairs)
 
+
 class DummyModule:
     __path__ = "foo"
     __name__ = "dummy"
     __file__ = ''
+
 
 class DummyIntrospectable(object):
     category_name = 'category'
@@ -392,10 +443,12 @@ class DummyIntrospectable(object):
 
 from zope.interface import Interface
 from zope.interface import implementer
+
+
 class IDummyEvent(Interface):
     pass
+
 
 @implementer(IDummyEvent)
 class DummyEvent(object):
     pass
-    

@@ -4,22 +4,11 @@ from webob.cookies import CookieProfile
 from zope.interface import implementer
 
 
-from pyramid.compat import (
-    bytes_,
-    urlparse,
-    text_,
-)
-from pyramid.exceptions import (
-    BadCSRFOrigin,
-    BadCSRFToken,
-)
+from pyramid.compat import bytes_, urlparse, text_
+from pyramid.exceptions import BadCSRFOrigin, BadCSRFToken
 from pyramid.interfaces import ICSRFStoragePolicy
 from pyramid.settings import aslist
-from pyramid.util import (
-    SimpleSerializer,
-    is_same_domain,
-    strings_differ
-)
+from pyramid.util import SimpleSerializer, is_same_domain, strings_differ
 
 
 @implementer(ICSRFStoragePolicy)
@@ -37,6 +26,7 @@ class LegacySessionCSRFStoragePolicy(object):
     .. versionadded:: 1.9
 
     """
+
     def new_csrf_token(self, request):
         """ Sets a new CSRF token into the session and returns it. """
         return request.session.new_csrf_token()
@@ -50,7 +40,8 @@ class LegacySessionCSRFStoragePolicy(object):
         """ Returns ``True`` if the ``supplied_token`` is valid."""
         expected_token = self.get_csrf_token(request)
         return not strings_differ(
-            bytes_(expected_token), bytes_(supplied_token))
+            bytes_(expected_token), bytes_(supplied_token)
+        )
 
 
 @implementer(ICSRFStoragePolicy)
@@ -68,6 +59,7 @@ class SessionCSRFStoragePolicy(object):
     .. versionadded:: 1.9
 
     """
+
     _token_factory = staticmethod(lambda: text_(uuid.uuid4().hex))
 
     def __init__(self, key='_csrft_'):
@@ -91,7 +83,8 @@ class SessionCSRFStoragePolicy(object):
         """ Returns ``True`` if the ``supplied_token`` is valid."""
         expected_token = self.get_csrf_token(request)
         return not strings_differ(
-            bytes_(expected_token), bytes_(supplied_token))
+            bytes_(expected_token), bytes_(supplied_token)
+        )
 
 
 @implementer(ICSRFStoragePolicy)
@@ -111,10 +104,19 @@ class CookieCSRFStoragePolicy(object):
        Added the ``samesite`` option and made the default ``'Lax'``.
 
     """
+
     _token_factory = staticmethod(lambda: text_(uuid.uuid4().hex))
 
-    def __init__(self, cookie_name='csrf_token', secure=False, httponly=False,
-                 domain=None, max_age=None, path='/', samesite='Lax'):
+    def __init__(
+        self,
+        cookie_name='csrf_token',
+        secure=False,
+        httponly=False,
+        domain=None,
+        max_age=None,
+        path='/',
+        samesite='Lax',
+    ):
         serializer = SimpleSerializer()
         self.cookie_profile = CookieProfile(
             cookie_name=cookie_name,
@@ -132,11 +134,10 @@ class CookieCSRFStoragePolicy(object):
         """ Sets a new CSRF token into the request and returns it. """
         token = self._token_factory()
         request.cookies[self.cookie_name] = token
+
         def set_cookie(request, response):
-            self.cookie_profile.set_cookies(
-                response,
-                token,
-            )
+            self.cookie_profile.set_cookies(response, token)
+
         request.add_response_callback(set_cookie)
         return token
 
@@ -153,7 +154,8 @@ class CookieCSRFStoragePolicy(object):
         """ Returns ``True`` if the ``supplied_token`` is valid."""
         expected_token = self.get_csrf_token(request)
         return not strings_differ(
-            bytes_(expected_token), bytes_(supplied_token))
+            bytes_(expected_token), bytes_(supplied_token)
+        )
 
 
 def get_csrf_token(request):
@@ -182,10 +184,9 @@ def new_csrf_token(request):
     return csrf.new_csrf_token(request)
 
 
-def check_csrf_token(request,
-                     token='csrf_token',
-                     header='X-CSRF-Token',
-                     raises=True):
+def check_csrf_token(
+    request, token='csrf_token', header='X-CSRF-Token', raises=True
+):
     """ Check the CSRF token returned by the
     :class:`pyramid.interfaces.ICSRFStoragePolicy` implementation against the
     value in ``request.POST.get(token)`` (if a POST request) or
@@ -267,6 +268,7 @@ def check_csrf_origin(request, trusted_origins=None, raises=True):
        Moved from :mod:`pyramid.session` to :mod:`pyramid.csrf`
 
     """
+
     def _fail(reason):
         if raises:
             raise BadCSRFOrigin(reason)
@@ -315,7 +317,8 @@ def check_csrf_origin(request, trusted_origins=None, raises=True):
         if trusted_origins is None:
             trusted_origins = aslist(
                 request.registry.settings.get(
-                    "pyramid.csrf_trusted_origins", [])
+                    "pyramid.csrf_trusted_origins", []
+                )
             )
 
         if request.host_port not in set(["80", "443"]):
@@ -325,8 +328,9 @@ def check_csrf_origin(request, trusted_origins=None, raises=True):
 
         # Actually check to see if the request's origin matches any of our
         # trusted origins.
-        if not any(is_same_domain(originp.netloc, host)
-                   for host in trusted_origins):
+        if not any(
+            is_same_domain(originp.netloc, host) for host in trusted_origins
+        ):
             reason = (
                 "Referer checking failed - {0} does not match any trusted "
                 "origins."
