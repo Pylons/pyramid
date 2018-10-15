@@ -48,8 +48,8 @@ class DefaultViewMapper(object):
         if is_unbound_method(view) and self.attr is None:
             raise ConfigurationError(
                 (
-                    'Unbound method calls are not supported, please set the class '
-                    'as your `view` and the method as your `attr`'
+                    'Unbound method calls are not supported, please set the '
+                    'class as your `view` and the method as your `attr`'
                 )
             )
 

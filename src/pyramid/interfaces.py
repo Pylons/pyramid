@@ -1341,7 +1341,7 @@ class IIntrospectable(Interface):
                     method = getattr(introspector, methodname)
                     method((i.category_name, i.discriminator),
                            (category_name, discriminator))
-        """
+        """  # noqa: E501
 
     def __hash__():
 
@@ -1354,7 +1354,8 @@ class IIntrospectable(Interface):
 
 class IActionInfo(Interface):
     """ Class which provides code introspection capability associated with an
-    action.  The ParserInfo class used by ZCML implements the same interface."""
+    action.  The ParserInfo class used by ZCML implements the same interface.
+    """
 
     file = Attribute('Filename of action-invoking code as a string')
     line = Attribute(

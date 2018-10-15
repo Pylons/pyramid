@@ -143,8 +143,8 @@ class CallbackAuthenticationPolicy(object):
         if self._clean_principal(userid) is None:
             debug and self._log(
                 (
-                    'unauthenticated_userid returned disallowed %r; returning %r '
-                    'as if it was None' % (userid, effective_principals)
+                    'unauthenticated_userid returned disallowed %r; returning '
+                    '%r as if it was None' % (userid, effective_principals)
                 ),
                 'effective_principals',
                 request,
@@ -315,8 +315,8 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         if groups is None:  # is None!
             self.debug and self._log(
                 (
-                    'security policy groups callback returned None; returning %r'
-                    % effective_principals
+                    'security policy groups callback returned None; returning '
+                    '%r' % effective_principals
                 ),
                 'effective_principals',
                 request,
@@ -339,8 +339,8 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         if self._clean_principal(userid) is None:
             self.debug and self._log(
                 (
-                    'unauthenticated_userid returned disallowed %r; returning %r '
-                    'as if it was None' % (userid, effective_principals)
+                    'unauthenticated_userid returned disallowed %r; returning '
+                    '%r as if it was None' % (userid, effective_principals)
                 ),
                 'effective_principals',
                 request,
@@ -596,7 +596,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     .. versionchanged:: 1.10
 
        Added the ``samesite`` option and made the default ``'Lax'``.
-    
+
     Objects of this class implement the interface described by
     :class:`pyramid.interfaces.IAuthenticationPolicy`.
 
@@ -1044,8 +1044,8 @@ class AuthTktCookieHelper(object):
                 "userid is of type {}, and is not supported by the "
                 "AuthTktAuthenticationPolicy. Explicitly converting to string "
                 "and storing as base64. Subsequent requests will receive a "
-                "string as the userid, it will not be decoded back to the type "
-                "provided.".format(type(userid)),
+                "string as the userid, it will not be decoded back to the "
+                "type provided.".format(type(userid)),
                 RuntimeWarning,
             )
             encoding, encoder = self.userid_type_encoders.get(text_type)
@@ -1154,8 +1154,8 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     ``realm``
 
-       Default: ``"Realm"``.  The Basic Auth Realm string.  Usually displayed to
-       the user by the browser in the login dialog.
+       Default: ``"Realm"``.  The Basic Auth Realm string.  Usually displayed
+       to the user by the browser in the login dialog.
 
     ``debug``
 

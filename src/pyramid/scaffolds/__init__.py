@@ -44,7 +44,7 @@ class PyramidTemplate(Template):
 
             Welcome to Pyramid.  Sorry for the convenience.
             %(separator)s
-        """
+        """  # noqa: E501
             % {'separator': separator}
         )
 

@@ -54,7 +54,7 @@ def has_permission(permission, context, request):
     """
     A function that calls :meth:`pyramid.request.Request.has_permission`
     and returns its result.
-    
+
     .. deprecated:: 1.5
         Use :meth:`pyramid.request.Request.has_permission` instead.
 
@@ -77,7 +77,7 @@ def authenticated_userid(request):
     """
     A function that returns the value of the property
     :attr:`pyramid.request.Request.authenticated_userid`.
-    
+
     .. deprecated:: 1.5
        Use :attr:`pyramid.request.Request.authenticated_userid` instead.
     """
@@ -93,10 +93,10 @@ deprecated(
 
 
 def unauthenticated_userid(request):
-    """ 
+    """
     A function that returns the value of the property
     :attr:`pyramid.request.Request.unauthenticated_userid`.
-    
+
     .. deprecated:: 1.5
         Use :attr:`pyramid.request.Request.unauthenticated_userid` instead.
     """
@@ -115,7 +115,7 @@ def effective_principals(request):
     """
     A function that returns the value of the property
     :attr:`pyramid.request.Request.effective_principals`.
-    
+
     .. deprecated:: 1.5
         Use :attr:`pyramid.request.Request.effective_principals` instead.
     """

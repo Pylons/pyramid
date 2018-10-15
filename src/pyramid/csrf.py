@@ -247,8 +247,8 @@ def check_csrf_origin(request, trusted_origins=None, raises=True):
     Check the ``Origin`` of the request to see if it is a cross site request or
     not.
 
-    If the value supplied by the ``Origin`` or ``Referer`` header isn't one of the
-    trusted origins and ``raises`` is ``True``, this function will raise a
+    If the value supplied by the ``Origin`` or ``Referer`` header isn't one of
+    the trusted origins and ``raises`` is ``True``, this function will raise a
     :exc:`pyramid.exceptions.BadCSRFOrigin` exception, but if ``raises`` is
     ``False``, this function will return ``False`` instead. If the CSRF origin
     checks are successful this function will return ``True`` unconditionally.

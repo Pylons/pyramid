@@ -48,7 +48,7 @@ def lineage(resource):
 
     Calling ``lineage(thing2)`` will return a generator.  When we turn
     it into a list, we will get::
-    
+
       list(lineage(thing2))
       [ <Thing object at thing2>, <Thing object at thing1> ]
     """

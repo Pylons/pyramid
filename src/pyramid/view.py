@@ -198,14 +198,14 @@ class view_config(object):
 
     See the :py:func:`venusian.attach` function in Venusian for more
     information about the ``_depth`` and ``_category`` arguments.
-    
+
     .. seealso::
-    
+
         See also :ref:`mapping_views_using_a_decorator_section` for
         details about using :class:`pyramid.view.view_config`.
 
     .. warning::
-    
+
         ``view_config`` will work ONLY on module top level members
         because of the limitation of ``venusian.Scanner.scan``.
 
@@ -402,7 +402,8 @@ class notfound_view_config(object):
             return HTTPNotFound('not found')
 
     The above means that a redirect to a slash-appended route will be
-    attempted, but instead of :class:`~pyramid.httpexceptions.HTTPTemporaryRedirect`
+    attempted, but instead of
+    :class:`~pyramid.httpexceptions.HTTPTemporaryRedirect`
     being used, :class:`~pyramid.httpexceptions.HTTPMovedPermanently will
     be used` for the redirect response if a slash-appended route is found.
 

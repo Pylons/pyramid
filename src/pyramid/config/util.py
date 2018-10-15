@@ -126,9 +126,9 @@ class PredicateList(object):
     def add(self, name, factory, weighs_more_than=None, weighs_less_than=None):
         # Predicates should be added to a predicate list in (presumed)
         # computation expense order.
-        ## if weighs_more_than is None and weighs_less_than is None:
-        ##     weighs_more_than = self.last_added or FIRST
-        ##     weighs_less_than = LAST
+        # if weighs_more_than is None and weighs_less_than is None:
+        #     weighs_more_than = self.last_added or FIRST
+        #     weighs_less_than = LAST
         self.last_added = name
         self.sorter.add(
             name, factory, after=weighs_more_than, before=weighs_less_than

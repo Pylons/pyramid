@@ -56,7 +56,7 @@ class TweensConfiguratorMixin(object):
         - An iterable of any combination of the above. This allows the user
           to specify fallbacks if the desired tween is not included, as well
           as compatibility with multiple other tweens.
-        
+
         ``under`` means 'closer to the main Pyramid application than',
         ``over`` means 'closer to the request ingress than'.
 

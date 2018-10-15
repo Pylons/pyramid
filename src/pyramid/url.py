@@ -172,10 +172,10 @@ class URLMethodsMixin(object):
 
            Python data structures that are passed as ``_query`` which are
            sequences or dictionaries are turned into a string under the same
-           rules as when run through :func:`urllib.urlencode` with the ``doseq``
-           argument equal to ``True``.  This means that sequences can be passed
-           as values, and a k=v pair will be placed into the query string for
-           each value.
+           rules as when run through :func:`urllib.urlencode` with the
+           ``doseq`` argument equal to ``True``.  This means that sequences can
+           be passed as values, and a k=v pair will be placed into the query
+           string for each value.
 
         If a keyword argument ``_anchor`` is present, its string
         representation will be quoted per :rfc:`3986#section-3.5` and used as
@@ -200,7 +200,7 @@ class URLMethodsMixin(object):
         ``_host='foo.com'``, and the URL that would have been generated
         without the host replacement is ``http://example.com/a``, the result
         will be ``http://foo.com/a``.
-        
+
         Note that if ``_scheme`` is passed as ``https``, and ``_port`` is not
         passed, the ``_port`` value is assumed to have been passed as
         ``443``.  Likewise, if ``_scheme`` is passed as ``http`` and
@@ -363,10 +363,10 @@ class URLMethodsMixin(object):
 
            Python data structures that are passed as ``query`` which are
            sequences or dictionaries are turned into a string under the same
-           rules as when run through :func:`urllib.urlencode` with the ``doseq``
-           argument equal to ``True``.  This means that sequences can be passed
-           as values, and a k=v pair will be placed into the query string for
-           each value.
+           rules as when run through :func:`urllib.urlencode` with the
+           ``doseq`` argument equal to ``True``.  This means that sequences can
+           be passed as values, and a k=v pair will be placed into the query
+           string for each value.
 
         If a keyword argument ``anchor`` is present, its string
         representation will be used as a named anchor in the generated URL
@@ -390,7 +390,7 @@ class URLMethodsMixin(object):
         ``host='foo.com'``, and the URL that would have been generated
         without the host replacement is ``http://example.com/a``, the result
         will be ``http://foo.com/a``.
-        
+
         If ``scheme`` is passed as ``https``, and an explicit ``port`` is not
         passed, the ``port`` value is assumed to have been passed as ``443``.
         Likewise, if ``scheme`` is passed as ``http`` and ``port`` is not
@@ -415,11 +415,11 @@ class URLMethodsMixin(object):
         If the ``resource`` passed in has a ``__resource_url__`` method, it
         will be used to generate the URL (scheme, host, port, path) for the
         base resource which is operated upon by this function.
-        
+
         .. seealso::
 
             See also :ref:`overriding_resource_url_generation`.
-           
+
         If ``route_name`` is passed, this function will delegate its URL
         production to the ``route_url`` function.  Calling
         ``resource_url(someresource, 'element1', 'element2', query={'a':1},
@@ -472,21 +472,21 @@ class URLMethodsMixin(object):
         is passed, the ``__resource_url__`` method of the resource passed is
         ignored unconditionally.  This feature is incompatible with
         resources which generate their own URLs.
-        
+
         .. note::
 
-           If the :term:`resource` used is the result of a :term:`traversal`, it
-           must be :term:`location`-aware.  The resource can also be the context
-           of a :term:`URL dispatch`; contexts found this way do not need to be
-           location-aware.
+           If the :term:`resource` used is the result of a :term:`traversal`,
+           it must be :term:`location`-aware.  The resource can also be the
+           context of a :term:`URL dispatch`; contexts found this way do not
+           need to be location-aware.
 
         .. note::
 
            If a 'virtual root path' is present in the request environment (the
            value of the WSGI environ key ``HTTP_X_VHM_ROOT``), and the resource
-           was obtained via :term:`traversal`, the URL path will not include the
-           virtual root prefix (it will be stripped off the left hand side of
-           the generated URL).
+           was obtained via :term:`traversal`, the URL path will not include
+           the virtual root prefix (it will be stripped off the left hand side
+           of the generated URL).
 
         .. note::
 

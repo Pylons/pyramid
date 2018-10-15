@@ -158,8 +158,7 @@ def _no_escape(value):
 
 @implementer(IExceptionResponse)
 class HTTPException(Response, Exception):
-
-    ## You should set in subclasses:
+    # You should set in subclasses:
     # code = 200
     # title = 'OK'
     # explanation = 'why this happens'
@@ -187,7 +186,8 @@ class HTTPException(Response, Exception):
     #   implies that this class' ``exception`` property always returns
     #   ``self`` (it exists only for bw compat at this point).
     #
-    # - documentation improvements (Pyramid-specific docstrings where necessary)
+    # - documentation improvements (Pyramid-specific docstrings where
+    #   necessary)
     #
     code = 520
     title = 'Unknown Error'
@@ -220,7 +220,7 @@ ${body}'''
 </html>'''
     )
 
-    ## Set this to True for responses that should have no request body
+    # Set this to True for responses that should have no request body
     empty_body = False
 
     def __init__(
@@ -381,7 +381,7 @@ class HTTPSuccessful(HTTPException):
 
 
 ############################################################
-## 2xx success
+# 2xx success
 ############################################################
 
 
@@ -488,10 +488,10 @@ class HTTPPartialContent(HTTPSuccessful):
     title = 'Partial Content'
 
 
-## FIXME: add 207 Multi-Status (but it's complicated)
+# FIXME: add 207 Multi-Status (but it's complicated)
 
 ############################################################
-## 3xx redirection
+# 3xx redirection
 ############################################################
 
 
@@ -675,7 +675,7 @@ class HTTPPermanentRedirect(_HTTPMove):
 
 
 ############################################################
-## 4xx client error
+# 4xx client error
 ############################################################
 
 
@@ -1067,7 +1067,7 @@ class HTTPUnprocessableEntity(HTTPClientError):
     code: 422, title: Unprocessable Entity
     """
 
-    ## Note: from WebDAV
+    # Note: from WebDAV
     code = 422
     title = 'Unprocessable Entity'
     explanation = 'Unable to process the contained instructions'
@@ -1082,7 +1082,7 @@ class HTTPLocked(HTTPClientError):
     code: 423, title: Locked
     """
 
-    ## Note: from WebDAV
+    # Note: from WebDAV
     code = 423
     title = 'Locked'
     explanation = 'The resource is locked'
@@ -1098,7 +1098,7 @@ class HTTPFailedDependency(HTTPClientError):
     code: 424, title: Failed Dependency
     """
 
-    ## Note: from WebDAV
+    # Note: from WebDAV
     code = 424
     title = 'Failed Dependency'
     explanation = (
@@ -1169,7 +1169,7 @@ class HTTPRequestHeaderFieldsTooLarge(HTTPClientError):
 
 
 ############################################################
-## 5xx Server Error
+# 5xx Server Error
 ############################################################
 #  Response status codes beginning with the digit "5" indicate cases in
 #  which the server is aware that it has erred or is incapable of

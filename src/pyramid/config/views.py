@@ -728,8 +728,8 @@ class ViewsConfiguratorMixin(object):
           If CSRF checking is performed, the checked value will be the value of
           ``request.params[check_name]``. This value will be compared against
           the value of ``policy.get_csrf_token()`` (where ``policy`` is an
-          implementation of :meth:`pyramid.interfaces.ICSRFStoragePolicy`), and the
-          check will pass if these two values are the same. If the check
+          implementation of :meth:`pyramid.interfaces.ICSRFStoragePolicy`), and
+          the check will pass if these two values are the same. If the check
           passes, the associated view will be permitted to execute. If the
           check fails, the associated view will not be permitted to execute.
 
@@ -808,13 +808,13 @@ class ViewsConfiguratorMixin(object):
         if custom_predicates:
             warnings.warn(
                 (
-                    'The "custom_predicates" argument to Configurator.add_view '
-                    'is deprecated as of Pyramid 1.5.  Use '
-                    '"config.add_view_predicate" and use the registered '
-                    'view predicate as a predicate argument to add_view instead. '
-                    'See "Adding A Third Party View, Route, or Subscriber '
-                    'Predicate" in the "Hooks" chapter of the documentation '
-                    'for more information.'
+                    'The "custom_predicates" argument to '
+                    'Configurator.add_view is deprecated as of Pyramid 1.5. '
+                    'Use "config.add_view_predicate" and use the registered '
+                    'view predicate as a predicate argument to add_view '
+                    'instead. See "Adding A Third Party View, Route, or '
+                    'Subscriber Predicate" in the "Hooks" chapter of the '
+                    'documentation for more information.'
                 ),
                 DeprecationWarning,
                 stacklevel=4,
@@ -824,10 +824,10 @@ class ViewsConfiguratorMixin(object):
             warnings.warn(
                 (
                     'The "check_csrf" argument to Configurator.add_view is '
-                    'deprecated as of Pyramid 1.7. Use the "require_csrf" option '
-                    'instead or see "Checking CSRF Tokens Automatically" in the '
-                    '"Sessions" chapter of the documentation for more '
-                    'information.'
+                    'deprecated as of Pyramid 1.7. Use the "require_csrf" '
+                    'option instead or see "Checking CSRF Tokens '
+                    'Automatically" in the "Sessions" chapter of the '
+                    'documentation for more information.'
                 ),
                 DeprecationWarning,
                 stacklevel=4,
@@ -842,9 +842,10 @@ class ViewsConfiguratorMixin(object):
                 warnings.warn(
                     (
                         'Passing a media range to the "accept" argument of '
-                        'Configurator.add_view is deprecated as of Pyramid 1.10. '
-                        'Use explicit media types to avoid ambiguities in '
-                        'content negotiation that may impact your users.'
+                        'Configurator.add_view is deprecated as of '
+                        'Pyramid 1.10. Use explicit media types to avoid '
+                        'ambiguities in content negotiation that may impact '
+                        'your users.'
                     ),
                     DeprecationWarning,
                     stacklevel=4,
@@ -1804,7 +1805,8 @@ class ViewsConfiguratorMixin(object):
             config.add_notfound_view(append_slash=HTTPMovedPermanently)
 
         The above means that a redirect to a slash-appended route will be
-        attempted, but instead of :class:`~pyramid.httpexceptions.HTTPTemporaryRedirect`
+        attempted, but instead of
+        :class:`~pyramid.httpexceptions.HTTPTemporaryRedirect`
         being used, :class:`~pyramid.httpexceptions.HTTPMovedPermanently will
         be used` for the redirect response if a slash-appended route is found.
 
@@ -1827,7 +1829,8 @@ class ViewsConfiguratorMixin(object):
 
         .. versionchanged: 1.10
 
-           Default response was changed from :class:`~pyramid.httpexceptions.HTTPFound`
+           Default response was changed from
+           :class:`~pyramid.httpexceptions.HTTPFound`
            to :class:`~pyramid.httpexceptions.HTTPTemporaryRedirect`.
 
         """

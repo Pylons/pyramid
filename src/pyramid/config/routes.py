@@ -158,8 +158,8 @@ class RoutesConfiguratorMixin(object):
              For backwards compatibility purposes (as of :app:`Pyramid` 1.0), a
              ``path`` keyword argument passed to this function will be used to
              represent the pattern value if the ``pattern`` argument is
-             ``None``.  If both ``path`` and ``pattern`` are passed, ``pattern``
-             wins.
+             ``None``.  If both ``path`` and ``pattern`` are passed,
+             ``pattern`` wins.
 
         xhr
 
@@ -298,9 +298,9 @@ class RoutesConfiguratorMixin(object):
         if custom_predicates:
             warnings.warn(
                 (
-                    'The "custom_predicates" argument to Configurator.add_route '
-                    'is deprecated as of Pyramid 1.5.  Use '
-                    '"config.add_route_predicate" and use the registered '
+                    'The "custom_predicates" argument to '
+                    'Configurator.add_route is deprecated as of Pyramid 1.5. '
+                    'Use "config.add_route_predicate" and use the registered '
                     'route predicate as a predicate argument to add_route '
                     'instead. See "Adding A Third Party View, Route, or '
                     'Subscriber Predicate" in the "Hooks" chapter of the '
@@ -315,9 +315,9 @@ class RoutesConfiguratorMixin(object):
                 if '*' in accept:
                     warnings.warn(
                         (
-                            'Passing a media range to the "accept" argument of '
-                            'Configurator.add_route is deprecated as of Pyramid '
-                            '1.10. Use a list of explicit media types.'
+                            'Passing a media range to the "accept" argument '
+                            'of Configurator.add_route is deprecated as of '
+                            'Pyramid 1.10. Use a list of explicit media types.'
                         ),
                         DeprecationWarning,
                         stacklevel=3,

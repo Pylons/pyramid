@@ -82,13 +82,13 @@ class Localizer(object):
         and ``plural`` objects should be unicode strings. There is no
         reason to use translation string objects as arguments as all
         metadata is ignored.
-        
+
         ``n`` represents the number of elements. ``domain`` is the
         translation domain to use to do the pluralization, and ``mapping``
         is the interpolation mapping that should be used on the result. If
         the ``domain`` is not supplied, a default domain is used (usually
         ``messages``).
-        
+
         Example::
 
            num = 1
@@ -110,7 +110,7 @@ class Localizer(object):
                                             num,
                                             mapping={'num':num})
 
-        
+
         """
         if self.pluralizer is None:
             self.pluralizer = Pluralizer(self.translations)
@@ -127,7 +127,7 @@ def default_locale_negotiator(request):
       the request object (possibly set by a view or a listener for an
       :term:`event`). If the attribute exists and it is not ``None``,
       its value will be used.
-  
+
     - Then it looks for the ``request.params['_LOCALE_']`` value.
 
     - Then it looks for the ``request.cookies['_LOCALE_']`` value.
@@ -176,7 +176,7 @@ def get_locale_name(request):
 
 def make_localizer(current_locale_name, translation_directories):
     """ Create a :class:`pyramid.i18n.Localizer` object
-    corresponding to the provided locale name from the 
+    corresponding to the provided locale name from the
     translations found in the list of translation directories."""
     translations = Translations()
     translations._catalog = {}
@@ -344,7 +344,7 @@ class Translations(gettext.GNUTranslations, object):
         return self._domains.get(domain, self).gettext(message)
 
     def ldgettext(self, domain, message):
-        """Like ``lgettext()``, but look the message up in the specified 
+        """Like ``lgettext()``, but look the message up in the specified
         domain.
         """
         return self._domains.get(domain, self).lgettext(message)
