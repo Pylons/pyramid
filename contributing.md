@@ -22,6 +22,6 @@ Git branches and their purpose and status at the time of this writing are listed
 Older branches are not actively maintained. In general, two stable branches and
 one or two development branches are actively maintained.
 
-## Prerequisites
+## Developing
 
 Follow the instructions in [HACKING.txt](https://github.com/Pylons/pyramid/blob/master/HACKING.txt) to install Pyramid and the tools needed to run its tests and build its documentation.
