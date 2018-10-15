@@ -71,17 +71,20 @@ Prepare new release branch
 
 - Change setup.py version to the release version number.
 
-- Make sure PyPI long description renders (requires ``readme_renderer``
-  installed into your Python)::
+- Make sure PyPI long description renders::
 
-  $ python setup.py check -r -s -m
+  $ tox -e lint
 
 - Create a release tag.
 
-- Make sure your Python has ``setuptools-git``, ``twine``, and ``wheel``
-  installed and release to PyPI::
+  $ git tag X.X
 
-  $ python setup.py sdist bdist_wheel
+- Build the sdist and wheel.
+
+  $ tox -e build
+
+- Upload the artifacts to PyPI:
+
   $ twine upload dist/pyramid-X.X-*
 
 - Configure RTD to publish the new release version of the docs.
