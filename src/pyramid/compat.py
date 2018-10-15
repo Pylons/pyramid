@@ -9,7 +9,7 @@ try:  # pragma: no cover
     import __pypy__
 
     PYPY = True
-except:  # pragma: no cover
+except BaseException:  # pragma: no cover
     __pypy__ = None
     PYPY = False
 
