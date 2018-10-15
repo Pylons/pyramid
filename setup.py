@@ -29,7 +29,7 @@ install_requires = [
     'setuptools',
     'translationstring >= 0.4',  # py3 compat
     'venusian >= 1.0',  # ``ignore``
-    'webob >= 1.8.2',  # cookies.make_cookie allows non-bytes samesite
+    'webob >= 1.8.3',  # Accept.parse_offer
     'zope.deprecation >= 3.5.0',  # py3 compat
     'zope.interface >= 3.8.0',  # has zope.interface.registry
 ]
