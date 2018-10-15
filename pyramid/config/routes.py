@@ -13,12 +13,16 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.request import route_request_iface
 from pyramid.urldispatch import RoutesMapper
 
-from pyramid.util import as_sorted_tuple
+from pyramid.util import (
+    as_sorted_tuple,
+    is_nonstr_iter,
+)
 
 import pyramid.predicates
 
 from pyramid.config.util import (
     action_method,
+    normalize_accept_offer,
     predvalseq,
 )
 
@@ -139,18 +143,6 @@ class RoutesConfiguratorMixin(object):
 
           .. versionadded:: 1.1
 
-        accept
-
-          This value represents a match query for one or more mimetypes in the
-          ``Accept`` HTTP request header.  If this value is specified, it must
-          be in one of the following forms: a mimetype match token in the form
-          ``text/plain``, a wildcard mimetype match token in the form
-          ``text/*`` or a match-all wildcard mimetype match token in the form
-          ``*/*``.  If any of the forms matches the ``Accept`` header of the
-          request, or if the ``Accept`` header isn't set at all in the request,
-          this will match the current route. If this does not match the
-          ``Accept`` header of the request, route matching continues.
-
         Predicate Arguments
 
         pattern
@@ -233,6 +225,32 @@ class RoutesConfiguratorMixin(object):
           case of the header name is not significant.  If this
           predicate returns ``False``, route matching continues.
 
+        accept
+
+          A :term:`media type` that will be matched against the ``Accept``
+          HTTP request header.  If this value is specified, it may be a
+          specific media type such as ``text/html``, or a list of the same.
+          If the media type is acceptable by the ``Accept`` header of the
+          request, or if the ``Accept`` header isn't set at all in the request,
+          this predicate will match. If this does not match the ``Accept``
+          header of the request, route matching continues.
+
+          If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is
+          not taken into consideration when deciding whether or not to select
+          the route.
+
+          Unlike the ``accept`` argument to
+          :meth:`pyramid.config.Configurator.add_view`, this value is
+          strictly a predicate and supports :func:`pyramid.config.not_`.
+
+          .. versionchanged:: 1.10
+
+              Specifying a media range is deprecated due to changes in WebOb
+              and ambiguities that occur when trying to match ranges against
+              ranges in the ``Accept`` header. Support will be removed in
+              :app:`Pyramid` 2.0. Use a list of specific media types to match
+              more than one type.
+
         effective_principals
 
           If specified, this value should be a :term:`principal` identifier or
@@ -289,6 +307,26 @@ class RoutesConfiguratorMixin(object):
                 DeprecationWarning,
                 stacklevel=3
                 )
+
+        if accept is not None:
+            if not is_nonstr_iter(accept):
+                if '*' in accept:
+                    warnings.warn(
+                        ('Passing a media range to the "accept" argument of '
+                         'Configurator.add_route is deprecated as of Pyramid '
+                         '1.10. Use a list of explicit media types.'),
+                        DeprecationWarning,
+                        stacklevel=3,
+                        )
+                # XXX switch this to False when range support is dropped
+                accept = [normalize_accept_offer(accept, allow_range=True)]
+
+            else:
+                accept = [
+                    normalize_accept_offer(accept_option)
+                    for accept_option in accept
+                ]
+
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried
         if request_method is not None:

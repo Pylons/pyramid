@@ -1209,3 +1209,9 @@ Glossary
 
    Alembic
       `Alembic <http://alembic.zzzcomputing.com/en/latest/>`_ is a lightweight database migration tool for usage with the SQLAlchemy Database Toolkit for Python.
+
+   media type
+       A label representing the type of some content.
+       A media type is a nested structure containing a top-level type and a subtype.
+       Optionally, a media type can also contain parameters specific to the type.
+       See :rfc:`6838` for more information about media types.

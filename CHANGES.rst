@@ -57,6 +57,16 @@ Features
 - Add support for Python 3.7. Add testing on Python 3.8 with allowed failures.
   See https://github.com/Pylons/pyramid/pull/3333
 
+- Added the ``pyramid.config.Configurator.add_accept_view_order`` directive,
+  allowing users to specify media type preferences in ambiguous situations
+  such as when several views match. A default ordering is defined for media
+  types that prefers human-readable html/text responses over JSON.
+  See https://github.com/Pylons/pyramid/pull/3326
+
+- Support a list of media types in the ``accept`` predicate used in
+  ``pyramid.config.Configurator.add_route``.
+  See https://github.com/Pylons/pyramid/pull/3326
+
 - Added ``pyramid.session.JSONSerializer``. See "Upcoming Changes to ISession
   in Pyramid 2.0" in the "Sessions" chapter of the documentation for more
   information about this feature.
@@ -102,6 +112,17 @@ Deprecations
   ``SignedCookieSessionFactory``, copying the code, or another session
   implementation if you're still using these features.
   See https://github.com/Pylons/pyramid/pull/3353
+
+- Media ranges are deprecated in the ``accept`` argument of
+  ``pyramid.config.Configurator.add_route``. Use a list of explicit
+  media types to ``add_route`` to support multiple types.
+
+- Media ranges are deprecated in the ``accept`` argument of
+  ``pyramid.config.Configurator.add_view``.  There is no replacement for
+  ranges to ``add_view``, but after much discussion the workflow is
+  fundamentally ambiguous in the face of various client-supplied values for
+  the ``Accept`` header.
+  See https://github.com/Pylons/pyramid/pull/3326
 
 Backward Incompatibilities
 --------------------------

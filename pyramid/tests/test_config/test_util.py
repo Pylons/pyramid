@@ -431,6 +431,42 @@ class TestDeprecatedPredicates(unittest.TestCase):
             from pyramid.config.predicates import XHRPredicate
             self.assertEqual(len(w), 1)
 
+class Test_sort_accept_offers(unittest.TestCase):
+    def _callFUT(self, offers, order=None):
+        from pyramid.config.util import sort_accept_offers
+        return sort_accept_offers(offers, order)
+
+    def test_default_specificities(self):
+        result = self._callFUT(['text/html', 'text/html;charset=utf8'])
+        self.assertEqual(result, [
+            'text/html;charset=utf8', 'text/html',
+        ])
+
+    def test_specific_type_order(self):
+        result = self._callFUT(
+            ['text/html', 'application/json', 'text/html;charset=utf8', 'text/plain'],
+            ['application/json', 'text/html'],
+        )
+        self.assertEqual(result, [
+            'application/json', 'text/html;charset=utf8', 'text/html', 'text/plain',
+        ])
+
+    def test_params_order(self):
+        result = self._callFUT(
+            ['text/html;charset=utf8', 'text/html;charset=latin1', 'text/html;foo=bar'],
+            ['text/html;charset=latin1', 'text/html;charset=utf8'],
+        )
+        self.assertEqual(result, [
+            'text/html;charset=latin1', 'text/html;charset=utf8', 'text/html;foo=bar',
+        ])
+
+    def test_params_inherit_type_prefs(self):
+        result = self._callFUT(
+            ['text/html;charset=utf8', 'text/plain;charset=latin1'],
+            ['text/plain', 'text/html'],
+        )
+        self.assertEqual(result, ['text/plain;charset=latin1', 'text/html;charset=utf8'])
+
 class DummyCustomPredicate(object):
     def __init__(self):
         self.__text__ = 'custom predicate'

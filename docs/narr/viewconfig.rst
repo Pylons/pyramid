@@ -285,6 +285,34 @@ Non-Predicate Arguments
   are just developing stock Pyramid applications. Pay no attention to the man
   behind the curtain.
 
+``accept``
+  A :term:`media type` that will be matched against the ``Accept`` HTTP request header.
+  If this value is specified, it must be a specific media type such as ``text/html`` or ``text/html;level=1``.
+  If the media type is acceptable by the ``Accept`` header of the request, or if the ``Accept`` header isn't set at all in the request, this predicate will match.
+  If this does not match the ``Accept`` header of the request, view matching continues.
+
+  If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is not taken into consideration when deciding whether or not to invoke the associated view callable.
+
+  The ``accept`` argument is technically not a predicate and does not support wrapping with :func:`pyramid.config.not_`.
+
+  See :ref:`accept_content_negotiation` for more information.
+
+  .. versionchanged:: 1.10
+
+      Specifying a media range is deprecated and will be removed in :app:`Pyramid` 2.0.
+      Use explicit media types to avoid any ambiguities in content negotiation.
+
+``exception_only``
+
+  When this value is ``True``, the ``context`` argument must be a subclass of
+  ``Exception``. This flag indicates that only an :term:`exception view` should
+  be created, and that this view should not match if the traversal
+  :term:`context` matches the ``context`` argument. If the ``context`` is a
+  subclass of ``Exception`` and this value is ``False`` (the default), then a
+  view will be registered to match the traversal :term:`context` as well.
+
+  .. versionadded:: 1.8
+
 Predicate Arguments
 +++++++++++++++++++
 
@@ -316,17 +344,6 @@ configured view.
 
   If ``context`` is not supplied, the value ``None``, which matches any
   resource, is used.
-
-``exception_only``
-
-  When this value is ``True``, the ``context`` argument must be a subclass of
-  ``Exception``. This flag indicates that only an :term:`exception view` should
-  be created, and that this view should not match if the traversal
-  :term:`context` matches the ``context`` argument. If the ``context`` is a
-  subclass of ``Exception`` and this value is ``False`` (the default), then a
-  view will be registered to match the traversal :term:`context` as well.
-
-  .. versionadded:: 1.8
 
 ``route_name``
   If ``route_name`` is supplied, the view callable will be invoked only when
@@ -423,19 +440,6 @@ configured view.
   If ``xhr`` is not specified, the ``HTTP_X_REQUESTED_WITH`` HTTP header is not
   taken into consideration when deciding whether or not to invoke the
   associated view callable.
-
-``accept``
-  The value of this argument represents a match query for one or more mimetypes
-  in the ``Accept`` HTTP request header.  If this value is specified, it must
-  be in one of the following forms: a mimetype match token in the form
-  ``text/plain``, a wildcard mimetype match token in the form ``text/*``, or a
-  match-all wildcard mimetype match token in the form ``*/*``.  If any of the
-  forms matches the ``Accept`` header of the request, this predicate will be
-  true.
-
-  If ``accept`` is not specified, the ``HTTP_ACCEPT`` HTTP header is not taken
-  into consideration when deciding whether or not to invoke the associated view
-  callable.
 
 ``header``
   This value represents an HTTP header name or a header name/value pair.
@@ -1024,6 +1028,110 @@ setting.  Details of why a view was not found will be printed to ``stderr``,
 and the browser representation of the error will include the same information.
 See :ref:`environment_chapter` for more information about how, and where to set
 these values.
+
+.. index::
+   single: Accept
+   single: Accept content negotiation
+
+.. _accept_content_negotiation:
+
+Accept Header Content Negotiation
+---------------------------------
+
+The ``accept`` argument to :meth:`pyramid.config.Configurator.add_view` can be used to control :term:`view lookup` by dispatching to different views based on the HTTP ``Accept`` request header.
+Consider the example below in which there are three views configured.
+
+.. code-block:: python
+
+    from pyramid.httpexceptions import HTTPNotAcceptable
+    from pyramid.view import view_config
+
+    @view_config(accept='application/json', renderer='json')
+    @view_config(accept='text/html', renderer='templates/hello.jinja2')
+    def myview(request):
+        return {
+            'name': request.GET.get('name', 'bob'),
+        }
+
+    @view_config()
+    def myview_unacceptable(request):
+        raise HTTPNotAcceptable
+
+Each view relies on the ``Accept`` header to trigger an appropriate response renderer.
+The appropriate view is selected here when the client specifies headers such as ``Accept: text/*`` or ``Accept: application/json, text/html;q=0.9`` in which only one of the views matches or it's clear based on the preferences which one should win.
+Similarly, if the client specifies a media type that no view is registered to handle, such as ``Accept: text/plain``, it will fall through to ``myview_unacceptable`` and raise ``406 Not Acceptable``.
+
+There are a few cases in which the client may specify an ``Accept`` header such that it's not clear which view should win.
+For example:
+
+- ``Accept: */*``.
+- More than one acceptable media type with the same quality.
+- A missing ``Accept`` header.
+- An invalid ``Accept`` header.
+
+In these cases the preferred view is not clearly defined (see :rfc:`7231#section-5.3.2`) and :app:`Pyramid` will select one randomly.
+This can be controlled by telling :app:`Pyramid` what the preferred relative ordering is between various media types by using :meth:`pyramid.config.Configurator.add_accept_view_order`.
+For example:
+
+.. code-block:: python
+
+    from pyramid.config import Configurator
+
+    def main(global_config, **settings):
+        config = Configurator(settings=settings)
+        config.add_accept_view_order('text/html')
+        config.add_accept_view_order(
+            'application/json',
+            weighs_more_than='text/html',
+        )
+        config.scan()
+        return config.make_wsgi_app()
+
+Now, the ``application/json`` view should always be preferred in cases where the client wasn't clear.
+
+.. index::
+    single: default accept ordering
+
+.. _default_accept_ordering:
+
+Default Accept Ordering
+~~~~~~~~~~~~~~~~~~~~~~~
+
+:app:`Pyramid` will always sort multiple views with the same ``(name, context, route_name)`` first by the specificity of the ``accept`` offer.
+For any set of media type offers with the same ``type/subtype``, the offers with params will weigh more than the bare ``type/subtype`` offer.
+This means that ``text/plain;charset=utf8`` will always be offered before ``text/plain``.
+
+By default, within a given ``type/subtype``, the order of offers is unspecified.
+For example, ``text/plain;charset=utf8`` versus ``text/plain;charset=latin1`` are sorted randomly.
+Similarly, between media types the order is also unspecified other than the defaults described below.
+For example, ``image/jpeg`` versus ``image/png`` versus ``application/pdf``.
+In these cases, the ordering may be controlled using :meth:`pyramid.config.Configurator.add_accept_view_order`.
+For example, to sort ``text/plain`` higher than ``text/html`` and to prefer a ``charset=utf8`` versus a ``charset=latin-1`` within the ``text/plain`` media type:
+
+.. code-block:: python
+
+    config.add_accept_view_order('text/html')
+    config.add_accept_view_order('text/plain;charset=latin-1')
+    config.add_accept_view_order('text/plain', weighs_more_than='text/html')
+    config.add_accept_view_order('text/plain;charset=utf8', weighs_more_than='text/plain;charset=latin-1')
+
+It is an error to try and sort accept headers across levels of specificity.
+You can only sort a ``type/subtype`` against another ``type/subtype``, not against a ``type/subtype;params``.
+That ordering is a hard requirement.
+
+By default, :app:`Pyramid` defines a very simple priority ordering for views that prefers human-readable responses over JSON:
+
+- ``text/html``
+- ``application/xhtml+xml``
+- ``application/xml``
+- ``text/xml``
+- ``text/plain``
+- ``application/json``
+
+API clients tend to be able to specify their desired headers with more control than web browsers, and can specify the correct ``Accept`` value, if necessary.
+Therefore, the motivation for this ordering is to optimize for readability.
+Media types that are not listed above are ordered randomly during :term:`view lookup` between otherwise-similar views.
+The defaults can be overridden using :meth:`pyramid.config.Configurator.add_accept_view_order` as described above.
 
 .. index::
    single: HTTP caching

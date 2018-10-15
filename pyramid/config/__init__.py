@@ -394,6 +394,7 @@ class Configurator(
 
         self.add_default_response_adapters()
         self.add_default_renderers()
+        self.add_default_accept_view_order()
         self.add_default_view_predicates()
         self.add_default_view_derivers()
         self.add_default_route_predicates()
