@@ -1,5 +1,7 @@
 import unittest
 from zope.component import getSiteManager
+from zope.interface import Interface
+from zope.interface import implementer
 from pyramid import testing
 
 
@@ -561,7 +563,7 @@ class Test_skip_on(unittest.TestCase):
         return skip_on(*platforms)
 
     def test_wrong_platform(self):
-        def foo():
+        def foo():  # pragma: no cover
             return True
 
         decorated = self._callFUT('wrong')(foo)
@@ -664,10 +666,6 @@ class TestDummySession(unittest.TestCase):
         token = session.get_csrf_token()
         self.assertNotEqual(token, None)
         self.assertTrue(len(token) >= 1)
-
-
-from zope.interface import Interface
-from zope.interface import implementer
 
 
 class IDummy(Interface):

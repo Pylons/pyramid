@@ -1,4 +1,3 @@
-from collections import deque
 import unittest
 from pyramid import testing
 
@@ -153,7 +152,8 @@ class TestRequest(unittest.TestCase):
 
     def test__process_response_callback_adding_response_callback(self):
         """
-        When a response callback adds another callback, that new callback should still be called.
+        When a response callback adds another callback, that new callback
+        should still be called.
 
         See https://github.com/Pylons/pyramid/pull/1373
         """

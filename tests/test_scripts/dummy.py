@@ -1,3 +1,7 @@
+from zope.interface import implementer
+from pyramid.interfaces import IMultiView
+
+
 class DummyTweens(object):
     def __init__(self, implicit, explicit):
         self._implicit = implicit
@@ -87,12 +91,8 @@ class DummyView(object):
     def __init__(self, **attrs):
         self.__request_attrs__ = attrs
 
-    def view(context, request):
+    def view(context, request):  # pragma: no cover
         pass
-
-
-from zope.interface import implementer
-from pyramid.interfaces import IMultiView
 
 
 @implementer(IMultiView)

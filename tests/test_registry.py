@@ -1,4 +1,6 @@
 import unittest
+from zope.interface import Interface
+from zope.interface import implementer
 
 
 class TestRegistry(unittest.TestCase):
@@ -439,10 +441,6 @@ class DummyIntrospectable(object):
 
     def __hash__(self):
         return hash((self.category_name,) + (self.discriminator,))
-
-
-from zope.interface import Interface
-from zope.interface import implementer
 
 
 class IDummyEvent(Interface):

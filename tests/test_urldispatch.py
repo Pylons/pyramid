@@ -26,8 +26,8 @@ class TestRoute(unittest.TestCase):
         self.assertEqual(route.path, ':path')
         self.assertEqual(route.name, 'name')
         self.assertEqual(route.factory, 'factory')
-        self.assertTrue(route.generate.__class__ is types.FunctionType)
-        self.assertTrue(route.match.__class__ is types.FunctionType)
+        self.assertIsInstance(route.generate, types.FunctionType)
+        self.assertIsInstance(route.match, types.FunctionType)
 
     def test_ctor_defaults(self):
         import types
@@ -37,8 +37,8 @@ class TestRoute(unittest.TestCase):
         self.assertEqual(route.path, ':path')
         self.assertEqual(route.name, 'name')
         self.assertEqual(route.factory, None)
-        self.assertTrue(route.generate.__class__ is types.FunctionType)
-        self.assertTrue(route.match.__class__ is types.FunctionType)
+        self.assertIsInstance(route.generate, types.FunctionType)
+        self.assertIsInstance(route.match, types.FunctionType)
 
     def test_match(self):
         route = self._makeOne('name', ':path')
@@ -501,7 +501,7 @@ class TestCompileRouteFunctional(unittest.TestCase):
         )
         self.matches('*traverse', '/zzz/abc', {'traverse': ('zzz', 'abc')})
         self.matches('*traverse', '/zzz/ abc', {'traverse': ('zzz', ' abc')})
-        #'/La%20Pe%C3%B1a'
+        # '/La%20Pe%C3%B1a'
         self.matches(
             '{x}',
             text_(b'/La Pe\xc3\xb1a', 'utf-8'),
@@ -544,7 +544,7 @@ class TestCompileRouteFunctional(unittest.TestCase):
         )
         self.matches('*traverse', '/zzz/abc', {'traverse': ('zzz', 'abc')})
         self.matches('*traverse', '/zzz/ abc', {'traverse': ('zzz', ' abc')})
-        #'/La%20Pe%C3%B1a'
+        # '/La%20Pe%C3%B1a'
         # pattern, path, expected
         self.matches(
             ':x',

@@ -1,11 +1,11 @@
 import unittest
+from zope.interface import Interface
+from zope.interface import implementer
 import sys
 
-from zope.interface import implementer
-
 from pyramid import testing
-
 from pyramid.interfaces import IRequest
+from pyramid.interfaces import IResponse
 
 
 class BaseTest(object):
@@ -68,7 +68,7 @@ class Test_notfound_view_config(BaseTest, unittest.TestCase):
         )
 
     def test_it_function(self):
-        def view(request):
+        def view(request):  # pragma: no cover
             pass
 
         decorator = self._makeOne(
@@ -119,7 +119,7 @@ class Test_notfound_view_config(BaseTest, unittest.TestCase):
         venusian = DummyVenusian()
         decorator.venusian = venusian
 
-        def foo():
+        def foo():  # pragma: no cover
             pass
 
         decorator(foo)
@@ -143,7 +143,7 @@ class Test_forbidden_view_config(BaseTest, unittest.TestCase):
         )
 
     def test_it_function(self):
-        def view(request):
+        def view(request):  # pragma: no cover
             pass
 
         decorator = self._makeOne(attr='attr', renderer='renderer')
@@ -191,7 +191,7 @@ class Test_forbidden_view_config(BaseTest, unittest.TestCase):
         venusian = DummyVenusian()
         decorator.venusian = venusian
 
-        def foo():
+        def foo():  # pragma: no cover
             pass
 
         decorator(foo)
@@ -228,7 +228,7 @@ class Test_exception_view_config(BaseTest, unittest.TestCase):
         )
 
     def test_it_function(self):
-        def view(request):
+        def view(request):  # pragma: no cover
             pass
 
         decorator = self._makeOne(context=Exception, renderer='renderer')
@@ -276,7 +276,7 @@ class Test_exception_view_config(BaseTest, unittest.TestCase):
         venusian = DummyVenusian()
         decorator.venusian = venusian
 
-        def foo():
+        def foo():  # pragma: no cover
             pass
 
         decorator(foo)
@@ -549,7 +549,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         venusian = DummyVenusian()
         decorator.venusian = venusian
 
-        def foo():
+        def foo():  # pragma: no cover
             pass
 
         wrapped = decorator(foo)
@@ -611,7 +611,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         decorator2 = self._makeOne(name='2')
         decorator2.venusian = venusian2
 
-        def foo():
+        def foo():  # pragma: no cover
             pass
 
         wrapped1 = decorator1(foo)
@@ -631,10 +631,10 @@ class TestViewConfigDecorator(unittest.TestCase):
         decorator.venusian = venusian
         decorator.venusian.info.scope = 'class'
 
-        def foo(self):
+        def foo(self):  # pragma: no cover
             pass
 
-        def bar(self):
+        def bar(self):  # pragma: no cover
             pass
 
         class foo(object):
@@ -652,7 +652,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         venusian = DummyVenusian()
         decorator.venusian = venusian
 
-        def foo(context, request):
+        def foo(context, request):  # pragma: no cover
             pass
 
         decorated = decorator(foo)
@@ -668,7 +668,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         venusian = DummyVenusian()
         decorator.venusian = venusian
 
-        def foo():
+        def foo():  # pragma: no cover
             pass
 
         wrapped = decorator(foo)
@@ -687,7 +687,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         venusian = DummyVenusian()
         decorator.venusian = venusian
 
-        def foo():
+        def foo():  # pragma: no cover
             pass
 
         wrapped = decorator(foo)
@@ -711,7 +711,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         venusian = DummyVenusian()
         decorator.venusian = venusian
 
-        def foo():
+        def foo():  # pragma: no cover
             pass
 
         wrapped = decorator(foo)
@@ -729,7 +729,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         venusian = DummyVenusian()
         decorator.venusian = venusian
 
-        def foo():
+        def foo():  # pragma: no cover
             pass
 
         decorator(foo)
@@ -742,7 +742,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         venusian = DummyVenusian()
         decorator.venusian = venusian
 
-        def foo():
+        def foo():  # pragma: no cover
             pass
 
         decorator(foo)
@@ -755,7 +755,7 @@ class TestViewConfigDecorator(unittest.TestCase):
         venusian = DummyVenusian()
         decorator.venusian = venusian
 
-        def foo():
+        def foo():  # pragma: no cover
             pass
 
         decorator(foo)
@@ -1091,7 +1091,7 @@ class TestViewMethodsMixin(unittest.TestCase):
     def test_it_rejects_secured_view(self):
         from pyramid.exceptions import Forbidden
 
-        def exc_view(exc, request):
+        def exc_view(exc, request):  # pragma: no cover
             pass
 
         self.config.testing_securitypolicy(permissive=False)
@@ -1147,7 +1147,7 @@ class TestViewMethodsMixin(unittest.TestCase):
     def test_it_raises_predicate_mismatch(self):
         from pyramid.exceptions import PredicateMismatch
 
-        def exc_view(exc, request):
+        def exc_view(exc, request):  # pragma: no cover
             pass
 
         self.config.add_view(
@@ -1164,7 +1164,7 @@ class TestViewMethodsMixin(unittest.TestCase):
             self.fail()
 
     def test_it_reraises_after_predicate_mismatch(self):
-        def exc_view(exc, request):
+        def exc_view(exc, request):  # pragma: no cover
             pass
 
         self.config.add_view(
@@ -1211,9 +1211,6 @@ class DummyRequest:
         self.environ = environ
 
 
-from pyramid.interfaces import IResponse
-
-
 @implementer(IResponse)
 class DummyResponse(object):
     headerlist = ()
@@ -1226,9 +1223,6 @@ class DummyResponse(object):
             self.app_iter = ()
         else:
             self.app_iter = [body]
-
-
-from zope.interface import Interface
 
 
 class IContext(Interface):

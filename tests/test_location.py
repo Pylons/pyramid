@@ -1,4 +1,6 @@
 import unittest
+from zope.interface import implementer
+from pyramid.interfaces import ILocation
 
 
 class TestInside(unittest.TestCase):
@@ -42,10 +44,6 @@ class TestLineage(unittest.TestCase):
         self.assertEqual(result, [o3, o2, o1])
         result = list(self._callFUT(o1))
         self.assertEqual(result, [o1])
-
-
-from pyramid.interfaces import ILocation
-from zope.interface import implementer
 
 
 @implementer(ILocation)

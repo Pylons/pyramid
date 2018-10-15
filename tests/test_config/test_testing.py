@@ -1,4 +1,5 @@
 import unittest
+from zope.interface import implementer
 
 from pyramid.compat import text_
 from pyramid.security import AuthenticationAPIMixin, AuthorizationAPIMixin
@@ -220,9 +221,6 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
         renderer.assert_(foo=1)
         renderer.assert_(bar=2)
         renderer.assert_(request=request)
-
-
-from zope.interface import implementer
 
 
 @implementer(IDummy)

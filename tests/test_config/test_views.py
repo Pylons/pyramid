@@ -1,15 +1,16 @@
 import os
 import unittest
+from zope.interface import implementer
+
 from pyramid import testing
-
-from . import IDummy
-
-from . import dummy_view
-
 from pyramid.compat import im_func, text_
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import ConfigurationExecutionError
 from pyramid.exceptions import ConfigurationConflictError
+from pyramid.interfaces import IResponse, IRequest, IMultiView
+
+from . import IDummy
+from . import dummy_view
 
 
 class TestViewsConfigurationMixin(unittest.TestCase):
@@ -859,7 +860,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         def view(context, request):
             return 'OK'
 
-        def view2(context, request):
+        def view2(context, request):  # pragma: no cover
             return 'OK2'
 
         def view3(context, request):
@@ -884,7 +885,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         def view(context, request):
             return 'OK'
 
-        def view2(context, request):
+        def view2(context, request):  # pragma: no cover
             return 'OK2'
 
         def view3(context, request):
@@ -1332,7 +1333,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             def __init__(self, request):
                 pass
 
-        def unknown(context, request):
+        def unknown(context, request):  # pragma: no cover
             return 'unknown'
 
         def view(context, request):
@@ -1379,7 +1380,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             def __init__(self, request):
                 pass
 
-        def unknown(context, request):
+        def unknown(context, request):  # pragma: no cover
             return 'unknown'
 
         def view(context, request):
@@ -2048,7 +2049,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.exceptions import BadCSRFToken
         from pyramid.renderers import null_renderer
 
-        def view(request):
+        def view(request):  # pragma: no cover
             return 'OK'
 
         config = self._makeOne(autocommit=True)
@@ -2251,13 +2252,12 @@ class TestViewsConfigurationMixin(unittest.TestCase):
 
     def test_add_view_class_method_no_attr(self):
         from pyramid.renderers import null_renderer
-        from zope.interface import directlyProvides
         from pyramid.exceptions import ConfigurationError
 
         config = self._makeOne(autocommit=True)
 
         class DummyViewClass(object):
-            def run(self):
+            def run(self):  # pragma: no cover
                 pass
 
         def configure_view():
@@ -2728,7 +2728,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.add_route('foo', '/foo/')
 
-        def view(request):
+        def view(request):  # pragma: no cover
             return Response('OK')
 
         config.add_notfound_view(
@@ -2757,7 +2757,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.add_route('foo', '/foo/')
 
-        def view(request):
+        def view(request):  # pragma: no cover
             return Response('OK')
 
         config.add_notfound_view(
@@ -2989,7 +2989,7 @@ class Test_runtime_exc_view(unittest.TestCase):
         def view1(context, request):
             return 'OK'
 
-        def view2(context, request):
+        def view2(context, request):  # pragma: no cover
             raise AssertionError
 
         result_view = self._makeOne(view1, view2)
@@ -2998,7 +2998,7 @@ class Test_runtime_exc_view(unittest.TestCase):
         self.assertEqual(result, 'OK')
 
     def test_call_dispatches_on_exception(self):
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             raise AssertionError
 
         def view2(context, request):
@@ -3011,15 +3011,15 @@ class Test_runtime_exc_view(unittest.TestCase):
         self.assertEqual(result, 'OK')
 
     def test_permitted(self):
-        def errfn(context, request):
+        def errfn(context, request):  # pragma: no cover
             raise AssertionError
 
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             raise AssertionError
 
         view1.__permitted__ = lambda c, r: 'OK'
 
-        def view2(context, request):
+        def view2(context, request):  # pragma: no cover
             raise AssertionError
 
         view2.__permitted__ = errfn
@@ -3029,15 +3029,15 @@ class Test_runtime_exc_view(unittest.TestCase):
         self.assertEqual(result, 'OK')
 
     def test_permitted_dispatches_on_exception(self):
-        def errfn(context, request):
+        def errfn(context, request):  # pragma: no cover
             raise AssertionError
 
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             raise AssertionError
 
         view1.__permitted__ = errfn
 
-        def view2(context, request):
+        def view2(context, request):  # pragma: no cover
             raise AssertionError
 
         view2.__permitted__ = lambda c, r: 'OK'
@@ -3055,17 +3055,17 @@ class Test_requestonly(unittest.TestCase):
         return requestonly(view, attr=attr)
 
     def test_defaults(self):
-        def aview(request, a=1, b=2):
+        def aview(request, a=1, b=2):  # pragma: no cover
             pass
 
         self.assertTrue(self._callFUT(aview))
 
     def test_otherattr(self):
         class AView(object):
-            def __init__(self, request, a=1, b=2):
+            def __init__(self, request, a=1, b=2):  # pragma: no cover
                 pass
 
-            def bleh(self):
+            def bleh(self):  # pragma: no cover
                 pass
 
         self.assertTrue(self._callFUT(AView, 'bleh'))
@@ -3166,13 +3166,13 @@ class TestMultiView(unittest.TestCase):
     def test_add_with_phash_override_accept(self):
         mv = self._makeOne()
 
-        def view1():
+        def view1():  # pragma: no cover
             pass
 
-        def view2():
+        def view2():  # pragma: no cover
             pass
 
-        def view3():
+        def view3():  # pragma: no cover
             pass
 
         mv.add(view1, 100, accept='text/html', phash='abc')
@@ -3186,13 +3186,13 @@ class TestMultiView(unittest.TestCase):
     def test_add_with_phash_override_accept2(self):
         mv = self._makeOne()
 
-        def view1():
+        def view1():  # pragma: no cover
             pass
 
-        def view2():
+        def view2():  # pragma: no cover
             pass
 
-        def view3():
+        def view3():  # pragma: no cover
             pass
 
         mv.add(view1, 100, accept='text/html', phash='abc')
@@ -3207,10 +3207,10 @@ class TestMultiView(unittest.TestCase):
         # this failed on py3 at one point, because functions aren't orderable
         # and we were sorting the views via a plain sort() rather than
         # sort(key=itemgetter(0)).
-        def view1(request):
+        def view1(request):  # pragma: no cover
             pass
 
-        def view2(request):
+        def view2(request):  # pragma: no cover
             pass
 
         mv = self._makeOne()
@@ -3692,12 +3692,12 @@ class Test_preserve_view_attrs(unittest.TestCase):
         self.assertTrue(result is view)
 
     def test_it_different_with_existing_original_view(self):
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             pass
 
         view1.__original_view__ = 'abc'
 
-        def view2(context, request):
+        def view2(context, request):  # pragma: no cover
             pass
 
         result = self._callFUT(view1, view2)
@@ -3950,7 +3950,7 @@ class TestStaticURLInfo(unittest.TestCase):
         self.assertTrue(called[0])
 
     def test_generate_url_cachebust_nomatch(self):
-        def fake_cb(*a, **kw):
+        def fake_cb(*a, **kw):  # pragma: no cover
             raise AssertionError
 
         inst = self._makeOne()
@@ -4188,7 +4188,7 @@ class Test_view_description(unittest.TestCase):
         return view_description(view)
 
     def test_with_text(self):
-        def view():
+        def view():  # pragma: no cover
             pass
 
         view.__text__ = 'some text'
@@ -4196,7 +4196,7 @@ class Test_view_description(unittest.TestCase):
         self.assertEqual(result, 'some text')
 
     def test_without_text(self):
-        def view():
+        def view():  # pragma: no cover
             pass
 
         result = self._callFUT(view)
@@ -4226,10 +4226,6 @@ class DummyRegistry:
 
     def queryUtility(self, type_or_iface, name=None, default=None):
         return self.utility or default
-
-
-from zope.interface import implementer
-from pyramid.interfaces import IResponse, IRequest
 
 
 @implementer(IResponse)
@@ -4293,10 +4289,6 @@ class DummyConfig:
 
     def introspectable(self, *arg):
         return {}
-
-
-from zope.interface import implementer
-from pyramid.interfaces import IMultiView
 
 
 @implementer(IMultiView)

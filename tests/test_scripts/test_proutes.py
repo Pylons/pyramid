@@ -121,7 +121,7 @@ class TestPRoutesCommand(unittest.TestCase):
 
         registry = self._makeRegistry()
 
-        def view():
+        def view():  # pragma: no cover
             pass
 
         class IMyRoute(Interface):
@@ -148,7 +148,7 @@ class TestPRoutesCommand(unittest.TestCase):
 
         registry = self._makeRegistry()
 
-        def view():
+        def view():  # pragma: no cover
             pass
 
         class IMyRoute(Interface):
@@ -181,7 +181,7 @@ class TestPRoutesCommand(unittest.TestCase):
 
         registry = self._makeRegistry()
 
-        def view():
+        def view():  # pragma: no cover
             pass
 
         class IMyRoute(Interface):
@@ -254,7 +254,7 @@ class TestPRoutesCommand(unittest.TestCase):
 
         registry = self._makeRegistry()
 
-        def view():
+        def view():  # pragma: no cover
             pass
 
         class IMyRoot(Interface):
@@ -269,7 +269,7 @@ class TestPRoutesCommand(unittest.TestCase):
         registry.registerUtility(IMyRoute, IRouteRequest, name='a')
         command = self._makeOne()
 
-        def factory(request):
+        def factory(request):  # pragma: no cover
             pass
 
         route = dummy.DummyRoute('a', '/a', factory=factory)
@@ -291,7 +291,7 @@ class TestPRoutesCommand(unittest.TestCase):
 
         registry = self._makeRegistry()
 
-        def view():
+        def view():  # pragma: no cover
             pass
 
         class IMyRoute(Interface):
@@ -334,7 +334,7 @@ class TestPRoutesCommand(unittest.TestCase):
     def test_one_route_all_methods_view_only_post(self):
         from pyramid.renderers import null_renderer as nr
 
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             return 'view1'
 
         config = self._makeConfig(autocommit=True)
@@ -362,7 +362,7 @@ class TestPRoutesCommand(unittest.TestCase):
     def test_one_route_only_post_view_all_methods(self):
         from pyramid.renderers import null_renderer as nr
 
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             return 'view1'
 
         config = self._makeConfig(autocommit=True)
@@ -388,7 +388,7 @@ class TestPRoutesCommand(unittest.TestCase):
     def test_one_route_only_post_view_post_and_get(self):
         from pyramid.renderers import null_renderer as nr
 
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             return 'view1'
 
         config = self._makeConfig(autocommit=True)
@@ -419,7 +419,7 @@ class TestPRoutesCommand(unittest.TestCase):
     def test_route_request_method_mismatch(self):
         from pyramid.renderers import null_renderer as nr
 
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             return 'view1'
 
         config = self._makeConfig(autocommit=True)
@@ -446,8 +446,6 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(compare_to, expected)
 
     def test_route_static_views(self):
-        from pyramid.renderers import null_renderer as nr
-
         config = self._makeConfig(autocommit=True)
         config.add_static_view('static', 'static', cache_max_age=3600)
         path2 = os.path.normpath('/var/www/static')
@@ -486,8 +484,6 @@ class TestPRoutesCommand(unittest.TestCase):
             self.assertEqual(data, expected[index])
 
     def test_route_no_view(self):
-        from pyramid.renderers import null_renderer as nr
-
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', '/a/b', request_method='POST')
 
@@ -507,7 +503,7 @@ class TestPRoutesCommand(unittest.TestCase):
 
         config1 = self._makeConfig(autocommit=True)
 
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             return 'view1'
 
         config1.add_route('foo', '/a/b', request_method='POST')
@@ -532,7 +528,7 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             return 'view1'
 
         config = self._makeConfig(autocommit=True)
@@ -564,7 +560,7 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             return 'view1'
 
         config = self._makeConfig(autocommit=True)
@@ -596,10 +592,10 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             return 'view1'
 
-        def view2(context, request):
+        def view2(context, request):  # pragma: no cover
             return 'view2'
 
         config = self._makeConfig(autocommit=True)
@@ -641,7 +637,7 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             return 'view1'
 
         config = self._makeConfig(autocommit=True)
@@ -672,7 +668,7 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             return 'view1'
 
         config = self._makeConfig(autocommit=True)
@@ -702,7 +698,7 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             return 'view1'
 
         config = self._makeConfig(autocommit=True)
@@ -736,7 +732,7 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             return 'view1'
 
         config = self._makeConfig(autocommit=True)
@@ -770,7 +766,7 @@ class TestPRoutesCommand(unittest.TestCase):
         from pyramid.renderers import null_renderer as nr
         from pyramid.config import not_
 
-        def view1(context, request):
+        def view1(context, request):  # pragma: no cover
             return 'view1'
 
         config = self._makeConfig(autocommit=True)
@@ -801,8 +797,6 @@ class TestPRoutesCommand(unittest.TestCase):
         self.assertEqual(L[0].split(), ['Method', 'Name'])
 
     def test_static_routes_included_in_list(self):
-        from pyramid.renderers import null_renderer as nr
-
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', 'http://example.com/bar.aspx', static=True)
 

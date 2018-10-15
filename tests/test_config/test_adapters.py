@@ -177,7 +177,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
 
         L = []
 
-        def subscriber(event):
+        def subscriber(event):  # pragma: no cover
             L.append(event)
 
         config = self._makeOne(autocommit=True)
@@ -206,7 +206,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
 
         L = []
 
-        def subscriber(event):
+        def subscriber(event):  # pragma: no cover
             L.append(event)
 
         config = self._makeOne(autocommit=True)
@@ -394,7 +394,7 @@ class Test_eventonly(unittest.TestCase):
         return eventonly(callee)
 
     def test_defaults(self):
-        def acallable(event, a=1, b=2):
+        def acallable(event, a=1, b=2):  # pragma: no cover
             pass
 
         self.assertTrue(self._callFUT(acallable))

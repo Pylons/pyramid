@@ -48,7 +48,8 @@ class TestPTweensCommand(unittest.TestCase):
         self.assertEqual(result, 0)
         self.assertEqual(
             L[0],
-            '"pyramid.tweens" config value set (explicitly ordered tweens used)',
+            '"pyramid.tweens" config value set (explicitly ordered tweens '
+            'used)',
         )
 
     def test__get_tweens(self):

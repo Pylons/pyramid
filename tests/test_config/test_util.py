@@ -426,7 +426,7 @@ class TestDeprecatedPredicates(unittest.TestCase):
 
         with warnings.catch_warnings(record=True) as w:
             warnings.filterwarnings('always')
-            from pyramid.config.predicates import XHRPredicate
+            from pyramid.config.predicates import XHRPredicate  # noqa: F401
 
             self.assertEqual(len(w), 1)
 
@@ -493,7 +493,7 @@ class DummyCustomPredicate(object):
     def __init__(self):
         self.__text__ = 'custom predicate'
 
-    def classmethod_predicate(*args):
+    def classmethod_predicate(*args):  # pragma: no cover
         pass
 
     classmethod_predicate.__text__ = 'classmethod predicate'

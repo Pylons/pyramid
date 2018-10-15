@@ -16,17 +16,17 @@ class TestUnboundMethods(unittest.TestCase):
         self.assertTrue(is_unbound_method(NewStyle.run))
 
     def test_normal_func_unbound(self):
-        def func():
+        def func():  # pragma: no cover
             return 'OK'
 
         self.assertFalse(is_unbound_method(func))
 
 
 class OldStyle:
-    def run(self):
+    def run(self):  # pragma: no cover
         return 'OK'
 
 
 class NewStyle(object):
-    def run(self):
+    def run(self):  # pragma: no cover
         return 'OK'

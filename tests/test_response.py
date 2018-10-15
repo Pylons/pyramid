@@ -166,7 +166,7 @@ class TestResponseAdapter(unittest.TestCase):
 
         dec = self._makeOne(IFoo)
 
-        def foo():
+        def foo():  # pragma: no cover
             pass
 
         config = DummyConfigurator()
@@ -186,7 +186,7 @@ class TestResponseAdapter(unittest.TestCase):
 
         dec = self._makeOne(IFoo, IBar)
 
-        def foo():
+        def foo():  # pragma: no cover
             pass
 
         config = DummyConfigurator()
@@ -205,7 +205,7 @@ class TestResponseAdapter(unittest.TestCase):
         dummy_venusian = DummyVenusian()
         dec.venusian = dummy_venusian
 
-        def foo():
+        def foo():  # pragma: no cover
             pass
 
         dec(foo)
@@ -223,7 +223,7 @@ class TestResponseAdapter(unittest.TestCase):
         dummy_venusian = DummyVenusian()
         dec.venusian = dummy_venusian
 
-        def foo():
+        def foo():  # pragma: no cover
             pass
 
         dec(foo)

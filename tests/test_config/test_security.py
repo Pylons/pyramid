@@ -133,7 +133,7 @@ class ConfiguratorSecurityMethodsTests(unittest.TestCase):
 
         config = self._makeOne(autocommit=True)
 
-        def callback(request):
+        def callback(request):  # pragma: no cover
             return True
 
         config.set_default_csrf_options(

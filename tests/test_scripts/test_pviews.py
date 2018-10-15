@@ -75,7 +75,7 @@ class TestPViewsCommand(unittest.TestCase):
 
         registry = Registry()
 
-        def view1():
+        def view1():  # pragma: no cover
             pass
 
         request = dummy.DummyRequest({'PATH_INFO': '/a'})
@@ -128,7 +128,7 @@ class TestPViewsCommand(unittest.TestCase):
 
         registry = Registry()
 
-        def view():
+        def view():  # pragma: no cover
             pass
 
         class IMyRoot(Interface):
@@ -167,10 +167,10 @@ class TestPViewsCommand(unittest.TestCase):
 
         registry = Registry()
 
-        def view1():
+        def view1():  # pragma: no cover
             pass
 
-        def view2():
+        def view2():  # pragma: no cover
             pass
 
         class IMyRoot(Interface):
@@ -213,10 +213,10 @@ class TestPViewsCommand(unittest.TestCase):
 
         registry = Registry()
 
-        def view1():
+        def view1():  # pragma: no cover
             pass
 
-        def view2():
+        def view2():  # pragma: no cover
             pass
 
         class IMyRoot(Interface):
@@ -259,7 +259,7 @@ class TestPViewsCommand(unittest.TestCase):
     def test__find_multi_routes_all_match(self):
         command = self._makeOne()
 
-        def factory(request):
+        def factory(request):  # pragma: no cover
             pass
 
         routes = [
@@ -280,7 +280,7 @@ class TestPViewsCommand(unittest.TestCase):
     def test__find_multi_routes_some_match(self):
         command = self._makeOne()
 
-        def factory(request):
+        def factory(request):  # pragma: no cover
             pass
 
         routes = [
@@ -295,7 +295,7 @@ class TestPViewsCommand(unittest.TestCase):
     def test__find_multi_routes_none_match(self):
         command = self._makeOne()
 
-        def factory(request):
+        def factory(request):  # pragma: no cover
             pass
 
         routes = [
@@ -363,7 +363,7 @@ class TestPViewsCommand(unittest.TestCase):
         L = []
         command.out = L.append
 
-        def view():
+        def view():  # pragma: no cover
             pass
 
         view.__request_attrs__ = {'context': 'context', 'view_name': 'a'}
@@ -405,7 +405,7 @@ class TestPViewsCommand(unittest.TestCase):
         L = []
         command.out = L.append
 
-        def predicate():
+        def predicate():  # pragma: no cover
             pass
 
         predicate.text = lambda *arg: "predicate = x"
@@ -483,7 +483,7 @@ class TestPViewsCommand(unittest.TestCase):
         L = []
         command.out = L.append
 
-        def predicate():
+        def predicate():  # pragma: no cover
             pass
 
         predicate.text = lambda *arg: "predicate = x"
@@ -563,7 +563,7 @@ class TestPViewsCommand(unittest.TestCase):
         L = []
         command.out = L.append
 
-        def predicate():
+        def predicate():  # pragma: no cover
             pass
 
         predicate.text = lambda *arg: "predicate = x"

@@ -121,7 +121,7 @@ class Test_prepare(unittest.TestCase):
         request.context = context
         registry = request.registry = self._makeRegistry()
         info = self._callFUT(request=request, registry=registry)
-        root, closer, root = info['root'], info['closer'], info['root']
+        closer = info['closer']
         closer()
         self.assertEqual(request.context, context)
 
@@ -136,7 +136,7 @@ class Test_prepare(unittest.TestCase):
         registry = request.registry = self._makeRegistry([exts, DummyFactory])
         info = self._callFUT(request=request, registry=registry)
         self.assertEqual(request.foo, 'bar')
-        root, closer = info['root'], info['closer']
+        closer = info['closer']
         closer()
 
     def test_it_is_a_context_manager(self):

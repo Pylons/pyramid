@@ -69,7 +69,7 @@ class Test_excview_tween_factory(unittest.TestCase):
     def test_it_reraises_on_mismatch(self):
         from pyramid.request import Request
 
-        def excview(request):
+        def excview(request):  # pragma: no cover
             pass
 
         self.config.add_view(excview, context=ValueError, request_method='GET')

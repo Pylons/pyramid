@@ -1,5 +1,5 @@
 # package
-
+from functools import partial
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -8,11 +8,11 @@ class IFactory(Interface):
     pass
 
 
-def dummy_tween_factory(handler, registry):
+def dummy_tween_factory(handler, registry):  # pragma: no cover
     pass
 
 
-def dummy_tween_factory2(handler, registry):
+def dummy_tween_factory2(handler, registry):  # pragma: no cover
     pass
 
 
@@ -58,8 +58,6 @@ def dummy_extend(config, discrim):
 def dummy_extend2(config, discrim):
     config.action(discrim, None, config.registry)
 
-
-from functools import partial
 
 dummy_partial = partial(dummy_extend, discrim='partial')
 

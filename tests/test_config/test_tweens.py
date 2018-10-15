@@ -17,10 +17,10 @@ class TestTweensConfiguratorMixin(unittest.TestCase):
         from pyramid.interfaces import ITweens
         from pyramid.tweens import excview_tween_factory
 
-        def factory1(handler, registry):
+        def factory1(handler, registry):  # pragma: no cover
             return handler
 
-        def factory2(handler, registry):
+        def factory2(handler, registry):  # pragma: no cover
             return handler
 
         config = self._makeOne()

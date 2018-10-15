@@ -1,6 +1,5 @@
 import os
 import unittest
-import warnings
 
 from pyramid import testing
 

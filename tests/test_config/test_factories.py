@@ -114,7 +114,7 @@ class TestFactoriesMixin(unittest.TestCase):
 
         config = self._makeOne(autocommit=True)
 
-        def foo(self):
+        def foo(self):  # pragma: no cover
             pass
 
         config.add_request_method(foo)
@@ -126,10 +126,10 @@ class TestFactoriesMixin(unittest.TestCase):
 
         config = self._makeOne()
 
-        def foo(self):
+        def foo(self):  # pragma: no cover
             pass
 
-        def bar(self):
+        def bar(self):  # pragma: no cover
             pass
 
         config.add_request_method(foo, name='bar')
@@ -149,7 +149,7 @@ class TestFactoriesMixin(unittest.TestCase):
 
         config = self._makeOne()
 
-        def bar(self):
+        def bar(self):  # pragma: no cover
             pass
 
         config.add_request_method(name='foo')
@@ -161,13 +161,12 @@ class TestFactoriesMixin(unittest.TestCase):
         self.assertRaises(AttributeError, config.add_request_method)
 
     def test_add_request_method_with_text_type_name(self):
-        from pyramid.interfaces import IRequestExtensions
         from pyramid.compat import text_, PY2
         from pyramid.exceptions import ConfigurationError
 
         config = self._makeOne(autocommit=True)
 
-        def boomshaka(r):
+        def boomshaka(r):  # pragma: no cover
             pass
 
         def get_bad_name():
@@ -185,7 +184,7 @@ class TestFactoriesMixin(unittest.TestCase):
 
         config = self._makeOne(autocommit=True)
 
-        def dummy_policy(environ, router):
+        def dummy_policy(environ, router):  # pragma: no cover
             pass
 
         config.set_execution_policy(dummy_policy)

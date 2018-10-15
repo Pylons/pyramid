@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-
 import datetime
 import gc
 import locale
 import os
 import unittest
+from webtest import TestApp
+from zope.interface import Interface
 
 from pyramid.wsgi import wsgiapp
 from pyramid.view import view_config
@@ -12,8 +13,7 @@ from pyramid.static import static_view
 from pyramid.testing import skip_on
 from pyramid.compat import text_, url_quote
 
-from zope.interface import Interface
-from webtest import TestApp
+from .pkgs.exceptionviewapp.models import AnException, NotAnException
 
 # 5 years from now (more or less)
 fiveyrsfuture = datetime.datetime.utcnow() + datetime.timedelta(5 * 365)
@@ -38,7 +38,7 @@ class WGSIAppPlusViewConfigTests(unittest.TestCase):
         import types
 
         self.assertTrue(getattr(wsgiapptest, ATTACH_ATTR))
-        self.assertTrue(type(wsgiapptest) is types.FunctionType)
+        self.assertIsInstance(wsgiapptest, types.FunctionType)
         context = DummyContext()
         request = DummyRequest()
         result = wsgiapptest(context, request)
@@ -450,7 +450,8 @@ class TestForbiddenView(IntegrationBase, unittest.TestCase):
 
 
 class TestViewPermissionBug(IntegrationBase, unittest.TestCase):
-    # view_execution_permitted bug as reported by Shane at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003603.html
+    # view_execution_permitted bug as reported by Shane at
+    # http://lists.repoze.org/pipermail/repoze-dev/2010-October/003603.html
     package = 'tests.pkgs.permbugapp'
 
     def test_test(self):
@@ -462,7 +463,8 @@ class TestViewPermissionBug(IntegrationBase, unittest.TestCase):
 
 
 class TestDefaultViewPermissionBug(IntegrationBase, unittest.TestCase):
-    # default_view_permission bug as reported by Wiggy at http://lists.repoze.org/pipermail/repoze-dev/2010-October/003602.html
+    # default_view_permission bug as reported by Wiggy at
+    # http://lists.repoze.org/pipermail/repoze-dev/2010-October/003602.html
     package = 'tests.pkgs.defpermbugapp'
 
     def test_x(self):
@@ -477,8 +479,6 @@ class TestDefaultViewPermissionBug(IntegrationBase, unittest.TestCase):
         res = self.testapp.get('/z', status=200)
         self.assertTrue(b'public' in res.body)
 
-
-from .pkgs.exceptionviewapp.models import AnException, NotAnException
 
 excroot = {'anexception': AnException(), 'notanexception': NotAnException()}
 

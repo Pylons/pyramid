@@ -1,6 +1,7 @@
-import unittest
-
 import os
+import unittest
+from zope.interface import Interface
+from zope.interface import implementer
 
 from pyramid.compat import im_func
 from pyramid.testing import skip_on
@@ -320,7 +321,7 @@ class ConfiguratorTests(unittest.TestCase):
         from pyramid.interfaces import IExceptionResponse
         from pyramid.interfaces import IRequest
 
-        def exceptionresponse_view(context, request):
+        def exceptionresponse_view(context, request):  # pragma: no cover
             pass
 
         config = self._makeOne(exceptionresponse_view=exceptionresponse_view)
@@ -793,7 +794,8 @@ tests.test_config.dummy_include2"""
         reg = Registry()
         config = self._makeOne(reg)
         settings = {
-            'pyramid.includes': """tests.test_config.dummy_include tests.test_config.dummy_include2"""
+            'pyramid.includes': """tests.test_config.dummy_include tests.\
+test_config.dummy_include2"""
         }
         config.setup_registry(settings=settings)
         self.assertTrue(reg.included)
@@ -963,7 +965,6 @@ tests.test_config.dummy_include2"""
 
     def test_include_threadlocals_active(self):
         from pyramid.threadlocal import get_current_registry
-        from tests import test_config
 
         stack = []
 
@@ -1308,10 +1309,10 @@ tests.test_config.dummy_include2"""
     def test_commit_conflict_simple(self):
         config = self._makeOne()
 
-        def view1(request):
+        def view1(request):  # pragma: no cover
             pass
 
-        def view2(request):
+        def view2(request):  # pragma: no cover
             pass
 
         config.add_view(view1)
@@ -1321,10 +1322,10 @@ tests.test_config.dummy_include2"""
     def test_commit_conflict_resolved_with_include(self):
         config = self._makeOne()
 
-        def view1(request):
+        def view1(request):  # pragma: no cover
             pass
 
-        def view2(request):
+        def view2(request):  # pragma: no cover
             pass
 
         def includeme(config):
@@ -1339,10 +1340,10 @@ tests.test_config.dummy_include2"""
     def test_commit_conflict_with_two_includes(self):
         config = self._makeOne()
 
-        def view1(request):
+        def view1(request):  # pragma: no cover
             pass
 
-        def view2(request):
+        def view2(request):  # pragma: no cover
             pass
 
         def includeme1(config):
@@ -1365,13 +1366,13 @@ tests.test_config.dummy_include2"""
     def test_commit_conflict_resolved_with_two_includes_and_local(self):
         config = self._makeOne()
 
-        def view1(request):
+        def view1(request):  # pragma: no cover
             pass
 
-        def view2(request):
+        def view2(request):  # pragma: no cover
             pass
 
-        def view3(request):
+        def view3(request):  # pragma: no cover
             pass
 
         def includeme1(config):
@@ -1392,13 +1393,13 @@ tests.test_config.dummy_include2"""
 
         config = self._makeOne(autocommit=True)
 
-        def view1(request):
+        def view1(request):  # pragma: no cover
             pass
 
-        def view2(request):
+        def view2(request):  # pragma: no cover
             pass
 
-        def view3(request):
+        def view3(request):  # pragma: no cover
             pass
 
         config.add_view(view1, renderer=null_renderer)
@@ -1411,10 +1412,10 @@ tests.test_config.dummy_include2"""
     def test_conflict_set_notfound_view(self):
         config = self._makeOne()
 
-        def view1(request):
+        def view1(request):  # pragma: no cover
             pass
 
-        def view2(request):
+        def view2(request):  # pragma: no cover
             pass
 
         config.set_notfound_view(view1)
@@ -1431,10 +1432,10 @@ tests.test_config.dummy_include2"""
     def test_conflict_set_forbidden_view(self):
         config = self._makeOne()
 
-        def view1(request):
+        def view1(request):  # pragma: no cover
             pass
 
-        def view2(request):
+        def view2(request):  # pragma: no cover
             pass
 
         config.set_forbidden_view(view1)
@@ -1461,7 +1462,7 @@ tests.test_config.dummy_include2"""
     def test___getattr__matches(self):
         config = self._makeOne()
 
-        def foo(config):
+        def foo(config):  # pragma: no cover
             pass
 
         directives = {'foo': (foo, True)}
@@ -1472,7 +1473,7 @@ tests.test_config.dummy_include2"""
     def test___getattr__matches_no_action_wrap(self):
         config = self._makeOne()
 
-        def foo(config):
+        def foo(config):  # pragma: no cover
             pass
 
         directives = {'foo': (foo, False)}
@@ -1977,7 +1978,7 @@ class TestActionState(unittest.TestCase):
         def f(*a, **k):
             c.actions.append((3, g, (8,), {}, (), None, -1))
 
-        def g(*a, **k):
+        def g(*a, **k):  # pragma: no cover
             pass
 
         c.actions = [(1, f, (1,))]
@@ -2004,7 +2005,7 @@ class TestActionState(unittest.TestCase):
         def f(*a, **k):
             pass
 
-        def g(*a, **k):
+        def g(*a, **k):  # pragma: no cover
             pass
 
         c.actions = [(1, f, (1,), {}, (), None, -1), (1, g, (2,))]
@@ -2018,7 +2019,7 @@ class TestActionState(unittest.TestCase):
         def f(*a, **k):
             c.actions.append((1, g, (8,)))
 
-        def g(*a, **k):
+        def g(*a, **k):  # pragma: no cover
             pass
 
         c.actions = [(1, f, (1,), {}, (), None, -1)]
@@ -2043,7 +2044,7 @@ class Test_reentrant_action_functional(unittest.TestCase):
         config = self._makeConfigurator()
         config.add_directive('add_auto_route', add_auto_route)
 
-        def my_view(request):
+        def my_view(request):  # pragma: no cover
             return request.response
 
         config.add_auto_route('foo', my_view)
@@ -2429,9 +2430,6 @@ class DummyThreadLocalManager(object):
         self.popped = True
 
 
-from zope.interface import implementer
-
-
 @implementer(IDummy)
 class DummyEvent:
     pass
@@ -2459,9 +2457,6 @@ class DummyRegistry(object):
 
     def queryUtility(self, *arg, **kw):
         return self.util
-
-
-from zope.interface import Interface
 
 
 class IOther(Interface):

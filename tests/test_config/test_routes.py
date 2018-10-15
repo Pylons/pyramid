@@ -164,10 +164,10 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
 
         config = self._makeOne(autocommit=True)
 
-        def pred1(context, request):
+        def pred1(context, request):  # pragma: no cover
             pass
 
-        def pred2(context, request):
+        def pred2(context, request):  # pragma: no cover
             pass
 
         with warnings.catch_warnings(record=True) as w:

@@ -1226,7 +1226,8 @@ class Test__join_path_tuple(unittest.TestCase):
 
     def test_segments_with_unsafes(self):
         safe_segments = tuple(
-            u"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-._~!$&'()*+,;=:@"
+            u"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+            u"-._~!$&'()*+,;=:@"
         )
         result = self._callFUT(safe_segments)
         self.assertEqual(result, u'/'.join(safe_segments))

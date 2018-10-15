@@ -87,14 +87,15 @@ class TestDeriveView(unittest.TestCase):
             msg = e.args[0]
             self.assertTrue(
                 msg.startswith(
-                    'Could not convert return value of the view callable object '
-                    '<tests.test_viewderivers.'
+                    'Could not convert return value of the view callable '
+                    'object <tests.test_viewderivers.'
                 )
             )
             self.assertTrue(
                 msg.endswith(
-                    '> into a response object. The value returned was None. You '
-                    'may have forgotten to return a value from the view callable.'
+                    '> into a response object. The value returned was None. '
+                    'You may have forgotten to return a value from the view '
+                    'callable.'
                 )
             )
         else:  # pragma: no cover
@@ -121,7 +122,6 @@ class TestDeriveView(unittest.TestCase):
         def view(request):
             return r
 
-        renderer = object()
         result = self.config.derive_view(view)
         self.assertFalse(result is view)
         response = result(None, None)
@@ -730,7 +730,7 @@ class TestDeriveView(unittest.TestCase):
         from pyramid.interfaces import IAuthorizationPolicy
         from pyramid.httpexceptions import HTTPForbidden
 
-        def myview(request):
+        def myview(request):  # pragma: no cover
             pass
 
         self.config.registry.settings = {}
@@ -781,7 +781,7 @@ class TestDeriveView(unittest.TestCase):
         def view(request):
             raise ValueError
 
-        def excview(request):
+        def excview(request):  # pragma: no cover
             pass
 
         self._registerSecurityPolicy(False)
@@ -850,7 +850,7 @@ class TestDeriveView(unittest.TestCase):
     def test_predicate_mismatch_view_has_name(self):
         from pyramid.exceptions import PredicateMismatch
 
-        def myview(request):
+        def myview(request):  # pragma: no cover
             pass
 
         def predicate1(context, request):
@@ -872,7 +872,7 @@ class TestDeriveView(unittest.TestCase):
     def test_predicate_mismatch_exception_has_text_in_detail(self):
         from pyramid.exceptions import PredicateMismatch
 
-        def myview(request):
+        def myview(request):  # pragma: no cover
             pass
 
         def predicate1(context, request):
@@ -1210,7 +1210,7 @@ class TestDeriveView(unittest.TestCase):
 
                 return wrapped
 
-        def view(context, request):
+        def view(context, request):  # pragma: no cover
             return 'NOTOK'
 
         result = self.config._derive_view(view, mapper=mapper)
@@ -1232,7 +1232,7 @@ class TestDeriveView(unittest.TestCase):
 
             return inner
 
-        def view(context, request):
+        def view(context, request):  # pragma: no cover
             return 'NOTOK'
 
         view.__view_mapper__ = mapper
@@ -1257,7 +1257,7 @@ class TestDeriveView(unittest.TestCase):
 
         self.config.set_view_mapper(mapper)
 
-        def view(context, request):
+        def view(context, request):  # pragma: no cover
             return 'NOTOK'
 
         result = self.config.derive_view(view)
@@ -1267,14 +1267,14 @@ class TestDeriveView(unittest.TestCase):
     def test_attr_wrapped_view_branching_default_phash(self):
         from pyramid.config.util import DEFAULT_PHASH
 
-        def view(context, request):
+        def view(context, request):  # pragma: no cover
             pass
 
         result = self.config._derive_view(view, phash=DEFAULT_PHASH)
         self.assertEqual(result.__wraps__, view)
 
     def test_attr_wrapped_view_branching_nondefault_phash(self):
-        def view(context, request):
+        def view(context, request):  # pragma: no cover
             pass
 
         result = self.config._derive_view(view, phash='nondefault')
@@ -1406,7 +1406,7 @@ class TestDeriveView(unittest.TestCase):
         self.assertFalse('Cache-Control' in headers)
 
     def test_http_cached_view_bad_tuple(self):
-        def view(request):
+        def view(request):  # pragma: no cover
             pass
 
         self.assertRaises(
@@ -1431,7 +1431,7 @@ class TestDeriveView(unittest.TestCase):
     def test_csrf_view_fails_with_bad_POST_header(self):
         from pyramid.exceptions import BadCSRFToken
 
-        def inner_view(request):
+        def inner_view(request):  # pragma: no cover
             pass
 
         request = self._makeRequest()
@@ -1460,7 +1460,7 @@ class TestDeriveView(unittest.TestCase):
     def test_csrf_view_fails_with_bad_POST_token(self):
         from pyramid.exceptions import BadCSRFToken
 
-        def inner_view(request):
+        def inner_view(request):  # pragma: no cover
             pass
 
         request = self._makeRequest()
@@ -1507,7 +1507,7 @@ class TestDeriveView(unittest.TestCase):
     def test_csrf_view_fails_on_bad_PUT_header(self):
         from pyramid.exceptions import BadCSRFToken
 
-        def inner_view(request):
+        def inner_view(request):  # pragma: no cover
             pass
 
         request = self._makeRequest()
@@ -1521,7 +1521,7 @@ class TestDeriveView(unittest.TestCase):
     def test_csrf_view_fails_on_bad_referrer(self):
         from pyramid.exceptions import BadCSRFOrigin
 
-        def inner_view(request):
+        def inner_view(request):  # pragma: no cover
             pass
 
         request = self._makeRequest()
@@ -1537,7 +1537,7 @@ class TestDeriveView(unittest.TestCase):
     def test_csrf_view_fails_on_bad_origin(self):
         from pyramid.exceptions import BadCSRFOrigin
 
-        def inner_view(request):
+        def inner_view(request):  # pragma: no cover
             pass
 
         request = self._makeRequest()
@@ -1553,7 +1553,7 @@ class TestDeriveView(unittest.TestCase):
     def test_csrf_view_enabled_by_default(self):
         from pyramid.exceptions import BadCSRFToken
 
-        def inner_view(request):
+        def inner_view(request):  # pragma: no cover
             pass
 
         request = self._makeRequest()
@@ -1570,7 +1570,7 @@ class TestDeriveView(unittest.TestCase):
 
         from pyramid.exceptions import BadCSRFToken
 
-        def inner_view(request):
+        def inner_view(request):  # pragma: no cover
             pass
 
         request = self._makeRequest()
@@ -1696,7 +1696,7 @@ class TestDeriveView(unittest.TestCase):
         def view(request):
             raise ValueError
 
-        def excview(request):
+        def excview(request):  # pragma: no cover
             pass
 
         self.config.set_default_csrf_options(require_csrf=True)
@@ -1879,7 +1879,7 @@ class TestAddDeriver(unittest.TestCase):
         self.assertFalse(response.deriv)
         self.config.add_view_deriver(deriv, 'test_deriv')
 
-        result = self.config._derive_view(view)
+        result = self.config._derive_view(view)  # noqa: F841
         self.assertTrue(response.deriv)
 
     def test_override_deriver(self):
@@ -1906,7 +1906,7 @@ class TestAddDeriver(unittest.TestCase):
         flags.clear()
         view2 = AView()
         self.config.add_view_deriver(deriv2, 'test_deriv')
-        result = self.config._derive_view(view2)
+        result = self.config._derive_view(view2)  # noqa: F841
         self.assertFalse(flags.get('deriv1'))
         self.assertTrue(flags.get('deriv2'))
 
@@ -1928,7 +1928,7 @@ class TestAddDeriver(unittest.TestCase):
         self.config.add_view_deriver(
             deriv1, name='mapped_view', under='rendered_view', over=VIEW
         )
-        result = self.config._derive_view(view)
+        result = self.config._derive_view(view)  # noqa: F841
         self.assertTrue(flags.get('deriv1'))
 
     def test_add_multi_derivers_ordered(self):
@@ -1953,13 +1953,13 @@ class TestAddDeriver(unittest.TestCase):
         self.config.add_view_deriver(deriv1, 'deriv1')
         self.config.add_view_deriver(deriv2, 'deriv2', INGRESS, 'deriv1')
         self.config.add_view_deriver(deriv3, 'deriv3', 'deriv2', 'deriv1')
-        result = self.config._derive_view(view)
+        result = self.config._derive_view(view)  # noqa: F841
         self.assertEqual(response.deriv, ['deriv1', 'deriv3', 'deriv2'])
 
     def test_add_deriver_without_name(self):
         from pyramid.interfaces import IViewDerivers
 
-        def deriv1(view, info):
+        def deriv1(view, info):  # pragma: no cover
             pass
 
         self.config.add_view_deriver(deriv1)
@@ -1970,7 +1970,7 @@ class TestAddDeriver(unittest.TestCase):
         from pyramid.exceptions import ConfigurationError
         from pyramid.viewderivers import INGRESS
 
-        def deriv1(view, info):
+        def deriv1(view, info):  # pragma: no cover
             pass
 
         self.assertRaises(
@@ -1981,7 +1981,7 @@ class TestAddDeriver(unittest.TestCase):
         from pyramid.exceptions import ConfigurationError
         from pyramid.viewderivers import INGRESS
 
-        def deriv1(view, info):
+        def deriv1(view, info):  # pragma: no cover
             pass
 
         try:
@@ -1995,7 +1995,7 @@ class TestAddDeriver(unittest.TestCase):
         from pyramid.exceptions import ConfigurationError
         from pyramid.viewderivers import VIEW
 
-        def deriv1(view, info):
+        def deriv1(view, info):  # pragma: no cover
             pass
 
         try:
@@ -2008,7 +2008,7 @@ class TestAddDeriver(unittest.TestCase):
     def test_add_deriver_enforces_mapped_view_is_last(self):
         from pyramid.exceptions import ConfigurationError
 
-        def deriv1(view, info):
+        def deriv1(view, info):  # pragma: no cover
             pass
 
         try:
@@ -2082,7 +2082,7 @@ class TestDeriverIntegration(unittest.TestCase):
     def test_unexpected_view_options(self):
         from pyramid.exceptions import ConfigurationError
 
-        def deriv1(view, info):
+        def deriv1(view, info):  # pragma: no cover
             pass
 
         self.config.add_view_deriver(deriv1, 'deriv1')

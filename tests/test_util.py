@@ -64,7 +64,7 @@ class Test_InstancePropertyHelper(unittest.TestCase):
         self.assertEqual(1, foo.y)
 
     def test_property_without_name(self):
-        def worker(obj):
+        def worker(obj):  # pragma: no cover
             pass
 
         foo = Dummy()
@@ -86,7 +86,7 @@ class Test_InstancePropertyHelper(unittest.TestCase):
         self.assertEqual(2, foo.x)
 
     def test_property_with_reify(self):
-        def worker(obj):
+        def worker(obj):  # pragma: no cover
             pass
 
         foo = Dummy()
@@ -101,7 +101,7 @@ class Test_InstancePropertyHelper(unittest.TestCase):
         )
 
     def test_override_property(self):
-        def worker(obj):
+        def worker(obj):  # pragma: no cover
             pass
 
         foo = Dummy()
@@ -114,7 +114,7 @@ class Test_InstancePropertyHelper(unittest.TestCase):
         self.assertRaises(AttributeError, doit)
 
     def test_override_reify(self):
-        def worker(obj):
+        def worker(obj):  # pragma: no cover
             pass
 
         foo = Dummy()
@@ -272,7 +272,7 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         self.assertEqual(1, foo.y)
 
     def test_property_without_name(self):
-        def worker(obj):
+        def worker(obj):  # pragma: no cover
             pass
 
         foo = self._makeOne()
@@ -290,7 +290,7 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         self.assertEqual(2, foo.x)
 
     def test_property_with_reify(self):
-        def worker(obj):
+        def worker(obj):  # pragma: no cover
             pass
 
         foo = self._makeOne()
@@ -303,7 +303,7 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         )
 
     def test_override_property(self):
-        def worker(obj):
+        def worker(obj):  # pragma: no cover
             pass
 
         foo = self._makeOne()
@@ -315,7 +315,7 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         self.assertRaises(AttributeError, doit)
 
     def test_override_reify(self):
-        def worker(obj):
+        def worker(obj):  # pragma: no cover
             pass
 
         foo = self._makeOne()
@@ -926,7 +926,7 @@ class Test_hide_attrs(unittest.TestCase):
         self.assertTrue('foo' not in obj.__dict__)
 
 
-def dummyfunc():
+def dummyfunc():  # pragma: no cover
     pass
 
 

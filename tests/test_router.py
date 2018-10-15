@@ -1,6 +1,8 @@
 import unittest
+from zope.interface import implementer
 
 from pyramid import testing
+from pyramid.interfaces import IResponse
 
 
 class TestRouter(unittest.TestCase):
@@ -1681,10 +1683,6 @@ class DummyStartResponse:
     def __call__(self, status, headers):
         self.status = status
         self.headers = headers
-
-
-from pyramid.interfaces import IResponse
-from zope.interface import implementer
 
 
 @implementer(IResponse)

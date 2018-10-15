@@ -27,7 +27,7 @@ class TestI18NConfiguratorMixin(unittest.TestCase):
 
         config = self._makeOne(autocommit=True)
 
-        def negotiator(request):
+        def negotiator(request):  # pragma: no cover
             pass
 
         config.set_locale_negotiator(negotiator)
@@ -120,8 +120,6 @@ class TestI18NConfiguratorMixin(unittest.TestCase):
         )
 
     def test_add_translation_dirs_invalid_kwargs(self):
-        from pyramid.interfaces import ITranslationDirectories
-
         config = self._makeOne(autocommit=True)
         with self.assertRaises(TypeError):
             config.add_translation_dirs('tests.pkgs.localeapp:locale', foo=1)

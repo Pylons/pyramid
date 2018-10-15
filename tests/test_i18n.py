@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-#
 import os
+import unittest
+from pyramid import testing
 
 here = os.path.dirname(__file__)
 localedir = os.path.join(here, 'pkgs', 'localeapp', 'locale')
-
-import unittest
-from pyramid import testing
 
 
 class TestTranslationString(unittest.TestCase):
