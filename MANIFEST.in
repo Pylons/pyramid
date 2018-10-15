@@ -1,6 +1,7 @@
-graft pyramid
+graft src/pyramid
 graft docs
 prune docs/_build
+graft tests
 
 include README.rst
 include CHANGES.rst HISTORY.rst BFG_HISTORY.rst
