@@ -1,5 +1,5 @@
-unreleased
-==========
+1.10a1 (2018-10-15)
+===================
 
 Features
 --------
@@ -38,8 +38,8 @@ Features
   See https://github.com/Pylons/pyramid/pull/3300
 
 - Modify ``pyramid.authentication.AuthTktAuthenticationPolicy`` and
-  ``pyramid.csrf.CookieCSRFStoragePolicy`` to support the SameSite option on
-  cookies and set the default to ``'Lax'``.
+  ``pyramid.csrf.CookieCSRFStoragePolicy`` to support the ``SameSite`` option
+  on cookies and set the default to ``'Lax'``.
   See https://github.com/Pylons/pyramid/pull/3319
 
 - Added new ``pyramid.httpexceptions.HTTPPermanentRedirect``
@@ -167,7 +167,7 @@ Documentation Changes
 ---------------------
 
 - Ad support for Read The Docs Ethical Ads.
-  https://github.com/Pylons/pyramid/pull/3360
+  See https://github.com/Pylons/pyramid/pull/3360 and
   https://docs.readthedocs.io/en/latest/advertising/ethical-advertising.html
 
 - Add support for alembic to the pyramid-cookiecutter-alchemy cookiecutter
