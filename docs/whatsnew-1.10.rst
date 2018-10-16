@@ -60,6 +60,12 @@ Feature Additions
 - In ``cherrypy_server_runner``, prefer imports from the ``cheroot`` package over the legacy imports from `cherrypy.wsgiserver`.
   See https://github.com/Pylons/pyramid/pull/3235
 
+- :app:`Pyramid`'s test suite is no longer distributed with the universal wheel.
+  See https://github.com/Pylons/pyramid/pull/3387
+
+- All Python code is now formatted automatically using ``black``.
+  See https://github.com/Pylons/pyramid/pull/3388
+
 Deprecations
 ------------
 
@@ -104,6 +110,10 @@ Backward Incompatibilities
 
 - Removed the ``principal`` keyword argument from :func:`pyramid.security.remember` which had been deprecated since :app:`Pyramid` 1.6 and replaced by the ``userid`` argument.
   See https://github.com/Pylons/pyramid/pull/3369
+
+- Removed the ``pyramid.tests`` subpackage that used to contain the Pyramid test suite.
+  These changes also changed the format of the repository to move the code into a ``src`` folder.
+  See https://github.com/Pylons/pyramid/pull/3387
 
 Documentation Enhancements
 --------------------------
