@@ -7,13 +7,10 @@ include README.rst
 include CHANGES.rst HISTORY.rst BFG_HISTORY.rst
 include CONTRIBUTORS.txt LICENSE.txt COPYRIGHT.txt
 
-include contributing.md RELEASING.txt
 include .coveragerc .flake8 setup.cfg pyproject.toml
 include tox.ini appveyor.yml .travis.yml rtd.txt
+include contributing.md RELEASING.txt HACKING.txt TODO.txt
 graft .github
-
-include HACKING.txt hacking-tox.ini
-include TODO.txt
 
 global-exclude __pycache__ *.py[cod]
 global-exclude .DS_Store

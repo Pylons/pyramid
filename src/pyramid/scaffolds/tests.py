@@ -19,7 +19,7 @@ class TemplateTest(object):
         logger = Logger([(Logger.level_for_integer(2), sys.stdout)])
         virtualenv.logger = logger
         virtualenv.create_environment(
-            directory, site_packages=False, clear=False, unzip_setuptools=True
+            directory, site_packages=False, clear=False
         )
 
     def install(self, tmpl_name):  # pragma: no cover
@@ -28,7 +28,7 @@ class TemplateTest(object):
             self.directory = tempfile.mkdtemp()
             self.make_venv(self.directory)
             here = os.path.abspath(os.path.dirname(__file__))
-            os.chdir(os.path.dirname(os.path.dirname(here)))
+            os.chdir(os.path.dirname(os.path.dirname(os.path.dirname(here))))
             pip = os.path.join(self.directory, 'bin', 'pip')
             subprocess.check_call([pip, 'install', '-e', '.'])
             os.chdir(self.directory)

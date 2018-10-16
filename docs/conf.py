@@ -71,7 +71,7 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'pytest': ('https://docs.pytest.org/en/latest/', None),
     'sphinx': ('http://www.sphinx-doc.org/en/latest', None),
-    'sqla': ('http://docs.sqlalchemy.org/en/latest', None),
+    'sqla': ('https://docs.sqlalchemy.org/en/latest', None),
     'tm': ('https://docs.pylonsproject.org/projects/pyramid-tm/en/latest/', None),
     'toolbar': ('https://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest', None),
     'tstring': ('https://docs.pylonsproject.org/projects/translationstring/en/latest', None),
@@ -79,10 +79,10 @@ intersphinx_mapping = {
     'venusian': ('https://docs.pylonsproject.org/projects/venusian/en/latest', None),
     'webob': ('https://docs.pylonsproject.org/projects/webob/en/latest/', None),
     'webtest': ('http://webtest.pythonpaste.org/en/latest', None),
-    'who': ('http://repozewho.readthedocs.io/en/latest', None),
+    'who': ('https://repozewho.readthedocs.io/en/latest', None),
     'zcml': ('https://docs.pylonsproject.org/projects/pyramid-zcml/en/latest', None),
-    'zcomponent': ('http://zopecomponent.readthedocs.io/en/latest/', None),
-    'zinterface': ('http://zopeinterface.readthedocs.io/en/latest/', None),
+    'zcomponent': ('https://zopecomponent.readthedocs.io/en/latest/', None),
+    'zinterface': ('https://zopeinterface.readthedocs.io/en/latest/', None),
 }
 
 

@@ -1,5 +1,5 @@
-unreleased
-==========
+1.10a1 (2018-10-15)
+===================
 
 Features
 --------
@@ -38,8 +38,8 @@ Features
   See https://github.com/Pylons/pyramid/pull/3300
 
 - Modify ``pyramid.authentication.AuthTktAuthenticationPolicy`` and
-  ``pyramid.csrf.CookieCSRFStoragePolicy`` to support the SameSite option on
-  cookies and set the default to ``'Lax'``.
+  ``pyramid.csrf.CookieCSRFStoragePolicy`` to support the ``SameSite`` option
+  on cookies and set the default to ``'Lax'``.
   See https://github.com/Pylons/pyramid/pull/3319
 
 - Added new ``pyramid.httpexceptions.HTTPPermanentRedirect``
@@ -75,6 +75,12 @@ Features
 - Add a ``registry`` argument to ``pyramid.renderers.get_renderer``
   to allow users to avoid threadlocals during renderer lookup.
   See https://github.com/Pylons/pyramid/pull/3358
+
+- Pyramid's test suite is no longer distributed with the universal wheel.
+  See https://github.com/Pylons/pyramid/pull/3387
+
+- All Python code is now formatted automatically using ``black``.
+  See https://github.com/Pylons/pyramid/pull/3388
 
 Bug Fixes
 ---------
@@ -163,11 +169,16 @@ Backward Incompatibilities
   and replaced by the ``userid`` argument.
   See https://github.com/Pylons/pyramid/pull/3369
 
+- Removed the ``pyramid.tests`` subpackage that used to contain the Pyramid
+  test suite. These changes also changed the format of the repository to move
+  the code into a ``src`` folder.
+  See https://github.com/Pylons/pyramid/pull/3387
+
 Documentation Changes
 ---------------------
 
 - Ad support for Read The Docs Ethical Ads.
-  https://github.com/Pylons/pyramid/pull/3360
+  See https://github.com/Pylons/pyramid/pull/3360 and
   https://docs.readthedocs.io/en/latest/advertising/ethical-advertising.html
 
 - Add support for alembic to the pyramid-cookiecutter-alchemy cookiecutter
