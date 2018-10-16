@@ -61,6 +61,7 @@
 
    :methodcategory:`Hooking Pyramid Behavior`
 
+     .. automethod:: add_accept_view_order
      .. automethod:: add_renderer
      .. automethod:: add_resource_url_adapter
      .. automethod:: add_response_adapter
