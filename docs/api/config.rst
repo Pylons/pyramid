@@ -17,6 +17,7 @@
     .. automethod:: end
     .. automethod:: include
     .. automethod:: make_wsgi_app()
+    .. automethod:: route_prefix_context
     .. automethod:: scan
 
   :methodcategory:`Adding Routes and Views`
