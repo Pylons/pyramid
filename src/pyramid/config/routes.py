@@ -535,19 +535,18 @@ class RoutesConfiguratorMixin(object):
 
         Example Usage:
 
-        >>> config = Configurator()
-        >>> with config.route_prefix_context('foo'):
-        ...     config.add_route('bar', '/bar')
+        .. code-block:: python
 
-        Arguments
+            config = Configurator()
+            with config.route_prefix_context('foo'):
+                config.add_route('bar', '/bar')
 
-        route_prefix
-
-          A string suitable to be used as a route prefix, or ``None``.
+        ``route_prefix`` is a string suitable to be used as a route prefix,
+        or ``None``.
 
         .. versionadded:: 1.10
-        """
 
+        """
         original_route_prefix = self.route_prefix
 
         if route_prefix is None:
