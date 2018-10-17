@@ -27,9 +27,9 @@ class PCreateCommand(object):
         description="""\
 Render Pyramid scaffolding to an output directory.
 
-Note: As of Pyramid 1.8, this command is deprecated. Use a specific
-cookiecutter instead:
-https://github.com/Pylons/?q=cookiecutter
+Note: As of Pyramid 1.8, this command is deprecated. Use
+pyramid-cookiecutter-starter instead:
+https://github.com/Pylons/pyramid-cookiecutter-starter
 """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
