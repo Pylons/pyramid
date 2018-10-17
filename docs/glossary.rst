@@ -923,8 +923,7 @@ Glossary
      can be used as global application values.
 
    WebTest
-     `WebTest <http://webtest.pythonpaste.org/en/latest/>`_ is a package which can help
-     you write functional tests for your WSGI application.
+     `WebTest <https://docs.pylonsproject.org/projects/webtest/en/latest/>`_ is a package which can help you write functional tests for your WSGI application.
 
    view mapper
     A view mapper is a class which implements the
