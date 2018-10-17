@@ -7,7 +7,7 @@ This article explains the new features in :app:`Pyramid` version 1.10 as compare
 
     This release is the last planned feature release to support Python 2.7.
     Bug fixes will continue to be backported until at least 2020-01-01 when Python 2.7 reaches end of life.
-    New features, and backports will be reviewed and accepted for the 1.x series of Pyramid but new development will be focused on Pyramid 2.x.
+    New features and backports will be reviewed and accepted for the 1.x series of Pyramid but new development will be focused on Pyramid 2.x.
 
 Feature Additions
 -----------------
