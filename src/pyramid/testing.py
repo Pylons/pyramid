@@ -2,6 +2,8 @@ import copy
 import os
 from contextlib import contextmanager
 
+from webob.acceptparse import create_accept_header
+
 from zope.interface import implementer, alsoProvides
 
 from pyramid.interfaces import IRequest, ISession
@@ -340,6 +342,7 @@ class DummyRequest(
     charset = 'UTF-8'
     script_name = ''
     _registry = None
+    _accept = None
     request_iface = IRequest
 
     def __init__(
@@ -350,6 +353,7 @@ class DummyRequest(
         path='/',
         cookies=None,
         post=None,
+        accept=None,
         **kw
     ):
         if environ is None:
@@ -388,6 +392,7 @@ class DummyRequest(
         self.virtual_root = None
         self.marshalled = params  # repoze.monty
         self.session = DummySession()
+        self.accept = accept
         self.__dict__.update(kw)
 
     def _get_registry(self):
@@ -402,6 +407,19 @@ class DummyRequest(
         self._registry = None
 
     registry = property(_get_registry, _set_registry, _del_registry)
+
+    def _set_accept(self, value):
+        self._accept = create_accept_header(value)
+
+    def _get_accept(self):
+        if self._accept is None:
+            self._accept = create_accept_header(None)
+        return self._accept
+
+    def _del_accept(self):
+        self._accept = None
+
+    accept = property(_get_accept, _set_accept, _del_accept)
 
     @reify
     def response(self):

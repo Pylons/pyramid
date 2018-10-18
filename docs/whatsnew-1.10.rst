@@ -87,14 +87,19 @@ Deprecations
 Backward Incompatibilities
 --------------------------
 
-- On Python 3.4+ the ``repoze.lru`` dependency is dropped. If you were using this package directly in your apps you should make sure that you are depending on it directly within your project.
+- Removed ``pyramid.config.Configurator.set_request_property`` which had been deprecated since :app:`Pyramid` 1.5.
+  Instead use :meth:`pyramid.config.Configurator.add_request_method` with ``reify=True`` or ``property=True``.
+  See https://github.com/Pylons/pyramid/pull/3368
+
+- On Python 3.4+ the ``repoze.lru`` dependency is dropped.
+  If you were using this package directly in your apps you should make sure that you are depending on it directly within your project.
   See https://github.com/Pylons/pyramid/pull/3140
 
 - Remove the ``permission`` argument from :meth:`pyramid.config.Configurator.add_route`.
   This was an argument left over from a feature removed in :app:`Pyramid` 1.5 and has had no effect since then.
   See https://github.com/Pylons/pyramid/pull/3299
 
-- Modify the builtin session implementations to set ``SameSite='Lax'`` on cookies.
+- Modified the builtin session implementations to set ``SameSite='Lax'`` on cookies.
   This affects :func:`pyramid.session.BaseCookieSessionFactory`, :func:`pyramid.session.SignedCookieSessionFactory`, and :func:`pyramid.session.UnencryptedCookieSessionFactoryConfig`.
   See https://github.com/Pylons/pyramid/pull/3300
 
@@ -103,10 +108,6 @@ Backward Incompatibilities
 
 - :meth:`pyramid.config.Configurator.add_notfound_view` uses default redirect class exception :class:`pyramid.httpexceptions.HTTPTemporaryRedirect` instead of previous :class:`pyramid.httpexceptions.HTTPFound`.
   See https://github.com/Pylons/pyramid/pull/3328
-
-- Removed ``pyramid.config.Configurator.set_request_property`` which had been deprecated since :app:`Pyramid` 1.5.
-  Instead use :meth:`pyramid.config.Configurator.add_request_method` with ``reify=True`` or ``property=True``.
-  See https://github.com/Pylons/pyramid/pull/3368
 
 - Removed the ``principal`` keyword argument from :func:`pyramid.security.remember` which had been deprecated since :app:`Pyramid` 1.6 and replaced by the ``userid`` argument.
   See https://github.com/Pylons/pyramid/pull/3369

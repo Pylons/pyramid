@@ -1,3 +1,14 @@
+unreleased
+==========
+
+Bug Fixes
+---------
+
+- Fix the ``pyramid.testing.DummyRequest`` to support the new
+  ``request.accept`` API so that ``acceptable_offers`` is available even
+  when code sets the value to a string.
+  See https://github.com/Pylons/pyramid/pull/3396
+
 1.10a1 (2018-10-15)
 ===================
 

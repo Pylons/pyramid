@@ -303,6 +303,29 @@ class TestDummyRequest(unittest.TestCase):
         self.assertEqual(resp.__class__, Response)
         self.assertTrue(request.response is resp)  # reified
 
+    def test_default_accept(self):
+        request = self._makeOne()
+        self.assertEqual(
+            request.accept.acceptable_offers(['text/html']),
+            [('text/html', 1.0)],
+        )
+
+        request.accept = 'text/plain'
+        self.assertEqual(request.accept.acceptable_offers(['text/html']), [])
+
+        del request.accept
+        self.assertEqual(
+            request.accept.acceptable_offers(['text/html']),
+            [('text/html', 1.0)],
+        )
+
+    def test_accept__init__(self):
+        request = self._makeOne(accept='text/plain')
+        self.assertEqual(
+            request.accept.acceptable_offers(['text/html', 'text/plain']),
+            [('text/plain', 1.0)],
+        )
+
 
 class TestDummyTemplateRenderer(unittest.TestCase):
     def _getTargetClass(self,):
