@@ -104,7 +104,7 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
 
     def test_testing_add_subscriber_dottedname(self):
         config = self._makeOne(autocommit=True)
-        L = config.testing_add_subscriber('tests.test_config.test_init.IDummy')
+        L = config.testing_add_subscriber('tests.test_config.IDummy')
         event = DummyEvent()
         config.registry.notify(event)
         self.assertEqual(len(L), 1)
