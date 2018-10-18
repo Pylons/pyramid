@@ -533,6 +533,9 @@ class RoutesConfiguratorMixin(object):
 
         When the context exits, the ``route_prefix`` is reset to the original.
 
+        ``route_prefix`` is a string suitable to be used as a route prefix,
+        or ``None``.
+
         Example Usage:
 
         .. code-block:: python
@@ -540,9 +543,6 @@ class RoutesConfiguratorMixin(object):
             config = Configurator()
             with config.route_prefix_context('foo'):
                 config.add_route('bar', '/bar')
-
-        ``route_prefix`` is a string suitable to be used as a route prefix,
-        or ``None``.
 
         .. versionadded:: 1.10
 
