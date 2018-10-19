@@ -11,7 +11,7 @@ from pyramid.renderers import RendererHelper
 
 from pyramid.traversal import decode_path_info, split_path_info
 
-from pyramid.config.util import action_method
+from pyramid.config.actions import action_method
 
 
 class TestingConfiguratorMixin(object):

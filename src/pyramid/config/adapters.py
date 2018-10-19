@@ -8,7 +8,7 @@ from pyramid.interfaces import IResponse, ITraverser, IResourceURL
 
 from pyramid.util import takes_one_arg
 
-from pyramid.config.util import action_method
+from pyramid.config.actions import action_method
 
 
 class AdaptersConfiguratorMixin(object):

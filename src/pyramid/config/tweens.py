@@ -10,7 +10,7 @@ from pyramid.tweens import MAIN, INGRESS, EXCVIEW
 
 from pyramid.util import is_string_or_iterable, TopologicalSorter
 
-from pyramid.config.util import action_method
+from pyramid.config.actions import action_method
 
 
 class TweensConfiguratorMixin(object):

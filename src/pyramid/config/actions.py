@@ -1,18 +1,19 @@
+import functools
 import itertools
 import operator
 import sys
+import traceback
+from zope.interface import implementer
 
 from pyramid.compat import reraise
-
-from pyramid.config.util import ActionInfo
-
 from pyramid.exceptions import (
     ConfigurationConflictError,
     ConfigurationError,
     ConfigurationExecutionError,
 )
-
+from pyramid.interfaces import IActionInfo
 from pyramid.registry import undefer
+from pyramid.util import is_nonstr_iter
 
 
 class ActionConfiguratorMixin(object):
@@ -152,6 +153,7 @@ class ActionConfiguratorMixin(object):
         finally:
             self.end()
         self.action_state = ActionState()  # old actions have been processed
+
 
 # this class is licensed under the ZPL (stolen from Zope)
 class ActionState(object):
@@ -523,3 +525,57 @@ def expand_action_tuple(
         order=order,
         introspectables=introspectables,
     )
+
+
+@implementer(IActionInfo)
+class ActionInfo(object):
+    def __init__(self, file, line, function, src):
+        self.file = file
+        self.line = line
+        self.function = function
+        self.src = src
+
+    def __str__(self):
+        srclines = self.src.split('\n')
+        src = '\n'.join('    %s' % x for x in srclines)
+        return 'Line %s of file %s:\n%s' % (self.line, self.file, src)
+
+
+def action_method(wrapped):
+    """ Wrapper to provide the right conflict info report data when a method
+    that calls Configurator.action calls another that does the same.  Not a
+    documented API but used by some external systems."""
+
+    def wrapper(self, *arg, **kw):
+        if self._ainfo is None:
+            self._ainfo = []
+        info = kw.pop('_info', None)
+        # backframes for outer decorators to actionmethods
+        backframes = kw.pop('_backframes', 0) + 2
+        if is_nonstr_iter(info) and len(info) == 4:
+            # _info permitted as extract_stack tuple
+            info = ActionInfo(*info)
+        if info is None:
+            try:
+                f = traceback.extract_stack(limit=4)
+
+                # Work around a Python 3.5 issue whereby it would insert an
+                # extra stack frame. This should no longer be necessary in
+                # Python 3.5.1
+                last_frame = ActionInfo(*f[-1])
+                if last_frame.function == 'extract_stack':  # pragma: no cover
+                    f.pop()
+                info = ActionInfo(*f[-backframes])
+            except Exception:  # pragma: no cover
+                info = ActionInfo(None, 0, '', '')
+        self._ainfo.append(info)
+        try:
+            result = wrapped(self, *arg, **kw)
+        finally:
+            self._ainfo.pop()
+        return result
+
+    if hasattr(wrapped, '__name__'):
+        functools.update_wrapper(wrapper, wrapped)
+    wrapper.__docobj__ = wrapped
+    return wrapper

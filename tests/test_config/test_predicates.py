@@ -3,44 +3,9 @@ import unittest
 from pyramid.compat import text_
 
 
-class TestActionInfo(unittest.TestCase):
-    def _getTargetClass(self):
-        from pyramid.config.util import ActionInfo
-
-        return ActionInfo
-
-    def _makeOne(self, filename, lineno, function, linerepr):
-        return self._getTargetClass()(filename, lineno, function, linerepr)
-
-    def test_class_conforms(self):
-        from zope.interface.verify import verifyClass
-        from pyramid.interfaces import IActionInfo
-
-        verifyClass(IActionInfo, self._getTargetClass())
-
-    def test_instance_conforms(self):
-        from zope.interface.verify import verifyObject
-        from pyramid.interfaces import IActionInfo
-
-        verifyObject(IActionInfo, self._makeOne('f', 0, 'f', 'f'))
-
-    def test_ctor(self):
-        inst = self._makeOne('filename', 10, 'function', 'src')
-        self.assertEqual(inst.file, 'filename')
-        self.assertEqual(inst.line, 10)
-        self.assertEqual(inst.function, 'function')
-        self.assertEqual(inst.src, 'src')
-
-    def test___str__(self):
-        inst = self._makeOne('filename', 0, 'function', '   linerepr  ')
-        self.assertEqual(
-            str(inst), "Line 0 of file filename:\n       linerepr  "
-        )
-
-
 class TestPredicateList(unittest.TestCase):
     def _makeOne(self):
-        from pyramid.config.util import PredicateList
+        from pyramid.config.predicates import PredicateList
         from pyramid import predicates
 
         inst = PredicateList()
@@ -71,7 +36,7 @@ class TestPredicateList(unittest.TestCase):
         self.assertTrue(order1 < order2)
 
     def test_ordering_number_of_predicates(self):
-        from pyramid.config.util import predvalseq
+        from pyramid.config.predicates import predvalseq
 
         order1, _, _ = self._callFUT(
             xhr='xhr',
@@ -169,7 +134,7 @@ class TestPredicateList(unittest.TestCase):
         self.assertTrue(order12 > order10)
 
     def test_ordering_importance_of_predicates(self):
-        from pyramid.config.util import predvalseq
+        from pyramid.config.predicates import predvalseq
 
         order1, _, _ = self._callFUT(xhr='xhr')
         order2, _, _ = self._callFUT(request_method='request_method')
@@ -194,7 +159,7 @@ class TestPredicateList(unittest.TestCase):
         self.assertTrue(order9 > order10)
 
     def test_ordering_importance_and_number(self):
-        from pyramid.config.util import predvalseq
+        from pyramid.config.predicates import predvalseq
 
         order1, _, _ = self._callFUT(
             xhr='xhr', request_method='request_method'
@@ -233,7 +198,7 @@ class TestPredicateList(unittest.TestCase):
         self.assertTrue(order1 > order2)
 
     def test_different_custom_predicates_with_same_hash(self):
-        from pyramid.config.util import predvalseq
+        from pyramid.config.predicates import predvalseq
 
         class PredicateWithHash(object):
             def __hash__(self):
@@ -286,7 +251,7 @@ class TestPredicateList(unittest.TestCase):
         )
 
     def test_custom_predicates_can_affect_traversal(self):
-        from pyramid.config.util import predvalseq
+        from pyramid.config.predicates import predvalseq
 
         def custom(info, request):
             m = info['match']
@@ -312,7 +277,7 @@ class TestPredicateList(unittest.TestCase):
         )
 
     def test_predicate_text_is_correct(self):
-        from pyramid.config.util import predvalseq
+        from pyramid.config.predicates import predvalseq
 
         _, predicates, _ = self._callFUT(
             xhr='xhr',
@@ -420,20 +385,9 @@ class TestPredicateList(unittest.TestCase):
         self.assertEqual(predicates[2](None, request), True)
 
 
-class TestDeprecatedPredicates(unittest.TestCase):
-    def test_it(self):
-        import warnings
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.filterwarnings('always')
-            from pyramid.config.predicates import XHRPredicate  # noqa: F401
-
-            self.assertEqual(len(w), 1)
-
-
 class Test_sort_accept_offers(unittest.TestCase):
     def _callFUT(self, offers, order=None):
-        from pyramid.config.util import sort_accept_offers
+        from pyramid.config.predicates import sort_accept_offers
 
         return sort_accept_offers(offers, order)
 

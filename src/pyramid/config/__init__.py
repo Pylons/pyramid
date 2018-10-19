@@ -9,7 +9,6 @@ from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
 from pyramid.interfaces import (
     IDebugLogger,
     IExceptionResponse,
-    IPredicateList,
     PHASE0_CONFIG,
     PHASE1_CONFIG,
     PHASE2_CONFIG,
@@ -40,13 +39,15 @@ from pyramid.threadlocal import manager
 
 from pyramid.util import WeakOrderedSet, object_description
 
-from pyramid.config.util import PredicateList, action_method, not_
+from pyramid.config.actions import action_method
+from pyramid.config.predicates import not_
 
 from pyramid.config.actions import ActionConfiguratorMixin
 from pyramid.config.adapters import AdaptersConfiguratorMixin
 from pyramid.config.assets import AssetsConfiguratorMixin
 from pyramid.config.factories import FactoriesConfiguratorMixin
 from pyramid.config.i18n import I18NConfiguratorMixin
+from pyramid.config.predicates import PredicateConfiguratorMixin
 from pyramid.config.rendering import RenderingConfiguratorMixin
 from pyramid.config.routes import RoutesConfiguratorMixin
 from pyramid.config.security import SecurityConfiguratorMixin
@@ -71,6 +72,7 @@ PHASE3_CONFIG = PHASE3_CONFIG  # api
 
 class Configurator(
     ActionConfiguratorMixin,
+    PredicateConfiguratorMixin,
     TestingConfiguratorMixin,
     TweensConfiguratorMixin,
     SecurityConfiguratorMixin,
@@ -530,45 +532,6 @@ class Configurator(
     introspector = property(
         _get_introspector, _set_introspector, _del_introspector
     )
-
-    def get_predlist(self, name):
-        predlist = self.registry.queryUtility(IPredicateList, name=name)
-        if predlist is None:
-            predlist = PredicateList()
-            self.registry.registerUtility(predlist, IPredicateList, name=name)
-        return predlist
-
-    def _add_predicate(
-        self, type, name, factory, weighs_more_than=None, weighs_less_than=None
-    ):
-        factory = self.maybe_dotted(factory)
-        discriminator = ('%s option' % type, name)
-        intr = self.introspectable(
-            '%s predicates' % type,
-            discriminator,
-            '%s predicate named %s' % (type, name),
-            '%s predicate' % type,
-        )
-        intr['name'] = name
-        intr['factory'] = factory
-        intr['weighs_more_than'] = weighs_more_than
-        intr['weighs_less_than'] = weighs_less_than
-
-        def register():
-            predlist = self.get_predlist(type)
-            predlist.add(
-                name,
-                factory,
-                weighs_more_than=weighs_more_than,
-                weighs_less_than=weighs_less_than,
-            )
-
-        self.action(
-            discriminator,
-            register,
-            introspectables=(intr,),
-            order=PHASE1_CONFIG,
-        )  # must be registered early
 
     def include(self, callable, route_prefix=None):
         """Include a configuration callable, to support imperative
