@@ -6,7 +6,7 @@ from pyramid.exceptions import ConfigurationExecutionError
 from pyramid.interfaces import IRequest
 
 
-class ConfiguratorTests(unittest.TestCase):
+class ActionConfiguratorMixinTests(unittest.TestCase):
     def _makeOne(self, *arg, **kw):
         from pyramid.config import Configurator
 
