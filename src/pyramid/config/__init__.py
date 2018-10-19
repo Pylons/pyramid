@@ -39,7 +39,7 @@ from pyramid.threadlocal import manager
 
 from pyramid.util import WeakOrderedSet, object_description
 
-from pyramid.config.actions import action_method
+from pyramid.config.actions import action_method, ActionState
 from pyramid.config.predicates import not_
 
 from pyramid.config.actions import ActionConfiguratorMixin
@@ -68,6 +68,8 @@ PHASE0_CONFIG = PHASE0_CONFIG  # api
 PHASE1_CONFIG = PHASE1_CONFIG  # api
 PHASE2_CONFIG = PHASE2_CONFIG  # api
 PHASE3_CONFIG = PHASE3_CONFIG  # api
+
+ActionState = ActionState  # bw-compat for pyramid_zcml
 
 
 class Configurator(
