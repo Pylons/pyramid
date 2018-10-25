@@ -15,7 +15,7 @@ from pyramid.traversal import DefaultRootFactory
 
 from pyramid.util import get_callable_name, InstancePropertyHelper
 
-from pyramid.config.util import action_method
+from pyramid.config.actions import action_method
 
 
 class FactoriesConfiguratorMixin(object):

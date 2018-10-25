@@ -14,7 +14,7 @@ from pyramid.csrf import LegacySessionCSRFStoragePolicy
 from pyramid.exceptions import ConfigurationError
 from pyramid.util import as_sorted_tuple
 
-from pyramid.config.util import action_method
+from pyramid.config.actions import action_method
 
 
 class SecurityConfiguratorMixin(object):

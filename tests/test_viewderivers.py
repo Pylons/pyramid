@@ -1265,7 +1265,7 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(result(None, None), response)
 
     def test_attr_wrapped_view_branching_default_phash(self):
-        from pyramid.config.util import DEFAULT_PHASH
+        from pyramid.config.predicates import DEFAULT_PHASH
 
         def view(context, request):  # pragma: no cover
             pass

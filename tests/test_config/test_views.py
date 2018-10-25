@@ -664,7 +664,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_default_phash_overrides_default_phash(self):
-        from pyramid.config.util import DEFAULT_PHASH
+        from pyramid.config.predicates import DEFAULT_PHASH
         from pyramid.renderers import null_renderer
         from zope.interface import Interface
         from pyramid.interfaces import IRequest
@@ -690,7 +690,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_exc_default_phash_overrides_default_phash(self):
-        from pyramid.config.util import DEFAULT_PHASH
+        from pyramid.config.predicates import DEFAULT_PHASH
         from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest

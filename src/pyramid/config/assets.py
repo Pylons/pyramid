@@ -9,7 +9,7 @@ from pyramid.interfaces import IPackageOverrides, PHASE1_CONFIG
 from pyramid.exceptions import ConfigurationError
 from pyramid.threadlocal import get_current_registry
 
-from pyramid.config.util import action_method
+from pyramid.config.actions import action_method
 
 
 class OverrideProvider(pkg_resources.DefaultProvider):

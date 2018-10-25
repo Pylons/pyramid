@@ -74,8 +74,8 @@ from pyramid.viewderivers import (
     wraps_view,
 )
 
-from pyramid.config.util import (
-    action_method,
+from pyramid.config.actions import action_method
+from pyramid.config.predicates import (
     DEFAULT_PHASH,
     MAX_ORDER,
     normalize_accept_offer,
