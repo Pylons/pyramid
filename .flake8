@@ -6,6 +6,8 @@ ignore =
     E731
     # W503: line break before binary operator (flake8 is not PEP8 compliant)
     W503
+    # W504: line break after binary operator (flake8 is not PEP8 compliant)
+    W504
 exclude =
     src/pyramid/compat.py
     src/pyramid/scaffolds/alchemy

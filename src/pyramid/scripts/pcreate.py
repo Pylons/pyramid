@@ -266,7 +266,7 @@ https://github.com/Pylons/pyramid-cookiecutter-starter
         try:
             # use absolute imports
             __import__(pkg_name, globals(), locals(), [], 0)
-        except ImportError as error:
+        except ImportError:
             pkg_exists = False
         if not pkg_exists:
             return True
