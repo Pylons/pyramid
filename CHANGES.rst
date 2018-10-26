@@ -9,6 +9,9 @@ Bug Fixes
   when code sets the value to a string.
   See https://github.com/Pylons/pyramid/pull/3396
 
+- Fix deprecated escape sequences in preparation for Python 3.8.
+  See https://github.com/Pylons/pyramid/pull/3400
+
 1.10a1 (2018-10-15)
 ===================
 
