@@ -346,7 +346,9 @@ class TestCompileRoute(unittest.TestCase):
         self.assertEqual(generator({'baz': 1, 'buz': 2}), '/foo/1/biz/2/bar')
 
     def test_custom_regex(self):
-        matcher, generator = self._callFUT('foo/{baz}/biz/{buz:[^/\.]+}.{bar}')
+        matcher, generator = self._callFUT(
+            'foo/{baz}/biz/{buz:[^/\\.]+}.{bar}'
+        )
         self.assertEqual(
             matcher('/foo/baz/biz/buz.bar'),
             {'baz': 'baz', 'buz': 'buz', 'bar': 'bar'},
@@ -358,7 +360,7 @@ class TestCompileRoute(unittest.TestCase):
 
     def test_custom_regex_with_colons(self):
         matcher, generator = self._callFUT(
-            'foo/{baz}/biz/{buz:(?:[^/\.]+)}.{bar}'
+            'foo/{baz}/biz/{buz:(?:[^/\\.]+)}.{bar}'
         )
         self.assertEqual(
             matcher('/foo/baz/biz/buz.bar'),
@@ -379,13 +381,13 @@ class TestCompileRoute(unittest.TestCase):
         self.assertEqual(generator({'baz': 1, 'buz': 2}), '/foo/1/biz/2/bar')
 
     def test_custom_regex_with_embedded_squigglies(self):
-        matcher, generator = self._callFUT('/{buz:\d{4}}')
+        matcher, generator = self._callFUT('/{buz:\\d{4}}')
         self.assertEqual(matcher('/2001'), {'buz': '2001'})
         self.assertEqual(matcher('/200'), None)
         self.assertEqual(generator({'buz': 2001}), '/2001')
 
     def test_custom_regex_with_embedded_squigglies2(self):
-        matcher, generator = self._callFUT('/{buz:\d{3,4}}')
+        matcher, generator = self._callFUT('/{buz:\\d{3,4}}')
         self.assertEqual(matcher('/2001'), {'buz': '2001'})
         self.assertEqual(matcher('/200'), {'buz': '200'})
         self.assertEqual(matcher('/20'), None)
@@ -393,7 +395,7 @@ class TestCompileRoute(unittest.TestCase):
 
     def test_custom_regex_with_embedded_squigglies3(self):
         matcher, generator = self._callFUT(
-            '/{buz:(\d{2}|\d{4})-[a-zA-Z]{3,4}-\d{2}}'
+            '/{buz:(\\d{2}|\\d{4})-[a-zA-Z]{3,4}-\\d{2}}'
         )
         self.assertEqual(matcher('/2001-Nov-15'), {'buz': '2001-Nov-15'})
         self.assertEqual(matcher('/99-June-10'), {'buz': '99-June-10'})
