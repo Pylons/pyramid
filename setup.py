@@ -12,6 +12,7 @@
 #
 ##############################################################################
 from setuptools import find_packages, setup
+from pkg_resources import parse_version
 
 
 def readfile(name):
@@ -21,6 +22,8 @@ def readfile(name):
 
 README = readfile('README.rst')
 CHANGES = readfile('CHANGES.rst')
+
+VERSION = '1.10a1'
 
 install_requires = [
     'hupper',
@@ -55,9 +58,15 @@ testing_extras = tests_require + [
     'virtualenv',  # for scaffolding tests
 ]
 
+base_version = parse_version(VERSION).base_version
+
+# black is refusing to make anything under 80 chars so just splitting it up
+docs_fmt = 'https://docs.pylonsproject.org/projects/pyramid/en/{}-branch/'
+docs_url = docs_fmt.format(base_version)
+
 setup(
     name='pyramid',
-    version='1.10a1',
+    version=VERSION,
     description='The Pyramid Web Framework, a Pylons project',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[
@@ -77,10 +86,15 @@ setup(
         "Topic :: Internet :: WWW/HTTP :: WSGI",
         "License :: Repoze Public License",
     ],
-    keywords='web wsgi pylons pyramid',
+    keywords=['web', 'wsgi', 'pylons', 'pyramid'],
     author="Chris McDonough, Agendaless Consulting",
     author_email="pylons-discuss@googlegroups.com",
     url="https://trypyramid.com",
+    project_urls={
+        'Documentation': docs_url,
+        'Changelog': '{}/whatsnew-{}.html'.format(docs_url, base_version),
+        'Issue Tracker': 'https://github.com/Pylons/pyramid/issues',
+    },
     license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
     packages=find_packages('src', exclude=['tests']),
     package_dir={'': 'src'},
