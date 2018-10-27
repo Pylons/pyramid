@@ -2,7 +2,7 @@ import inspect
 
 from zope.interface import implementer, provider
 
-from pyramid.security import NO_PERMISSION_REQUIRED
+from pyramid.security import NO_PERMISSION_REQUIRED, Authenticated
 from pyramid.csrf import check_csrf_origin, check_csrf_token
 from pyramid.response import Response
 
@@ -20,7 +20,7 @@ from pyramid.interfaces import (
 from pyramid.compat import is_bound_method, is_unbound_method
 
 from pyramid.exceptions import ConfigurationError
-from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
 from pyramid.util import object_description, takes_one_arg
 from pyramid.view import render_view_to_response
 from pyramid import renderers
@@ -329,7 +329,9 @@ def _secured_view(view, info):
                 'authdebug_message',
                 'Unauthorized: %s failed permission check' % view_name,
             )
-            raise HTTPForbidden(msg, result=result)
+            if Authenticated in result.principals:
+                raise HTTPForbidden(msg, result=result)
+            raise HTTPUnauthorized(msg)
 
         wrapped_view = secured_view
         wrapped_view.__call_permissive__ = view
