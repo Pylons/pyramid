@@ -92,7 +92,7 @@ setup(
     url="https://trypyramid.com",
     project_urls={
         'Documentation': docs_url,
-        'Changelog': '{}/whatsnew-{}.html'.format(docs_url, base_version),
+        'Changelog': '{}whatsnew-{}.html'.format(docs_url, base_version),
         'Issue Tracker': 'https://github.com/Pylons/pyramid/issues',
     },
     license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
