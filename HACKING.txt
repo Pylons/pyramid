@@ -132,7 +132,7 @@ or adds the feature.  To build and review docs, use the following steps.
 
      $ tox -e docs
 
-2. Open the `docs/_build/html/index.html` file to see the resulting HTML
+2. Open the `.tox/docs/html/index.html` file to see the resulting HTML
    rendering.
 
 
