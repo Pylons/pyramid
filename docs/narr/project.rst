@@ -867,12 +867,12 @@ also informs Python that the directory which contains it is a *package*.
    Within ``main`` further application configuration is performed.
 
    Line 7 opens a context manager with an instance of a :term:`Configurator`.
-   This applies lines in the ``.ini`` file to ``config``, the configuration returned by :term:`Configurator`.
+   This applies lines in the ``.ini`` file.
    Only those lines in :ref:`[app:main] <app_main>` which are understood by :app:`Pyramid` are applied, such as ``pyramid.includes = pyramid_debugtoolbar``.
 
-   Line 8 adds support for Jinja2 templating bindings, allowing us to specify renderers with the ``.jinja2`` extension.
-   The expectation is that the add-on applies what is relevant in the ``.ini`` file at this point.
-   Consult your add-on's documentation.
+   Line 8 adds support for Jinja2 templating bindings.
+   Settings are applied to the configuration allowing us to specify renderers with the ``.jinja2`` extension.
+   These settings are add-on dependent and may come from the ``.ini`` file or from elsewhere.
 
    Line 9 includes the ``routes.py`` module.
 
