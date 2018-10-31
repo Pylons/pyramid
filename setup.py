@@ -52,10 +52,7 @@ docs_extras = [
     'sphinxcontrib-autoprogram',
 ]
 
-testing_extras = tests_require + [
-    'coverage',
-    'nose',
-]
+testing_extras = tests_require + ['coverage', 'nose']
 
 base_version = parse_version(VERSION).base_version
 
