@@ -10,9 +10,6 @@ ignore =
     W504
 exclude =
     src/pyramid/compat.py
-    src/pyramid/scaffolds/alchemy
-    src/pyramid/scaffolds/starter
-    src/pyramid/scaffolds/zodb
     tests/fixtures
     tests/pkgs
     tests/test_config/pkgs

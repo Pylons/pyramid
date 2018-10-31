@@ -110,14 +110,9 @@ setup(
     tests_require=tests_require,
     test_suite="tests",
     entry_points="""\
-        [pyramid.scaffold]
-        starter=pyramid.scaffolds:StarterProjectTemplate
-        zodb=pyramid.scaffolds:ZODBProjectTemplate
-        alchemy=pyramid.scaffolds:AlchemyProjectTemplate
         [pyramid.pshell_runner]
         python=pyramid.scripts.pshell:python_shell_runner
         [console_scripts]
-        pcreate = pyramid.scripts.pcreate:main
         pserve = pyramid.scripts.pserve:main
         pshell = pyramid.scripts.pshell:main
         proutes = pyramid.scripts.proutes:main
