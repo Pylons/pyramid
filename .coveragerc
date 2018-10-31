@@ -1,0 +1,15 @@
+[run]
+source =
+    pyramid
+    tests
+omit =
+    src/pyramid/scaffolds/tests.py
+
+[paths]
+source =
+    src/pyramid
+    */site-packages/pyramid
+
+[report]
+show_missing = true
+precision = 2

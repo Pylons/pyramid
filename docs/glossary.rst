@@ -923,8 +923,7 @@ Glossary
      can be used as global application values.
 
    WebTest
-     `WebTest <http://webtest.pythonpaste.org/en/latest/>`_ is a package which can help
-     you write functional tests for your WSGI application.
+     `WebTest <https://docs.pylonsproject.org/projects/webtest/en/latest/>`_ is a package which can help you write functional tests for your WSGI application.
 
    view mapper
     A view mapper is a class which implements the
@@ -1209,3 +1208,9 @@ Glossary
 
    Alembic
       `Alembic <http://alembic.zzzcomputing.com/en/latest/>`_ is a lightweight database migration tool for usage with the SQLAlchemy Database Toolkit for Python.
+
+   media type
+       A label representing the type of some content.
+       A media type is a nested structure containing a top-level type and a subtype.
+       Optionally, a media type can also contain parameters specific to the type.
+       See :rfc:`6838` for more information about media types.

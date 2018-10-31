@@ -714,14 +714,16 @@ object that implements the following interface:
 .. code-block:: python
     :linenos:
 
-    class IAuthorizationPolicy(object):
+    class IAuthorizationPolicy(Interface):
         """ An object representing a Pyramid authorization policy. """
-        def permits(self, context, principals, permission):
-            """ Return ``True`` if any of the ``principals`` is allowed the
-            ``permission`` in the current ``context``, else return ``False``
+        def permits(context, principals, permission):
+            """ Return an instance of :class:`pyramid.security.Allowed` if any
+            of the ``principals`` is allowed the ``permission`` in the current
+            ``context``, else return an instance of
+            :class:`pyramid.security.Denied`.
             """
 
-        def principals_allowed_by_permission(self, context, permission):
+        def principals_allowed_by_permission(context, permission):
             """ Return a set of principal identifiers allowed by the
             ``permission`` in ``context``.  This behavior is optional; if you
             choose to not implement it you should define this method as

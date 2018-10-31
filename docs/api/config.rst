@@ -17,6 +17,7 @@
     .. automethod:: end
     .. automethod:: include
     .. automethod:: make_wsgi_app()
+    .. automethod:: route_prefix_context
     .. automethod:: scan
 
   :methodcategory:`Adding Routes and Views`
@@ -61,6 +62,7 @@
 
    :methodcategory:`Hooking Pyramid Behavior`
 
+     .. automethod:: add_accept_view_order
      .. automethod:: add_renderer
      .. automethod:: add_resource_url_adapter
      .. automethod:: add_response_adapter

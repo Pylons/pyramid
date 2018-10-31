@@ -31,7 +31,7 @@ On Unix
 .. code-block:: bash
 
     cd ~
-    cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
+    cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout 1.10-branch
 
 On Windows
 ^^^^^^^^^^
@@ -39,7 +39,7 @@ On Windows
 .. code-block:: doscon
 
     cd \
-    cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
+    cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout 1.10-branch
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^

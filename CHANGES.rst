@@ -1,5 +1,19 @@
-unreleased
-==========
+1.10b1 (2018-10-28)
+===================
+
+Bug Fixes
+---------
+
+- Fix the ``pyramid.testing.DummyRequest`` to support the new
+  ``request.accept`` API so that ``acceptable_offers`` is available even
+  when code sets the value to a string.
+  See https://github.com/Pylons/pyramid/pull/3396
+
+- Fix deprecated escape sequences in preparation for Python 3.8.
+  See https://github.com/Pylons/pyramid/pull/3400
+
+1.10a1 (2018-10-15)
+===================
 
 Features
 --------
@@ -38,8 +52,8 @@ Features
   See https://github.com/Pylons/pyramid/pull/3300
 
 - Modify ``pyramid.authentication.AuthTktAuthenticationPolicy`` and
-  ``pyramid.csrf.CookieCSRFStoragePolicy`` to support the SameSite option on
-  cookies and set the default to ``'Lax'``.
+  ``pyramid.csrf.CookieCSRFStoragePolicy`` to support the ``SameSite`` option
+  on cookies and set the default to ``'Lax'``.
   See https://github.com/Pylons/pyramid/pull/3319
 
 - Added new ``pyramid.httpexceptions.HTTPPermanentRedirect``
@@ -57,6 +71,16 @@ Features
 - Add support for Python 3.7. Add testing on Python 3.8 with allowed failures.
   See https://github.com/Pylons/pyramid/pull/3333
 
+- Added the ``pyramid.config.Configurator.add_accept_view_order`` directive,
+  allowing users to specify media type preferences in ambiguous situations
+  such as when several views match. A default ordering is defined for media
+  types that prefers human-readable html/text responses over JSON.
+  See https://github.com/Pylons/pyramid/pull/3326
+
+- Support a list of media types in the ``accept`` predicate used in
+  ``pyramid.config.Configurator.add_route``.
+  See https://github.com/Pylons/pyramid/pull/3326
+
 - Added ``pyramid.session.JSONSerializer``. See "Upcoming Changes to ISession
   in Pyramid 2.0" in the "Sessions" chapter of the documentation for more
   information about this feature.
@@ -65,6 +89,12 @@ Features
 - Add a ``registry`` argument to ``pyramid.renderers.get_renderer``
   to allow users to avoid threadlocals during renderer lookup.
   See https://github.com/Pylons/pyramid/pull/3358
+
+- Pyramid's test suite is no longer distributed with the universal wheel.
+  See https://github.com/Pylons/pyramid/pull/3387
+
+- All Python code is now formatted automatically using ``black``.
+  See https://github.com/Pylons/pyramid/pull/3388
 
 Bug Fixes
 ---------
@@ -102,6 +132,17 @@ Deprecations
   ``SignedCookieSessionFactory``, copying the code, or another session
   implementation if you're still using these features.
   See https://github.com/Pylons/pyramid/pull/3353
+
+- Media ranges are deprecated in the ``accept`` argument of
+  ``pyramid.config.Configurator.add_route``. Use a list of explicit
+  media types to ``add_route`` to support multiple types.
+
+- Media ranges are deprecated in the ``accept`` argument of
+  ``pyramid.config.Configurator.add_view``.  There is no replacement for
+  ranges to ``add_view``, but after much discussion the workflow is
+  fundamentally ambiguous in the face of various client-supplied values for
+  the ``Accept`` header.
+  See https://github.com/Pylons/pyramid/pull/3326
 
 Backward Incompatibilities
 --------------------------
@@ -142,11 +183,16 @@ Backward Incompatibilities
   and replaced by the ``userid`` argument.
   See https://github.com/Pylons/pyramid/pull/3369
 
+- Removed the ``pyramid.tests`` subpackage that used to contain the Pyramid
+  test suite. These changes also changed the format of the repository to move
+  the code into a ``src`` folder.
+  See https://github.com/Pylons/pyramid/pull/3387
+
 Documentation Changes
 ---------------------
 
 - Ad support for Read The Docs Ethical Ads.
-  https://github.com/Pylons/pyramid/pull/3360
+  See https://github.com/Pylons/pyramid/pull/3360 and
   https://docs.readthedocs.io/en/latest/advertising/ethical-advertising.html
 
 - Add support for alembic to the pyramid-cookiecutter-alchemy cookiecutter

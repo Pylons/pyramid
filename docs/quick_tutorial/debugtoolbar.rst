@@ -38,18 +38,19 @@ Steps
 
         cd ..; cp -r ini debugtoolbar; cd debugtoolbar
 
-#.  Add ``pyramid_debugtoolbar`` to our project's dependencies in ``setup.py``:
+#.  Add ``pyramid_debugtoolbar`` to our project's dependencies in ``setup.py`` as a :term:`Setuptools` "extra" for development:
 
     .. literalinclude:: debugtoolbar/setup.py
         :language: python
         :linenos:
-        :emphasize-lines: 5
+        :emphasize-lines: 10-16, 20-22
 
 #.  Install our project and its newly added dependency.
+    Note that we use the extra specifier ``[dev]`` to install development requirements and surround it and the period with double quote marks.
 
     .. code-block:: bash
 
-        $VENV/bin/pip install -e .
+        $VENV/bin/pip install -e ".[dev]"
 
 #.  Our ``debugtoolbar/development.ini`` gets a configuration entry for ``pyramid.includes``:
 
@@ -96,14 +97,20 @@ experience otherwise inexplicable client-side weirdness, you can shut it off
 by commenting out the ``pyramid_debugtoolbar`` line in ``pyramid.includes``
 temporarily.
 
+Finally we've introduced the concept of :term:`Setuptools` extras.
+These are optional or recommended features that may be installed with an "extras" specifier, in this case, ``dev``.
+The specifier is the name of a key in a Python dictionary, and is surrounded by square brackets when invoked on the command line, for example, .
+The value for the key is a Python list of dependencies.
+
 .. seealso:: See also :ref:`pyramid_debugtoolbar <toolbar:overview>`.
 
 
 Extra credit
 ============
 
-#.  We added ``pyramid_debugtoolbar`` to the list of ``install_requires`` dependencies in ``debugtoolbar/setup.py`` because this tutorial is for development and educational purposes only.
-    In what cases would you *not* want to add ``pyramid_debugtoolbar`` to your dependencies?
+#.  We added ``pyramid_debugtoolbar`` to the list of ``dev_requires`` dependencies in ``debugtoolbar/setup.py``.
+    We then installed the dependencies via ``pip install -e ".[dev]"`` by virtue of the Setuptools ``extras_require`` value in the Python dictionary.
+    Why did we add them there instead of in the ``requires`` list?
 
 #.  Introduce a bug into your application. Change:
 

@@ -42,14 +42,14 @@ Steps
     .. literalinclude:: functional_testing/setup.py
         :language: python
         :linenos:
-        :emphasize-lines: 14
+        :emphasize-lines: 16
 
 #.  Install our project and its newly added dependency.
-    Note that we use the extra specifier ``[test]`` to install testing requirements.
+    Note that we use the extra specifier ``[dev]`` to install testing requirements for development and surround it and the period with double quote marks.
 
     .. code-block:: bash
 
-        $VENV/bin/pip install -e .[test]
+        $VENV/bin/pip install -e ".[dev]"
 
 #.  Let's extend ``functional_testing/tutorial/tests.py`` to include a functional test:
 
