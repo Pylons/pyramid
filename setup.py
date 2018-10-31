@@ -55,7 +55,6 @@ docs_extras = [
 testing_extras = tests_require + [
     'coverage',
     'nose',
-    'virtualenv',  # for scaffolding tests
 ]
 
 base_version = parse_version(VERSION).base_version
