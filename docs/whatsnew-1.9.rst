@@ -11,9 +11,7 @@ Pyramid 1.9 was released on 2017-06-26.
 The following bug fix releases were made since then. Bug fix releases also include documentation improvements and other minor feature changes.
 
 - :ref:`changes_1.9.1`
-
 - :ref:`changes_1.9.2`
-
 - :ref:`changes_1.9.3`
 
 Major Feature Additions
