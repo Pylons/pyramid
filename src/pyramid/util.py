@@ -1,11 +1,6 @@
 from contextlib import contextmanager
 import functools
-
-try:
-    # py2.7.7+ and py3.3+ have native comparison support
-    from hmac import compare_digest
-except ImportError:  # pragma: no cover
-    compare_digest = None
+from hmac import compare_digest
 import inspect
 import weakref
 
@@ -19,7 +14,6 @@ from pyramid.compat import (
     string_types,
     bytes_,
     text_,
-    PY2,
     native_,
 )
 
@@ -337,10 +331,7 @@ def object_description(object):
     if isinstance(object, (bool, float, type(None))):
         return text_(str(object))
     if isinstance(object, set):
-        if PY2:
-            return shortrepr(object, ')')
-        else:
-            return shortrepr(object, '}')
+        return shortrepr(object, '}')
     if isinstance(object, tuple):
         return shortrepr(object, ')')
     if isinstance(object, list):

@@ -13,7 +13,7 @@ from pyramid.interfaces import (
     ISessionFactory,
 )
 
-from pyramid.compat import text_, bytes_, native_, iteritems_
+from pyramid.compat import text_, bytes_, native_
 
 from pyramid.decorator import reify
 from pyramid.i18n import LocalizerRequestMixin
@@ -328,7 +328,7 @@ def apply_request_extensions(request, extensions=None):
     if extensions is None:
         extensions = request.registry.queryUtility(IRequestExtensions)
     if extensions is not None:
-        for name, fn in iteritems_(extensions.methods):
+        for name, fn in extensions.methods.items():
             method = fn.__get__(request, request.__class__)
             setattr(request, name, method)
 

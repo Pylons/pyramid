@@ -19,8 +19,6 @@ import webbrowser
 
 import hupper
 
-from pyramid.compat import PY2
-
 from pyramid.scripts.common import get_config_loader
 from pyramid.scripts.common import parse_vars
 from pyramid.path import AssetResolver
@@ -380,18 +378,15 @@ def cherrypy_server_runner(
 
     server = WSGIServer(bind_addr, app, server_name=server_name, **kwargs)
     if ssl_pem is not None:
-        if PY2:
-            server.ssl_certificate = server.ssl_private_key = ssl_pem
-        else:
-            # creates wsgiserver.ssl_builtin as side-effect
-            try:
-                from cheroot.server import get_ssl_adapter_class
-                from cheroot.ssl.builtin import BuiltinSSLAdapter
-            except ImportError:
-                from cherrypy.wsgiserver import get_ssl_adapter_class
-                from cherrypy.wsgiserver.ssl_builtin import BuiltinSSLAdapter
-            get_ssl_adapter_class()
-            server.ssl_adapter = BuiltinSSLAdapter(ssl_pem, ssl_pem)
+        # creates wsgiserver.ssl_builtin as side-effect
+        try:
+            from cheroot.server import get_ssl_adapter_class
+            from cheroot.ssl.builtin import BuiltinSSLAdapter
+        except ImportError:
+            from cherrypy.wsgiserver import get_ssl_adapter_class
+            from cherrypy.wsgiserver.ssl_builtin import BuiltinSSLAdapter
+        get_ssl_adapter_class()
+        server.ssl_adapter = BuiltinSSLAdapter(ssl_pem, ssl_pem)
 
     if protocol_version:
         server.protocol = protocol_version

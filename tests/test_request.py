@@ -1,7 +1,7 @@
 import unittest
 from pyramid import testing
 
-from pyramid.compat import PY2, text_, bytes_, native_
+from pyramid.compat import text_, bytes_, native_
 from pyramid.security import AuthenticationAPIMixin, AuthorizationAPIMixin
 
 
@@ -352,10 +352,7 @@ class TestRequest(unittest.TestCase):
         inp = text_(
             b'/\xe6\xb5\x81\xe8\xa1\x8c\xe8\xb6\x8b\xe5\x8a\xbf', 'utf-8'
         )
-        if PY2:
-            body = json.dumps({'a': inp}).decode('utf-8').encode('utf-16')
-        else:
-            body = bytes(json.dumps({'a': inp}), 'utf-16')
+        body = bytes(json.dumps({'a': inp}), 'utf-16')
         request.body = body
         request.content_type = 'application/json; charset=utf-16'
         self.assertEqual(request.json_body, {'a': inp})

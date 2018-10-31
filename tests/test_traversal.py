@@ -3,7 +3,7 @@ import unittest
 
 from pyramid.testing import cleanUp
 
-from pyramid.compat import text_, native_, text_type, url_quote, PY2
+from pyramid.compat import text_, native_, text_type, url_quote
 
 
 class TraversalPathTests(unittest.TestCase):
@@ -346,10 +346,7 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         foo = DummyContext(bar, path)
         root = DummyContext(foo, 'root')
         policy = self._makeOne(root)
-        if PY2:
-            vhm_root = b'/Qu\xc3\xa9bec'
-        else:
-            vhm_root = b'/Qu\xc3\xa9bec'.decode('latin-1')
+        vhm_root = b'/Qu\xc3\xa9bec'.decode('latin-1')
         environ = self._getEnviron(HTTP_X_VHM_ROOT=vhm_root)
         request = DummyRequest(environ, path_info=text_('/bar'))
         result = policy(request)

@@ -2,7 +2,6 @@ import os
 import unittest
 
 from pyramid.compat import im_func
-from pyramid.testing import skip_on
 
 from . import dummy_tween_factory
 from . import dummy_include
@@ -1157,7 +1156,6 @@ test_config.dummy_include2"""
                 "@view_config(name='two', renderer='string')" in which
             )
 
-    @skip_on('py3')
     def test_hook_zca(self):
         from zope.component import getSiteManager
 
@@ -1173,7 +1171,6 @@ test_config.dummy_include2"""
         finally:
             getSiteManager.reset()
 
-    @skip_on('py3')
     def test_unhook_zca(self):
         from zope.component import getSiteManager
 

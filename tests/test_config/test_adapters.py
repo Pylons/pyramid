@@ -1,6 +1,5 @@
 import unittest
 
-from pyramid.compat import PY2
 from . import IDummy
 
 
@@ -270,10 +269,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         from pyramid.interfaces import IResponse
 
         config = self._makeOne(autocommit=True)
-        if PY2:
-            str_name = '__builtin__.str'
-        else:
-            str_name = 'builtins.str'
+        str_name = 'builtins.str'
         config.add_response_adapter('pyramid.response.Response', str_name)
         result = config.registry.queryAdapter('foo', IResponse)
         self.assertTrue(result.body, b'foo')

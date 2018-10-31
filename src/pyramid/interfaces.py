@@ -1,7 +1,5 @@
 from zope.interface import Attribute, Interface
 
-from pyramid.compat import PY2
-
 # public API interfaces
 
 
@@ -365,19 +363,6 @@ class IDict(Interface):
 
     def values():
         """ Return a list of values from the dictionary """
-
-    if PY2:
-
-        def iterkeys():
-            """ Return an iterator of keys from the dictionary """
-
-        def iteritems():
-            """ Return an iterator of (k,v) pairs from the dictionary """
-
-        def itervalues():
-            """ Return an iterator of values from the dictionary """
-
-        has_key = __contains__
 
     def pop(k, default=None):
         """ Pop the key k from the dictionary and return its value.  If k

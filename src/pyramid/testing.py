@@ -8,7 +8,7 @@ from zope.interface import implementer, alsoProvides
 
 from pyramid.interfaces import IRequest, ISession
 
-from pyramid.compat import PY3, PYPY, class_types, text_
+from pyramid.compat import PYPY, class_types, text_
 
 from pyramid.config import Configurator
 from pyramid.decorator import reify
@@ -639,8 +639,6 @@ def skip_on(*platforms):  # pragma: no  cover
         if skip_on.os_name.startswith(platform):
             skip = True
         if platform == 'pypy' and PYPY:
-            skip = True
-        if platform == 'py3' and PY3:
             skip = True
 
     def decorator(func):
