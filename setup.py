@@ -23,7 +23,7 @@ def readfile(name):
 README = readfile('README.rst')
 CHANGES = readfile('CHANGES.rst')
 
-VERSION = '1.10b1'
+VERSION = '1.10'
 
 install_requires = [
     'hupper',
