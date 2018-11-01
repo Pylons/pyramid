@@ -1005,15 +1005,6 @@ Glossary
      :term:`cookiecutter`.  For more information, see
      https://docs.pylonsproject.org/projects/pyramid_debugtoolbar/en/latest/.
 
-   scaffold
-     A project template that generates some of the major parts of a Pyramid
-     application and helps users to quickly get started writing larger
-     applications.  Scaffolds are usually used via the ``pcreate`` command.
-
-     .. deprecated:: 1.8
-
-     .. seealso:: See also :term:`cookiecutter`.
-
    pyramid_exclog
      A package which logs Pyramid application exception (error) information
      to a standard Python logger.  This add-on is most useful when
@@ -1161,8 +1152,6 @@ Glossary
       .. deprecated:: 1.10
           ``pyramid-cookiecutter-alchemy`` and ``pyramid-cookiecutter-zodb`` are no longer supported.
           Use ``pyramid-cookiecutter-starter`` going forward.
-
-      .. seealso:: See also :term:`scaffold`.
 
    coverage
       A measurement of code coverage, usually expressed as a percentage of which lines of code have been executed over which lines are executable, typically run during test execution.

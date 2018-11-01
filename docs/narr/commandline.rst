@@ -1131,6 +1131,6 @@ start with either ``foo`` or ``bar``:
     reload_assets                                False
     prevent_http_cache                           False
 
-Pyramid's ``pserve``, ``pcreate``, ``pshell``, ``prequest``, ``ptweens``, and
+Pyramid's ``pserve``, ``pshell``, ``prequest``, ``ptweens``, and
 other ``p*`` scripts are implemented as console scripts.  When you invoke one
 of those, you are using a console script.
