@@ -1,5 +1,3 @@
-from zope.deprecation import deprecated
-
 from zope.interface import Attribute, Interface
 
 from pyramid.compat import PY2
@@ -474,22 +472,6 @@ class IRenderer(Interface):
         renderer), ``context`` (the context object passed to the
         view), and ``request`` (the request object passed to the
         view)."""
-
-
-class ITemplateRenderer(IRenderer):
-    def implementation():
-        """ Return the object that the underlying templating system
-        uses to render the template; it is typically a callable that
-        accepts arbitrary keyword arguments and returns a string or
-        unicode object """
-
-
-deprecated(
-    'ITemplateRenderer',
-    'As of Pyramid 1.5 the, "pyramid.interfaces.ITemplateRenderer" interface '
-    'is scheduled to be removed. It was used by the Mako and Chameleon '
-    'renderers which have been split into their own packages.',
-)
 
 
 class IViewMapper(Interface):
