@@ -181,15 +181,14 @@ developer needs to understand a ZCA concept or API during the creation of a
 
 Instead the framework hides the presence of the ZCA registry behind
 special-purpose API functions that *do* use ZCA APIs.  Take for example the
-``pyramid.security.authenticated_userid`` function, which returns the userid
+``request.authenticated_userid`` function, which returns the userid
 present in the current request or ``None`` if no userid is present in the
 current request.  The application developer calls it like so:
 
 .. code-block:: python
     :linenos:
 
-    from pyramid.security import authenticated_userid
-    userid = authenticated_userid(request)
+    userid = request.authenticated_userid
 
 They now have the current user id.
 
