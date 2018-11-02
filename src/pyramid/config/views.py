@@ -116,7 +116,7 @@ class MultiView(object):
                     self.views[i] = (order, view, phash)
                     return
 
-        if accept is None or '*' in accept:
+        if accept is None:
             self.views.append((order, view, phash))
             self.views.sort(key=operator.itemgetter(0))
         else:
@@ -570,6 +570,10 @@ class ViewsConfiguratorMixin(object):
               :app:`Pyramid` 2.0. Use explicit media types to avoid any
               ambiguities in content negotiation.
 
+          .. versionchanged:: 2.0
+
+              Removed support for media ranges.
+
         exception_only
 
           .. versionadded:: 1.8
@@ -838,20 +842,7 @@ class ViewsConfiguratorMixin(object):
                 raise ConfigurationError(
                     'A list is not supported in the "accept" view predicate.'
                 )
-            if '*' in accept:
-                warnings.warn(
-                    (
-                        'Passing a media range to the "accept" argument of '
-                        'Configurator.add_view is deprecated as of '
-                        'Pyramid 1.10. Use explicit media types to avoid '
-                        'ambiguities in content negotiation that may impact '
-                        'your users.'
-                    ),
-                    DeprecationWarning,
-                    stacklevel=4,
-                )
-            # XXX when media ranges are gone, switch allow_range=False
-            accept = normalize_accept_offer(accept, allow_range=True)
+            accept = normalize_accept_offer(accept)
 
         view = self.maybe_dotted(view)
         context = self.maybe_dotted(context)
