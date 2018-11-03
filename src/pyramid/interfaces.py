@@ -1084,21 +1084,27 @@ class ISession(IDict):
     """ An interface representing a session (a web session object,
     usually accessed via ``request.session``.
 
-    Keys and values of a session must be pickleable.
+    Keys and values of a session must be JSON-serializable.
 
     .. warning::
 
-       In :app:`Pyramid` 2.0 the session will only be required to support
-       types that can be serialized using JSON. It's recommended to switch any
-       session implementations to support only JSON and to only store primitive
-       types in sessions. See :ref:`pickle_session_deprecation` for more
-       information about why this change is being made.
+        In :app:`Pyramid` 2.0 the session was changed to only be required to
+        support types that can be serialized using JSON. It's recommended to
+        switch any session implementations to support only JSON and to only
+        store primitive types in sessions. See
+        :ref:`pickle_session_deprecation` for more information about why this
+        change was made.
 
     .. versionchanged:: 1.9
 
-       Sessions are no longer required to implement ``get_csrf_token`` and
-       ``new_csrf_token``. CSRF token support was moved to the pluggable
-       :class:`pyramid.interfaces.ICSRFStoragePolicy` configuration hook.
+        Sessions are no longer required to implement ``get_csrf_token`` and
+        ``new_csrf_token``. CSRF token support was moved to the pluggable
+        :class:`pyramid.interfaces.ICSRFStoragePolicy` configuration hook.
+
+    .. versionchanged:: 2.0
+
+        Sessions now need to be JSON-serializable. This is more strict than
+        the previous requirement of pickleable objects.
 
     """
 

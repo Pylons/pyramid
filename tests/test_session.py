@@ -364,10 +364,10 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         import base64
         import hashlib
         import hmac
-        import pickle
+        import json
 
         digestmod = lambda: hashlib.new(hashalg)
-        cstruct = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+        cstruct = json.dumps(value).encode('utf-8')
         sig = hmac.new(salt + b'secret', cstruct, digestmod).digest()
         return base64.urlsafe_b64encode(sig + cstruct).rstrip(b'=')
 
@@ -504,24 +504,6 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
 
         self.assertEqual(result, None)
         self.assertTrue('Set-Cookie' in dict(response.headerlist))
-
-    def test_bad_pickle(self):
-        import base64
-        import hashlib
-        import hmac
-
-        digestmod = lambda: hashlib.new('sha512')
-        # generated from dumping an object that cannot be found anymore, eg:
-        # class Foo: pass
-        # print(pickle.dumps(Foo()))
-        cstruct = b'(i__main__\nFoo\np0\n(dp1\nb.'
-        sig = hmac.new(b'pyramid.session.secret', cstruct, digestmod).digest()
-        cookieval = base64.urlsafe_b64encode(sig + cstruct).rstrip(b'=')
-
-        request = testing.DummyRequest()
-        request.cookies['session'] = cookieval
-        session = self._makeOne(request, secret='secret')
-        self.assertEqual(session, {})
 
 
 class Test_manage_accessed(unittest.TestCase):

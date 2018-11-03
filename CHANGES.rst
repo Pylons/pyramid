@@ -4,6 +4,14 @@ unreleased
 Features
 --------
 
+- Changed the default ``serializer`` on
+  ``pyramid.session.SignedCookieSessionFactory`` to use
+  ``pyramid.session.JSONSerializer`` instead of
+  ``pyramid.session.PickleSerializer``. Read
+  "Changes to ISession in Pyramid 2.0" in the "Sessions" chapter of the
+  documentation for more information about why this change was made.
+  See https://github.com/Pylons/pyramid/pull/3413
+
 Bug Fixes
 ---------
 
@@ -51,6 +59,14 @@ Backward Incompatibilities
   and were coupled to the vulnerable pickle serialization format which could
   lead to remove code execution if the secret key is compromised.
   See https://github.com/Pylons/pyramid/pull/3412
+
+- Changed the default ``serializer`` on
+  ``pyramid.session.SignedCookieSessionFactory`` to use
+  ``pyramid.session.JSONSerializer`` instead of
+  ``pyramid.session.PickleSerializer``. Read
+  "Changes to ISession in Pyramid 2.0" in the "Sessions" chapter of the
+  documentation for more information about why this change was made.
+  See https://github.com/Pylons/pyramid/pull/3413
 
 Documentation Changes
 ---------------------

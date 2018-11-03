@@ -25,7 +25,7 @@ Using the Default Session Factory
 In order to use sessions, you must set up a :term:`session factory` during your
 :app:`Pyramid` configuration.
 
-A very basic, insecure sample session factory implementation is provided in the
+A very basic session factory implementation is provided in the
 :app:`Pyramid` core.  It uses a cookie to store session information.  This
 implementation has the following limitations:
 
@@ -38,8 +38,8 @@ implementation has the following limitations:
   of the session is fewer than 4000.  This is suitable only for very small data
   sets.
 
-It is digitally signed, however, and thus its data cannot easily be tampered
-with.
+It is digitally signed, however, and thus a client cannot easily tamper with
+the content without compromising the secret key.
 
 You can configure this session factory in your :app:`Pyramid` application by
 using the :meth:`pyramid.config.Configurator.set_session_factory` method.
@@ -70,11 +70,6 @@ using the :meth:`pyramid.config.Configurator.set_session_factory` method.
 
      Set ``httponly=True`` to mitigate this vulnerability by hiding the cookie from client-side JavaScript.
 
-   - The default serialization method, while replaceable with something like JSON, is implemented using pickle which can lead to remote code execution if your secret key is compromised.
-
-     To mitigate this, set ``serializer=pyramid.session.JSONSerializer()`` to use :class:`pyramid.session.JSONSerializer`. This option will be the default in :app:`Pyramid` 2.0.
-     See :ref:`pickle_session_deprecation` for more information about this change.
-
    In short, use a different session factory implementation (preferably one which keeps session data on the server) for anything but the most basic of applications where "session security doesn't matter", you are sure your application has no cross-site scripting vulnerabilities, and you are confident your secret key will not be exposed.
 
 .. index::
@@ -82,13 +77,13 @@ using the :meth:`pyramid.config.Configurator.set_session_factory` method.
 
 .. _pickle_session_deprecation:
 
-Upcoming Changes to ISession in Pyramid 2.0
--------------------------------------------
+Changes to ISession in Pyramid 2.0
+----------------------------------
 
-In :app:`Pyramid` 2.0 the :class:`pyramid.interfaces.ISession` interface will be changing to require that session implementations only need to support JSON-serializable data types.
-This is a stricter contract than the current requirement that all objects be pickleable and it is being done for security purposes.
+In :app:`Pyramid` 2.0 the :class:`pyramid.interfaces.ISession` interface was changed to require that session implementations only need to support JSON-serializable data types.
+This is a stricter contract than the previous requirement that all objects be pickleable and it is being done for security purposes.
 This is a backward-incompatible change.
-Currently, if a client-side session implementation is compromised, it leaves the application vulnerable to remote code execution attacks using specially-crafted sessions that execute code when deserialized.
+Previously, if a client-side session implementation was compromised, it left the application vulnerable to remote code execution attacks using specially-crafted sessions that execute code when deserialized.
 
 For users with compatibility concerns, it's possible to craft a serializer that can handle both formats until you are satisfied that clients have had time to reasonably upgrade.
 Remember that sessions should be short-lived and thus the number of clients affected should be small (no longer than an auth token, at a maximum). An example serializer:
@@ -178,11 +173,10 @@ object are in the :class:`pyramid.interfaces.ISession` documentation.
 
 Some gotchas:
 
-- Keys and values of session data must be *pickleable*.  This means, typically,
-  that they are instances of basic types of objects, such as strings, lists,
-  dictionaries, tuples, integers, etc.  If you place an object in a session
-  data key or value that is not pickleable, an error will be raised when the
-  session is serialized. Please also see :ref:`pickle_session_deprecation`.
+- Keys and values of session data must be JSON-serializable.
+  This means, typically, that they are instances of basic types of objects, such as strings, lists, dictionaries, tuples, integers, etc.
+  If you place an object in a session data key or value that is not JSON-serializable, an error will be raised when the session is serialized.
+  Please also see :ref:`pickle_session_deprecation`.
 
 - If you place a mutable value (for example, a list or a dictionary) in a
   session object, and you subsequently mutate that value, you must call the
