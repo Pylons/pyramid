@@ -39,6 +39,19 @@ Backward Incompatibilities
   matching that was not compliant with the RFC.
   See https://github.com/Pylons/pyramid/pull/3411
 
+- Removed ``pyramid.session.UnencryptedCookieSessionFactoryConfig``. This
+  session factory was replaced with
+  ``pyramid.session.SignedCookieSessionFactory`` in Pyramid 1.5 and has been
+  deprecated since then.
+  See https://github.com/Pylons/pyramid/pull/3412
+
+- Removed ``pyramid.session.signed_serialize``, and
+  ``pyramid.session.signed_deserialize``. These methods were only used by
+  the now-removed ``pyramid.session.UnencryptedCookieSessionFactoryConfig``
+  and were coupled to the vulnerable pickle serialization format which could
+  lead to remove code execution if the secret key is compromised.
+  See https://github.com/Pylons/pyramid/pull/3412
+
 Documentation Changes
 ---------------------
 
