@@ -39,7 +39,7 @@ implementation has the following limitations:
   sets.
 
 It is digitally signed, however, and thus a client cannot easily tamper with
-the content without compromising the secret key.
+the content without having access to the secret key.
 
 You can configure this session factory in your :app:`Pyramid` application by
 using the :meth:`pyramid.config.Configurator.set_session_factory` method.
