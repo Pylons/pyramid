@@ -247,6 +247,10 @@ class RoutesConfiguratorMixin(object):
               :app:`Pyramid` 2.0. Use a list of specific media types to match
               more than one type.
 
+          .. versionchanged:: 2.0
+
+              Removed support for media ranges.
+
         effective_principals
 
           If specified, this value should be a :term:`principal` identifier or
@@ -308,24 +312,11 @@ class RoutesConfiguratorMixin(object):
 
         if accept is not None:
             if not is_nonstr_iter(accept):
-                if '*' in accept:
-                    warnings.warn(
-                        (
-                            'Passing a media range to the "accept" argument '
-                            'of Configurator.add_route is deprecated as of '
-                            'Pyramid 1.10. Use a list of explicit media types.'
-                        ),
-                        DeprecationWarning,
-                        stacklevel=3,
-                    )
-                # XXX switch this to False when range support is dropped
-                accept = [normalize_accept_offer(accept, allow_range=True)]
-
-            else:
-                accept = [
-                    normalize_accept_offer(accept_option)
-                    for accept_option in accept
-                ]
+                accept = [accept]
+            accept = [
+                normalize_accept_offer(accept_option)
+                for accept_option in accept
+            ]
 
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried

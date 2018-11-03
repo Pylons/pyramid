@@ -32,6 +32,13 @@ Backward Incompatibilities
   request. For example, ``request.authenticated_userid``.
   See https://github.com/Pylons/pyramid/pull/3410
 
+- Removed support for supplying a media range to the ``accept`` predicate of
+  both ``pyramid.config.Configurator.add_view`` and
+  ``pyramid.config.Configurator.add_route``. These options were deprecated
+  in Pyramid 1.10 and WebOb 1.8 because they resulted in uncontrollable
+  matching that was not compliant with the RFC.
+  See https://github.com/Pylons/pyramid/pull/3411
+
 Documentation Changes
 ---------------------
 

@@ -1815,25 +1815,12 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request.accept = DummyAccept('text/html')
         self._assertNotFound(wrapper, None, request)
 
-    def test_add_view_with_range_accept_match(self):
-        from pyramid.renderers import null_renderer
-
+    def test_add_view_with_wildcard_accept_raises(self):
         view = lambda *arg: 'OK'
         config = self._makeOne(autocommit=True)
-        config.add_view(view=view, accept='text/*', renderer=null_renderer)
-        wrapper = self._getViewCallable(config)
-        request = self._makeRequest(config)
-        request.accept = DummyAccept('text/html', contains=True)
-        self.assertEqual(wrapper(None, request), 'OK')
-
-    def test_add_view_with_range_accept_nomatch(self):
-        view = lambda *arg: 'OK'
-        config = self._makeOne(autocommit=True)
-        config.add_view(view=view, accept='text/*')
-        wrapper = self._getViewCallable(config)
-        request = self._makeRequest(config)
-        request.accept = DummyAccept('application/json', contains=False)
-        self._assertNotFound(wrapper, None, request)
+        self.assertRaises(
+            ValueError, lambda: config.add_view(view=view, accept='text/*')
+        )
 
     def test_add_view_with_containment_true(self):
         from pyramid.renderers import null_renderer
@@ -3142,11 +3129,6 @@ class TestMultiView(unittest.TestCase):
         self.assertEqual(mv.media_views['text/xml'], [(100, 'view5', None)])
         self.assertEqual(set(mv.accepts), set(['text/xml', 'text/html']))
         self.assertEqual(mv.views, [(99, 'view2', None), (100, 'view', None)])
-        mv.add('view6', 98, accept='text/*')
-        self.assertEqual(
-            mv.views,
-            [(98, 'view6', None), (99, 'view2', None), (100, 'view', None)],
-        )
 
     def test_add_with_phash(self):
         mv = self._makeOne()
@@ -4265,9 +4247,6 @@ class DummyAccept(object):
             if match in offers:
                 results.append((match, 1.0))
         return results
-
-    def __contains__(self, value):
-        return self.contains
 
 
 class DummyConfig:

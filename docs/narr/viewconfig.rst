@@ -302,6 +302,10 @@ Non-Predicate Arguments
       Specifying a media range is deprecated and will be removed in :app:`Pyramid` 2.0.
       Use explicit media types to avoid any ambiguities in content negotiation.
 
+  .. versionchanged:: 2.0
+
+      Removed support for media ranges.
+
 ``exception_only``
 
   When this value is ``True``, the ``context`` argument must be a subclass of

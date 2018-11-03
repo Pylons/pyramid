@@ -197,9 +197,7 @@ class PredicateList(object):
         return order, preds, phash.hexdigest()
 
 
-def normalize_accept_offer(offer, allow_range=False):
-    if allow_range and '*' in offer:
-        return offer.lower()
+def normalize_accept_offer(offer):
     return str(Accept.parse_offer(offer))
 
 
