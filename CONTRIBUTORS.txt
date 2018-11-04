@@ -230,6 +230,7 @@ Contributors
 - Antti Haapala, 2013/11/15
 
 - Amit Mane, 2014/01/23
+<<<<<<< HEAD
 
 - Fenton Travers, 2014/05/06
 
@@ -296,6 +297,8 @@ Contributors
 - Martin Frlin, 2016/12/7
 
 - Kirill Kuzminykh, 2017/03/01
+
+- Charlie Choiniere, 2017/04/03
 
 - Aleph Melo, 2017/04/16
 
