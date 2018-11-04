@@ -12,6 +12,12 @@ Features
   documentation for more information about why this change was made.
   See https://github.com/Pylons/pyramid/pull/3413
 
+- It is now possible to declare a route to not contain a trailing slash
+  when it is mounted via ``config.include(..., route_prefix=...)`` or via
+  ``with config.route_prefix_context(...)`` by specifying a ``pattern`` of
+  ``''``. This change is backward incompatible, see the notes below.
+  See https://github.com/Pylons/pyramid/pull/3414
+
 Bug Fixes
 ---------
 
@@ -67,6 +73,15 @@ Backward Incompatibilities
   "Changes to ISession in Pyramid 2.0" in the "Sessions" chapter of the
   documentation for more information about why this change was made.
   See https://github.com/Pylons/pyramid/pull/3413
+
+- Changed the URL generation and matching for a route with a ``pattern`` of
+  ``''`` when the route is mounted with a ``route_prefix`` via either
+  ``config.include(..., route_prefix=...)`` or
+  ``with config.route_prefix_context(...)``. This route will now match a bare
+  URL without a trailing slash. To preserve the old behavior, set the
+  ``pattern`` to ``'/'`` instead of the empty string and the URL will contain
+  a trailing slash. This only affects mounted routes using ``route_prefix``.
+  See https://github.com/Pylons/pyramid/pull/3414
 
 Documentation Changes
 ---------------------
