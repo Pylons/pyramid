@@ -1,7 +1,6 @@
 import binascii
 import os
 import time
-import warnings
 
 from zope.deprecation import deprecated
 from zope.interface import implementer
@@ -350,8 +349,6 @@ def SignedCookieSessionFactory(
     serializer=None,
 ):
     """
-    .. versionadded:: 1.5
-
     Configure a :term:`session factory` which will provide signed
     cookie-based sessions.  The return value of this
     function is a :term:`session factory`, which may be provided as
@@ -441,33 +438,29 @@ def SignedCookieSessionFactory(
       method should accept bytes and return a Python object.  The ``dumps``
       method should accept a Python object and return bytes.  A ``ValueError``
       should be raised for malformed inputs.  If a serializer is not passed,
-      the :class:`pyramid.session.PickleSerializer` serializer will be used.
+      the :class:`pyramid.session.JSONSerializer` serializer will be used.
 
     .. warning::
 
-       In :app:`Pyramid` 2.0 the default ``serializer`` option will change to
+       In :app:`Pyramid` 2.0 the default ``serializer`` option changed to
        use :class:`pyramid.session.JSONSerializer`. See
        :ref:`pickle_session_deprecation` for more information about why this
-       change is being made.
+       change was made.
 
     .. versionadded: 1.5a3
 
     .. versionchanged: 1.10
 
-       Added the ``samesite`` option and made the default ``Lax``.
+        Added the ``samesite`` option and made the default ``Lax``.
+
+    .. versionchanged: 2.0
+
+        Changed the default ``serializer`` to be an instance of
+        :class:`pyramid.session.JSONSerializer`.
 
     """
     if serializer is None:
-        serializer = PickleSerializer()
-        warnings.warn(
-            'The default pickle serializer is deprecated as of Pyramid 1.9 '
-            'and it will be changed to use pyramid.session.JSONSerializer in '
-            'version 2.0. Explicitly set the serializer to avoid future '
-            'incompatibilities. See "Upcoming Changes to ISession in '
-            'Pyramid 2.0" for more information about this change.',
-            DeprecationWarning,
-            stacklevel=1,
-        )
+        serializer = JSONSerializer()
 
     signed_serializer = SignedSerializer(
         secret, salt, hashalg, serializer=serializer
