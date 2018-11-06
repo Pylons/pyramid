@@ -1,3 +1,11 @@
+unreleased
+==========
+
+- Fix an issue when passing a duck-typed registry object into
+  ``pyramid.testing.setUp(registry=...)`` in which the registry wasn't
+  properly fixed prior to invoking actions.
+  See https://github.com/Pylons/pyramid/pull/3418
+
 1.10 (2018-10-31)
 =================
 
