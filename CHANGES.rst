@@ -1,5 +1,7 @@
-unreleased
-==========
+.. _changes_1.10.1:
+
+1.10.1 (2018-11-06)
+===================
 
 - Fix an issue when passing a duck-typed registry object into
   ``pyramid.testing.setUp(registry=...)`` in which the registry wasn't
