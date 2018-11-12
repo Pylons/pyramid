@@ -144,10 +144,11 @@ class RoutesConfiguratorMixin(object):
 
           This argument can only be used when the ``pattern`` is an empty
           string (``''``). By default, the composed route pattern will always
-          includes a trailing slash, but this argument provides a way to
-          opt-out if both, you and the integrator (the developer setting the
-          :term:`route prefix`), agree that the pattern should not contain
-          a trailing slash. For example:
+          include a trailing slash, but this argument provides a way to
+          opt-out if both, you (the developer invoking ``add_route``) and the
+          integrator (the developer setting the :term:`route prefix`),
+          agree that the pattern should not contain a trailing slash.
+          For example:
 
           .. code-block:: python
 
@@ -155,7 +156,7 @@ class RoutesConfiguratorMixin(object):
                   config.add_route('users', '', inherit_slash=True)
 
           In this example, the resulting route pattern will be ``/users``.
-          Alternatively, if the route prefix were ``/users/`` then the
+          Alternatively, if the route prefix were ``/users/``, then the
           resulting route pattern would be ``/users/``.
 
           .. versionadded:: 2.0
