@@ -54,10 +54,22 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
         config.add_route('name', 'path')
         self._assertRoute(config, 'name', 'root/path')
 
-    def test_add_route_with_empty_string_with_route_prefix(self):
+    def test_add_route_with_inherit_errors(self):
+        from pyramid.exceptions import ConfigurationError
+
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(
+            ConfigurationError,
+            config.add_route,
+            'name',
+            '/',
+            inherit_slash=True,
+        )
+
+    def test_add_route_with_route_prefix_with_inherit_slash(self):
         config = self._makeOne(autocommit=True)
         config.route_prefix = 'root'
-        config.add_route('name', '')
+        config.add_route('name', '', inherit_slash=True)
         self._assertRoute(config, 'name', 'root')
 
     def test_add_route_with_root_slash_with_route_prefix(self):
