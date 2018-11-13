@@ -13,9 +13,6 @@ from zope.interface import implementer
 from webob.cookies import CookieProfile
 
 from pyramid.compat import (
-    long,
-    text_type,
-    binary_type,
     url_unquote,
     url_quote,
     bytes_,
@@ -857,9 +854,8 @@ class AuthTktCookieHelper(object):
 
     userid_type_encoders = {
         int: ('int', str),
-        long: ('int', str),
-        text_type: ('b64unicode', lambda x: b64encode(utf_8_encode(x)[0])),
-        binary_type: ('b64str', lambda x: b64encode(x)),
+        str: ('b64unicode', lambda x: b64encode(utf_8_encode(x)[0])),
+        bytes: ('b64str', lambda x: b64encode(x)),
     }
 
     def __init__(
@@ -1048,7 +1044,7 @@ class AuthTktCookieHelper(object):
                 "type provided.".format(type(userid)),
                 RuntimeWarning,
             )
-            encoding, encoder = self.userid_type_encoders.get(text_type)
+            encoding, encoder = self.userid_type_encoders.get(str)
             userid = str(userid)
 
         userid = encoder(userid)
@@ -1056,7 +1052,7 @@ class AuthTktCookieHelper(object):
 
         new_tokens = []
         for token in tokens:
-            if isinstance(token, text_type):
+            if isinstance(token, str):
                 try:
                     token = ascii_native_(token)
                 except UnicodeEncodeError:

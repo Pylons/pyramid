@@ -7,8 +7,6 @@ from zope.interface import implementer
 
 from pyramid.interfaces import IAssetDescriptor
 
-from pyramid.compat import string_types
-
 ignore_types = [imp.C_EXTENSION, imp.C_BUILTIN]
 init_names = [
     '__init__%s' % x[0]
@@ -101,7 +99,7 @@ class Resolver(object):
         if package in (None, CALLER_PACKAGE):
             self.package = package
         else:
-            if isinstance(package, string_types):
+            if isinstance(package, str):
                 try:
                     __import__(package)
                 except ImportError:
@@ -307,7 +305,7 @@ class DottedNameResolver(Resolver):
            v = r.resolve('xml') # v is the xml module
 
         """
-        if not isinstance(dotted, string_types):
+        if not isinstance(dotted, str):
             raise ValueError('%r is not a string' % (dotted,))
         package = self.package
         if package is CALLER_PACKAGE:
@@ -328,7 +326,7 @@ class DottedNameResolver(Resolver):
            v = r.maybe_resolve(xml)
            # v is the xml module; no exception raised
         """
-        if isinstance(dotted, string_types):
+        if isinstance(dotted, str):
             package = self.package
             if package is CALLER_PACKAGE:
                 package = caller_package()

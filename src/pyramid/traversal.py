@@ -1,3 +1,4 @@
+from functools import lru_cache
 from zope.interface import implementer
 from zope.interface.interfaces import IInterface
 
@@ -10,14 +11,10 @@ from pyramid.interfaces import (
 
 from pyramid.compat import (
     native_,
-    text_,
     ascii_native_,
-    text_type,
-    binary_type,
     is_nonstr_iter,
     decode_path_info,
     unquote_bytes_to_wsgi,
-    lru_cache,
 )
 
 from pyramid.encode import url_quote
@@ -28,7 +25,7 @@ from pyramid.threadlocal import get_current_registry
 PATH_SEGMENT_SAFE = "~!$&'()*+,;=:@"  # from webob
 PATH_SAFE = PATH_SEGMENT_SAFE + "/"
 
-empty = text_('')
+empty = ''
 
 
 def find_root(resource):
@@ -93,7 +90,7 @@ def find_resource(resource, path):
     :func:`pyramid.traversal.resource_path_tuple` can always be
     resolved by ``find_resource``.
     """
-    if isinstance(path, text_type):
+    if isinstance(path, str):
         path = ascii_native_(path)
     D = traverse(resource, path)
     view_name = D['view_name']
@@ -445,7 +442,7 @@ def traversal_path(path):
     not. A :exc:`UnicodeEncodeError` will be raised if the Unicode cannot be
     encoded directly to ASCII.
     """
-    if isinstance(path, text_type):
+    if isinstance(path, str):
         # must not possess characters outside ascii
         path = path.encode('ascii')
     # we unquote this path exactly like a PEP 3333 server would
@@ -550,37 +547,36 @@ def split_path_info(path):
 
 _segment_cache = {}
 
-quote_path_segment_doc = """ \
-Return a quoted representation of a 'path segment' (such as
-the string ``__name__`` attribute of a resource) as a string.  If the
-``segment`` passed in is a unicode object, it is converted to a
-UTF-8 string, then it is URL-quoted using Python's
-``urllib.quote``.  If the ``segment`` passed in is a string, it is
-URL-quoted using Python's :mod:`urllib.quote`.  If the segment
-passed in is not a string or unicode object, an error will be
-raised.  The return value of ``quote_path_segment`` is always a
-string, never Unicode.
-
-You may pass a string of characters that need not be encoded as
-the ``safe`` argument to this function.  This corresponds to the
-``safe`` argument to :mod:`urllib.quote`.
-
-.. note::
-
-   The return value for each segment passed to this
-   function is cached in a module-scope dictionary for
-   speed: the cached version is returned when possible
-   rather than recomputing the quoted version.  No cache
-   emptying is ever done for the lifetime of an
-   application, however.  If you pass arbitrary
-   user-supplied strings to this function (as opposed to
-   some bounded set of values from a 'working set' known to
-   your application), it may become a memory leak.
-"""
-
 
 def quote_path_segment(segment, safe=PATH_SEGMENT_SAFE):
-    """ %s """ % quote_path_segment_doc
+    """
+    Return a quoted representation of a 'path segment' (such as
+    the string ``__name__`` attribute of a resource) as a string.  If the
+    ``segment`` passed in is a unicode object, it is converted to a
+    UTF-8 string, then it is URL-quoted using Python's
+    ``urllib.quote``.  If the ``segment`` passed in is a string, it is
+    URL-quoted using Python's :mod:`urllib.quote`.  If the segment
+    passed in is not a string or unicode object, an error will be
+    raised.  The return value of ``quote_path_segment`` is always a
+    string, never Unicode.
+
+    You may pass a string of characters that need not be encoded as
+    the ``safe`` argument to this function.  This corresponds to the
+    ``safe`` argument to :mod:`urllib.quote`.
+
+    .. note::
+
+       The return value for each segment passed to this
+       function is cached in a module-scope dictionary for
+       speed: the cached version is returned when possible
+       rather than recomputing the quoted version.  No cache
+       emptying is ever done for the lifetime of an
+       application, however.  If you pass arbitrary
+       user-supplied strings to this function (as opposed to
+       some bounded set of values from a 'working set' known to
+       your application), it may become a memory leak.
+
+    """
     # The bit of this code that deals with ``_segment_cache`` is an
     # optimization: we cache all the computation of URL path segments
     # in this module-scope dictionary with the original string (or
@@ -589,7 +585,7 @@ def quote_path_segment(segment, safe=PATH_SEGMENT_SAFE):
     try:
         return _segment_cache[(segment, safe)]
     except KeyError:
-        if segment.__class__ not in (text_type, binary_type):
+        if segment.__class__ not in (str, bytes):
             segment = str(segment)
         result = url_quote(native_(segment, 'utf-8'), safe)
         # we don't need a lock to mutate _segment_cache, as the below
@@ -598,7 +594,7 @@ def quote_path_segment(segment, safe=PATH_SEGMENT_SAFE):
         return result
 
 
-slash = text_('/')
+slash = '/'
 
 
 @implementer(ITraverser)

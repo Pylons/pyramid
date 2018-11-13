@@ -10,8 +10,6 @@ from pyramid.compat import (
     getargspec,
     im_func,
     is_nonstr_iter,
-    integer_types,
-    string_types,
     bytes_,
     text_,
     native_,
@@ -30,7 +28,7 @@ class DottedNameResolver(_DottedNameResolver):
 
 
 def is_string_or_iterable(v):
-    if isinstance(v, string_types):
+    if isinstance(v, str):
         return True
     if hasattr(v, '__iter__'):
         return True
@@ -324,9 +322,9 @@ def object_description(object):
     is a boolean, an integer, a list, a tuple, a set, or ``None``, a
     (possibly shortened) string representation is returned.
     """
-    if isinstance(object, string_types):
+    if isinstance(object, str):
         return text_(object)
-    if isinstance(object, integer_types):
+    if isinstance(object, int):
         return text_(str(object))
     if isinstance(object, (bool, float, type(None))):
         return text_(str(object))

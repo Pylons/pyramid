@@ -1,6 +1,4 @@
 from pyramid.compat import (
-    text_type,
-    binary_type,
     is_nonstr_iter,
     url_quote as _url_quote,
     url_quote_plus as _quote_plus,
@@ -9,9 +7,9 @@ from pyramid.compat import (
 
 def url_quote(val, safe=''):  # bw compat api
     cls = val.__class__
-    if cls is text_type:
+    if cls is str:
         val = val.encode('utf-8')
-    elif cls is not binary_type:
+    elif cls is not bytes:
         val = str(val).encode('utf-8')
     return _url_quote(val, safe=safe)
 
@@ -19,9 +17,9 @@ def url_quote(val, safe=''):  # bw compat api
 # bw compat api (dnr)
 def quote_plus(val, safe=''):
     cls = val.__class__
-    if cls is text_type:
+    if cls is str:
         val = val.encode('utf-8')
-    elif cls is not binary_type:
+    elif cls is not bytes:
         val = str(val).encode('utf-8')
     return _quote_plus(val, safe=safe)
 

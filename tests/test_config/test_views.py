@@ -2795,15 +2795,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request = self._makeRequest(config)
         self.assertRaises(PredicateMismatch, wrapper, context, request)
 
-    # Since Python 3 has to be all cool and fancy and different...
-    def _assertBody(self, response, value):
-        from pyramid.compat import text_type
-
-        if isinstance(value, text_type):  # pragma: no cover
-            self.assertEqual(response.text, value)
-        else:  # pragma: no cover
-            self.assertEqual(response.body, value)
-
     def test_add_notfound_view_with_renderer(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
@@ -2820,7 +2811,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             request_iface=IRequest,
         )
         result = view(None, request)
-        self._assertBody(result, '{}')
+        self.assertEqual(result.text, '{}')
 
     def test_add_forbidden_view_with_renderer(self):
         from zope.interface import implementedBy
@@ -2838,7 +2829,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             request_iface=IRequest,
         )
         result = view(None, request)
-        self._assertBody(result, '{}')
+        self.assertEqual(result.text, '{}')
 
     def test_set_view_mapper(self):
         from pyramid.interfaces import IViewMapperFactory

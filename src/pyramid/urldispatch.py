@@ -3,15 +3,7 @@ from zope.interface import implementer
 
 from pyramid.interfaces import IRoutesMapper, IRoute
 
-from pyramid.compat import (
-    native_,
-    text_,
-    text_type,
-    string_types,
-    binary_type,
-    is_nonstr_iter,
-    decode_path_info,
-)
+from pyramid.compat import native_, text_, is_nonstr_iter, decode_path_info
 
 from pyramid.exceptions import URLDecodeError
 
@@ -126,7 +118,7 @@ def _compile_route(route):
     # using the ASCII decoding.  We decode it using ASCII because we don't
     # want to accept bytestrings with high-order characters in them here as
     # we have no idea what the encoding represents.
-    if route.__class__ is not text_type:
+    if route.__class__ is not str:
         try:
             route = text_(route, 'ascii')
         except UnicodeDecodeError:
@@ -173,7 +165,7 @@ def _compile_route(route):
             name, reg = name.split(':', 1)
         else:
             reg = '[^/]+'
-        gen.append('%%(%s)s' % native_(name))  # native
+        gen.append('%%(%s)s' % name)  # native
         name = '(?P<%s>%s)' % (name, reg)  # unicode
         rpat.append(name)
         s = pat.pop()  # unicode
@@ -188,7 +180,7 @@ def _compile_route(route):
 
     if remainder:
         rpat.append('(?P<%s>.*?)' % remainder)  # unicode
-        gen.append('%%(%s)s' % native_(remainder))  # native
+        gen.append('%%(%s)s' % remainder)  # native
 
     pattern = ''.join(rpat) + '$'  # unicode
 
@@ -201,7 +193,7 @@ def _compile_route(route):
         # because we don't want to accept bytestrings with high-order
         # characters in them here as we have no idea what the encoding
         # represents.
-        if path.__class__ is not text_type:
+        if path.__class__ is not str:
             path = text_(path, 'ascii')
         m = match(path)
         if m is None:
@@ -226,7 +218,7 @@ def _compile_route(route):
     def generator(dict):
         newdict = {}
         for k, v in dict.items():
-            if v.__class__ is binary_type:
+            if v.__class__ is bytes:
                 # url_quote below needs a native string, not bytes on Py3
                 v = v.decode('utf-8')
 
@@ -235,11 +227,11 @@ def _compile_route(route):
                 if is_nonstr_iter(v):
                     v = '/'.join([q(x) for x in v])  # native
                 else:
-                    if v.__class__ not in string_types:
+                    if v.__class__ is not str:
                         v = str(v)
                     v = q(v)
             else:
-                if v.__class__ not in string_types:
+                if v.__class__ is not str:
                     v = str(v)
                 # v may be bytes (py2) or native string (py3)
                 v = q(v)

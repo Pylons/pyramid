@@ -1,6 +1,6 @@
 import unittest
 
-from pyramid.compat import bytes_, string_types, text_
+from pyramid.compat import bytes_, text_
 
 
 class Test_exception_response(unittest.TestCase):
@@ -406,7 +406,7 @@ class TestHTTPException(unittest.TestCase):
 
     def test_allow_detail_non_str(self):
         exc = self._makeOne(detail={'error': 'This is a test'})
-        self.assertIsInstance(exc.__str__(), string_types)
+        self.assertIsInstance(exc.__str__(), str)
 
 
 class TestRenderAllExceptionsWithoutArguments(unittest.TestCase):

@@ -1,5 +1,3 @@
-from pyramid.compat import string_types
-
 truthy = frozenset(('t', 'true', 'y', 'yes', 'on', '1'))
 falsey = frozenset(('f', 'false', 'n', 'no', 'off', '0'))
 
@@ -17,7 +15,7 @@ def asbool(s):
 
 
 def aslist_cronly(value):
-    if isinstance(value, string_types):
+    if isinstance(value, str):
         value = filter(None, [x.strip() for x in value.splitlines()])
     return list(value)
 

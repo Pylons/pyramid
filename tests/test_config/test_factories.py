@@ -160,7 +160,7 @@ class TestFactoriesMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         self.assertRaises(AttributeError, config.add_request_method)
 
-    def test_add_request_method_with_text_type_name(self):
+    def test_add_request_method_with_text_name(self):
         from pyramid.exceptions import ConfigurationError
 
         config = self._makeOne(autocommit=True)

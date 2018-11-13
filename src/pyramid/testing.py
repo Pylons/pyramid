@@ -8,7 +8,7 @@ from zope.interface import implementer, alsoProvides
 
 from pyramid.interfaces import IRequest, ISession
 
-from pyramid.compat import PYPY, class_types, text_
+from pyramid.compat import PYPY, text_
 
 from pyramid.config import Configurator
 from pyramid.decorator import reify
@@ -642,7 +642,7 @@ def skip_on(*platforms):  # pragma: no  cover
             skip = True
 
     def decorator(func):
-        if isinstance(func, class_types):
+        if isinstance(func, type):
             if skip:
                 return None
             else:

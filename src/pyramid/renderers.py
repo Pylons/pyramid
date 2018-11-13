@@ -8,8 +8,6 @@ from zope.interface.registry import Components
 
 from pyramid.interfaces import IJSONAdapter, IRendererFactory, IRendererInfo
 
-from pyramid.compat import string_types, text_type
-
 from pyramid.csrf import get_csrf_token
 from pyramid.decorator import reify
 
@@ -169,7 +167,7 @@ def get_renderer(renderer_name, package=None, registry=None):
 
 def string_renderer_factory(info):
     def _render(value, system):
-        if not isinstance(value, string_types):
+        if not isinstance(value, str):
             value = str(value)
         request = system.get('request')
         if request is not None:
@@ -485,7 +483,7 @@ class RendererHelper(object):
             response = response_factory(request)
 
         if result is not None:
-            if isinstance(result, text_type):
+            if isinstance(result, str):
                 response.text = result
             elif isinstance(result, bytes):
                 response.body = result

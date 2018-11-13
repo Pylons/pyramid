@@ -3,7 +3,7 @@ import unittest
 
 from pyramid.testing import cleanUp
 
-from pyramid.compat import text_, native_, text_type, url_quote
+from pyramid.compat import text_, native_, url_quote
 
 
 class TraversalPathTests(unittest.TestCase):
@@ -71,8 +71,8 @@ class TraversalPathInfoTests(unittest.TestCase):
 
     def test_segments_are_unicode(self):
         result = self._callFUT('/foo/bar')
-        self.assertEqual(type(result[0]), text_type)
-        self.assertEqual(type(result[1]), text_type)
+        self.assertEqual(type(result[0]), str)
+        self.assertEqual(type(result[1]), str)
 
     def test_same_value_returned_if_cached(self):
         result1 = self._callFUT('/foo/bar')
@@ -869,15 +869,6 @@ class QuotePathSegmentTests(unittest.TestCase):
         s = 12345
         result = self._callFUT(s)
         self.assertEqual(result, '12345')
-
-    def test_long(self):
-        from pyramid.compat import long
-        import sys
-
-        s = long(sys.maxsize + 1)
-        result = self._callFUT(s)
-        expected = str(s)
-        self.assertEqual(result, expected)
 
     def test_other(self):
         class Foo(object):

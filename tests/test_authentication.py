@@ -1272,18 +1272,6 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         self.assertEqual(val['userid'], '1')
         self.assertEqual(val['user_data'], 'userid_type:int')
 
-    def test_remember_long_userid(self):
-        from pyramid.compat import long
-
-        helper = self._makeOne('secret')
-        request = self._makeRequest()
-        result = helper.remember(request, long(1))
-        values = self._parseHeaders(result)
-        self.assertEqual(len(result), 3)
-        val = self._cookieValue(values[0])
-        self.assertEqual(val['userid'], '1')
-        self.assertEqual(val['user_data'], 'userid_type:int')
-
     def test_remember_unicode_userid(self):
         import base64
 

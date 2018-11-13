@@ -1,13 +1,11 @@
 import os
 import pkg_resources
 
-from pyramid.compat import string_types
-
 from pyramid.path import package_path, package_name
 
 
 def resolve_asset_spec(spec, pname='__main__'):
-    if pname and not isinstance(pname, string_types):
+    if pname and not isinstance(pname, str):
         pname = pname.__name__  # as package
     if os.path.isabs(spec):
         return None, spec

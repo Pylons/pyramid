@@ -19,8 +19,6 @@ from pyramid.asset import resolve_asset_spec
 
 from pyramid.authorization import ACLAuthorizationPolicy
 
-from pyramid.compat import text_, string_types
-
 from pyramid.events import ApplicationCreated
 
 from pyramid.exceptions import ConfigurationError
@@ -59,7 +57,6 @@ from pyramid.config.zca import ZCAConfiguratorMixin
 
 from pyramid.path import DottedNameResolver
 
-empty = text_('')
 _marker = object()
 
 not_ = not_  # api
@@ -367,7 +364,7 @@ class Configurator(
 
         self._set_settings(settings)
 
-        if isinstance(debug_logger, string_types):
+        if isinstance(debug_logger, str):
             debug_logger = logging.getLogger(debug_logger)
 
         if debug_logger is None:
@@ -489,11 +486,7 @@ class Configurator(
         if not hasattr(_registry, 'registerSelfAdapter'):
 
             def registerSelfAdapter(
-                required=None,
-                provided=None,
-                name=empty,
-                info=empty,
-                event=True,
+                required=None, provided=None, name='', info='', event=True
             ):
                 return _registry.registerAdapter(
                     lambda x: x,
@@ -759,7 +752,7 @@ class Configurator(
         when generating an absolute asset specification.  If the
         provided ``relative_spec`` argument is already absolute, or if
         the ``relative_spec`` is not a string, it is simply returned."""
-        if not isinstance(relative_spec, string_types):
+        if not isinstance(relative_spec, str):
             return relative_spec
         return self._make_spec(relative_spec)
 

@@ -32,13 +32,7 @@ from pyramid.interfaces import (
 from pyramid import renderers
 
 from pyramid.asset import resolve_asset_spec
-from pyramid.compat import (
-    string_types,
-    urlparse,
-    url_quote,
-    WIN,
-    is_nonstr_iter,
-)
+from pyramid.compat import urlparse, url_quote, WIN, is_nonstr_iter
 
 from pyramid.decorator import reify
 
@@ -889,7 +883,7 @@ class ViewsConfiguratorMixin(object):
         if not IInterface.providedBy(r_context):
             r_context = implementedBy(r_context)
 
-        if isinstance(renderer, string_types):
+        if isinstance(renderer, str):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package, registry=self.registry
             )
@@ -1582,7 +1576,7 @@ class ViewsConfiguratorMixin(object):
     ):
         view = self.maybe_dotted(view)
         mapper = self.maybe_dotted(mapper)
-        if isinstance(renderer, string_types):
+        if isinstance(renderer, str):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package, registry=self.registry
             )
