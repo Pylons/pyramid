@@ -971,7 +971,7 @@ application from small and potentially reusable components.
 The :meth:`pyramid.config.Configurator.include` method accepts an argument
 named ``route_prefix`` which can be useful to authors of URL-dispatch-based
 applications.  If ``route_prefix`` is supplied to the include method, it must
-be a string.  This string represents a route prefix that will be prepended to
+be a string.  This string represents a :term:`route prefix` that will be prepended to
 all route patterns added by the *included* configuration.  Any calls to
 :meth:`pyramid.config.Configurator.add_route` within the included callable will
 have their pattern prefixed with the value of ``route_prefix``. This can be
@@ -997,6 +997,22 @@ route pattern of ``/users/show`` instead of ``/show`` because the
 then only match if the URL path is ``/users/show``, and when the
 :meth:`pyramid.request.Request.route_url` function is called with the route
 name ``show_users``, it will generate a URL with that same path.
+
+To create a route that matches requests to the ``route_prefix`` without a trailing slash, pass ``inherit_slash=True`` to the call to ``add_route``.
+
+.. code-block:: python
+   :linenos:
+
+   from pyramid.config import Configurator
+
+   def users_include(config):
+       config.add_route('show_users', '', inherit_slash=True)
+
+   def main(global_config, **settings):
+       config = Configurator()
+       config.include(users_include, route_prefix='/users')
+
+The above configuration will match ``/users`` instead of ``/users/``.
 
 Route prefixes are recursive, so if a callable executed via an include itself
 turns around and includes another callable, the second-level route prefix will

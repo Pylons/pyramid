@@ -12,6 +12,25 @@ Features
   documentation for more information about why this change was made.
   See https://github.com/Pylons/pyramid/pull/3413
 
+- It is now possible to control whether a route pattern contains a trailing
+  slash when it is composed with a route prefix using
+  ``config.include(..., route_prefix=...)`` or
+  ``with config.route_prefix_context(...)``. This can be done by specifying
+  an empty pattern and setting the new argument
+  ``inherit_slash=True``. For example:
+
+  .. code-block:: python
+
+      with config.route_prefix_context('/users'):
+          config.add_route('users', '', inherit_slash=True)
+
+  In the example, the resulting pattern will be ``/users``. Similarly, if the
+  route prefix were ``/users/`` then the final pattern would be ``/users/``.
+  If the ``pattern`` was ``'/'``, then the final pattern would always be
+  ``/users/``. This new setting is only available if the pattern supplied
+  to ``add_route`` is the empty string (``''``).
+  See https://github.com/Pylons/pyramid/pull/3420
+
 Bug Fixes
 ---------
 

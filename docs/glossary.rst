@@ -1203,3 +1203,7 @@ Glossary
        A media type is a nested structure containing a top-level type and a subtype.
        Optionally, a media type can also contain parameters specific to the type.
        See :rfc:`6838` for more information about media types.
+
+   route prefix
+      A route prefix is a path prefix that is prepended to any routes that are configured while it is active.
+      A route prefix can be set via :meth:`pyramid.config.Configurator.include` or :meth:`pyramid.config.Configurator.route_prefix_context`.
