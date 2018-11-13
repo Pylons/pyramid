@@ -6,7 +6,6 @@ import sys
 import textwrap
 import pkg_resources
 
-from pyramid.compat import exec_
 from pyramid.util import DottedNameResolver
 from pyramid.util import make_contextmanager
 from pyramid.paster import bootstrap
@@ -214,7 +213,7 @@ class PShellCommand(object):
 
             if self.pystartup and os.path.isfile(self.pystartup):
                 with open(self.pystartup, 'rb') as fp:
-                    exec_(fp.read().decode('utf-8'), env)
+                    exec(fp.read().decode('utf-8'), env)
                 if '__builtins__' in env:
                     del env['__builtins__']
 
