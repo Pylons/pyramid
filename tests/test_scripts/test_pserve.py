@@ -1,3 +1,4 @@
+from io import StringIO
 import os
 import unittest
 from . import dummy
@@ -8,9 +9,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 class TestPServeCommand(unittest.TestCase):
     def setUp(self):
-        from pyramid.compat import NativeIO
-
-        self.out_ = NativeIO()
+        self.out_ = StringIO()
 
     def out(self, msg):
         self.out_.write(msg)

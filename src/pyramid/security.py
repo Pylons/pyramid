@@ -8,7 +8,6 @@ from pyramid.interfaces import (
     IViewClassifier,
 )
 
-from pyramid.compat import map_
 from pyramid.threadlocal import get_current_registry
 
 Everyone = 'system.Everyone'
@@ -149,7 +148,7 @@ def view_execution_permitted(context, request, name=''):
 
     """
     reg = _get_registry(request)
-    provides = [IViewClassifier] + map_(providedBy, (request, context))
+    provides = [IViewClassifier] + [providedBy(x) for x in (request, context)]
     # XXX not sure what to do here about using _find_views or analogue;
     # for now let's just keep it as-is
     view = reg.adapters.lookup(provides, ISecuredView, name=name)

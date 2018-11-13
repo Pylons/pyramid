@@ -70,22 +70,6 @@ def reraise(tp, value, tb=None):
     raise value
 
 
-def iteritems_(d):
-    return d.items()
-
-
-def itervalues_(d):
-    return d.values()
-
-
-def iterkeys_(d):
-    return d.keys()
-
-
-def map_(*arg):
-    return list(map(*arg))
-
-
 def is_nonstr_iter(v):
     if isinstance(v, str):
         return False
@@ -95,19 +79,9 @@ def is_nonstr_iter(v):
 im_func = '__func__'
 im_self = '__self__'
 
-import configparser
-
 from http.cookies import SimpleCookie
 
 from html import escape
-
-input_ = input
-
-from io import StringIO as NativeIO
-
-# "json" is not an API; it's here to support older pyramid_debugtoolbar
-# versions which attempt to import it
-import json
 
 # see PEP 3333 for why we encode WSGI PATH_INFO to latin-1 before
 # decoding it to utf-8
@@ -129,8 +103,6 @@ def is_bound_method(ob):
 
 # support annotations and keyword-only arguments in PY3
 from inspect import getfullargspec as getargspec
-
-from itertools import zip_longest
 
 
 def is_unbound_method(fn):
