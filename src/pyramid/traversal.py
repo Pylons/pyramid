@@ -25,8 +25,6 @@ from pyramid.threadlocal import get_current_registry
 PATH_SEGMENT_SAFE = "~!$&'()*+,;=:@"  # from webob
 PATH_SAFE = PATH_SEGMENT_SAFE + "/"
 
-empty = ''
-
 
 def find_root(resource):
     """ Find the root node in the resource tree to which ``resource``
@@ -594,9 +592,6 @@ def quote_path_segment(segment, safe=PATH_SEGMENT_SAFE):
         return result
 
 
-slash = '/'
-
-
 @implementer(ITraverser)
 class ResourceTreeTraverser(object):
     """ A resource tree traverser that should be used (for speed) when
@@ -616,12 +611,12 @@ class ResourceTreeTraverser(object):
 
         if matchdict is not None:
 
-            path = matchdict.get('traverse', slash) or slash
+            path = matchdict.get('traverse', '/') or '/'
             if is_nonstr_iter(path):
                 # this is a *traverse stararg (not a {traverse})
                 # routing has already decoded these elements, so we just
                 # need to join them
-                path = '/' + slash.join(path) or slash
+                path = '/' + '/'.join(path) or '/'
 
             subpath = matchdict.get('subpath', ())
             if not is_nonstr_iter(subpath):
@@ -635,10 +630,10 @@ class ResourceTreeTraverser(object):
             subpath = ()
             try:
                 # empty if mounted under a path in mod_wsgi, for example
-                path = request.path_info or slash
+                path = request.path_info or '/'
             except KeyError:
                 # if environ['PATH_INFO'] is just not there
-                path = slash
+                path = '/'
             except UnicodeDecodeError as e:
                 raise URLDecodeError(
                     e.encoding, e.object, e.start, e.end, e.reason
@@ -660,7 +655,7 @@ class ResourceTreeTraverser(object):
         root = self.root
         ob = vroot = root
 
-        if vpath == slash:  # invariant: vpath must not be empty
+        if vpath == '/':  # invariant: vpath must not be empty
             # prevent a call to traversal_path if we know it's going
             # to return the empty tuple
             vpath_tuple = ()
@@ -714,7 +709,7 @@ class ResourceTreeTraverser(object):
 
         return {
             'context': ob,
-            'view_name': empty,
+            'view_name': '',
             'subpath': subpath,
             'traversed': vpath_tuple,
             'virtual_root': vroot,
