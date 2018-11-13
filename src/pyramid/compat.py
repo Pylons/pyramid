@@ -13,8 +13,6 @@ except BaseException:  # pragma: no cover
     __pypy__ = None
     PYPY = False
 
-import pickle
-
 
 def text_(s, encoding='latin-1', errors='strict'):
     """ If ``s`` is an instance of ``bytes``, return
