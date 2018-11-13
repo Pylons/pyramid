@@ -17,7 +17,9 @@ Features
   ``config.include(..., route_prefix=...)`` or
   ``with config.route_prefix_context(...)``. This can be done by specifying
   an empty pattern and setting the new argument
-  ``inherit_slash=True``. For example::
+  ``inherit_slash=True``. For example:
+
+  .. code-block:: python
 
       with config.route_prefix_context('/users'):
           config.add_route('users', '', inherit_slash=True)
