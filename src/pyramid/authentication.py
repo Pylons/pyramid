@@ -13,13 +13,11 @@ from zope.interface import implementer
 
 from webob.cookies import CookieProfile
 
-from pyramid.compat import bytes_, ascii_native_, native_
-
 from pyramid.interfaces import IAuthenticationPolicy, IDebugLogger
 
 from pyramid.security import Authenticated, Everyone
 
-from pyramid.util import strings_differ
+from pyramid.util import strings_differ, bytes_, ascii_, text_
 from pyramid.util import SimpleSerializer
 
 VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
@@ -747,7 +745,7 @@ def parse_ticket(secret, ticket, ip, hashalg='md5'):
     If the ticket cannot be parsed, a ``BadTicket`` exception will be raised
     with an explanation.
     """
-    ticket = native_(ticket).strip('"')
+    ticket = text_(ticket).strip('"')
     digest_size = hashlib.new(hashalg).digest_size * 2
     digest = ticket[:digest_size]
     try:
@@ -866,16 +864,13 @@ class AuthTktCookieHelper(object):
         domain=None,
         samesite='Lax',
     ):
-
-        serializer = SimpleSerializer()
-
         self.cookie_profile = CookieProfile(
             cookie_name=cookie_name,
             secure=secure,
             max_age=max_age,
             httponly=http_only,
             path=path,
-            serializer=serializer,
+            serializer=SimpleSerializer(),
             samesite=samesite,
         )
 
@@ -1045,7 +1040,7 @@ class AuthTktCookieHelper(object):
         for token in tokens:
             if isinstance(token, str):
                 try:
-                    token = ascii_native_(token)
+                    token = ascii_(token)
                 except UnicodeEncodeError:
                     raise ValueError("Invalid token %r" % (token,))
             if not (isinstance(token, str) and VALID_TOKEN.match(token)):

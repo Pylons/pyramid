@@ -2,7 +2,7 @@ import unittest
 
 from pyramid import testing
 
-from pyramid.compat import text_
+from pyramid.util import text_
 
 
 class TestXHRPredicate(unittest.TestCase):

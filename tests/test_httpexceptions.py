@@ -1,6 +1,6 @@
 import unittest
 
-from pyramid.compat import bytes_, text_
+from pyramid.util import bytes_, text_
 
 
 class Test_exception_response(unittest.TestCase):

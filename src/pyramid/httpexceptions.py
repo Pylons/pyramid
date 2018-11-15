@@ -137,10 +137,9 @@ from zope.interface import implementer
 from webob import html_escape as _html_escape
 from webob.acceptparse import create_accept_header
 
-from pyramid.compat import text_
-
 from pyramid.interfaces import IExceptionResponse
 from pyramid.response import Response
+from pyramid.util import text_
 
 
 def _no_escape(value):

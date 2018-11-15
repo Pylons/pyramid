@@ -8,11 +8,11 @@ from urllib.parse import quote
 from webtest import TestApp
 from zope.interface import Interface
 
-from pyramid.wsgi import wsgiapp
-from pyramid.view import view_config
 from pyramid.static import static_view
 from pyramid.testing import skip_on
-from pyramid.compat import text_
+from pyramid.util import text_
+from pyramid.view import view_config
+from pyramid.wsgi import wsgiapp
 
 from .pkgs.exceptionviewapp.models import AnException, NotAnException
 

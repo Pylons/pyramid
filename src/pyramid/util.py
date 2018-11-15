@@ -4,10 +4,6 @@ from hmac import compare_digest
 import inspect
 import weakref
 
-from pyramid.exceptions import ConfigurationError, CyclicDependencyError
-
-from pyramid.compat import bytes_, text_, native_
-
 from pyramid.path import DottedNameResolver as _DottedNameResolver
 
 _marker = object()
@@ -18,6 +14,32 @@ class DottedNameResolver(_DottedNameResolver):
         self, package=None
     ):  # default to package = None for bw compat
         _DottedNameResolver.__init__(self, package)
+
+
+def text_(s, encoding='latin-1', errors='strict'):
+    """ If ``s`` is an instance of ``bytes``, return
+    ``s.decode(encoding, errors)``, otherwise return ``s``"""
+    if isinstance(s, bytes):
+        return s.decode(encoding, errors)
+    return s
+
+
+def bytes_(s, encoding='latin-1', errors='strict'):
+    """ If ``s`` is an instance of ``str``, return
+    ``s.encode(encoding, errors)``, otherwise return ``s``"""
+    if isinstance(s, str):
+        return s.encode(encoding, errors)
+    return s
+
+
+def ascii_(s):
+    """
+    If ``s`` is an instance of ``str``, return
+    ``s.encode('ascii')``, otherwise return ``str(s, 'ascii', 'strict')``
+    """
+    if isinstance(s, str):
+        s = s.encode('ascii')
+    return str(s, 'ascii', 'strict')
 
 
 def is_nonstr_iter(v):
@@ -322,11 +344,11 @@ def object_description(object):
     (possibly shortened) string representation is returned.
     """
     if isinstance(object, str):
-        return text_(object)
+        return object
     if isinstance(object, int):
-        return text_(str(object))
+        return str(object)
     if isinstance(object, (bool, float, type(None))):
-        return text_(str(object))
+        return str(object)
     if isinstance(object, set):
         return shortrepr(object, '}')
     if isinstance(object, tuple):
@@ -337,26 +359,25 @@ def object_description(object):
         return shortrepr(object, '}')
     module = inspect.getmodule(object)
     if module is None:
-        return text_('object %s' % str(object))
+        return 'object %s' % str(object)
     modulename = module.__name__
     if inspect.ismodule(object):
-        return text_('module %s' % modulename)
+        return 'module %s' % modulename
     if inspect.ismethod(object):
         oself = getattr(object, '__self__', None)
-        if oself is None:  # pragma: no cover
-            oself = getattr(object, 'im_self', None)
-        return text_(
-            'method %s of class %s.%s'
-            % (object.__name__, modulename, oself.__class__.__name__)
+        return 'method %s of class %s.%s' % (
+            object.__name__,
+            modulename,
+            oself.__class__.__name__,
         )
 
     if inspect.isclass(object):
         dottedname = '%s.%s' % (modulename, object.__name__)
-        return text_('class %s' % dottedname)
+        return 'class %s' % dottedname
     if inspect.isfunction(object):
         dottedname = '%s.%s' % (modulename, object.__name__)
-        return text_('function %s' % dottedname)
-    return text_('object %s' % str(object))
+        return 'function %s' % dottedname
+    return 'object %s' % str(object)
 
 
 def shortrepr(object, closer):
@@ -487,11 +508,17 @@ class TopologicalSorter(object):
                 has_after.add(b)
 
         if not self.req_before.issubset(has_before):
+            # avoid circular dependency
+            from pyramid.exceptions import ConfigurationError
+
             raise ConfigurationError(
                 'Unsatisfied before dependencies: %s'
                 % (', '.join(sorted(self.req_before - has_before)))
             )
         if not self.req_after.issubset(has_after):
+            # avoid circular dependency
+            from pyramid.exceptions import ConfigurationError
+
             raise ConfigurationError(
                 'Unsatisfied after dependencies: %s'
                 % (', '.join(sorted(self.req_after - has_after)))
@@ -512,6 +539,9 @@ class TopologicalSorter(object):
             del graph[root]
 
         if graph:
+            # avoid circular dependency
+            from pyramid.exceptions import CyclicDependencyError
+
             # loop in input
             cycledeps = {}
             for k, v in graph.items():
@@ -533,8 +563,11 @@ def get_callable_name(name):
     if it is not.
     """
     try:
-        return native_(name, 'ascii')
+        return ascii_(name)
     except (UnicodeEncodeError, UnicodeDecodeError):
+        # avoid circular dependency
+        from pyramid.exceptions import ConfigurationError
+
         msg = (
             '`name="%s"` is invalid. `name` must be ascii because it is '
             'used on __name__ of the method'
@@ -641,7 +674,7 @@ def takes_one_arg(callee, attr=None, argname=None):
 
 class SimpleSerializer(object):
     def loads(self, bstruct):
-        return native_(bstruct)
+        return text_(bstruct)
 
     def dumps(self, appstruct):
         return bytes_(appstruct)

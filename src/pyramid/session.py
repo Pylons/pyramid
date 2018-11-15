@@ -8,10 +8,11 @@ from zope.interface import implementer
 
 from webob.cookies import JSONSerializer, SignedSerializer
 
-from pyramid.compat import text_, bytes_, native_
 from pyramid.csrf import check_csrf_origin, check_csrf_token
 
 from pyramid.interfaces import ISession
+
+from pyramid.util import text_, bytes_
 
 
 def manage_accessed(wrapped):
@@ -304,7 +305,7 @@ def BaseCookieSessionFactory(
                     exception is not None
                 ):  # dont set a cookie during exceptions
                     return False
-            cookieval = native_(
+            cookieval = text_(
                 serializer.dumps((self.accessed, self.created, dict(self)))
             )
             if len(cookieval) > 4064:

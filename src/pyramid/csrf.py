@@ -5,11 +5,16 @@ from webob.cookies import CookieProfile
 from zope.interface import implementer
 
 
-from pyramid.compat import bytes_, text_
 from pyramid.exceptions import BadCSRFOrigin, BadCSRFToken
 from pyramid.interfaces import ICSRFStoragePolicy
 from pyramid.settings import aslist
-from pyramid.util import SimpleSerializer, is_same_domain, strings_differ
+from pyramid.util import (
+    SimpleSerializer,
+    is_same_domain,
+    strings_differ,
+    bytes_,
+    text_,
+)
 
 
 @implementer(ICSRFStoragePolicy)
@@ -118,7 +123,6 @@ class CookieCSRFStoragePolicy(object):
         path='/',
         samesite='Lax',
     ):
-        serializer = SimpleSerializer()
         self.cookie_profile = CookieProfile(
             cookie_name=cookie_name,
             secure=secure,
@@ -126,7 +130,7 @@ class CookieCSRFStoragePolicy(object):
             httponly=httponly,
             path=path,
             domains=[domain],
-            serializer=serializer,
+            serializer=SimpleSerializer(),
             samesite=samesite,
         )
         self.cookie_name = cookie_name

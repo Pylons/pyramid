@@ -4,7 +4,7 @@ from urllib.parse import quote
 
 from pyramid.testing import cleanUp
 
-from pyramid.compat import text_, native_
+from pyramid.util import text_
 
 
 class TraversalPathTests(unittest.TestCase):
@@ -87,15 +87,14 @@ class TraversalPathInfoTests(unittest.TestCase):
 
     def test_highorder(self):
         la = b'La Pe\xc3\xb1a'
-        latin1 = native_(la)
+        latin1 = text_(la)
         result = self._callFUT(latin1)
         self.assertEqual(result, (text_(la, 'utf-8'),))
 
     def test_highorder_undecodeable(self):
         from pyramid.exceptions import URLDecodeError
 
-        la = text_(b'La Pe\xc3\xb1a', 'utf-8')
-        notlatin1 = native_(la)
+        notlatin1 = text_(b'La Pe\xc3\xb1a', 'utf-8')
         self.assertRaises(URLDecodeError, self._callFUT, notlatin1)
 
 

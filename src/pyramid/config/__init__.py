@@ -35,7 +35,7 @@ from pyramid.settings import aslist
 
 from pyramid.threadlocal import manager
 
-from pyramid.util import WeakOrderedSet, object_description
+from pyramid.util import WeakOrderedSet, get_callable_name, object_description
 
 from pyramid.config.actions import action_method, ActionState
 from pyramid.config.predicates import not_
@@ -698,6 +698,7 @@ class Configurator(
         ``add_directive`` does not participate in conflict detection, and
         later calls to ``add_directive`` will override earlier calls.
         """
+        name = get_callable_name(name)
         c = self.maybe_dotted(directive)
         if not hasattr(self.registry, '_directives'):
             self.registry._directives = {}

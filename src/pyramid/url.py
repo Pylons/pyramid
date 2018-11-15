@@ -5,10 +5,10 @@ import os
 
 from pyramid.interfaces import IResourceURL, IRoutesMapper, IStaticURLInfo
 
-from pyramid.compat import bytes_
 from pyramid.encode import url_quote, urlencode
 from pyramid.path import caller_package
 from pyramid.threadlocal import get_current_registry
+from pyramid.util import bytes_
 
 from pyramid.traversal import (
     ResourceURL,

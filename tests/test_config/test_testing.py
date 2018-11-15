@@ -1,8 +1,8 @@
 import unittest
 from zope.interface import implementer
 
-from pyramid.compat import text_
 from pyramid.security import AuthenticationAPIMixin, AuthorizationAPIMixin
+from pyramid.util import text_
 from . import IDummy
 
 

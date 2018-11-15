@@ -1,6 +1,6 @@
 import sys
 import unittest
-from pyramid.compat import text_, bytes_
+from pyramid.util import text_, bytes_
 
 
 class Test_InstancePropertyHelper(unittest.TestCase):
@@ -833,21 +833,26 @@ class TestSentinel(unittest.TestCase):
 
 
 class TestCallableName(unittest.TestCase):
-    def test_valid_ascii(self):
+    def _callFUT(self, val):
         from pyramid.util import get_callable_name
 
+        return get_callable_name(val)
+
+    def test_valid_ascii_bytes(self):
         name = b'hello world'
-        self.assertEqual(get_callable_name(name), 'hello world')
+        self.assertEqual(self._callFUT(name), 'hello world')
 
-    def test_invalid_ascii(self):
-        from pyramid.util import get_callable_name
+    def test_valid_ascii_string(self):
         from pyramid.exceptions import ConfigurationError
 
-        def get_bad_name():
-            name = b'La Pe\xc3\xb1a'
-            get_callable_name(name)
+        name = b'La Pe\xc3\xb1a'.decode('utf-8')
+        self.assertRaises(ConfigurationError, self._callFUT, name)
 
-        self.assertRaises(ConfigurationError, get_bad_name)
+    def test_invalid_ascii(self):
+        from pyramid.exceptions import ConfigurationError
+
+        name = b'La Pe\xc3\xb1a'
+        self.assertRaises(ConfigurationError, self._callFUT, name)
 
 
 class Test_hide_attrs(unittest.TestCase):

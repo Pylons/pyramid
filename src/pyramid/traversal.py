@@ -11,13 +11,11 @@ from pyramid.interfaces import (
     VH_ROOT_KEY,
 )
 
-from pyramid.compat import native_, ascii_native_
-
 from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
 from pyramid.location import lineage
 from pyramid.threadlocal import get_current_registry
-from pyramid.util import is_nonstr_iter
+from pyramid.util import ascii_, is_nonstr_iter, text_
 
 PATH_SEGMENT_SAFE = "~!$&'()*+,;=:@"  # from webob
 PATH_SAFE = PATH_SEGMENT_SAFE + "/"
@@ -86,7 +84,7 @@ def find_resource(resource, path):
     resolved by ``find_resource``.
     """
     if isinstance(path, str):
-        path = ascii_native_(path)
+        path = ascii_(path)
     D = traverse(resource, path)
     view_name = D['view_name']
     context = D['context']
@@ -303,7 +301,7 @@ def traverse(resource, path):
     # step rather than later down the line as the result of calling
     # ``traversal_path``).
 
-    path = ascii_native_(path)
+    path = ascii_(path)
 
     if path and path[0] == '/':
         resource = find_root(resource)
@@ -592,7 +590,7 @@ def quote_path_segment(segment, safe=PATH_SEGMENT_SAFE):
     except KeyError:
         if segment.__class__ not in (str, bytes):
             segment = str(segment)
-        result = url_quote(native_(segment, 'utf-8'), safe)
+        result = url_quote(text_(segment, 'utf-8'), safe)
         # we don't need a lock to mutate _segment_cache, as the below
         # will generate exactly one Python bytecode (STORE_SUBSCR)
         _segment_cache[(segment, safe)] = result

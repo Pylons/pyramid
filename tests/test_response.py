@@ -73,9 +73,9 @@ class TestFileResponse(unittest.TestCase):
         # function returns Unicode for the content_type, unlike any previous
         # version of Python.  See https://github.com/Pylons/pyramid/issues/1360
         # for more information.
-        from pyramid.compat import text_
         import mimetypes as old_mimetypes
         from pyramid import response
+        from pyramid.util import text_
 
         class FakeMimetypesModule(object):
             def guess_type(self, *arg, **kw):

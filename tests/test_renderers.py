@@ -1,8 +1,8 @@
 import unittest
 
-from pyramid.testing import cleanUp
 from pyramid import testing
-from pyramid.compat import text_
+from pyramid.testing import cleanUp
+from pyramid.util import text_
 
 
 class TestJSON(unittest.TestCase):

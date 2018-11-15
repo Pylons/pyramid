@@ -1,8 +1,8 @@
 import unittest
 from pyramid import testing
 
-from pyramid.compat import text_, bytes_, native_
 from pyramid.security import AuthenticationAPIMixin, AuthorizationAPIMixin
+from pyramid.util import text_, bytes_
 
 
 class TestRequest(unittest.TestCase):
@@ -478,7 +478,7 @@ class Test_call_app_with_subpath_as_path_info(unittest.TestCase):
         self.assertEqual(request.environ['PATH_INFO'], '/hello/')
 
     def test_subpath_path_info_and_script_name_have_utf8(self):
-        encoded = native_(text_(b'La Pe\xc3\xb1a'))
+        encoded = text_(b'La Pe\xc3\xb1a')
         decoded = text_(bytes_(encoded), 'utf-8')
         request = DummyRequest(
             {'PATH_INFO': '/' + encoded, 'SCRIPT_NAME': '/' + encoded}

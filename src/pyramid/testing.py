@@ -8,7 +8,7 @@ from zope.interface import implementer, alsoProvides
 
 from pyramid.interfaces import IRequest, ISession
 
-from pyramid.compat import PYPY, text_
+from pyramid.compat import PYPY
 
 from pyramid.config import Configurator
 from pyramid.decorator import reify
@@ -28,7 +28,7 @@ from pyramid.threadlocal import get_current_registry, manager
 from pyramid.i18n import LocalizerRequestMixin
 from pyramid.request import CallbackMethodsMixin
 from pyramid.url import URLMethodsMixin
-from pyramid.util import InstancePropertyMixin
+from pyramid.util import InstancePropertyMixin, text_
 from pyramid.view import ViewMethodsMixin
 
 
