@@ -25,6 +25,7 @@ class TestURLMethodsMixin(unittest.TestCase):
 
             def __init__(self, environ):
                 self.environ = environ
+                self.scheme = environ.get('wsgi.url_scheme', 'http')
 
         request = Request(environ)
         request.registry = self.config.registry

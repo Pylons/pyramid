@@ -3,7 +3,7 @@ from zope.interface import implementer
 
 from pyramid.interfaces import IRoutesMapper, IRoute
 
-from pyramid.compat import native_, text_, decode_path_info
+from pyramid.compat import text_
 
 from pyramid.exceptions import URLDecodeError
 
@@ -75,10 +75,9 @@ class RoutesMapper(object):
         return self.routes[name].generate(kw)
 
     def __call__(self, request):
-        environ = request.environ
         try:
             # empty if mounted under a path in mod_wsgi, for example
-            path = decode_path_info(environ['PATH_INFO'] or '/')
+            path = request.path_info or '/'
         except KeyError:
             path = '/'
         except UnicodeDecodeError as e:
@@ -202,14 +201,10 @@ def _compile_route(route):
             return None
         d = {}
         for k, v in m.groupdict().items():
-            # k and v will be Unicode 2.6.4 and lower doesnt accept unicode
-            # kwargs as **kw, so we explicitly cast the keys to native
-            # strings in case someone wants to pass the result as **kw
-            nk = native_(k, 'ascii')
             if k == remainder:
-                d[nk] = split_path_info(v)
+                d[k] = split_path_info(v)
             else:
-                d[nk] = v
+                d[k] = v
         return d
 
     gen = ''.join(gen)

@@ -88,7 +88,7 @@ class static_view(object):
         if self.use_subpath:
             path_tuple = request.subpath
         else:
-            path_tuple = traversal_path_info(request.environ['PATH_INFO'])
+            path_tuple = traversal_path_info(request.path_info)
         path = _secure_path(path_tuple)
 
         if path is None:

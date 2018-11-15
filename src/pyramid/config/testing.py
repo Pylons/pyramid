@@ -9,7 +9,7 @@ from pyramid.interfaces import (
 
 from pyramid.renderers import RendererHelper
 
-from pyramid.traversal import decode_path_info, split_path_info
+from pyramid.traversal import split_path_info
 
 from pyramid.config.actions import action_method
 
@@ -95,7 +95,7 @@ class TestingConfiguratorMixin(object):
                 self.context = context
 
             def __call__(self, request):
-                path = decode_path_info(request.environ['PATH_INFO'])
+                path = request.path_info
                 ob = resources[path]
                 traversed = split_path_info(path)
                 return {

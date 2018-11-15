@@ -81,8 +81,11 @@ class DummyRoute(object):
 class DummyRequest:
     application_url = 'http://example.com:5432'
     script_name = ''
+    path_info = '/'
 
-    def __init__(self, environ):
+    def __init__(self, environ=None):
+        if environ is None:
+            environ = {}
         self.environ = environ
         self.matchdict = {}
 

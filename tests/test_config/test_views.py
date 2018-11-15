@@ -1357,6 +1357,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             request_method='POST',
         )
         request = self._makeRequest(config)
+        request.path_info = '/'
         request.method = 'POST'
         request.params = {}
         router = Router(config.registry)
@@ -1412,6 +1413,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             request_method='POST',
         )
         request = self._makeRequest(config)
+        request.path_info = '/'
         request.method = 'POST'
         request.params = {}
         router = Router(config.registry)
@@ -2722,7 +2724,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             view, renderer=null_renderer, append_slash=True
         )
         request = self._makeRequest(config)
-        request.environ['PATH_INFO'] = '/foo'
+        request.path_info = '/foo'
         request.query_string = 'a=1&b=2'
         request.path = '/scriptname/foo'
         view = self._getViewCallable(
@@ -2751,7 +2753,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             view, renderer=null_renderer, append_slash=HTTPMovedPermanently
         )
         request = self._makeRequest(config)
-        request.environ['PATH_INFO'] = '/foo'
+        request.path_info = '/foo'
         request.query_string = 'a=1&b=2'
         request.path = '/scriptname/foo'
         view = self._getViewCallable(

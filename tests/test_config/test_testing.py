@@ -69,23 +69,27 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.testing_resources(resources)
         adapter = config.registry.getAdapter(None, ITraverser)
-        result = adapter(DummyRequest({'PATH_INFO': '/ob1'}))
+        request = DummyRequest()
+        request.path_info = '/ob1'
+        result = adapter(request)
         self.assertEqual(result['context'], ob1)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
         self.assertEqual(result['traversed'], (text_('ob1'),))
         self.assertEqual(result['virtual_root'], ob1)
         self.assertEqual(result['virtual_root_path'], ())
-        result = adapter(DummyRequest({'PATH_INFO': '/ob2'}))
+        request = DummyRequest()
+        request.path_info = '/ob2'
+        result = adapter(request)
         self.assertEqual(result['context'], ob2)
         self.assertEqual(result['view_name'], '')
         self.assertEqual(result['subpath'], ())
         self.assertEqual(result['traversed'], (text_('ob2'),))
         self.assertEqual(result['virtual_root'], ob2)
         self.assertEqual(result['virtual_root_path'], ())
-        self.assertRaises(
-            KeyError, adapter, DummyRequest({'PATH_INFO': '/ob3'})
-        )
+        request = DummyRequest()
+        request.path_info = '/ob3'
+        self.assertRaises(KeyError, adapter, request)
         try:
             config.begin()
             self.assertEqual(find_resource(None, '/ob1'), ob1)

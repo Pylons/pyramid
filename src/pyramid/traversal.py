@@ -1,4 +1,6 @@
 from functools import lru_cache
+from urllib.parse import unquote_to_bytes
+
 from zope.interface import implementer
 from zope.interface.interfaces import IInterface
 
@@ -9,12 +11,7 @@ from pyramid.interfaces import (
     VH_ROOT_KEY,
 )
 
-from pyramid.compat import (
-    native_,
-    ascii_native_,
-    decode_path_info,
-    unquote_bytes_to_wsgi,
-)
+from pyramid.compat import native_, ascii_native_
 
 from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
@@ -541,6 +538,16 @@ def split_path_info(path):
         else:
             clean.append(segment)
     return tuple(clean)
+
+
+# see PEP 3333 for why we encode to latin-1 then decode to utf-8
+def decode_path_info(path):
+    return path.encode('latin-1').decode('utf-8')
+
+
+# see PEP 3333 for why we decode the path to latin-1
+def unquote_bytes_to_wsgi(bytestring):
+    return unquote_to_bytes(bytestring).decode('latin-1')
 
 
 _segment_cache = {}

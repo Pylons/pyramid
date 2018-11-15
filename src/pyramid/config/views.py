@@ -2192,9 +2192,7 @@ class StaticURLInfo(object):
                     parsed = urlparse(url)
                     if not parsed.scheme:
                         url = urlunparse(
-                            parsed._replace(
-                                scheme=request.environ['wsgi.url_scheme']
-                            )
+                            parsed._replace(scheme=request.scheme)
                         )
                     subpath = quote(subpath)
                     result = urljoin(url, subpath)
