@@ -3,7 +3,7 @@ import unittest
 from zope.interface import implementer
 
 from pyramid import testing
-from pyramid.compat import im_func, text_
+from pyramid.compat import text_
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import ConfigurationExecutionError
 from pyramid.exceptions import ConfigurationConflictError
@@ -3723,16 +3723,16 @@ class Test_preserve_view_attrs(unittest.TestCase):
         self.assertTrue(view1.__module__ is view2.__module__)
         self.assertTrue(view1.__name__ is view2.__name__)
         self.assertTrue(
-            getattr(view1.__call_permissive__, im_func)
-            is getattr(view2.__call_permissive__, im_func)
+            getattr(view1.__call_permissive__, '__func__')
+            is getattr(view2.__call_permissive__, '__func__')
         )
         self.assertTrue(
-            getattr(view1.__permitted__, im_func)
-            is getattr(view2.__permitted__, im_func)
+            getattr(view1.__permitted__, '__func__')
+            is getattr(view2.__permitted__, '__func__')
         )
         self.assertTrue(
-            getattr(view1.__predicated__, im_func)
-            is getattr(view2.__predicated__, im_func)
+            getattr(view1.__predicated__, '__func__')
+            is getattr(view2.__predicated__, '__func__')
         )
 
 

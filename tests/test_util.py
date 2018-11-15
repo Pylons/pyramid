@@ -1223,3 +1223,26 @@ class TestSimpleSerializer(unittest.TestCase):
     def test_dumps(self):
         inst = self._makeOne()
         self.assertEqual(inst.dumps('abc'), bytes_('abc'))
+
+
+class TestUnboundMethods(unittest.TestCase):
+    class Dummy(object):
+        def run(self):  # pragma: no cover
+            return 'OK'
+
+    def _callFUT(self, val):
+        from pyramid.util import is_unbound_method
+
+        return is_unbound_method(val)
+
+    def test_bound_method(self):
+        self.assertFalse(self._callFUT(self.Dummy().run))
+
+    def test_unbound_method(self):
+        self.assertTrue(self._callFUT(self.Dummy.run))
+
+    def test_normal_func_unbound(self):
+        def func():  # pragma: no cover
+            return 'OK'
+
+        self.assertFalse(self._callFUT(func))

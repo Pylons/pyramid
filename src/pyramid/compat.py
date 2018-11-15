@@ -76,9 +76,6 @@ def is_nonstr_iter(v):
     return hasattr(v, '__iter__')
 
 
-im_func = '__func__'
-im_self = '__self__'
-
 from http.cookies import SimpleCookie
 
 from html import escape
@@ -95,28 +92,3 @@ from urllib.parse import unquote_to_bytes
 
 def unquote_bytes_to_wsgi(bytestring):
     return unquote_to_bytes(bytestring).decode('latin-1')
-
-
-def is_bound_method(ob):
-    return inspect.ismethod(ob) and getattr(ob, im_self, None) is not None
-
-
-# support annotations and keyword-only arguments in PY3
-from inspect import getfullargspec as getargspec
-
-
-def is_unbound_method(fn):
-    """
-    This consistently verifies that the callable is bound to a
-    class.
-    """
-    is_bound = is_bound_method(fn)
-
-    if not is_bound and inspect.isroutine(fn):
-        spec = getargspec(fn)
-        has_self = len(spec.args) > 0 and spec.args[0] == 'self'
-
-        if inspect.isfunction(fn) and has_self:
-            return True
-
-    return False

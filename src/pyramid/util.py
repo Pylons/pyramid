@@ -6,14 +6,7 @@ import weakref
 
 from pyramid.exceptions import ConfigurationError, CyclicDependencyError
 
-from pyramid.compat import (
-    getargspec,
-    im_func,
-    is_nonstr_iter,
-    bytes_,
-    text_,
-    native_,
-)
+from pyramid.compat import is_nonstr_iter, bytes_, text_, native_
 
 from pyramid.path import DottedNameResolver as _DottedNameResolver
 
@@ -616,13 +609,13 @@ def takes_one_arg(callee, attr=None, argname=None):
             return False
 
     try:
-        argspec = getargspec(fn)
+        argspec = inspect.getfullargspec(fn)
     except TypeError:
         return False
 
     args = argspec[0]
 
-    if hasattr(fn, im_func) or ismethod:
+    if hasattr(fn, '__func__') or ismethod:
         # it's an instance method (or unbound method on py2)
         if not args:
             return False
@@ -653,3 +646,24 @@ class SimpleSerializer(object):
 
     def dumps(self, appstruct):
         return bytes_(appstruct)
+
+
+def is_bound_method(ob):
+    return inspect.ismethod(ob) and getattr(ob, '__self__', None) is not None
+
+
+def is_unbound_method(fn):
+    """
+    This consistently verifies that the callable is bound to a
+    class.
+    """
+    is_bound = is_bound_method(fn)
+
+    if not is_bound and inspect.isroutine(fn):
+        spec = inspect.getfullargspec(fn)
+        has_self = len(spec.args) > 0 and spec.args[0] == 'self'
+
+        if inspect.isfunction(fn) and has_self:
+            return True
+
+    return False
