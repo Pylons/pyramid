@@ -100,13 +100,11 @@ class FileIter(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         val = self.file.read(self.block_size)
         if not val:
             raise StopIteration
         return val
-
-    __next__ = next  # py3
 
     def close(self):
         self.file.close()

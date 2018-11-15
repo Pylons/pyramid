@@ -140,6 +140,23 @@ class RoutesMapperTests(unittest.TestCase):
         request.registry = get_current_registry()
         self.assertRaises(URLDecodeError, mapper, request)
 
+    def test___call__pathinfo_KeyError(self):
+        from pyramid.threadlocal import get_current_registry
+
+        class DummyRequest:
+            @property
+            def path_info(self):
+                # if the PATH_INFO is missing from the environ
+                raise KeyError
+
+        mapper = self._makeOne()
+        mapper.connect('root', '')
+        request = DummyRequest()
+        request.registry = get_current_registry()
+        result = mapper(request)
+        self.assertEqual(result['route'], mapper.routes['root'])
+        self.assertEqual(result['match'], {})
+
     def test___call__route_matches(self):
         mapper = self._makeOne()
         mapper.connect('foo', 'archives/:action/:article')

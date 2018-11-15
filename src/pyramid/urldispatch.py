@@ -188,14 +188,6 @@ def _compile_route(route):
     match = re.compile(pattern).match
 
     def matcher(path):
-        # This function really wants to consume Unicode patterns natively,
-        # but if someone passes us a bytestring, we allow it by converting it
-        # to Unicode using the ASCII decoding.  We decode it using ASCII
-        # because we don't want to accept bytestrings with high-order
-        # characters in them here as we have no idea what the encoding
-        # represents.
-        if path.__class__ is not str:
-            path = text_(path, 'ascii')
         m = match(path)
         if m is None:
             return None
@@ -216,7 +208,7 @@ def _compile_route(route):
         newdict = {}
         for k, v in dict.items():
             if v.__class__ is bytes:
-                # url_quote below needs a native string, not bytes on Py3
+                # url_quote below needs a native string
                 v = v.decode('utf-8')
 
             if k == remainder:
@@ -230,7 +222,6 @@ def _compile_route(route):
             else:
                 if v.__class__ is not str:
                     v = str(v)
-                # v may be bytes (py2) or native string (py3)
                 v = q(v)
 
             # at this point, the value will be a native string

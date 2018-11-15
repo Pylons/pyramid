@@ -67,6 +67,12 @@ class Test__no_escape(unittest.TestCase):
     def test_not_basestring(self):
         self.assertEqual(self._callFUT(42), '42')
 
+    def test_bytes(self):
+        self.assertEqual(
+            self._callFUT(b'/La Pe\xc3\xb1a/{x}'),
+            b'/La Pe\xc3\xb1a/{x}'.decode('utf-8'),
+        )
+
     def test_unicode(self):
         class DummyUnicodeObject(object):
             def __unicode__(self):

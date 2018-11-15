@@ -1,3 +1,4 @@
+import sys
 import unittest
 from pyramid.compat import text_, bytes_
 
@@ -1246,3 +1247,54 @@ class TestUnboundMethods(unittest.TestCase):
             return 'OK'
 
         self.assertFalse(self._callFUT(func))
+
+
+class TestReraise(unittest.TestCase):
+    def _callFUT(self, *args):
+        from pyramid.util import reraise
+
+        return reraise(*args)
+
+    def test_it(self):
+        # tests cribbed from six.py
+        def get_next(tb):
+            return tb.tb_next.tb_next.tb_next
+
+        e = Exception('blah')
+        try:
+            raise e
+        except Exception:
+            tp, val, tb = sys.exc_info()
+
+        try:
+            self._callFUT(tp, val, tb)
+        except Exception:
+            tp2, val2, tb2 = sys.exc_info()
+        self.assertIs(tp2, Exception)
+        self.assertIs(val2, e)
+        self.assertIs(get_next(tb2), tb)
+
+        try:
+            self._callFUT(tp, val)
+        except Exception:
+            tp2, val2, tb2 = sys.exc_info()
+        self.assertIs(tp2, Exception)
+        self.assertIs(val2, e)
+        self.assertIsNot(get_next(tb2), tb)
+
+        try:
+            self._callFUT(tp, val, tb2)
+        except Exception:
+            tp2, val2, tb3 = sys.exc_info()
+        self.assertIs(tp2, Exception)
+        self.assertIs(val2, e)
+        self.assertIs(get_next(tb3), tb2)
+
+        try:
+            self._callFUT(tp, None, tb)
+        except Exception:
+            tp2, val2, tb2 = sys.exc_info()
+        self.assertIs(tp2, Exception)
+        self.assertIsNot(val2, val)
+        self.assertIsInstance(val2, Exception)
+        self.assertIs(get_next(tb2), tb)

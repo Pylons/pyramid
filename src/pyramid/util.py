@@ -603,10 +603,7 @@ def takes_one_arg(callee, attr=None, argname=None):
     if inspect.isroutine(callee):
         fn = callee
     elif inspect.isclass(callee):
-        try:
-            fn = callee.__init__
-        except AttributeError:
-            return False
+        fn = callee.__init__
         ismethod = hasattr(fn, '__call__')
     else:
         try:
@@ -614,15 +611,11 @@ def takes_one_arg(callee, attr=None, argname=None):
         except AttributeError:
             return False
 
-    try:
-        argspec = inspect.getfullargspec(fn)
-    except TypeError:
-        return False
-
+    argspec = inspect.getfullargspec(fn)
     args = argspec[0]
 
     if hasattr(fn, '__func__') or ismethod:
-        # it's an instance method (or unbound method on py2)
+        # it's an instance method
         if not args:
             return False
         args = args[1:]
@@ -676,8 +669,12 @@ def is_unbound_method(fn):
 
 
 def reraise(tp, value, tb=None):
-    if value is None:
-        value = tp
-    if value.__traceback__ is not tb:
-        raise value.with_traceback(tb)
-    raise value
+    try:
+        if value is None:
+            value = tp()
+        if value.__traceback__ is not tb:
+            raise value.with_traceback(tb)
+        raise value
+    finally:
+        value = None
+        tb = None
