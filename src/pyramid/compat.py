@@ -76,10 +76,6 @@ def is_nonstr_iter(v):
     return hasattr(v, '__iter__')
 
 
-from http.cookies import SimpleCookie
-
-from html import escape
-
 # see PEP 3333 for why we encode WSGI PATH_INFO to latin-1 before
 # decoding it to utf-8
 def decode_path_info(path):

@@ -1,4 +1,4 @@
-from pyramid.compat import escape
+from html import escape
 from pyramid.security import view_execution_permitted
 from pyramid.response import Response
 

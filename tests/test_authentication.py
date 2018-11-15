@@ -1,3 +1,4 @@
+from http.cookies import SimpleCookie
 import unittest
 import warnings
 from pyramid import testing
@@ -706,8 +707,6 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         return cookie
 
     def _parseCookie(self, cookie):
-        from pyramid.compat import SimpleCookie
-
         cookies = SimpleCookie()
         cookies.load(cookie)
         return cookies.get('auth_tkt')
