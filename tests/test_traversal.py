@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import unittest
+from urllib.parse import quote
 
 from pyramid.testing import cleanUp
 
-from pyramid.compat import text_, native_, url_quote
+from pyramid.compat import text_, native_
 
 
 class TraversalPathTests(unittest.TestCase):
@@ -14,7 +15,7 @@ class TraversalPathTests(unittest.TestCase):
 
     def test_utf8(self):
         la = b'La Pe\xc3\xb1a'
-        encoded = url_quote(la)
+        encoded = quote(la)
         decoded = text_(la, 'utf-8')
         path = '/'.join([encoded, encoded])
         result = self._callFUT(path)
@@ -24,7 +25,7 @@ class TraversalPathTests(unittest.TestCase):
         from pyramid.exceptions import URLDecodeError
 
         la = text_(b'La Pe\xc3\xb1a', 'utf-8').encode('utf-16')
-        encoded = url_quote(la)
+        encoded = quote(la)
         path = '/'.join([encoded, encoded])
         self.assertRaises(URLDecodeError, self._callFUT, path)
 

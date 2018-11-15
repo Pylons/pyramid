@@ -5,6 +5,7 @@ import operator
 import os
 import warnings
 
+from urllib.parse import quote, urljoin, urlparse, urlunparse
 from webob.acceptparse import Accept
 from zope.interface import Interface, implementedBy, implementer
 from zope.interface.interfaces import IInterface
@@ -32,7 +33,7 @@ from pyramid.interfaces import (
 from pyramid import renderers
 
 from pyramid.asset import resolve_asset_spec
-from pyramid.compat import urlparse, url_quote, WIN
+from pyramid.compat import WIN
 
 from pyramid.decorator import reify
 
@@ -76,9 +77,6 @@ from pyramid.config.predicates import (
     predvalseq,
     sort_accept_offers,
 )
-
-urljoin = urlparse.urljoin
-url_parse = urlparse.urlparse
 
 DefaultViewMapper = DefaultViewMapper  # bw-compat
 preserve_view_attrs = preserve_view_attrs  # bw-compat
@@ -2191,14 +2189,14 @@ class StaticURLInfo(object):
                     return request.route_url(route_name, **kw)
                 else:
                     app_url, qs, anchor = parse_url_overrides(request, kw)
-                    parsed = url_parse(url)
+                    parsed = urlparse(url)
                     if not parsed.scheme:
-                        url = urlparse.urlunparse(
+                        url = urlunparse(
                             parsed._replace(
                                 scheme=request.environ['wsgi.url_scheme']
                             )
                         )
-                    subpath = url_quote(subpath)
+                    subpath = quote(subpath)
                     result = urljoin(url, subpath)
                     return result + qs + anchor
 
@@ -2227,7 +2225,7 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
-        if url_parse(name).netloc:
+        if urlparse(name).netloc:
             # it's a URL
             # url, spec, route_name
             url = name

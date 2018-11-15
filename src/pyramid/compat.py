@@ -49,19 +49,6 @@ def native_(s, encoding='latin-1', errors='strict'):
     return str(s, encoding, errors)
 
 
-from urllib import parse
-
-urlparse = parse
-from urllib.parse import quote as url_quote
-from urllib.parse import quote_plus as url_quote_plus
-from urllib.parse import unquote as url_unquote
-from urllib.parse import urlencode as url_encode
-from urllib.request import urlopen as url_open
-
-url_unquote_text = url_unquote
-url_unquote_native = url_unquote
-
-
 # see PEP 3333 for why we encode WSGI PATH_INFO to latin-1 before
 # decoding it to utf-8
 def decode_path_info(path):

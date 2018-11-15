@@ -2,8 +2,8 @@ import base64
 import argparse
 import sys
 import textwrap
+from urllib.parse import unquote
 
-from pyramid.compat import url_unquote
 from pyramid.request import Request
 from pyramid.scripts.common import get_config_loader
 from pyramid.scripts.common import parse_vars
@@ -152,7 +152,7 @@ class PRequestCommand(object):
         except ValueError:
             qs = ''
 
-        path = url_unquote(path)
+        path = unquote(path)
 
         headers = {}
         if self.args.login:

@@ -6,19 +6,14 @@ import hashlib
 import base64
 import re
 import time as time_mod
+from urllib.parse import quote, unquote
 import warnings
 
 from zope.interface import implementer
 
 from webob.cookies import CookieProfile
 
-from pyramid.compat import (
-    url_unquote,
-    url_quote,
-    bytes_,
-    ascii_native_,
-    native_,
-)
+from pyramid.compat import bytes_, ascii_native_, native_
 
 from pyramid.interfaces import IAuthenticationPolicy, IDebugLogger
 
@@ -724,11 +719,7 @@ class AuthTicket(object):
         )
 
     def cookie_value(self):
-        v = '%s%08x%s!' % (
-            self.digest(),
-            int(self.time),
-            url_quote(self.userid),
-        )
+        v = '%s%08x%s!' % (self.digest(), int(self.time), quote(self.userid))
         if self.tokens:
             v += self.tokens + '!'
         v += self.user_data
@@ -767,7 +758,7 @@ def parse_ticket(secret, ticket, ip, hashalg='md5'):
         userid, data = ticket[digest_size + 8 :].split('!', 1)
     except ValueError:
         raise BadTicket('userid is not followed by !')
-    userid = url_unquote(userid)
+    userid = unquote(userid)
     if '!' in data:
         tokens, user_data = data.split('!', 1)
     else:  # pragma: no cover (never generated)
