@@ -3,8 +3,7 @@ import unittest
 
 from pyramid import testing
 
-from pyramid.compat import WIN
-from pyramid.util import text_
+from pyramid.util import WIN, text_
 
 
 class TestURLMethodsMixin(unittest.TestCase):

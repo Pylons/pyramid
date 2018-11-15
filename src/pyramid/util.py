@@ -2,11 +2,22 @@ from contextlib import contextmanager
 import functools
 from hmac import compare_digest
 import inspect
+import platform
 import weakref
 
 from pyramid.path import DottedNameResolver as _DottedNameResolver
 
 _marker = object()
+
+WIN = platform.system() == 'Windows'
+
+try:  # pragma: no cover
+    import __pypy__
+
+    PYPY = True
+except BaseException:  # pragma: no cover
+    __pypy__ = None
+    PYPY = False
 
 
 class DottedNameResolver(_DottedNameResolver):
