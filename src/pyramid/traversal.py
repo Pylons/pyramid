@@ -12,7 +12,6 @@ from pyramid.interfaces import (
 from pyramid.compat import (
     native_,
     ascii_native_,
-    is_nonstr_iter,
     decode_path_info,
     unquote_bytes_to_wsgi,
 )
@@ -21,6 +20,7 @@ from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
 from pyramid.location import lineage
 from pyramid.threadlocal import get_current_registry
+from pyramid.util import is_nonstr_iter
 
 PATH_SEGMENT_SAFE = "~!$&'()*+,;=:@"  # from webob
 PATH_SAFE = PATH_SEGMENT_SAFE + "/"

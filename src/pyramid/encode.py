@@ -1,8 +1,8 @@
 from pyramid.compat import (
-    is_nonstr_iter,
     url_quote as _url_quote,
     url_quote_plus as _quote_plus,
 )
+from pyramid.util import is_nonstr_iter
 
 
 def url_quote(val, safe=''):  # bw compat api

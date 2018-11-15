@@ -2,13 +2,15 @@ from zope.interface import implementer
 
 from pyramid.interfaces import ITweens
 
-from pyramid.compat import is_nonstr_iter
-
 from pyramid.exceptions import ConfigurationError
 
 from pyramid.tweens import MAIN, INGRESS, EXCVIEW
 
-from pyramid.util import is_string_or_iterable, TopologicalSorter
+from pyramid.util import (
+    is_nonstr_iter,
+    is_string_or_iterable,
+    TopologicalSorter,
+)
 
 from pyramid.config.actions import action_method
 

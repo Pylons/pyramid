@@ -62,12 +62,6 @@ url_unquote_text = url_unquote
 url_unquote_native = url_unquote
 
 
-def is_nonstr_iter(v):
-    if isinstance(v, str):
-        return False
-    return hasattr(v, '__iter__')
-
-
 # see PEP 3333 for why we encode WSGI PATH_INFO to latin-1 before
 # decoding it to utf-8
 def decode_path_info(path):

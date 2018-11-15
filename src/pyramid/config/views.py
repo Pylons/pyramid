@@ -32,7 +32,7 @@ from pyramid.interfaces import (
 from pyramid import renderers
 
 from pyramid.asset import resolve_asset_spec
-from pyramid.compat import urlparse, url_quote, WIN, is_nonstr_iter
+from pyramid.compat import urlparse, url_quote, WIN
 
 from pyramid.decorator import reify
 
@@ -53,7 +53,7 @@ from pyramid.url import parse_url_overrides
 
 from pyramid.view import AppendSlashNotFoundViewFactory
 
-from pyramid.util import as_sorted_tuple, TopologicalSorter
+from pyramid.util import as_sorted_tuple, is_nonstr_iter, TopologicalSorter
 
 import pyramid.predicates
 import pyramid.viewderivers

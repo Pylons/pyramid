@@ -3,11 +3,13 @@ from zope.interface import implementer
 
 from pyramid.interfaces import IRoutesMapper, IRoute
 
-from pyramid.compat import native_, text_, is_nonstr_iter, decode_path_info
+from pyramid.compat import native_, text_, decode_path_info
 
 from pyramid.exceptions import URLDecodeError
 
 from pyramid.traversal import quote_path_segment, split_path_info, PATH_SAFE
+
+from pyramid.util import is_nonstr_iter
 
 _marker = object()
 

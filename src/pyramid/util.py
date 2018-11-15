@@ -6,7 +6,7 @@ import weakref
 
 from pyramid.exceptions import ConfigurationError, CyclicDependencyError
 
-from pyramid.compat import is_nonstr_iter, bytes_, text_, native_
+from pyramid.compat import bytes_, text_, native_
 
 from pyramid.path import DottedNameResolver as _DottedNameResolver
 
@@ -18,6 +18,12 @@ class DottedNameResolver(_DottedNameResolver):
         self, package=None
     ):  # default to package = None for bw compat
         _DottedNameResolver.__init__(self, package)
+
+
+def is_nonstr_iter(v):
+    if isinstance(v, str):
+        return False
+    return hasattr(v, '__iter__')
 
 
 def is_string_or_iterable(v):
