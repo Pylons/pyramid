@@ -62,14 +62,6 @@ url_unquote_text = url_unquote
 url_unquote_native = url_unquote
 
 
-def reraise(tp, value, tb=None):
-    if value is None:
-        value = tp
-    if value.__traceback__ is not tb:
-        raise value.with_traceback(tb)
-    raise value
-
-
 def is_nonstr_iter(v):
     if isinstance(v, str):
         return False

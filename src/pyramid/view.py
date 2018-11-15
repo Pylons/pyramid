@@ -16,7 +16,6 @@ from pyramid.interfaces import (
 )
 
 from pyramid.compat import decode_path_info
-from pyramid.compat import reraise as reraise_
 
 from pyramid.exceptions import ConfigurationError, PredicateMismatch
 
@@ -29,6 +28,7 @@ from pyramid.httpexceptions import (
 from pyramid.threadlocal import get_current_registry, manager
 
 from pyramid.util import hide_attrs
+from pyramid.util import reraise as reraise_
 
 _marker = object()
 

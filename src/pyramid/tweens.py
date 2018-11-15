@@ -1,7 +1,7 @@
 import sys
 
-from pyramid.compat import reraise
 from pyramid.httpexceptions import HTTPNotFound
+from pyramid.util import reraise
 
 
 def _error_handler(request, exc):

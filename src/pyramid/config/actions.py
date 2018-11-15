@@ -5,7 +5,6 @@ import sys
 import traceback
 from zope.interface import implementer
 
-from pyramid.compat import reraise
 from pyramid.exceptions import (
     ConfigurationConflictError,
     ConfigurationError,
@@ -14,6 +13,7 @@ from pyramid.exceptions import (
 from pyramid.interfaces import IActionInfo
 from pyramid.registry import undefer
 from pyramid.util import is_nonstr_iter
+from pyramid.util import reraise
 
 
 class ActionConfiguratorMixin(object):
