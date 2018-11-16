@@ -1071,7 +1071,7 @@ Glossary
 
    Green Unicorn
       Aka ``gunicorn``, a fast :term:`WSGI` server that runs on Unix under
-      Python 2.6+ or Python 3.1+.  See https://gunicorn.org/ for detailed
+      Python 2.6+ or Python 3.4+.  See https://gunicorn.org/ for detailed
       information.
 
    predicate factory
