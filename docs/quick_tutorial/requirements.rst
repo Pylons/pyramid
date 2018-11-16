@@ -157,8 +157,7 @@ environment variable.
     # Windows
     python -m venv %VENV%
 
-.. seealso:: See also Python 3's :mod:`venv module <python:venv>` and Python
-   2's `virtualenv <https://virtualenv.pypa.io/en/latest/>`_ package.
+.. seealso:: See also :mod:`venv module <python:venv>`.
 
 
 Update packaging tools in the virtual environment
