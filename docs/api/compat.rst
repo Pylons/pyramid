@@ -29,36 +29,3 @@ systems which require compatibility imports.
    .. autofunction:: text_
 
    .. autofunction:: native_
-
-   .. attribute:: urlparse
-
-      ``urllib.parse``
-
-   .. attribute:: url_quote
-
-      ``urllib.parse.quote``
-
-   .. attribute:: url_quote_plus
-
-      ``urllib.parse.quote_plus``
-
-   .. attribute:: url_unquote
-
-      ``urllib.parse.unquote``
-
-   .. attribute:: url_encode
-
-      ``urllib.parse.urlencode``
-
-   .. attribute:: url_open
-
-      ``urllib.request.urlopen``
-
-   .. function:: url_unquote_text(v, encoding='utf-8', errors='replace')
-
-      Return the result of ``urllib.parse.unquote``.
-
-   .. function:: url_unquote_native(v, encoding='utf-8', errors='replace')
-
-      Return the result of ``urllib.parse.unquote``.
-
