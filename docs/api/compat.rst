@@ -18,10 +18,6 @@ systems which require compatibility imports.
 
       The string value ``__func__``.
 
-   .. function:: is_nonstr_iter(v)
-
-      Return ``True`` if ``v`` is a non-``str``.
-
    .. attribute:: long
 
       Long type ``int``.
