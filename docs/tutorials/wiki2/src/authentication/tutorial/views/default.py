@@ -1,4 +1,4 @@
-from pyramid.compat import escape
+from html import escape
 import re
 from docutils.core import publish_parts
 
