@@ -18,10 +18,6 @@ systems which require compatibility imports.
 
       The string value ``__func__``.
 
-   .. attribute:: long
-
-      Long type ``int``.
-
    .. attribute:: PYPY
 
       ``True`` if running on PyPy, ``False`` otherwise.
