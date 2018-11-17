@@ -14,10 +14,6 @@ systems which require compatibility imports.
 
    .. autofunction:: bytes_
         
-   .. function:: escape(v)
-
-      The ``html.escape`` function.
-
    .. attribute:: im_func
 
       The string value ``__func__``.
@@ -37,10 +33,6 @@ systems which require compatibility imports.
    .. function:: reraise(tp, value, tb=None)
 
       Reraise an exception ``reraise(*sys.exc_info())``.
-
-   .. attribute:: SimpleCookie
-
-      ``http.cookies.SimpleCookie`` module.
 
    .. autofunction:: text_
 
