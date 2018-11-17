@@ -30,10 +30,6 @@ systems which require compatibility imports.
 
       ``True`` if running on PyPy, ``False`` otherwise.
 
-   .. function:: reraise(tp, value, tb=None)
-
-      Reraise an exception ``reraise(*sys.exc_info())``.
-
    .. autofunction:: text_
 
    .. autofunction:: native_
