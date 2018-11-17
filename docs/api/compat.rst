@@ -10,7 +10,7 @@ systems which require compatibility imports.
 
 .. automodule:: pyramid.compat
 
-   .. autofunction:: ascii_native_
+   .. autofunction:: ascii_
 
    .. autofunction:: bytes_
         
@@ -27,5 +27,3 @@ systems which require compatibility imports.
       ``True`` if running on PyPy, ``False`` otherwise.
 
    .. autofunction:: text_
-
-   .. autofunction:: native_
