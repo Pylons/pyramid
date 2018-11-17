@@ -22,10 +22,6 @@ systems which require compatibility imports.
 
       The ``html.escape`` function.
 
-   .. function:: exec_(code, globs=None, locs=None)
-
-      Exec code.
-
    .. attribute:: im_func
 
       The string value ``__func__``.
@@ -57,10 +53,6 @@ systems which require compatibility imports.
    .. function:: map_(v)
 
       Return ``list(map(v))``.
-
-   .. attribute:: pickle
-
-       ``cPickle`` module if it exists, ``pickle`` module otherwise.
 
    .. attribute:: PYPY
 
