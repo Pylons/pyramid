@@ -14,10 +14,6 @@ systems which require compatibility imports.
 
    .. autofunction:: bytes_
         
-   .. attribute:: configparser
-
-      The ``configparser`` module.
-
    .. function:: escape(v)
 
       The ``html.escape`` function.
@@ -26,33 +22,13 @@ systems which require compatibility imports.
 
       The string value ``__func__``.
 
-   .. function:: input_(v)
-
-      The ``input`` function.
-
    .. function:: is_nonstr_iter(v)
 
       Return ``True`` if ``v`` is a non-``str``.
 
-   .. function:: iteritems_(d)
-
-      Return ``d.items()``.
-
-   .. function:: itervalues_(d)
-
-      Return ``d.values()``.
-
-   .. function:: iterkeys_(d)
-
-      Return ``d.keys()``.
-
    .. attribute:: long
 
       Long type ``int``.
-
-   .. function:: map_(v)
-
-      Return ``list(map(v))``.
 
    .. attribute:: PYPY
 
