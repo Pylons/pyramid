@@ -212,8 +212,4 @@ def _guess_type(path):
     content_type, content_encoding = mimetypes.guess_type(path, strict=False)
     if content_type is None:
         content_type = 'application/octet-stream'
-    # str-ifying content_type is a workaround for a bug in Python 2.7.7
-    # on Windows where mimetypes.guess_type returns unicode for the
-    # content_type.
-    content_type = str(content_type)
     return content_type, content_encoding

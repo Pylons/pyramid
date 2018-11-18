@@ -26,8 +26,8 @@ def quote_plus(val, safe=''):
 def urlencode(query, doseq=True, quote_via=quote_plus):
     """
     An alternate implementation of Python's stdlib
-    :func:`urllib.parse.urlencode` function which accepts unicode keys and
-    values within the ``query`` dict/sequence; all Unicode keys and values are
+    :func:`urllib.parse.urlencode` function which accepts string keys and
+    values within the ``query`` dict/sequence; all string keys and values are
     first converted to UTF-8 before being used to compose the query string.
 
     The value of ``query`` must be a sequence of two-tuples

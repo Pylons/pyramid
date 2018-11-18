@@ -112,7 +112,7 @@ def forget(request):
 
 def principals_allowed_by_permission(context, permission):
     """ Provided a ``context`` (a resource object), and a ``permission``
-    (a string or unicode object), if an :term:`authorization policy` is
+    string, if an :term:`authorization policy` is
     in effect, return a sequence of :term:`principal` ids that possess
     the permission in the ``context``.  If no authorization policy is
     in effect, this will return a sequence with the single value
@@ -340,7 +340,7 @@ class AuthorizationAPIMixin(object):
         ``request.context`` attribute.
 
         :param permission: Does this request have the given permission?
-        :type permission: unicode, str
+        :type permission: str
         :param context: A resource object or ``None``
         :type context: object
         :returns: Either :class:`pyramid.security.Allowed` or
