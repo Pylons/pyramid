@@ -23,8 +23,8 @@ requires = [
 ]
 
 tests_require = [
-    'WebTest >= 1.3.1',
-    'pytest>=3.7.4',
+    'WebTest',
+    'pytest',
     'pytest-cov',
 ]
 
