@@ -188,8 +188,7 @@ of them.  Here are a couple that might be useful:
 Text (Unicode)
 ++++++++++++++
 
-Many of the properties of the request object will be text values (``unicode``
-under Python 2 or ``str`` under Python 3) if the request encoding/charset is
+Many of the properties of the request object will be text values (``str`` type) if the request encoding/charset is
 provided.  If it is provided, the values in ``req.POST``, ``req.GET``,
 ``req.params``, and ``req.cookies`` will contain text.  The client *can*
 indicate the charset with something like ``Content-Type:

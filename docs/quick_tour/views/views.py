@@ -1,4 +1,4 @@
-from pyramid.compat import escape
+from html import escape
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.response import Response
@@ -16,7 +16,7 @@ def home_view(request):
 def hello_view(request):
     name = request.params.get('name', 'No Name')
     body = '<p>Hi %s, this <a href="/goto">redirects</a></p>'
-    # pyramid.compat.escape to prevent Cross-Site Scripting (XSS) [CWE 79]
+    # Python html.escape to prevent Cross-Site Scripting (XSS) [CWE 79]
     return Response(body % escape(name))
 
 

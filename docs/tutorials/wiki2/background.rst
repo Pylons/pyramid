@@ -17,6 +17,6 @@ variant, etc.) *or* a Windows system of any kind.
 
 .. note::
 
-  This tutorial runs on both Python 2 and 3 without modification.
+  This tutorial runs on Python 3 without modification.
 
 Have fun!

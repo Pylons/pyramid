@@ -33,11 +33,6 @@ Prepare new release branch
 
 - Run tests on Windows if feasible.
 
-- Make sure all scaffold tests pass (CPython 2.7, 3.4, 3.5, 3.6, and 3.7, and
-  PyPy on UNIX; this doesn't work on Windows):
-
-  $ tox -e{py27,py34,py35,py36,py37,pypy}-scaffolds
-
 - For each ``pyramid-cookiecutter-*``, make a new branch off "master" with the
   same name to align with the new Pyramid release branch name.
 
