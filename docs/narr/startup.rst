@@ -18,7 +18,7 @@ on your keyboard after typing ``pserve development.ini`` and the time the lines
 ``Serving on http://localhost:6543`` are output to your console.
 
 .. index::
-   single: startup
+   single: startup process
    pair: settings; .ini
 
 .. _the_startup_process:

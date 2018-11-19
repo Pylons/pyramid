@@ -297,7 +297,7 @@ path to the module on which we want to run tests and coverage.
    single: running an application
    single: pserve
    single: reload
-   single: startup
+   single: starting
 
 .. _running_the_project_application:
 
