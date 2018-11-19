@@ -115,9 +115,8 @@ Here's a high-level time-ordered overview of what happens when you press
    for the meanings of these keys.
 
 #. The ``main`` function first constructs a
-   :class:`~pyramid.config.Configurator` instance, passing the ``settings``
-   dictionary captured via the ``**settings`` kwarg as its ``settings``
-   argument.
+   :class:`~pyramid.config.Configurator` instance.
+   It holds the application's settings and is able to :term:`commit` any :term:`configuration declaration`\s the settings contain because the dictionary captured via the ``**settings`` kwarg is passed to the :class:`~pyramid.config.Configurator` in its``settings`` argument.
 
    .. _startup_settings:
 
