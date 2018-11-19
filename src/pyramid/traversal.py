@@ -62,7 +62,7 @@ def find_resource(resource, path):
     (absolute) or ``to%20the/La%20Pe%C3%B1a`` (relative).  The
     :func:`pyramid.traversal.resource_path` function generates strings
     which follow these rules (albeit only absolute ones). The text may not
-    have any nonascii characters in it.
+    have any non-ASCII characters in it.
 
     Rules for passing a *tuple* as the ``path`` argument: if the first
     element in the path tuple is the empty string (for example ``('',
@@ -190,8 +190,10 @@ def traverse(resource, path):
       example: if the path passed is ``/foo/bar``, and a resource
       object is found at ``/foo`` (but not at ``/foo/bar``), the 'view
       name' will be ``'bar'``.  If the ``resource`` was found via
-      urldispatch, the view_name will be the name the route found was
-      registered with.
+      url dispatch, the ``view_name`` will be the empty string unless
+      the ``traverse`` predicate was specified or the ``*traverse`` route
+      pattern was used, at which point normal traversal rules dictate the
+      result.
 
     - ``subpath``: For a ``resource`` found via :term:`traversal`, this
       is a sequence of path segments found in the ``path`` that follow
@@ -421,9 +423,9 @@ def traversal_path(path):
     """ Variant of :func:`pyramid.traversal.traversal_path_info` suitable for
     decoding paths that are URL-encoded.
 
-    If this function is passed a string, it *must* directly encodeable to
+    If this function is passed a string, it *must* be directly encodeable to
     ASCII.  For example, '/foo' will work but '/<unprintable unicode>' (a
-    string object with characters that cannot be encoded to ascii) will
+    string object with characters that cannot be encoded to ASCII) will
     not. A :exc:`UnicodeEncodeError` will be raised if the string cannot be
     encoded directly to ASCII.
     """

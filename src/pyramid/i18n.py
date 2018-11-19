@@ -45,7 +45,7 @@ class Localizer(object):
         ``translate`` method accepts three arguments: ``tstring``
         (required), ``domain`` (optional) and ``mapping`` (optional).
         When called, it will translate the ``tstring`` translation
-        string the current locale.  If the current locale could not be
+        string using the current locale.  If the current locale could not be
         determined, the result of interpolation of the default value is
         returned.  The optional ``domain`` argument can be used to specify
         or override the domain of the ``tstring`` (useful when ``tstring``
