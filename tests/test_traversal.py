@@ -677,7 +677,7 @@ class FindResourceTests(unittest.TestCase):
 
     def test_absolute_unicode_found(self):
         # test for bug wiggy found in wild, traceback stack:
-        # root = u'/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF'
+        # root = '/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF'
         # wiggy's code: section=find_resource(page, root)
         # find_resource L76: D = traverse(resource, path)
         # traverse L291: return traverser(request)
@@ -1214,18 +1214,18 @@ class Test__join_path_tuple(unittest.TestCase):
 
     def test_segments_with_unsafes(self):
         safe_segments = tuple(
-            u"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-            u"-._~!$&'()*+,;=:@"
+            "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+            "-._~!$&'()*+,;=:@"
         )
         result = self._callFUT(safe_segments)
-        self.assertEqual(result, u'/'.join(safe_segments))
+        self.assertEqual(result, '/'.join(safe_segments))
         unsafe_segments = tuple(
             chr(i) for i in range(0x20, 0x80) if not chr(i) in safe_segments
-        ) + (u'あ',)
+        ) + ('あ',)
         result = self._callFUT(unsafe_segments)
         self.assertEqual(
             result,
-            u'/'.join(
+            '/'.join(
                 ''.join(
                     '%%%02X' % (ord(c) if isinstance(c, str) else c)
                     for c in unsafe_segment.encode('utf-8')

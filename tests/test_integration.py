@@ -726,8 +726,8 @@ class UnicodeInURLTest(unittest.TestCase):
         res = testapp.get(request_path, status=404)
 
         # Pyramid default 404 handler outputs:
-        # u'404 Not Found\n\nThe resource could not be found.\n\n\n'
-        # u'/avalia\xe7\xe3o_participante\n\n'
+        # '404 Not Found\n\nThe resource could not be found.\n\n\n'
+        # '/avalia\xe7\xe3o_participante\n\n'
         self.assertTrue(request_path_unicode in res.text)
 
     def test_unicode_in_url_200(self):
