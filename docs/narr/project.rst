@@ -139,8 +139,8 @@ or install your application for deployment or development.
 
 An ``.ini`` file named ``development.ini`` will be created in the project
 directory.  You will use this ``.ini`` file to configure a server, to run your
-application, and to debug your application.  It contains configuration that
-enables an interactive debugger and settings optimized for development.
+application, and to debug your application.
+It contains configuration that enables an interactive debugger and :term:`settings` optimized for development.
 
 Another ``.ini`` file named ``production.ini`` will also be created in the
 project directory.  It contains configuration that disables any interactive
