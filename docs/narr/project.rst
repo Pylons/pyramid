@@ -661,7 +661,7 @@ The sections after ``# logging configuration`` represent Python's standard
 library :mod:`logging` module configuration for your application.
 The default configuration
 sends application logging output to the standard error output of your terminal.
-For more information about logging configuration, see :ref:`logging_chapter`.
+For more information see :ref:`logging_chapter`.
 
 See the :term:`PasteDeploy` documentation for more information about other
 types of things you can put into this ``.ini`` file, such as other
