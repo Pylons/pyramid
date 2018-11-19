@@ -658,10 +658,8 @@ only (``127.0.0.1``).
 .. _myproject_ini_logging:
 
 The sections after ``# logging configuration`` represent Python's standard
-library :mod:`logging` module configuration for your application.  These
-sections are passed to the `logging module's config file configuration engine
-<https://docs.python.org/2/howto/logging.html#configuring-logging>`_ when the
-``pserve`` or ``pshell`` commands are executed.  The default configuration
+library :mod:`logging` module configuration for your application.
+The default configuration
 sends application logging output to the standard error output of your terminal.
 For more information about logging configuration, see :ref:`logging_chapter`.
 
