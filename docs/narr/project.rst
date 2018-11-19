@@ -856,7 +856,7 @@ also informs Python that the directory which contains it is a *package*.
    WSGI application.  This function is meant to be called by the
    :term:`PasteDeploy` framework as a result of running ``pserve``.
 
-   Within this function, application configuration is performed.
+   The ``main`` function configures the application.
 
    Line 7 opens a context manager with an instance of a :term:`Configurator`.
 
