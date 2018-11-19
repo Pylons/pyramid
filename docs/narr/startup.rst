@@ -18,8 +18,10 @@ on your keyboard after typing ``pserve development.ini`` and the time the lines
 ``Serving on http://localhost:6543`` are output to your console.
 
 .. index::
-   single: startup process
+   single: startup
    pair: settings; .ini
+
+.. _the_startup_process:
 
 The Startup Process
 -------------------
@@ -81,6 +83,8 @@ Here's a high-level time-ordered overview of what happens when you press
       :language: python
       :linenos:
 
+   .. _startup_constructor_arguments:
+
    Note that the constructor function accepts a ``global_config`` argument,
    which is a dictionary of key/value pairs mentioned in the ``[DEFAULT]``
    section of an ``.ini`` file (if :ref:`[DEFAULT]
@@ -110,6 +114,8 @@ Here's a high-level time-ordered overview of what happens when you press
    :class:`~pyramid.config.Configurator` instance, passing the ``settings``
    dictionary captured via the ``**settings`` kwarg as its ``settings``
    argument.
+
+   .. _startup_settings:
 
    The ``settings`` dictionary contains all the options in the ``[app:main]``
    section of our .ini file except the ``use`` option (which is internal to
