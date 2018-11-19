@@ -611,8 +611,6 @@ The generated ``development.ini`` file looks like so:
 This file contains several sections including ``[app:main]``,
 ``[server:main]``, and several other sections related to logging configuration.
 
-.. _app_main:
-
 The ``[app:main]`` section represents configuration for your :app:`Pyramid`
 application.  The ``use`` setting is the only setting required to be present in
 the ``[app:main]`` section.  Its default value, ``egg:myproject``, indicates
@@ -836,11 +834,6 @@ Pyramid developers can get up to speed quickly on your code when you need help.
 
 .. index::
    single: __init__.py
-   single: ini file processing
-   pair: conflict resolution; ini file
-   pair: add-on; configuration
-   pair: logging; configuration
-   pair: PasteDeploy; configuration
 
 .. _init_py:
 
@@ -863,16 +856,12 @@ also informs Python that the directory which contains it is a *package*.
    WSGI application.  This function is meant to be called by the
    :term:`PasteDeploy` framework as a result of running ``pserve``.
 
-   Before ``main`` is called :term:`PasteDeploy` :ref:`configures logging <myproject_ini_logging>`.
-   Within ``main`` further application configuration is performed.
+   Within this function, application configuration is performed.
 
    Line 7 opens a context manager with an instance of a :term:`Configurator`.
-   This applies lines in the ``.ini`` file to ``config``, the configuration returned by :term:`Configurator`.
-   Only those lines in :ref:`[app:main] <app_main>` which are understood by :app:`Pyramid` are applied, such as ``pyramid.includes = pyramid_debugtoolbar``.
 
-   Line 8 adds support for Jinja2 templating bindings, allowing us to specify renderers with the ``.jinja2`` extension.
-   The expectation is that the add-on applies what is relevant in the ``.ini`` file at this point.
-   Consult your add-on's documentation.
+   Line 8 adds support for Jinja2 templating bindings, allowing us to
+   specify renderers with the ``.jinja2`` extension.
 
    Line 9 includes the ``routes.py`` module.
 
