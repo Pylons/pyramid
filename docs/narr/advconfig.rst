@@ -169,8 +169,8 @@ Using ``config.commit()``
 You can manually commit a configuration by using the
 :meth:`~pyramid.config.Configurator.commit` method between configuration calls.
 For example, we prevent conflicts from occurring in the application we examined
-previously as the result of adding a ``commit``.  Here's the application that
-generates conflicts:
+previously by adding a ``commit``.
+Here's the application that generates conflicts:
 
 .. code-block:: python
     :linenos:
