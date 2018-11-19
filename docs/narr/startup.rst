@@ -114,9 +114,9 @@ Here's a high-level time-ordered overview of what happens when you press
    pyramid.includes = pyramid_debugtoolbar}``.  See :ref:`environment_chapter`
    for the meanings of these keys.
 
-#. The ``main`` function first constructs a
-   :class:`~pyramid.config.Configurator` instance.
-   It holds the application's settings and is able to :term:`commit` any :term:`configuration declaration`\s the settings contain because the dictionary captured via the ``**settings`` kwarg is passed to the :class:`~pyramid.config.Configurator` in its``settings`` argument.
+#. The ``main`` function begins by making a :term:`configurator`.
+   The dictionary captured via the ``**settings`` kwarg is passed to the :class:`~pyramid.config.Configurator` constructor in its ``settings`` argument.
+   The new configurator holds the application's :term:`settings` and is able to :term:`commit` any :term:`configuration declaration`\s the settings contain.
 
    .. _startup_settings:
 
