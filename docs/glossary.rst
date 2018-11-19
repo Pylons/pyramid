@@ -165,7 +165,7 @@ Glossary
      An object representing a node in the :term:`resource tree` of an
      application.  If :term:`traversal` is used, a resource is an element in
      the resource tree traversed by the system.  When traversal is used, a
-     resource becomes the :term:`context` of a :term:`view`.  If :term:`url
+     resource becomes the :term:`context` of a :term:`view`.  If :term:`URL
      dispatch` is used, a single resource is generated for each request and
      is used as the context resource of a view.
 
@@ -405,13 +405,13 @@ Glossary
      the Routes syntax (which was inspired by Ruby On Rails pattern syntax).
 
    route
-     A single pattern matched by the :term:`url dispatch` subsystem,
+     A single pattern matched by the :term:`URL dispatch` subsystem,
      which generally resolves to a :term:`root factory` (and then
      ultimately a :term:`view`).
 
      .. seealso::
 
-        See also :term:`url dispatch`.
+        See also :term:`URL dispatch`.
 
    route configuration
      Route configuration is the act of associating request parameters with a
@@ -912,7 +912,7 @@ Glossary
      :meth:`pyramid.config.Configurator.add_route` and
      :meth:`pyramid.config.Configurator.add_view` to make it more convenient
      to register a collection of views as a single class when using
-     :term:`url dispatch`.  View handlers ship as part of the
+     :term:`URL dispatch`.  View handlers ship as part of the
      :term:`pyramid_handlers` add-on package.
 
    Deployment settings
