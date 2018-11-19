@@ -83,6 +83,10 @@ Here's a high-level time-ordered overview of what happens when you press
       :language: python
       :linenos:
 
+   .. index::
+      single: ini file
+      pair: PasteDeploy; configuration
+
    .. _startup_constructor_arguments:
 
    Note that the constructor function accepts a ``global_config`` argument,
