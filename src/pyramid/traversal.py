@@ -171,17 +171,17 @@ def traverse(resource, path):
     A definition of each value in the returned dictionary:
 
     - ``context``: The :term:`context` (a :term:`resource` object) found
-      via traversal or url dispatch.  If the ``path`` passed in is the
+      via traversal or URL dispatch.  If the ``path`` passed in is the
       empty string, the value of the ``resource`` argument passed to this
       function is returned.
 
     - ``root``: The resource object at which :term:`traversal` begins.
-      If the ``resource`` passed in was found via url dispatch or if the
+      If the ``resource`` passed in was found via URL dispatch or if the
       ``path`` passed in was relative (non-absolute), the value of the
       ``resource`` argument passed to this function is returned.
 
     - ``view_name``: The :term:`view name` found during
-      :term:`traversal` or :term:`url dispatch`; if the ``resource`` was
+      :term:`traversal` or :term:`URL dispatch`; if the ``resource`` was
       found via traversal, this is usually a representation of the
       path segment which directly follows the path to the ``context``
       in the ``path``.  The ``view_name`` will be a  string.  The
@@ -190,7 +190,7 @@ def traverse(resource, path):
       example: if the path passed is ``/foo/bar``, and a resource
       object is found at ``/foo`` (but not at ``/foo/bar``), the 'view
       name' will be ``'bar'``.  If the ``resource`` was found via
-      url dispatch, the ``view_name`` will be the empty string unless
+      URL dispatch, the ``view_name`` will be the empty string unless
       the ``traverse`` predicate was specified or the ``*traverse`` route
       pattern was used, at which point normal traversal rules dictate the
       result.
@@ -203,7 +203,7 @@ def traverse(resource, path):
       passed is ``/foo/bar/baz/buz``, and a resource object is found at
       ``/foo`` (but not ``/foo/bar``), the 'view name' will be
       ``'bar'`` and the :term:`subpath` will be ``['baz', 'buz']``.
-      For a ``resource`` found via url dispatch, the subpath will be a
+      For a ``resource`` found via URL dispatch, the subpath will be a
       sequence of values discerned from ``*subpath`` in the route
       pattern matched or the empty sequence.
 
@@ -213,7 +213,7 @@ def traverse(resource, path):
       were traversed to find the ``context`` object (e.g. if the
       ``path`` provided is the empty string), the ``traversed`` value
       will be the empty sequence.  If the ``resource`` is a resource found
-      via :term:`url dispatch`, traversed will be None.
+      via :term:`URL dispatch`, traversed will be None.
 
     - ``virtual_root``: A resource object representing the 'virtual' root
       of the resource tree being traversed during :term:`traversal`.
@@ -232,7 +232,7 @@ def traverse(resource, path):
       items is a string.  If no path segments were traversed
       to find the ``virtual_root`` resource (e.g. if virtual hosting is
       not in effect), the ``traversed`` value will be the empty list.
-      If url dispatch was used to find the ``resource``, this will be
+      If URL dispatch was used to find the ``resource``, this will be
       ``None``.
 
     If the path cannot be resolved, a :exc:`KeyError` will be raised.

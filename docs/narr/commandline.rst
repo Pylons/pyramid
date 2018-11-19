@@ -1006,7 +1006,7 @@ top-level directory, your ``setup.py`` file will look something like this:
     requires = ['pyramid', 'pyramid_debugtoolbar']
 
     tests_require = [
-        'WebTest >= 1.3.1',
+        'WebTest',
         'pytest',
         'pytest-cov',
     ]
@@ -1073,7 +1073,7 @@ The result will be something like:
     requires = ['pyramid', 'pyramid_debugtoolbar']
 
     tests_require = [
-        'WebTest >= 1.3.1',
+        'WebTest',
         'pytest',
         'pytest-cov',
     ]
