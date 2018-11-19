@@ -124,6 +124,7 @@ Here's a high-level time-ordered overview of what happens when you press
    section of our .ini file except the ``use`` option (which is internal to
    PasteDeploy) such as ``pyramid.reload_templates``,
    ``pyramid.debug_authorization``, etc.
+   It is :ref:`available for use <deployment_settings>` in your code.
 
 #. The ``main`` function then calls various methods on the instance of the
    class :class:`~pyramid.config.Configurator` created in the previous step.
