@@ -869,6 +869,8 @@ also informs Python that the directory which contains it is a *package*.
    Line 11 returns a :term:`WSGI` application to the caller of the function
    (Pyramid's pserve).
 
+.. seealso::
+   
    See :ref:`the_startup_process` for more about the application's :ref:`settings <startup_settings>` and ``main``\'s :ref:`arguments <startup_constructor_arguments>` and statements.
 
 
