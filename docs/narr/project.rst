@@ -872,7 +872,7 @@ also informs Python that the directory which contains it is a *package*.
 
    Line 8 adds support for Jinja2 templating bindings.
    Settings are applied to the configuration allowing us to specify renderers with the ``.jinja2`` extension.
-   The source of these settings are add-on dependent.
+   These settings are add-on dependent and may come from the ``.ini`` file or from elsewhere.
 
    Line 9 includes the ``routes.py`` module.
 
