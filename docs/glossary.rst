@@ -1209,5 +1209,6 @@ Glossary
       A route prefix can be set via :meth:`pyramid.config.Configurator.include` or :meth:`pyramid.config.Configurator.route_prefix_context`.
 
    commit
-      An operation applied to a :term:`configurator` which checks for conflicts in :term:`configuration declaration`\s, and if none are found applies all pending :term:`action`\s.
+      An operation applied to a :term:`configurator`.
+      A commit checks for conflicts in :term:`configuration declaration`\s, and if none are found applies all pending :term:`action`\s.
       It is possible, although not necessarily recommended, to invoke :term:`commit`\s using :meth:`pyramid.config.Configurator.commit` to :ref:`manually resolve <manually_resolving_conflicts>` configuration conflicts.
