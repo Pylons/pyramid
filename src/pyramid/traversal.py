@@ -444,11 +444,11 @@ def traversal_path_info(path):
     already-URL-decoded ``str`` type as if it had come to us from an upstream
     WSGI server as the ``PATH_INFO`` environ variable.
 
-    The ``path`` is first decoded to from its WSGI representation to text.
-    Per the PEP 3333 spec, ``path`` is first encoded to bytes using the
+    The ``path`` is first decoded from its WSGI representation to text.
+    Per the :pep:`3333` spec, ``path`` is first encoded to bytes using the
     Latin-1 encoding; the resulting set of bytes is subsequently decoded to
     text using the UTF-8 encoding; a :exc:`pyramid.exc.URLDecodeError` is
-    raised if a the URL cannot be decoded.
+    raised if the URL cannot be decoded.
 
     The ``path`` is split on slashes, creating a list of segments.  If a
     segment name is empty or if it is ``.``, it is ignored.  If a segment
@@ -544,7 +544,7 @@ def quote_path_segment(segment, safe=PATH_SEGMENT_SAFE):
     the string ``__name__`` attribute of a resource) as a string.  If the
     ``segment`` passed in is a bytes object, it is decoded as a UTF-8 string.
     The result is then URL-quoted using Python's ``urllib.quote``.
-    If the segment passed in is not bytes or a string, an error will be
+    If the segment passed in is not bytes nor a string, an error will be
     raised. The return value of ``quote_path_segment`` is always a string.
 
     You may pass a string of characters that need not be encoded as
