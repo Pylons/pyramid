@@ -168,7 +168,7 @@ Using ``config.commit()``
 
 You can manually commit a configuration by using the
 :meth:`~pyramid.config.Configurator.commit` method between configuration calls.
-After a commit more :term:`configuration declaration`\s may be added to a :term:`configurator`.
+After a commit, more :term:`configuration declaration`\s may be added to a :term:`configurator`.
 New declarations will not conflict with committed declarations, they will override them.
 
 For example, we prevent conflicts from occurring in the application we examined
