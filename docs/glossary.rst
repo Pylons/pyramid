@@ -232,7 +232,7 @@ Glossary
      object *location-aware*.
 
    permission
-     A string or Unicode object that represents an action being taken against
+     A string that represents an action being taken against
      a :term:`context` resource.  A permission is associated with a view name
      and a resource type by the developer.  Resources are decorated with
      security declarations (e.g. an :term:`ACL`), which reference these
@@ -289,7 +289,7 @@ Glossary
      :term:`authorization policy`.
 
    principal
-     A *principal* is a string or Unicode object representing an entity,
+     A *principal* is a string representing an entity,
      typically a user or group. Principals are provided by an
      :term:`authentication policy`. For example, if a user has the
      :term:`userid` `bob`, and is a member of two groups named `group foo` and
@@ -298,7 +298,7 @@ Glossary
      foo` and `group bar`.
 
    userid
-     A *userid* is a string or Unicode object used to identify and authenticate
+     A *userid* is a string used to identify and authenticate
      a real-world user or client. A userid is supplied to an
      :term:`authentication policy` in order to discover the user's
      :term:`principals <principal>`. In the authentication policies which
@@ -523,8 +523,8 @@ Glossary
      from the :term:`physical root`.  For example, the physical path of the
      ``abc`` subobject of the physical root object is ``/abc``.  Physical paths
      can also be specified as tuples where the first element is the empty
-     string (representing the root), and every other element is a Unicode
-     object, e.g. ``('', 'abc')``.  Physical paths are also sometimes called
+     string (representing the root), and every other element is a string,
+     e.g. ``('', 'abc')``.  Physical paths are also sometimes called
      "traversal paths".
 
    lineage
@@ -755,7 +755,7 @@ Glossary
 
    Translation String
      An instance of :class:`pyramid.i18n.TranslationString`, which
-     is a class that behaves like a Unicode string, but has several
+     is a class that behaves like a string, but has several
      extra attributes such as ``domain``, ``msgid``, and ``mapping``
      for use during translation.  Translation strings are usually
      created by hand within software, but are sometimes created on the
@@ -779,7 +779,7 @@ Glossary
 
    Translator
      A callable which receives a :term:`translation string` and returns a
-     translated Unicode object for the purposes of internationalization.  A
+     translated string for the purposes of internationalization.  A
      :term:`localizer` supplies a translator to a :app:`Pyramid` application
      accessible via its :class:`~pyramid.i18n.Localizer.translate` method.
 

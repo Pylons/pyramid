@@ -145,8 +145,7 @@ used in the ``renderer`` attribute of view configurations.
 The ``string`` renderer renders a view callable result to a string.  If a view
 callable returns a non-Response object, and the ``string`` renderer is
 associated in that view's configuration, the result will be to run the object
-through the Python ``str`` function to generate a string.  Note that if a
-Unicode object is returned by the view callable, it is not ``str()``-ified.
+through the Python ``str`` function to generate a string.
 
 Here's an example of a view that returns a dictionary.  If the ``string``
 renderer is specified in the configuration for this view, the view will render
@@ -496,7 +495,7 @@ interface. A typical class that follows this setup is as follows:
         def __call__(self, value, system):
             """ Call the renderer implementation with the value
             and the system value passed in as arguments and return
-            the result (a string or unicode object).  The value is
+            the result (a bytes or string object).  The value is
             the return value of a view.  The system value is a
             dictionary containing available system values
             (e.g., view, context, and request). """

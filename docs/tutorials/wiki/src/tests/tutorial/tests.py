@@ -8,12 +8,12 @@ class PageModelTests(unittest.TestCase):
         from .models import Page
         return Page
 
-    def _makeOne(self, data=u'some data'):
+    def _makeOne(self, data='some data'):
         return self._getTargetClass()(data=data)
 
     def test_constructor(self):
         instance = self._makeOne()
-        self.assertEqual(instance.data, u'some data')
+        self.assertEqual(instance.data, 'some data')
 
 class WikiModelTests(unittest.TestCase):
 
