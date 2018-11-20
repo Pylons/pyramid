@@ -242,7 +242,7 @@ uses this algorithm to find a :term:`context` resource and a :term:`view name`.
     Conversion from a URL-decoded string into Unicode is attempted using the
     UTF-8 encoding.  If any URL-unquoted path segment in ``PATH_INFO`` is not
     decodeable using the UTF-8 decoding, a :exc:`TypeError` is raised.  A
-    segment will be fully URL-unquoted and UTF8-decoded before it is passed in
+    segment will be fully URL-unquoted and UTF-8-decoded before it is passed in
     to the ``__getitem__`` of any resource during traversal.
 
     Thus a request with a ``PATH_INFO`` variable of ``/a/b/c`` maps to the
