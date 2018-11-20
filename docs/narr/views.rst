@@ -469,7 +469,7 @@ For implicit decoding to work reliably, you should ensure that every form you
 render that posts to a :app:`Pyramid` view explicitly defines a charset
 encoding of UTF-8. This can be done via a response that has a
 ``;charset=UTF-8`` in its ``Content-Type`` header; or, as in the form above,
-with a ``accept-charset`` tag that implies that informs the browser that the
+with an ``accept-charset`` attribute, informing the browser that the
 server expects the form content to be encoded using UTF-8.  This must be done
 explicitly because all known browser clients assume that they should encode
 form data in the same character set implied by the ``Content-Type`` value of

@@ -165,8 +165,8 @@ The above pattern will match these URLs, generating the following matchdicts:
 
 .. code-block:: text
 
-    foo/1/2        -> {'baz':'1', 'bar':'2'}
-    foo/abc/def    -> {'baz':'abc', 'bar':'def'}
+    foo/1/2        -> {'baz': '1', 'bar': '2'}
+    foo/abc/def    -> {'baz': 'abc', 'bar': 'def'}
 
 It will not match the following patterns however:
 
@@ -184,7 +184,7 @@ instance, if this route pattern was used:
     foo/{name}.html
 
 The literal path ``/foo/biz.html`` will match the above route pattern, and the
-match result will be ``{'name':'biz'}``.  However, the literal path
+match result will be ``{'name': 'biz'}``.  However, the literal path
 ``/foo/biz`` will not match, because it does not contain a literal ``.html`` at
 the end of the segment represented by ``{name}.html`` (it only contains
 ``biz``, not ``biz.html``).
@@ -303,10 +303,10 @@ The above pattern will match these URLs, generating the following matchdicts:
 .. code-block:: text
 
     foo/1/2/           ->
-             {'baz':'1', 'bar':'2', 'fizzle':()}
+             {'baz': '1', 'bar': '2', 'fizzle': ()}
 
     foo/abc/def/a/b/c  ->
-             {'baz':'abc', 'bar':'def', 'fizzle':('a', 'b', 'c')}
+             {'baz': 'abc', 'bar': 'def', 'fizzle': ('a', 'b', 'c')}
 
 Note that when a ``*stararg`` remainder match is matched, the value put into
 the matchdict is turned into a tuple of path segments representing the
@@ -327,7 +327,7 @@ Will generate the following matchdict:
 
 .. code-block:: text
 
-    {'fizzle':('La Pe\xf1a', 'a', 'b', 'c')}
+    {'fizzle': ('La Pe\xf1a', 'a', 'b', 'c')}
 
 By default, the ``*stararg`` will parse the remainder sections into a tuple
 split by segment. Changing the regular expression used to match a marker can
@@ -341,8 +341,8 @@ The above pattern will match these URLs, generating the following matchdicts:
 
 .. code-block:: text
 
-    foo/1/2/           -> {'baz':'1', 'bar':'2', 'fizzle':''}
-    foo/abc/def/a/b/c  -> {'baz':'abc', 'bar':'def', 'fizzle': 'a/b/c'}
+    foo/1/2/           -> {'baz': '1', 'bar': '2', 'fizzle': ''}
+    foo/abc/def/a/b/c  -> {'baz': 'abc', 'bar': 'def', 'fizzle': 'a/b/c'}
 
 This occurs because the default regular expression for a marker is ``[^/]+``
 which will match everything up to the first ``/``, while ``{fizzle:.*}`` will
@@ -513,7 +513,7 @@ When the ``/site/{id}`` route pattern matches during a request, the
 When this route matches, a ``matchdict`` will be generated and attached to the
 request as ``request.matchdict``.  If the specific URL matched is ``/site/1``,
 the ``matchdict`` will be a dictionary with a single key, ``id``; the value
-will be the string ``'1'``, ex.: ``{'id':'1'}``.
+will be the string ``'1'``, ex.: ``{'id': '1'}``.
 
 The ``mypackage.views`` module referred to above might look like so:
 
@@ -581,17 +581,17 @@ forms:
 - When a URL matches the pattern ``/ideas/{idea}``, the view callable
   available at the dotted Python pathname ``mypackage.views.idea_view`` will
   be called.  For the specific URL ``/ideas/1``, the ``matchdict`` generated
-  and attached to the :term:`request` will consist of ``{'idea':'1'}``.
+  and attached to the :term:`request` will consist of ``{'idea': '1'}``.
 
 - When a URL matches the pattern ``/users/{user}``, the view callable
   available at the dotted Python pathname ``mypackage.views.user_view`` will be
   called.  For the specific URL ``/users/1``, the ``matchdict`` generated and
-  attached to the :term:`request` will consist of ``{'user':'1'}``.
+  attached to the :term:`request` will consist of ``{'user': '1'}``.
 
 - When a URL matches the pattern ``/tags/{tag}``, the view callable available
   at the dotted Python pathname ``mypackage.views.tag_view`` will be called.
   For the specific URL ``/tags/1``, the ``matchdict`` generated and attached to
-  the :term:`request` will consist of ``{'tag':'1'}``.
+  the :term:`request` will consist of ``{'tag': '1'}``.
 
 In this example we've again associated each of our routes with a :term:`view
 callable` directly.  In all cases, the request, which will have a ``matchdict``
