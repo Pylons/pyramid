@@ -165,8 +165,8 @@ The above pattern will match these URLs, generating the following matchdicts:
 
 .. code-block:: text
 
-    foo/1/2        -> {'baz':'1', 'bar':'2'}
-    foo/abc/def    -> {'baz':'abc', 'bar':'def'}
+    foo/1/2        -> {'baz': '1', 'bar': '2'}
+    foo/abc/def    -> {'baz': 'abc', 'bar': 'def'}
 
 It will not match the following patterns however:
 
@@ -303,10 +303,10 @@ The above pattern will match these URLs, generating the following matchdicts:
 .. code-block:: text
 
     foo/1/2/           ->
-             {'baz':'1', 'bar':'2', 'fizzle':()}
+             {'baz': '1', 'bar': '2', 'fizzle': ()}
 
     foo/abc/def/a/b/c  ->
-             {'baz':'abc', 'bar':'def', 'fizzle':('a', 'b', 'c')}
+             {'baz': 'abc', 'bar': 'def', 'fizzle': ('a', 'b', 'c')}
 
 Note that when a ``*stararg`` remainder match is matched, the value put into
 the matchdict is turned into a tuple of path segments representing the
@@ -327,7 +327,7 @@ Will generate the following matchdict:
 
 .. code-block:: text
 
-    {'fizzle':('La Pe\xf1a', 'a', 'b', 'c')}
+    {'fizzle': ('La Pe\xf1a', 'a', 'b', 'c')}
 
 By default, the ``*stararg`` will parse the remainder sections into a tuple
 split by segment. Changing the regular expression used to match a marker can
@@ -341,8 +341,8 @@ The above pattern will match these URLs, generating the following matchdicts:
 
 .. code-block:: text
 
-    foo/1/2/           -> {'baz':'1', 'bar':'2', 'fizzle':''}
-    foo/abc/def/a/b/c  -> {'baz':'abc', 'bar':'def', 'fizzle': 'a/b/c'}
+    foo/1/2/           -> {'baz': '1', 'bar': '2', 'fizzle': ''}
+    foo/abc/def/a/b/c  -> {'baz': 'abc', 'bar': 'def', 'fizzle': 'a/b/c'}
 
 This occurs because the default regular expression for a marker is ``[^/]+``
 which will match everything up to the first ``/``, while ``{fizzle:.*}`` will
