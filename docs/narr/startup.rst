@@ -21,6 +21,8 @@ on your keyboard after typing ``pserve development.ini`` and the time the lines
    single: startup process
    pair: settings; .ini
 
+.. _the_startup_process:
+
 The Startup Process
 -------------------
 
@@ -81,6 +83,12 @@ Here's a high-level time-ordered overview of what happens when you press
       :language: python
       :linenos:
 
+   .. index::
+      single: ini file
+      pair: PasteDeploy; configuration
+
+   .. _startup_constructor_arguments:
+
    Note that the constructor function accepts a ``global_config`` argument,
    which is a dictionary of key/value pairs mentioned in the ``[DEFAULT]``
    section of an ``.ini`` file (if :ref:`[DEFAULT]
@@ -106,15 +114,17 @@ Here's a high-level time-ordered overview of what happens when you press
    pyramid.includes = pyramid_debugtoolbar}``.  See :ref:`environment_chapter`
    for the meanings of these keys.
 
-#. The ``main`` function first constructs a
-   :class:`~pyramid.config.Configurator` instance, passing the ``settings``
-   dictionary captured via the ``**settings`` kwarg as its ``settings``
-   argument.
+#. The ``main`` function begins by making a :term:`configurator`.
+   The dictionary captured via the ``**settings`` kwarg is passed to the :class:`~pyramid.config.Configurator` constructor in its ``settings`` argument.
+   The new configurator holds the application's :term:`settings` and is able to :term:`commit` any :term:`configuration declaration`\s the settings contain.
+
+   .. _startup_settings:
 
    The ``settings`` dictionary contains all the options in the ``[app:main]``
    section of our .ini file except the ``use`` option (which is internal to
    PasteDeploy) such as ``pyramid.reload_templates``,
    ``pyramid.debug_authorization``, etc.
+   It is :ref:`available for use <deployment_settings>` in your code.
 
 #. The ``main`` function then calls various methods on the instance of the
    class :class:`~pyramid.config.Configurator` created in the previous step.
@@ -158,9 +168,6 @@ Here's a high-level time-ordered overview of what happens when you press
 Deployment Settings
 -------------------
 
-Note that an augmented version of the values passed as ``**settings`` to the
-:class:`~pyramid.config.Configurator` constructor will be available in
-:app:`Pyramid` :term:`view callable` code as ``request.registry.settings``. You
-can create objects you wish to access later from view code, and put them into
-the dictionary you pass to the configurator as ``settings``.  They will then be
-present in the ``request.registry.settings`` dictionary at application runtime.
+Note that an augmented version of the values passed as ``**settings`` to the :class:`~pyramid.config.Configurator` constructor is available in :app:`Pyramid` :term:`view callable` code as ``request.registry.settings``.
+You can create objects you wish to access later from view code, and put them into the dictionary you pass to the configurator as ``settings``.
+They will then be present in the ``request.registry.settings`` dictionary at application runtime.
