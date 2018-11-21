@@ -190,8 +190,9 @@ WSGI Application Creation
 
 After configuring views and ending configuration, the script creates a WSGI
 *application* via the :meth:`pyramid.config.Configurator.make_wsgi_app` method.
-A call to ``make_wsgi_app`` implies that all configuration is finished (meaning all method calls to the configurator, which sets up views and various other configuration :term:`settings`, have been performed).
-The ``make_wsgi_app``
+A call to ``make_wsgi_app`` implies that all configuration is finished
+(meaning all method calls to the configurator, which sets up views and various
+other configuration settings, have been performed).  The ``make_wsgi_app``
 method returns a :term:`WSGI` application object that can be used by any WSGI
 server to present an application to a requestor. :term:`WSGI` is a protocol
 that allows servers to talk to Python applications.  We don't discuss
