@@ -301,7 +301,7 @@ class WeakOrderedSet(object):
             return self._items[oid]()
 
 
-def strings_differ(string1, string2, compare_digest=compare_digest):
+def strings_differ(string1, string2):
     """Check whether two strings differ while avoiding timing attacks.
 
     This function returns True if the given strings differ and False
@@ -325,11 +325,7 @@ def strings_differ(string1, string2, compare_digest=compare_digest):
         left = string2
     right = string2
 
-    if compare_digest is not None:
-        invalid_bits += not compare_digest(left, right)
-    else:
-        for a, b in zip(left, right):
-            invalid_bits += a != b
+    invalid_bits += not compare_digest(left, right)
     return invalid_bits != 0
 
 
