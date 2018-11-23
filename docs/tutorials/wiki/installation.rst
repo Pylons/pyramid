@@ -392,9 +392,7 @@ Decisions the cookiecutter backend option ``zodb`` has made for you
 When creating a project and selecting the backend option of ``zodb``, the cookiecutter makes the following assumptions:
 
 - You are willing to use :term:`ZODB` for persistent storage.
-
 - You are willing to use :term:`traversal` to map URLs to code.
-
 - You want to use `pyramid_zodbconn <https://docs.pylonsproject.org/projects/pyramid-zodbconn/en/latest/>`_, `pyramid_tm <https://docs.pylonsproject.org/projects/pyramid-tm/en/latest/>`_, and the `transaction <https://zodb.readthedocs.io/en/latest/transactions.html>`_ packages to manage connections and transactions with :term:`ZODB`.
 
 .. note::
