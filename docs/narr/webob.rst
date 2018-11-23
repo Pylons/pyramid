@@ -382,7 +382,7 @@ A response object has three fundamental parts:
 ``response.app_iter``
     An iterable (such as a list or generator) that will produce the content of
     the response.  This is also accessible as ``response.body`` (bytes),
-    ``response.text`` (a string, informed by ``response.charset``), and
+    ``response.text`` (a Unicode string, informed by ``response.charset``), and
     ``response.body_file`` (a file-like object; writing to it appends to
     ``app_iter``).
 

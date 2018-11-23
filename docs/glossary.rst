@@ -523,7 +523,7 @@ Glossary
      from the :term:`physical root`.  For example, the physical path of the
      ``abc`` subobject of the physical root object is ``/abc``.  Physical paths
      can also be specified as tuples where the first element is the empty
-     string (representing the root), and every other element is a string,
+     string (representing the root), and every other element is a Unicode string,
      e.g. ``('', 'abc')``.  Physical paths are also sometimes called
      "traversal paths".
 

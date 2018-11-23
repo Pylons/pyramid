@@ -667,7 +667,7 @@ that implements the following interface:
             will be a resource object representing the virtual root (or the
             physical root if traversal was not performed), and
             ``virtual_root_path`` will be a sequence representing the
-            virtual root path (a sequence of strings) or None if
+            virtual root path (a sequence of strings) or ``None`` if
             traversal was not performed.
 
             Extra keys for special purpose functionality can be added as
