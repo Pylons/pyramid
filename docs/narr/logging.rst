@@ -39,7 +39,7 @@ format <ConfigParser>`. This is the same format used as the Python
 :ref:`logging module's Configuration file format <logging-config-fileformat>`.
 The application-related and logging-related sections in the configuration file
 can coexist peacefully, and the logging-related sections in the file are used
-from when you run ``pserve``.
+when you run ``pserve``.
 
 The ``pserve`` command calls the :func:`pyramid.paster.setup_logging` function,
 a thin wrapper around the :func:`logging.config.fileConfig` using the specified
