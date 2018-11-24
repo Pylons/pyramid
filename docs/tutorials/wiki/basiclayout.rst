@@ -256,15 +256,11 @@ Without repeating ourselves, we will point out the differences between this view
 Configuration in ``development.ini``
 ------------------------------------
 
-The ``development.ini`` (in the ``tutorial`` :term:`project` directory, as
-opposed to the ``tutorial`` :term:`package` directory) looks like this:
+The ``development.ini`` (in the ``tutorial`` :term:`project` directory, as opposed to the ``tutorial`` :term:`package` directory) looks like this:
 
 .. literalinclude:: src/basiclayout/development.ini
   :language: ini
 
-Note the existence of a ``[app:main]`` section which specifies our WSGI
-application.  Our ZODB database settings are specified as the
-``zodbconn.uri`` setting within this section.  This value, and the other
-values within this section, are passed as ``**settings`` to the ``main``
-function we defined in ``__init__.py`` when the server is started via
-``pserve``.
+Note the existence of a ``[app:main]`` section which specifies our WSGI application.
+Our ZODB database settings are specified as the ``zodbconn.uri`` setting within this section.
+When the server is started via ``pserve``, the values within this section are passed as ``**settings`` to the ``main`` function defined in ``__init__.py``.
