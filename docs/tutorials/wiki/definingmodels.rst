@@ -10,8 +10,13 @@ We will do this inside our ``models.py`` file.
 
 Because we are using :term:`ZODB` to represent our :term:`resource tree`, each of these resource constructors represents a :term:`domain model` object.
 We will call these constructors "model constructors".
-Both our Page and Wiki constructors will be class objects.
+Both our ``Page`` and ``Wiki`` constructors will be class objects.
 A single instance of the "Wiki" class will serve as a container for "Page" objects, which will be instances of the "Page" class.
+
+.. note::
+
+    We will introduce a lot of concepts throughout the remainder of this tutorial.
+    See also the chapter :ref:`resources_chapter` for a complete description of resources and the chapter :ref:`traversal_chapter` for the technical details of how traversal works in Pyramid.
 
 
 Delete the database
