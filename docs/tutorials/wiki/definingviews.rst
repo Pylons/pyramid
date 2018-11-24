@@ -21,6 +21,11 @@ A view callable is assumed to return a :term:`response` object.
 
 We will define several :term:`view callable` functions, then wire them into :app:`Pyramid` using some :term:`view configuration`.
 
+.. note::
+
+    This chapter will introduce more concepts, as did the previous.
+    See also the chapter :ref:`resources_chapter` for a complete description of resources and the chapter :ref:`traversal_chapter` for the technical details of how traversal works in Pyramid.
+
 
 Declaring Dependencies in Our ``setup.py`` File
 ===============================================
