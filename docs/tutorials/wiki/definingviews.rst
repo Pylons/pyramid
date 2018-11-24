@@ -187,49 +187,43 @@ Here is the code for the ``add_page`` view function and its decorator:
     :lineno-match:
     :language: python
 
-The ``add_page`` function is configured to respond when the context resource
-is a Wiki and the :term:`view name` is ``add_page``.  We provide it with a
-``@view_config`` decorator which names the string ``add_page`` as its
-:term:`view name` (via ``name=``), the class ``tutorial.models.Wiki`` as its
-context, and the renderer named ``templates/edit.pt``.  This means that when a
-Wiki resource is the context, and a :term:`view name` named ``add_page``
-exists as the result of traversal, this view will be used.  We inform
-:app:`Pyramid` this view will use the ``templates/edit.pt`` template file as a
-``renderer``.  We share the same template between add and edit views, thus
-``edit.pt`` instead of ``add.pt``.
+The ``add_page`` function is configured to respond when the context resource is a ``Wiki`` and the :term:`view name` is ``add_page``.
+We provide it with a ``@view_config`` decorator which names the string ``add_page`` as its :term:`view name` (via ``name=``), the class ``tutorial.models.Wiki`` as its context, and the renderer named ``templates/edit.pt``.
+This means that when a ``Wiki`` resource is the context, and a :term:`view name` named ``add_page`` exists as the result of traversal, then this view will be used.
+We inform :app:`Pyramid` this view will use the ``templates/edit.pt`` template file as a ``renderer``.
+We share the same template between add and edit views, thus ``edit.pt`` instead of ``add.pt``.
 
-The ``add_page`` function will be invoked when a user clicks on a WikiWord
-which isn't yet represented as a page in the system.  The ``check`` function
-within the ``view_page`` view generates URLs to this view.  It also acts as a
-handler for the form that is generated when we want to add a page resource.
-The ``context`` of the ``add_page`` view is always a Wiki resource (*not* a
-Page resource).
+The ``add_page`` function will be invoked when a user clicks on a ``WikiWord`` that is not yet represented as a page in the system.
+The ``check`` function within the ``view_page`` view generates URLs to this view.
+It also acts as a handler for the form that is generated when we want to add a page resource.
+The ``context`` of the ``add_page`` view is always a ``Wiki`` resource (*not* a ``Page`` resource).
 
-The request :term:`subpath` in :app:`Pyramid` is the sequence of names that
-are found *after* the :term:`view name` in the URL segments given in the
-``PATH_INFO`` of the WSGI request as the result of :term:`traversal`.  If our
-add view is invoked via, e.g., ``http://localhost:6543/add_page/SomeName``,
-the :term:`subpath` will be a tuple: ``('SomeName',)``.
+The request :term:`subpath` in :app:`Pyramid` is the sequence of names that are found *after* the :term:`view name` in the URL segments given in the ``PATH_INFO`` of the WSGI request as the result of :term:`traversal`.
+If our add view is invoked via, for example, ``http://localhost:6543/add_page/SomeName``, then the :term:`subpath` will be a tuple ``('SomeName',)``.
 
-The add view takes the zero\ :sup:`th` element of the subpath (the wiki page name),
-and aliases it to the name attribute in order to know the name of the page
-we're trying to add.
+The add view takes the zero\ :sup:`th` element of the subpath (the wiki page name), then aliases it to the name attribute to know the name of the page we are trying to add.
 
-If the view rendering is *not* a result of a form submission (if the
-expression ``'form.submitted' in request.params`` is ``False``), the view
-renders a template.  To do so, it generates a "save url" which the template
-uses as the form post URL during rendering.  We're lazy here, so we're trying
-to use the same template (``templates/edit.pt``) for the add view as well as
-the page edit view.  To do so, we create a dummy Page resource object in
-order to satisfy the edit form's desire to have *some* page object exposed as
-``page``, and we'll render the template to a response.
+If the view rendering is *not* a result of a form submission (if the expression ``'form.submitted' in request.params`` is ``False``), then the view renders a template.
+To do so, it generates a ``save_url`` which the template uses as the form post URL during rendering.
+We are lazy here, so we try to use the same template (``templates/edit.pt``) for both the add and edit views.
+To do so, we create a dummy ``Page`` resource object to satisfy the edit form's desire to have *some* page object exposed as ``page``.
+We then set the ``Page`` object's ``__name__`` and ``__parent__``.
+Then we will render the template to a response.
 
-If the view rendering *is* a result of a form submission (if the expression
-``'form.submitted' in request.params`` is ``True``), we grab the page body
-from the form data, create a Page object using the name in the subpath and
-the page body, and save it into "our context" (the Wiki) using the
-``__setitem__`` method of the context. We then redirect back to the
-``view_page`` view (the default view for a page) for the newly created page.
+If the view rendering *is* a result of a form submission (if the expression ``'form.submitted' in request.params`` is ``True``), then do the following:
+
+- Grab the page body from the form data as ``body``.
+- Create a ``Page`` object using the name in the subpath and the page body as ``page``.
+- Set the ``Page`` object's ``__name__`` and ``__parent__``.
+- Save it into "our context" (the ``Wiki``) using the ``__setitem__`` method of the context.
+- We then redirect back to the ``view_page`` view (the default view for a page) for the newly created page.
+
+.. seealso::
+
+    In the :ref:`previous chapter <wiki_defining_the_domain_model>`, we mentioned that all objects in a traversal graph must have a ``__name__`` and a ``__parent__`` attribute.
+    That provides location awareness for resources.
+    See also the section on :ref:`location-aware-resources` in the :ref:`resources_chapter` chapter for a complete discussion.
+
 
 The ``edit_page`` view function
 -------------------------------
