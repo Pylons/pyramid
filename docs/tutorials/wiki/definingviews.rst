@@ -143,48 +143,34 @@ Here is the code for the ``view_page`` view function and its decorator:
     :lineno-match:
     :language: python
 
-The ``view_page`` function is configured to respond as the default view
-of a Page resource.  We provide it with a ``@view_config`` decorator which
-names the class ``tutorial.models.Page`` as its context.  This means that
-when a Page resource is the context, and no :term:`view name` exists in the
-request, this view will be used.  We inform :app:`Pyramid` this view will use
-the ``templates/view.pt`` template file as a ``renderer``.
+The ``view_page`` function is configured to respond as the default view of a ``Page`` resource.
+We provide it with a ``@view_config`` decorator which names the class ``tutorial.models.Page`` as its context.
+This means that when a ``Page`` resource is the context, and no :term:`view name` exists in the request, this view will be used.
+We inform :app:`Pyramid` this view will use the ``templates/view.pt`` template file as a ``renderer``.
 
-The ``view_page`` function generates the :term:`reStructuredText` body of a
-page (stored as the ``data`` attribute of the context passed to the view; the
-context will be a ``Page`` resource) as HTML.  Then it substitutes an HTML
-anchor for each *WikiWord* reference in the rendered HTML using a compiled
-regular expression.
+The ``view_page`` function generates the :term:`reStructuredText` body of a page as HTML.
+The body is stored as the ``data`` attribute of the context passed to the view.
+The context will be a ``Page`` resource.
+Then it substitutes an HTML anchor for each *WikiWord* reference in the rendered HTML using a compiled regular expression.
 
-The curried function named ``check`` is used as the first argument to
-``wikiwords.sub``, indicating that it should be called to provide a value for
-each WikiWord match found in the content.  If the wiki (our page's
-``__parent__``) already contains a page with the matched WikiWord name, the
-``check`` function generates a view link to be used as the substitution value
-and returns it.  If the wiki does not already contain a page with the
-matched WikiWord name, the function generates an "add" link as the
-substitution value and returns it.
+The curried function named ``check`` is used as the first argument to ``wikiwords.sub``, indicating that it should be called to provide a value for each WikiWord match found in the content.
+If the wiki (our page's ``__parent__``) already contains a page with the matched WikiWord name, the ``check`` function generates a view link to be used as the substitution value and returns it.
+If the wiki does not already contain a page with the matched WikiWord name, the function generates an "add" link as the substitution value and returns it.
 
-As a result, the ``content`` variable is now a fully formed bit of HTML
-containing various view and add links for WikiWords based on the content of
-our current page resource.
+As a result, the ``content`` variable is now a fully formed bit of HTML containing various view and add links for WikiWords based on the content of our current page resource.
 
-We then generate an edit URL because it's easier to do here than in the
-template, and we wrap up a number of arguments in a dictionary and return
-it.
+We then generate an edit URL because it is easier to do here than in the template.
+Finally we wrap up a number of arguments in a dictionary and return it.
 
-The arguments we wrap into a dictionary include ``page``, ``content``, and
-``edit_url``.  As a result, the *template* associated with this view callable
-(via ``renderer=`` in its configuration) will be able to use these names to
-perform various rendering tasks.  The template associated with this view
-callable will be a template which lives in ``templates/view.pt``.
+The arguments we wrap into a dictionary include ``page``, ``content``, and ``edit_url``.
+As a result, the *template* associated with this view callable (via ``renderer=`` in its configuration) will be able to use these names to perform various rendering tasks.
+The template associated with this view callable will be a template which lives in ``templates/view.pt``.
 
-Note the contrast between this view callable and the ``view_wiki`` view
-callable.  In the ``view_wiki`` view callable, we unconditionally return a
-:term:`response` object.  In the ``view_page`` view callable, we return a
-*dictionary*.  It is *always* fine to return a :term:`response` object from a
-:app:`Pyramid` view.  Returning a dictionary is allowed only when there is a
-:term:`renderer` associated with the view callable in the view configuration.
+Note the contrast between this view callable and the ``view_wiki`` view callable.
+In the ``view_wiki`` view callable, we unconditionally return a :term:`response` object.
+In the ``view_page`` view callable, we return a *dictionary*.  It is *always* fine to return a :term:`response` object from a :app:`Pyramid` view.
+Returning a dictionary is allowed only when there is a :term:`renderer` associated with the view callable in the view configuration.
+
 
 The ``add_page`` view function
 ------------------------------
