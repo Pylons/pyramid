@@ -24,62 +24,132 @@ It should already contain the following:
     :linenos:
     :language: py
 
-#.  *Lines 1-3*.
-    Perform some dependency imports.
+Let's go over this piece-by-piece.
+First we need some imports to support later code.
 
-#.  *Lines 6-8*.
-    Define a :term:`root factory` for our Pyramid application.
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+    :end-before: root_factory
+    :lineno-match:
+    :language: py
 
-#.  *Line 11*.
-    ``__init__.py`` defines a function named ``main``.
+Define a :term:`root factory` for our Pyramid application.
+It establishes a connection to ZODB database.
+It returns an ``appmaker``, which we will describe in the next section :ref:`wiki-resources-and-models`.
 
-#.  *Line 14*.
-    Construct a :term:`Configurator` as a :term:`context manager` with the ``settings`` keyword parsed by :term:`PasteDeploy`.  See :term:`Deployment settings`.
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+    :pyobject: root_factory
+    :lineno-match:
+    :language: py
 
-#.  *Line 15*.
-    Use an explicit transaction manager for apps so that they do not implicitly create new transactions when touching the manager outside of the ``pyramid_tm`` lifecycle.
+``__init__.py`` defines a function named ``main``.
+Here is the entirety of the ``main`` function that we have defined in our ``__init__.py``:
 
-#.  *Line 16*.
-    Include support for ``pyramid_tm``, allowing Pyramid requests to join the active transaction as provided by the `transaction <https://pypi.org/project/transaction/>`_ package.
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+    :pyobject: main
+    :lineno-match:
+    :language: py
 
-#.  *Line 17*.
-    Include support for ``pyramid_retry`` to retry a request when transient exceptions occur.
+When you invoke the ``pserve development.ini`` command, the ``main`` function above is executed.
+It accepts some settings and returns a :term:`WSGI` application.
+See :ref:`startup_chapter` for more about ``pserve``.
 
-#.  *Line 18*.
-    Include support for ``pyramid_zodbconn``, providing integration between :term:`ZODB` and a Pyramid application.
+Next in ``main``, construct a :term:`Configurator` object using a context manager.
+See also :term:`Deployment settings`.
 
-#.  *Line 19*.
-    Set a root factory using our function named ``root_factory``.
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+    :lines: 14
+    :lineno-match:
+    :language: py
 
-#.  *Line 20*.
-    Include support for the :term:`Chameleon` template rendering bindings, allowing us to use the ``.pt`` templates.
+``settings`` is passed to the ``Configurator`` as a keyword argument with the dictionary values passed as the ``**settings`` argument.
+This will be a dictionary of settings parsed from the ``.ini`` file, which contains
+deployment-related values, such as ``pyramid.reload_templates``, ``zodbconn.uri``, and so on.
 
-#.  *Line 21*.
-    Include routes from the ``.routes`` module.
-    This registers a "static view" using the :meth:`pyramid.config.Configurator.add_static_view` method.
-    This view answers requests whose URL path starts with ``/static``.
-    This statement registers a view that will serve up static assets, such as CSS and image files.
-    In this case the URL will answer requests at ``http://localhost:6543/static/`` and below.
+Next use an explicit transaction manager for our application.
+This prevents new transactions from being implicitly created when touching the manager outside of the ``pyramid_tm`` lifecycle.
 
-    The first argument is the "name" ``static``, which indicates that the URL path prefix of the view will be ``/static``.
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+    :lines: 15
+    :lineno-match:
+    :language: py
 
-    The second argument of this method is the "path".
-    It is a relative :term:`asset specification`.
-    It finds the resources it should serve within the ``static`` directory inside the ``tutorial`` package.
-    Alternatively the cookiecutter could have used an *absolute* asset specification as the path (``tutorial:static``).
+Next include support for ``pyramid_tm``, allowing Pyramid requests to join the active transaction as provided by the `transaction <https://pypi.org/project/transaction/>`_ package.
 
-    The third argument is an optional ``cache_max_age`` which specifies the number of seconds the static asset will be HTTP-cached.
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+    :lines: 16
+    :lineno-match:
+    :language: py
 
-#.  *Line 22*.
-    Perform a :term:`scan`.
-    A scan will find :term:`configuration decoration`, such as view configuration decorators (e.g., ``@view_config``) in the source code of the ``tutorial`` package.
-    It will take actions based on these decorators.
-    We don't pass any arguments to :meth:`~pyramid.config.Configurator.scan`, which implies that the scan should take place in the current package (in this case, ``tutorial``).
-    The cookiecutter could have equivalently said ``config.scan('tutorial')``, but it chose to omit the package name argument.
+Next include support for ``pyramid_retry`` to retry a request when transient exceptions occur.
 
-#.  *Line 23*.
-    Use the :meth:`pyramid.config.Configurator.make_wsgi_app` method to return a :term:`WSGI` application.
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+    :lines: 17
+    :lineno-match:
+    :language: py
 
+Next include support for ``pyramid_zodbconn``, providing integration between :term:`ZODB` and a Pyramid application.
+
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+    :lines: 18
+    :lineno-match:
+    :language: py
+
+Next set a root factory using our function named ``root_factory``.
+
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+    :lines: 19
+    :lineno-match:
+    :language: py
+
+Next include support for the :term:`Chameleon` template rendering bindings, allowing us to use the ``.pt`` templates.
+
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+    :lines: 20
+    :lineno-match:
+    :language: py
+
+Next include routes from the ``.routes`` module.
+
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+    :lines: 21
+    :lineno-match:
+    :language: py
+
+This registers a "static view" using the :meth:`pyramid.config.Configurator.add_static_view` method.
+This view answers requests whose URL path starts with ``/static``.
+This statement registers a view that will serve up static assets, such as CSS and image files.
+In this case the URL will answer requests at ``http://localhost:6543/static/`` and below.
+
+The first argument is the "name" ``static``, which indicates that the URL path prefix of the view will be ``/static``.
+
+The second argument of this method is the "path".
+It is a relative :term:`asset specification`.
+It finds the resources it should serve within the ``static`` directory inside the ``tutorial`` package.
+Alternatively the cookiecutter could have used an *absolute* asset specification as the path (``tutorial:static``).
+
+The third argument is an optional ``cache_max_age`` which specifies the number of seconds the static asset will be HTTP-cached.
+
+Next perform a :term:`scan`.
+
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+    :lines: 22
+    :lineno-match:
+    :language: py
+
+A scan will find :term:`configuration decoration`, such as view configuration decorators (e.g., ``@view_config``) in the source code of the ``tutorial`` package.
+It will take actions based on these decorators.
+We don't pass any arguments to :meth:`~pyramid.config.Configurator.scan`, which implies that the scan should take place in the current package (in this case, ``tutorial``).
+The cookiecutter could have equivalently said ``config.scan('tutorial')``, but it chose to omit the package name argument.
+
+Finally use the :meth:`pyramid.config.Configurator.make_wsgi_app` method to return a :term:`WSGI` application.
+
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+    :lines: 23
+    :lineno-match:
+    :language: py
+
+
+.. _wiki-resources-and-models:
 
 Resources and models with ``models`` package
 --------------------------------------------
@@ -162,6 +232,16 @@ Let's try to understand the components in this module:
     This is the standard call signature for a Pyramid :term:`view callable`.
     The function returns the dictionary ``{'project': 'myproj'}``.
     This dictionary is used by the template named by the ``mytemplate.pt`` asset specification to fill in certain values on the page.
+
+Now let us open the ``notfound.py`` module, and describe its function.
+
+.. literalinclude:: src/basiclayout/tutorial/views/notfound.py
+    :linenos:
+    :language: python
+
+Without repeating ourselves, we will point out the differences between this view and the previous.
+
+#.
 
 
 Configuration in ``development.ini``
