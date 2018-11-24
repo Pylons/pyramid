@@ -47,7 +47,7 @@ Here's a high-level time-ordered overview of what happens when you press
    the :term:`PasteDeploy` library and returns a parser that can understand
    the format.
 
-.. _ini_section_discovery:
+   .. _ini_section_discovery:
 
 #. The :term:`PasteDeploy` finds a section named either ``[app:main]``,
    ``[pipeline:main]``, or ``[composite:main]`` in the ``.ini`` file.
@@ -69,10 +69,10 @@ Here's a high-level time-ordered overview of what happens when you press
    will have a single ``[app:main]`` section in it, and this will be the
    application served.
 
-.. index::
-   pair: logging; startup
+   .. index::
+      pair: logging; startup
 
-.. _startup_logging_initialization:
+   .. _startup_logging_initialization:
 
 #. The framework finds all :mod:`logging` related configuration in the ``.ini``
    file and uses it to configure the Python standard library logging system for
