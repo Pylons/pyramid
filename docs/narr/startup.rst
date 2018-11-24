@@ -74,7 +74,7 @@ Here's a high-level time-ordered overview of what happens when you press
 
 #. The application's entry point :ref:`found above <entry_point_discovery>`, usually the entry point referenced on the above mentioned ``use=`` line, is the application's *constructor*.
    It is passed the key/value parameters in :ref:`the application's .ini section <ini_section_discovery>`.
-   The constructor is meant to return a :term:`router` instance, which is a :term:`WSGI` application.
+   The constructor should return a :term:`router` instance, which is a :term:`WSGI` application.
 
    For :app:`Pyramid` applications, the constructor is a function named
    ``main`` in the ``__init__.py`` file within the :term:`package` in which
