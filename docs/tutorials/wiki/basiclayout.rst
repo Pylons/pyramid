@@ -170,16 +170,16 @@ Here is the source for ``models.py``:
     The ``MyModel`` :term:`resource` class is implemented here.
     Instances of this class are capable of being persisted in :term:`ZODB` because the class inherits from the :class:`persistent.mapping.PersistentMapping` class.
     The ``__parent__`` and ``__name__`` are important parts of the :term:`traversal` protocol.
-    By default, set these to ``None`` to indicate that this is the :term:`root` object.
+    By default, these are set to ``None`` to indicate that this is the :term:`root` object.
 
 #.  *Lines 8-12*.
     ``appmaker`` is used to return the *application root* object.
     It is called on *every request* to the :app:`Pyramid` application.
     It also performs bootstrapping by *creating* an application root (inside the ZODB root object) if one does not already exist.
-    It is used by the ``root_factory`` we've defined in our ``__init__.py``.
+    It is used by the ``root_factory`` we have defined in our ``__init__.py``.
  
     Bootstrapping is done by first seeing if the database has the persistent application root.
-    If not, we make an instance, store it, and commit the transaction.
+    If not, then we make an instance, store it, and commit the transaction.
     We then return the application root object.
 
 
