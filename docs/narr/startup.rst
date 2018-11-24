@@ -68,11 +68,9 @@ Here's a high-level time-ordered overview of what happens when you press
    file and uses it to configure the Python standard library logging system for
    this application.  See :ref:`logging_config` for more information.
 
-#. The application's *constructor* named by the entry point referenced on the
-   ``use=`` line of the section representing your :app:`Pyramid` application is
-   passed the key/value parameters mentioned within the section in which it's
-   defined.  The constructor is meant to return a :term:`router` instance,
-   which is a :term:`WSGI` application.
+#. The application's *constructor* is named by the entry point referenced on the ``use=`` line of the ``ini`` section which configures your :app:`Pyramid` application.
+   It is passed the key/value parameters mentioned within the this section.
+   The constructor is meant to return a :term:`router` instance, which is a :term:`WSGI` application.
 
    For :app:`Pyramid` applications, the constructor will be a function named
    ``main`` in the ``__init__.py`` file within the :term:`package` in which
