@@ -4,31 +4,22 @@
 Defining Views
 ==============
 
-A :term:`view callable` in a :term:`traversal`-based :app:`Pyramid`
-application is typically a simple Python function that accepts two
-parameters: :term:`context` and :term:`request`.  A view callable is
-assumed to return a :term:`response` object.
+A :term:`view callable` in a :term:`traversal`-based :app:`Pyramid` application is typically a simple Python function that accepts two parameters: :term:`context` and :term:`request`.
+A view callable is assumed to return a :term:`response` object.
 
 .. note::
 
-   A :app:`Pyramid` view can also be defined as callable
-   which accepts *only* a :term:`request` argument.  You'll see
-   this one-argument pattern used in other :app:`Pyramid` tutorials
-   and applications.  Either calling convention will work in any
-   :app:`Pyramid` application; the calling conventions can be used
-   interchangeably as necessary. In :term:`traversal`-based applications,
-   URLs are mapped to a context :term:`resource`, and since our
-   :term:`resource tree` also represents our application's
-   "domain model", we're often interested in the context because
-   it represents the persistent storage of our application.  For
-   this reason, in this tutorial we define views as callables that
-   accept ``context`` in the callable argument list.  If you do
-   need the ``context`` within a view function that only takes
-   the request as a single argument, you can obtain it via
-   ``request.context``.
+    A :app:`Pyramid` view can also be defined as callable which accepts *only* a :term:`request` argument.
+    You will see this one-argument pattern used in other :app:`Pyramid` tutorials and applications.
+    Either calling convention will work in any :app:`Pyramid` application.
+    The calling conventions can be used interchangeably as necessary.
 
-We're going to define several :term:`view callable` functions, then wire them
-into :app:`Pyramid` using some :term:`view configuration`.
+    In :term:`traversal`-based applications, URLs are mapped to a context :term:`resource`.
+    Since our :term:`resource tree` also represents our application's "domain model", we are often interested in the context because it represents the persistent storage of our application.
+    For this reason, in this tutorial we define views as callables that accept ``context`` in the callable argument list.
+    If you do need the ``context`` within a view function that only takes the request as a single argument, you can obtain it via ``request.context``.
+
+We will define several :term:`view callable` functions, then wire them into :app:`Pyramid` using some :term:`view configuration`.
 
 
 Declaring Dependencies in Our ``setup.py`` File
