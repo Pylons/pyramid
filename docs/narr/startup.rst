@@ -68,6 +68,9 @@ Here's a high-level time-ordered overview of what happens when you press
    will have a single ``[app:main]`` section in it, and this will be the
    application served.
 
+.. index::
+   pair: logging; startup
+
 .. _startup_logging_initialization:
 
 #. The framework finds all :mod:`logging` related configuration in the ``.ini``
