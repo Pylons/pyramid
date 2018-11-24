@@ -188,8 +188,8 @@ View declarations via the ``views`` package
 
 Our cookiecutter generated a default ``views`` package on our behalf.
 It contains a two views.
-which is used to render the page shown when you visit the URL ``http://localhost:6543/``.
 
+The first view is used to render the page shown when you visit the URL ``http://localhost:6543/``.
 Open ``tutorial/views/default.py`` in the ``views`` package.
 It should already contain the following:
 
@@ -233,7 +233,7 @@ Let's try to understand the components in this module:
     The function returns the dictionary ``{'project': 'myproj'}``.
     This dictionary is used by the template named by the ``mytemplate.pt`` asset specification to fill in certain values on the page.
 
-Now let us open the ``notfound.py`` module, and describe its function.
+Let us open ``tutorial/views/default.py`` in the ``views`` package to look at the second view.
 
 .. literalinclude:: src/basiclayout/tutorial/views/notfound.py
     :linenos:
@@ -241,7 +241,16 @@ Now let us open the ``notfound.py`` module, and describe its function.
 
 Without repeating ourselves, we will point out the differences between this view and the previous.
 
-#.
+#.  *Line 4*.
+    The ``notfound_view`` function is decorated with ``@notfound_view_config``.
+    This decorator registers a :term:`Not Found View` using :meth:`pyramid.config.Configurator.add_notfound_view`.
+
+    The ``renderer`` argument names an :term:`asset specification` of ``templates/404.pt``.
+
+#.  *Lines 5-7*.
+    A :term:`view callable` named ``notfound_view`` is defined, which is decorated in the step above.
+    It sets the HTTP response status code to ``404``.
+    The function returns an empty dictionary to the template ``404.pt``, which accepts no parameters anyway.
 
 
 Configuration in ``development.ini``
