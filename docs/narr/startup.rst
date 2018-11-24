@@ -70,7 +70,7 @@ Here's a high-level time-ordered overview of what happens when you press
 
 #. The framework finds all :mod:`logging` related configuration in the ``.ini``
    file and uses it to configure the Python standard library logging system for
-   this application.  See :ref:`logging_config` for more information.
+   the application.  See :ref:`logging_config` for more information.
 
 #. The application's entry point :ref:`found above <entry_point_discovery>`, usually the entry point referenced on the above mentioned ``use=`` line, is the application's *constructor*.
    It is passed the key/value parameters in :ref:`the application's .ini section <ini_section_discovery>`.
