@@ -37,15 +37,20 @@ These ``.ini`` file sections are passed to the `logging module's config file con
 PasteDeploy ``.ini`` files use the Python standard library :mod:`ConfigParser
 format <ConfigParser>`. This is the same format used as the Python
 :ref:`logging module's Configuration file format <logging-config-fileformat>`.
-The application-related and logging-related sections in the configuration file
-can coexist peacefully, and the logging-related sections in the file are used
-from when you run ``pserve``.
+The application-related and logging-related sections in the configuration file can coexist peacefully.
+The logging-related sections in the file configure logging when you run ``pserve``.
 
-The ``pserve`` command calls the :func:`pyramid.paster.setup_logging` function,
-a thin wrapper around the :func:`logging.config.fileConfig` using the specified
-``.ini`` file, if it contains a ``[loggers]`` section (all of the
-cookiecutter-generated ``.ini`` files do). ``setup_logging`` reads the logging
-configuration from the ini file upon which ``pserve`` was invoked.
+.. index::
+   pair: logging; startup
+
+If the configuration ``.ini`` file, specified when invoking ``pserve``, contains a ``[loggers]`` section then on :ref:`startup <the_startup_process>` the following process takes place:
+
+#.  The ``pserve`` command calls the :func:`pyramid.paster.setup_logging` function, passing the ``.ini`` file.
+
+#.  ``setup_logging`` is a thin wrapper which calls the Python standard library's :func:`logging.config.fileConfig`.
+
+#.  :func:`logging.config.fileConfig` reads the logging configuration from the ``.ini`` file and configures logging.
+
 
 Default logging configuration is provided in both the default
 ``development.ini`` and the ``production.ini`` files.  If you use our cookiecutter to generate a Pyramid project with the name of the package as ``hello_world``, then the logging configuration
