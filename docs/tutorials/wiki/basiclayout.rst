@@ -174,12 +174,12 @@ Here is the source for ``models.py``:
 
 #.  *Lines 8-12*.
     ``appmaker`` is used to return the *application root* object.
-    It is called on *every request* to the :app:`Pyramid` application.
+    It is called on *every request* to the :app:`Pyramid` application by virtue of the ``root_factory`` defined in our ``__init__.py``.
     It also performs bootstrapping by *creating* an application root (inside the ZODB root object) if one does not already exist.
-    It is used by the ``root_factory`` we have defined in our ``__init__.py``.
- 
+
     Bootstrapping is done by first seeing if the database has the persistent application root.
     If not, then we make an instance, store it, and commit the transaction.
+
     We then return the application root object.
 
 
