@@ -51,7 +51,8 @@ Here's a high-level time-ordered overview of what happens when you press
 
 #. The :term:`PasteDeploy` finds a section named either ``[app:main]``,
    ``[pipeline:main]``, or ``[composite:main]`` in the ``.ini`` file.
-   This section becomes the ``ini`` section for the :term:`WSGI` webserver portion of your application -- the part ``Pyramid`` was built to help with.
+   This section configures the :term:`WSGI` webserver which serves your application.
+   As such it is the ``ini`` section for your application and can supply many of your application's :term:`settings`.
 
    .. _entry_point_discovery:
 
