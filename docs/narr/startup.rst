@@ -78,7 +78,7 @@ Here's a high-level time-ordered overview of what happens when you press
    file and uses it to configure the Python standard library logging system for
    the application.  See :ref:`logging_config` for more information.
 
-#. The application's entry point, usually the entry point referenced on the :ref:`above mentioned <entry_point_discovery>` ``use=`` line, is the application's *constructor*.
+#. The application's entry point, usually the entry point referenced on the :ref:`above mentioned <entry_point_discovery>` ``use=`` line, is the application's :term:`constructor`.
    It is passed the key/value parameters in :ref:`the application's .ini section <ini_section_discovery>`.
    The constructor should return a :term:`router` instance, which is a :term:`WSGI` application.
 
