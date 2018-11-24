@@ -112,63 +112,57 @@ Here is the source for ``models.py``:
     If not, we make an instance, store it, and commit the transaction.
     We then return the application root object.
 
-Views With ``views.py``
------------------------
 
-Our cookiecutter generated a default ``views.py`` on our behalf.  It
-contains a single view, which is used to render the page shown when you visit
-the URL ``http://localhost:6543/``.
+View declarations via the ``views`` package
+-------------------------------------------
 
-Here is the source for ``views.py``:
+Our cookiecutter generated a default ``views`` package on our behalf.
+It contains a two views.
+which is used to render the page shown when you visit the URL ``http://localhost:6543/``.
 
-.. literalinclude:: src/basiclayout/tutorial/views.py
-  :linenos:
-  :language: python
+Open ``tutorial/views/default.py`` in the ``views`` package.
+It should already contain the following:
+
+.. literalinclude:: src/basiclayout/tutorial/views/default.py
+    :linenos:
+    :language: python
 
 Let's try to understand the components in this module:
 
-#. *Lines 1-2*. Perform some dependency imports.
+#.  *Lines 1-3*.
+    Perform some dependency imports.
 
-#. *Line 5*.  Use the :func:`pyramid.view.view_config` :term:`configuration
-   decoration` to perform a :term:`view configuration` registration.  This
-   view configuration registration will be activated when the application is
-   started.  It will be activated by virtue of it being found as the result
-   of a :term:`scan` (when Line 14 of ``__init__.py`` is run).
+#.  *Line 6*.
+    Use the :func:`pyramid.view.view_config` :term:`configuration decoration` to perform a :term:`view configuration` registration.
+    This view configuration registration will be activated when the application is started.
+    Remember in our application's ``__init__.py`` when we executed the :meth:`pyramid.config.Configurator.scan` method ``config.scan()``?
+    By calling the scan method, Pyramid's configurator will find and process this ``@view_config`` decorator, and create a view configuration within our application.
+    Without being processed by ``scan``, the decorator effectively does nothing.
+    ``@view_config`` is inert without being detected via a :term:`scan`.
 
-   The ``@view_config`` decorator accepts a number of keyword arguments.  We
-   use two keyword arguments here: ``context`` and ``renderer``.
+    The ``@view_config`` decorator accepts a number of keyword arguments.
+    We use two keyword arguments here: ``context`` and ``renderer``.
 
-   The ``context`` argument signifies that the decorated view callable should
-   only be run when :term:`traversal` finds the ``tutorial.models.MyModel``
-   :term:`resource` to be the :term:`context` of a request.  In English, this
-   means that when the URL ``/`` is visited, because ``MyModel`` is the root
-   model, this view callable will be invoked.
+    The ``context`` argument signifies that the decorated view callable ``my_view`` should only be run when :term:`traversal` finds the ``tutorial.models.MyModel`` :term:`resource` as the :term:`context` of a request.
+    In English this means that when the URL ``/`` is visited, and because ``MyModel`` is the root model, this view callable will be invoked.
 
-   The ``renderer`` argument names an :term:`asset specification` of
-   ``templates/mytemplate.pt``.  This asset specification points at a
-   :term:`Chameleon` template which lives in the ``mytemplate.pt`` file
-   within the ``templates`` directory of the ``tutorial`` package.  And
-   indeed if you look in the ``templates`` directory of this package, you'll
-   see a ``mytemplate.pt`` template file, which renders the default home page
-   of the generated project.  This asset specification is *relative* (to the
-   view.py's current package).  Alternatively we could have used the
-   absolute asset specification ``tutorial:templates/mytemplate.pt``, but
-   chose to use the relative version.
+    The ``renderer`` argument names an :term:`asset specification` of ``templates/mytemplate.pt``.
+    This asset specification points at a :term:`Chameleon` template which lives in the ``mytemplate.pt`` file within the ``templates`` directory of the ``tutorial`` package.
+    And indeed if you look in the ``templates`` directory of this package, you will see a ``mytemplate.pt`` template file
+    This template renders the default home page of the generated project.
+    This asset specification is *relative* to the ``views`` package.
+    Alternatively we could have used the absolute asset specification ``tutorial:templates/mytemplate.pt``.
 
-   Since this call to ``@view_config`` doesn't pass a ``name`` argument, the
-   ``my_view`` function which it decorates represents the "default" view
-   callable used when the context is of the type ``MyModel``.
+    Since this call to ``@view_config`` doesn't pass a ``name`` argument, the ``my_view`` function which it decorates represents the "default" view callable used when the context is of the type ``MyModel``.
 
-#. *Lines 6-7*.  We define a :term:`view callable` named ``my_view``, which
-   we decorated in the step above.  This view callable is a *function* we
-   write generated by the ``zodb`` cookiecutter that is given a
-   ``request`` and which returns a dictionary.  The ``mytemplate.pt``
-   :term:`renderer` named by the asset specification in the step above will
-   convert this dictionary to a :term:`response` on our behalf.
+#.  *Lines 7-8*.
+    A :term:`view callable` named ``my_view`` is defined, which is decorated in the step above.
+    This view callable is a *function* generated by the cookiecutter.
+    It is given a single argument, ``request``.
+    This is the standard call signature for a Pyramid :term:`view callable`.
+    The function returns the dictionary ``{'project': 'myproj'}``.
+    This dictionary is used by the template named by the ``mytemplate.pt`` asset specification to fill in certain values on the page.
 
-   The function returns the dictionary ``{'project':'tutorial'}``.  This
-   dictionary is used by the template named by the ``mytemplate.pt`` asset
-   specification to fill in certain values on the page.
 
 Configuration in ``development.ini``
 ------------------------------------
