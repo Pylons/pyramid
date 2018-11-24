@@ -107,45 +107,38 @@ The ``view_wiki`` view function
 
 Following is the code for the ``view_wiki`` view function and its decorator:
 
-.. literalinclude:: src/views/tutorial/views.py
+.. literalinclude:: src/views/tutorial/views/default.py
     :lines: 12-14
     :lineno-match:
     :language: python
 
-.. note:: In our code, we use an *import* that is *relative* to our package
-    named ``tutorial``, meaning we can omit the name of the package in the
-    ``import`` and ``context`` statements. In our narrative, however, we refer
-    to a *class* and thus we use the *absolute* form, meaning that the name of
-    the package is included.
+.. note::
 
-``view_wiki()`` is the :term:`default view` that gets called when a request is
-made to the root URL of our wiki.  It always redirects to an URL which
-represents the path to our "FrontPage".
+    In our code, we use an *import* that is *relative* to our package named ``tutorial``.
+    This means we can omit the name of the package in the ``import`` and ``context`` statements.
+    In our narrative, however, we refer to a *class* and thus we use the *absolute* form.
+    This means that the name of the package is included.
 
-We provide it with a ``@view_config`` decorator which names the class
-``tutorial.models.Wiki`` as its context. This means that when a Wiki resource
-is the context and no :term:`view name` exists in the request, then this view
-will be used.  The view configuration associated with ``view_wiki`` does not
-use a ``renderer`` because the view callable always returns a :term:`response`
-object rather than a dictionary. No renderer is necessary when a view returns
-a response object.
+``view_wiki()`` is the :term:`default view` that gets called when a request is made to the root URL of our wiki.
+It always redirects to an URL which represents the path to our ``FrontPage``.
 
-The ``view_wiki`` view callable always redirects to the URL of a Page resource
-named "FrontPage".  To do so, it returns an instance of the
-:class:`pyramid.httpexceptions.HTTPFound` class (instances of which implement
-the :class:`pyramid.interfaces.IResponse` interface, like
-:class:`pyramid.response.Response` does). It uses the
-:meth:`pyramid.request.Request.route_url` API to construct an URL to the
-``FrontPage`` page resource (i.e., ``http://localhost:6543/FrontPage``), and
-uses it as the "location" of the ``HTTPFound`` response, forming an HTTP
-redirect.
+We provide it with a ``@view_config`` decorator which names the class ``tutorial.models.Wiki`` as its context.
+This means that when a ``Wiki`` resource is the context and no :term:`view name` exists in the request, then this view will be used.
+The view configuration associated with ``view_wiki`` does not use a ``renderer`` because the view callable always returns a :term:`response` object rather than a dictionary.
+No renderer is necessary when a view returns a response object.
+
+The ``view_wiki`` view callable always redirects to the URL of a ``Page`` resource named ``FrontPage``.
+To do so, it returns an instance of the :class:`pyramid.httpexceptions.HTTPFound` class.
+Instances of this class implement the :class:`pyramid.interfaces.IResponse` interface, similar to :class:`pyramid.response.Response`.
+It uses the :meth:`pyramid.request.Request.route_url` API to construct an URL to the ``FrontPage`` page resource (in other words, ``http://localhost:6543/FrontPage``), and uses it as the ``location`` of the ``HTTPFound`` response, forming an HTTP redirect.
+
 
 The ``view_page`` view function
 -------------------------------
 
 Here is the code for the ``view_page`` view function and its decorator:
 
-.. literalinclude:: src/views/tutorial/views.py
+.. literalinclude:: src/views/tutorial/views/default.py
     :lines: 16-33
     :lineno-match:
     :language: python
@@ -198,7 +191,7 @@ The ``add_page`` view function
 
 Here is the code for the ``add_page`` view function and its decorator:
 
-.. literalinclude:: src/views/tutorial/views.py
+.. literalinclude:: src/views/tutorial/views/default.py
     :lines: 35-50
     :lineno-match:
     :language: python
@@ -252,7 +245,7 @@ The ``edit_page`` view function
 
 Here is the code for the ``edit_page`` view function and its decorator:
 
-.. literalinclude:: src/views/tutorial/views.py
+.. literalinclude:: src/views/tutorial/views/default.py
     :lines: 52-60
     :lineno-match:
     :language: python
