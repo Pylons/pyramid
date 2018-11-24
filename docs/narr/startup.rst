@@ -76,7 +76,7 @@ Here's a high-level time-ordered overview of what happens when you press
    It is passed the key/value parameters in :ref:`the application's .ini section <ini_section_discovery>`.
    The constructor is meant to return a :term:`router` instance, which is a :term:`WSGI` application.
 
-   For :app:`Pyramid` applications, the constructor will be a function named
+   For :app:`Pyramid` applications, the constructor is a function named
    ``main`` in the ``__init__.py`` file within the :term:`package` in which
    your application lives.  If this function succeeds, it will return a
    :app:`Pyramid` :term:`router` instance.  Here's the contents of an example
