@@ -21,7 +21,7 @@ A view callable is assumed to return a :term:`response` object.
 
 We will define several :term:`view callable` functions, then wire them into :app:`Pyramid` using some :term:`view configuration`.
 
-.. note::
+.. seealso::
 
     This chapter will introduce more concepts, as did the previous.
     See also the chapter :ref:`resources_chapter` for a complete description of resources and the chapter :ref:`traversal_chapter` for the technical details of how traversal works in Pyramid.
@@ -162,7 +162,7 @@ The curried function named ``check`` is used as the first argument to ``wikiword
 If the wiki (our page's ``__parent__``) already contains a page with the matched ``WikiWord`` name, the ``check`` function generates a view link to be used as the substitution value and returns it.
 If the wiki does not already contain a page with the matched ``WikiWord`` name, the function generates an "add" link as the substitution value and returns it.
 
-As a result, the ``content`` variable is now a fully formed bit of HTML containing various view and add links for ``WikiWord``s based on the content of our current page resource.
+As a result, the ``content`` variable is now a fully formed bit of HTML containing various view and add links for ``WikiWord``\s based on the content of our current page resource.
 
 We then generate an edit URL because it is easier to do here than in the template.
 Finally we wrap up a number of arguments in a dictionary and return it.
@@ -222,7 +222,7 @@ If the view rendering *is* a result of a form submission (if the expression ``'f
 
     In the :ref:`previous chapter <wiki_defining_the_domain_model>`, we mentioned that all objects in a traversal graph must have a ``__name__`` and a ``__parent__`` attribute.
     That provides location awareness for resources.
-    See also the section on :ref:`location-aware-resources` in the :ref:`resources_chapter` chapter for a complete discussion.
+    See also the section on :ref:`location_aware` in the :ref:`resources_chapter` chapter for a complete discussion.
 
 
 The ``edit_page`` view function

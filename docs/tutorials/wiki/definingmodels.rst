@@ -13,7 +13,7 @@ We will call these constructors "model constructors".
 Both our ``Page`` and ``Wiki`` constructors will be class objects.
 A single instance of the "Wiki" class will serve as a container for "Page" objects, which will be instances of the "Page" class.
 
-.. note::
+.. seealso::
 
     We will introduce a lot of concepts throughout the remainder of this tutorial.
     See also the chapter :ref:`resources_chapter` for a complete description of resources and the chapter :ref:`traversal_chapter` for the technical details of how traversal works in Pyramid.
