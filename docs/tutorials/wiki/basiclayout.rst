@@ -80,42 +80,37 @@ It should already contain the following:
 #.  *Line 23*.
     Use the :meth:`pyramid.config.Configurator.make_wsgi_app` method to return a :term:`WSGI` application.
 
-Resources and models with ``models.py``
----------------------------------------
 
-:app:`Pyramid` uses the word :term:`resource` to describe objects arranged
-hierarchically in a :term:`resource tree`.  This tree is consulted by
-:term:`traversal` to map URLs to code.  In this application, the resource
-tree represents the site structure, but it *also* represents the
-:term:`domain model` of the application, because each resource is a node
-stored persistently in a :term:`ZODB` database.  The ``models.py`` file is
-where the ``zodb`` cookiecutter put the classes that implement our
-resource objects, each of which also happens to be a domain model object.
+Resources and models with ``models`` package
+--------------------------------------------
+
+:app:`Pyramid` uses the word :term:`resource` to describe objects arranged hierarchically in a :term:`resource tree`.
+This tree is consulted by :term:`traversal` to map URLs to code.
+In this application, the resource tree represents the site structure, but it *also* represents the :term:`domain model` of the application.
+Each resource is a node stored persistently in a :term:`ZODB` database.
+The ``models.py`` file is where the ``zodb`` cookiecutter put the classes that implement our resource objects, each of which also happens to be a domain model object.
 
 Here is the source for ``models.py``:
 
-.. literalinclude:: src/basiclayout/tutorial/models.py
+.. literalinclude:: src/basiclayout/tutorial/models/__init__.py
   :linenos:
   :language: python
 
-#. *Lines 4-5*.  The ``MyModel`` :term:`resource` class is implemented here.
-   Instances of this class are capable of being persisted in :term:`ZODB`
-   because the class inherits from the
-   :class:`persistent.mapping.PersistentMapping` class.  The ``__parent__``
-   and ``__name__`` are important parts of the :term:`traversal` protocol.
-   By default, set these to ``None`` to indicate that this is the
-   :term:`root` object.
+#.  *Lines 4-5*.
+    The ``MyModel`` :term:`resource` class is implemented here.
+    Instances of this class are capable of being persisted in :term:`ZODB` because the class inherits from the :class:`persistent.mapping.PersistentMapping` class.
+    The ``__parent__`` and ``__name__`` are important parts of the :term:`traversal` protocol.
+    By default, set these to ``None`` to indicate that this is the :term:`root` object.
 
-#. *Lines 8-12*.  ``appmaker`` is used to return the *application
-   root* object.  It is called on *every request* to the
-   :app:`Pyramid` application.  It also performs bootstrapping by
-   *creating* an application root (inside the ZODB root object) if one
-   does not already exist.  It is used by the ``root_factory`` we've defined
-   in our ``__init__.py``.
+#.  *Lines 8-12*.
+    ``appmaker`` is used to return the *application root* object.
+    It is called on *every request* to the :app:`Pyramid` application.
+    It also performs bootstrapping by *creating* an application root (inside the ZODB root object) if one does not already exist.
+    It is used by the ``root_factory`` we've defined in our ``__init__.py``.
  
-   Bootstrapping is done by first seeing if the database has the persistent
-   application root.  If not, we make an instance, store it, and commit the
-   transaction.  We then return the application root object.
+    Bootstrapping is done by first seeing if the database has the persistent application root.
+    If not, we make an instance, store it, and commit the transaction.
+    We then return the application root object.
 
 Views With ``views.py``
 -----------------------
