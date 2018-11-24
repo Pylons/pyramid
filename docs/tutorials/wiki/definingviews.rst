@@ -158,11 +158,11 @@ The body is stored as the ``data`` attribute of the context passed to the view.
 The context will be a ``Page`` resource.
 Then it substitutes an HTML anchor for each *WikiWord* reference in the rendered HTML using a compiled regular expression.
 
-The curried function named ``check`` is used as the first argument to ``wikiwords.sub``, indicating that it should be called to provide a value for each WikiWord match found in the content.
-If the wiki (our page's ``__parent__``) already contains a page with the matched WikiWord name, the ``check`` function generates a view link to be used as the substitution value and returns it.
-If the wiki does not already contain a page with the matched WikiWord name, the function generates an "add" link as the substitution value and returns it.
+The curried function named ``check`` is used as the first argument to ``wikiwords.sub``, indicating that it should be called to provide a value for each ``WikiWord`` match found in the content.
+If the wiki (our page's ``__parent__``) already contains a page with the matched ``WikiWord`` name, the ``check`` function generates a view link to be used as the substitution value and returns it.
+If the wiki does not already contain a page with the matched ``WikiWord`` name, the function generates an "add" link as the substitution value and returns it.
 
-As a result, the ``content`` variable is now a fully formed bit of HTML containing various view and add links for WikiWords based on the content of our current page resource.
+As a result, the ``content`` variable is now a fully formed bit of HTML containing various view and add links for ``WikiWord``s based on the content of our current page resource.
 
 We then generate an edit URL because it is easier to do here than in the template.
 Finally we wrap up a number of arguments in a dictionary and return it.
@@ -242,11 +242,11 @@ Here is the code for the ``edit_page`` view function and its decorator:
     :language: python
 
 The ``edit_page`` function is configured to respond when the context is
-a Page resource and the :term:`view name` is ``edit_page``.  We provide it
+a ``Page`` resource and the :term:`view name` is ``edit_page``.  We provide it
 with a ``@view_config`` decorator which names the string ``edit_page`` as its
 :term:`view name` (via ``name=``), the class ``tutorial.models.Page`` as its
 context, and the renderer named ``templates/edit.pt``.  This means that when
-a Page resource is the context, and a :term:`view name` exists as the result
+a ``Page`` resource is the context, and a :term:`view name` exists as the result
 of traversal named ``edit_page``, this view will be used.  We inform
 :app:`Pyramid` this view will use the ``templates/edit.pt`` template file as
 a ``renderer``.
@@ -254,7 +254,7 @@ a ``renderer``.
 The ``edit_page`` function will be invoked when a user clicks the "Edit this
 Page" button on the view form.  It renders an edit form but it also acts as
 the form post view callable for the form it renders.  The ``context`` of the
-``edit_page`` view will *always* be a Page resource (never a Wiki resource).
+``edit_page`` view will *always* be a ``Page`` resource (never a ``Wiki`` resource).
 
 If the view execution is *not* a result of a form submission (if the
 expression ``'form.submitted' in request.params`` is ``False``), the view
@@ -345,16 +345,16 @@ We can finally examine our application in a browser (See
 each of the following URLs, checking that the result is as expected:
 
 - http://localhost:6543/ invokes the ``view_wiki`` view.  This always
-  redirects to the ``view_page`` view of the ``FrontPage`` Page resource.
+  redirects to the ``view_page`` view of the ``FrontPage`` ``Page`` resource.
 
 - http://localhost:6543/FrontPage/ invokes the ``view_page`` view of the front
   page resource.  This is because it's the :term:`default view` (a view
-  without a ``name``) for Page resources.
+  without a ``name``) for ``Page`` resources.
 
 - http://localhost:6543/FrontPage/edit_page invokes the edit view for the
-  ``FrontPage`` Page resource.
+  ``FrontPage`` ``Page`` resource.
 
-- http://localhost:6543/add_page/SomePageName invokes the add view for a Page.
+- http://localhost:6543/add_page/SomePageName invokes the add view for a ``Page``.
 
 - To generate an error, visit http://localhost:6543/add_page which will
   generate an ``IndexError: tuple index out of range`` error. You'll see an
