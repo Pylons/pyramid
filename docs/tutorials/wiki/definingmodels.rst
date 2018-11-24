@@ -4,30 +4,26 @@
 Defining the Domain Model
 =========================
 
-The first change we'll make to our stock cookiecutter-generated application will
-be to define two :term:`resource` constructors, one representing a wiki page,
-and another representing the wiki as a mapping of wiki page names to page
-objects.  We'll do this inside our ``models.py`` file.
+Let's make changes to our stock cookiecutter-generated application.
+We will define two :term:`resource` constructors, one representing a wiki page, and another representing the wiki as a mapping of wiki page names to page objects.
+We will do this inside our ``models.py`` file.
 
-Because we're using :term:`ZODB` to represent our
-:term:`resource tree`, each of these resource constructors represents a
-:term:`domain model` object, so we'll call these constructors "model
-constructors". Both our Page and Wiki constructors will be class objects.  A
-single instance of the "Wiki" class will serve as a container for "Page"
-objects, which will be instances of the "Page" class.
+Because we are using :term:`ZODB` to represent our :term:`resource tree`, each of these resource constructors represents a :term:`domain model` object.
+We will call these constructors "model constructors".
+Both our Page and Wiki constructors will be class objects.
+A single instance of the "Wiki" class will serve as a container for "Page" objects, which will be instances of the "Page" class.
 
 
 Delete the database
 -------------------
 
-In the next step, we're going to remove the ``MyModel`` Python model
-class from our ``models.py`` file.  Since this class is referred to within
-our persistent storage (represented on disk as a file named ``Data.fs``),
-we'll have strange things happen the next time we want to visit the
-application in a browser.  Remove the ``Data.fs`` from the ``tutorial``
-directory before proceeding any further.  It's always fine to do this as long
-as you don't care about the content of the database; the database itself will
-be recreated as necessary.
+In the next step, we will remove the ``MyModel`` Python model class from our ``models`` package.
+Since this class is referred to within our persistent storage (represented on disk as a file named ``Data.fs``), we will have strange things happen the next time we want to visit the application in a browser.
+
+Remove the ``Data.fs`` from the ``tutorial`` directory before proceeding any further.
+It is always fine to do this as long as you don't care about the content of the database.
+The database itself will be recreated as necessary.
+
 
 Edit ``models.py``
 ------------------
