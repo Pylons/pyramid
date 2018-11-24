@@ -509,6 +509,7 @@ def setUp(
     )
     if settings is None:
         settings = {}
+    config._fix_registry()
     if getattr(registry, 'settings', None) is None:
         config._set_settings(settings)
     if hasattr(registry, 'registerUtility'):

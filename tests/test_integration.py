@@ -869,45 +869,6 @@ class AcceptContentTypeTest(unittest.TestCase):
         )
         self.assertEqual(res.content_type, 'text/x-fallback')
 
-    def test_deprecated_ranges_in_route_predicate(self):
-        config = self._makeConfig()
-        config.add_route('foo', '/foo', accept='text/*')
-        config.add_view(lambda r: 'OK', route_name='foo', renderer='string')
-        app = self._makeTestApp(config)
-        res = app.get(
-            '/foo',
-            headers={'Accept': 'application/json; q=1.0, text/plain; q=0.9'},
-            status=200,
-        )
-        self.assertEqual(res.content_type, 'text/plain')
-        self.assertEqual(res.body, b'OK')
-        res = app.get(
-            '/foo', headers={'Accept': 'application/json'}, status=404
-        )
-        self.assertEqual(res.content_type, 'application/json')
-
-    def test_deprecated_ranges_in_view_predicate(self):
-        config = self._makeConfig()
-        config.add_route('foo', '/foo')
-        config.add_view(
-            lambda r: 'OK',
-            route_name='foo',
-            accept='text/*',
-            renderer='string',
-        )
-        app = self._makeTestApp(config)
-        res = app.get(
-            '/foo',
-            headers={'Accept': 'application/json; q=1.0, text/plain; q=0.9'},
-            status=200,
-        )
-        self.assertEqual(res.content_type, 'text/plain')
-        self.assertEqual(res.body, b'OK')
-        res = app.get(
-            '/foo', headers={'Accept': 'application/json'}, status=404
-        )
-        self.assertEqual(res.content_type, 'application/json')
-
 
 class DummyContext(object):
     pass

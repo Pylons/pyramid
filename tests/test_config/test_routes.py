@@ -54,6 +54,30 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
         config.add_route('name', 'path')
         self._assertRoute(config, 'name', 'root/path')
 
+    def test_add_route_with_inherit_errors(self):
+        from pyramid.exceptions import ConfigurationError
+
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(
+            ConfigurationError,
+            config.add_route,
+            'name',
+            '/',
+            inherit_slash=True,
+        )
+
+    def test_add_route_with_route_prefix_with_inherit_slash(self):
+        config = self._makeOne(autocommit=True)
+        config.route_prefix = 'root'
+        config.add_route('name', '', inherit_slash=True)
+        self._assertRoute(config, 'name', 'root')
+
+    def test_add_route_with_root_slash_with_route_prefix(self):
+        config = self._makeOne(autocommit=True)
+        config.route_prefix = 'root'
+        config.add_route('name', '/')
+        self._assertRoute(config, 'name', 'root/')
+
     def test_add_route_discriminator(self):
         config = self._makeOne()
         config.add_route('name', 'path')
@@ -216,17 +240,12 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
         request.accept = DummyAccept('text/html')
         self.assertEqual(predicate(None, request), False)
 
-    def test_add_route_with_wildcard_accept(self):
+    def test_add_route_with_wildcard_accept_raises(self):
         config = self._makeOne(autocommit=True)
-        config.add_route('name', 'path', accept='text/*')
-        route = self._assertRoute(config, 'name', 'path', 1)
-        predicate = route.predicates[0]
-        request = self._makeRequest(config)
-        request.accept = DummyAccept('text/xml', contains=True)
-        self.assertEqual(predicate(None, request), True)
-        request = self._makeRequest(config)
-        request.accept = DummyAccept('application/json', contains=False)
-        self.assertEqual(predicate(None, request), False)
+        self.assertRaises(
+            ValueError,
+            lambda: config.add_route('name', 'path', accept='text/*'),
+        )
 
     def test_add_route_no_pattern_with_path(self):
         config = self._makeOne(autocommit=True)
@@ -313,6 +332,3 @@ class DummyAccept(object):
             if match in offers:
                 results.append((match, 1.0))
         return results
-
-    def __contains__(self, value):
-        return self.contains

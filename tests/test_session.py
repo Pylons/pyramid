@@ -364,10 +364,10 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         import base64
         import hashlib
         import hmac
-        import pickle
+        import json
 
         digestmod = lambda: hashlib.new(hashalg)
-        cstruct = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+        cstruct = json.dumps(value).encode('utf-8')
         sig = hmac.new(salt + b'secret', cstruct, digestmod).digest()
         return base64.urlsafe_b64encode(sig + cstruct).rstrip(b'=')
 
@@ -505,112 +505,6 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         self.assertEqual(result, None)
         self.assertTrue('Set-Cookie' in dict(response.headerlist))
 
-    def test_bad_pickle(self):
-        import base64
-        import hashlib
-        import hmac
-
-        digestmod = lambda: hashlib.new('sha512')
-        # generated from dumping an object that cannot be found anymore, eg:
-        # class Foo: pass
-        # print(pickle.dumps(Foo()))
-        cstruct = b'(i__main__\nFoo\np0\n(dp1\nb.'
-        sig = hmac.new(b'pyramid.session.secret', cstruct, digestmod).digest()
-        cookieval = base64.urlsafe_b64encode(sig + cstruct).rstrip(b'=')
-
-        request = testing.DummyRequest()
-        request.cookies['session'] = cookieval
-        session = self._makeOne(request, secret='secret')
-        self.assertEqual(session, {})
-
-
-class TestUnencryptedCookieSession(
-    SharedCookieSessionTests, unittest.TestCase
-):
-    def setUp(self):
-        super(TestUnencryptedCookieSession, self).setUp()
-        from zope.deprecation import __show__
-
-        __show__.off()
-
-    def tearDown(self):
-        super(TestUnencryptedCookieSession, self).tearDown()
-        from zope.deprecation import __show__
-
-        __show__.on()
-
-    def _makeOne(self, request, **kw):
-        from pyramid.session import UnencryptedCookieSessionFactoryConfig
-
-        self._rename_cookie_var(kw, 'path', 'cookie_path')
-        self._rename_cookie_var(kw, 'domain', 'cookie_domain')
-        self._rename_cookie_var(kw, 'secure', 'cookie_secure')
-        self._rename_cookie_var(kw, 'httponly', 'cookie_httponly')
-        self._rename_cookie_var(kw, 'set_on_exception', 'cookie_on_exception')
-        return UnencryptedCookieSessionFactoryConfig('secret', **kw)(request)
-
-    def _rename_cookie_var(self, kw, src, dest):
-        if src in kw:
-            kw.setdefault(dest, kw.pop(src))
-
-    def _serialize(self, value):
-        from pyramid.compat import bytes_
-        from pyramid.session import signed_serialize
-
-        return bytes_(signed_serialize(value, 'secret'))
-
-    def test_serialize_option(self):
-        from pyramid.response import Response
-
-        secret = 'secret'
-        request = testing.DummyRequest()
-        session = self._makeOne(
-            request, signed_serialize=dummy_signed_serialize
-        )
-        session['key'] = 'value'
-        response = Response()
-        self.assertEqual(session._set_cookie(response), True)
-        cookie = response.headerlist[-1][1]
-        expected_cookieval = dummy_signed_serialize(
-            (session.accessed, session.created, {'key': 'value'}), secret
-        )
-        response = Response()
-        response.set_cookie('session', expected_cookieval, samesite='Lax')
-        expected_cookie = response.headerlist[-1][1]
-        self.assertEqual(cookie, expected_cookie)
-
-    def test_deserialize_option(self):
-        import time
-
-        secret = 'secret'
-        request = testing.DummyRequest()
-        accessed = time.time()
-        state = {'key': 'value'}
-        cookieval = dummy_signed_serialize((accessed, accessed, state), secret)
-        request.cookies['session'] = cookieval
-        session = self._makeOne(
-            request, signed_deserialize=dummy_signed_deserialize
-        )
-        self.assertEqual(dict(session), state)
-
-
-def dummy_signed_serialize(data, secret):
-    import base64
-    from pyramid.compat import pickle, bytes_
-
-    pickled = pickle.dumps(data)
-    return base64.b64encode(bytes_(secret)) + base64.b64encode(pickled)
-
-
-def dummy_signed_deserialize(serialized, secret):
-    import base64
-    from pyramid.compat import pickle, bytes_
-
-    serialized_data = base64.b64decode(
-        serialized[len(base64.b64encode(bytes_(secret))) :]
-    )
-    return pickle.loads(serialized_data)
-
 
 class Test_manage_accessed(unittest.TestCase):
     def _makeOne(self, wrapped):
@@ -667,91 +561,6 @@ class Test_manage_changed(unittest.TestCase):
         wrapper(session, 'a', 1)
         self.assertNotEqual(session.accessed, None)
         self.assertTrue(session._dirty)
-
-
-def serialize(data, secret):
-    import hmac
-    import base64
-    from hashlib import sha1
-    from pyramid.compat import bytes_
-    from pyramid.compat import native_
-    from pyramid.compat import pickle
-
-    pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
-    sig = hmac.new(bytes_(secret, 'utf-8'), pickled, sha1).hexdigest()
-    return sig + native_(base64.b64encode(pickled))
-
-
-class Test_signed_serialize(unittest.TestCase):
-    def _callFUT(self, data, secret):
-        from pyramid.session import signed_serialize
-
-        return signed_serialize(data, secret)
-
-    def test_it(self):
-        expected = serialize('123', 'secret')
-        result = self._callFUT('123', 'secret')
-        self.assertEqual(result, expected)
-
-    def test_it_with_highorder_secret(self):
-        secret = b'\xce\xb1\xce\xb2\xce\xb3\xce\xb4'.decode('utf-8')
-        expected = serialize('123', secret)
-        result = self._callFUT('123', secret)
-        self.assertEqual(result, expected)
-
-    def test_it_with_latin1_secret(self):
-        secret = b'La Pe\xc3\xb1a'
-        expected = serialize('123', secret)
-        result = self._callFUT('123', secret.decode('latin-1'))
-        self.assertEqual(result, expected)
-
-
-class Test_signed_deserialize(unittest.TestCase):
-    def _callFUT(self, serialized, secret, hmac=None):
-        if hmac is None:
-            import hmac
-        from pyramid.session import signed_deserialize
-
-        return signed_deserialize(serialized, secret, hmac=hmac)
-
-    def test_it(self):
-        serialized = serialize('123', 'secret')
-        result = self._callFUT(serialized, 'secret')
-        self.assertEqual(result, '123')
-
-    def test_invalid_bits(self):
-        serialized = serialize('123', 'secret')
-        self.assertRaises(ValueError, self._callFUT, serialized, 'seekrit')
-
-    def test_invalid_len(self):
-        class hmac(object):
-            def new(self, *arg):
-                return self
-
-            def hexdigest(self):
-                return '1234'
-
-        serialized = serialize('123', 'secret123')
-        self.assertRaises(
-            ValueError, self._callFUT, serialized, 'secret', hmac=hmac()
-        )
-
-    def test_it_bad_encoding(self):
-        serialized = 'bad' + serialize('123', 'secret')
-        self.assertRaises(ValueError, self._callFUT, serialized, 'secret')
-
-    def test_it_with_highorder_secret(self):
-        secret = b'\xce\xb1\xce\xb2\xce\xb3\xce\xb4'.decode('utf-8')
-        serialized = serialize('123', secret)
-        result = self._callFUT(serialized, secret)
-        self.assertEqual(result, '123')
-
-    # bwcompat with pyramid <= 1.5b1 where latin1 is the default
-    def test_it_with_latin1_secret(self):
-        secret = b'La Pe\xc3\xb1a'
-        serialized = serialize('123', secret)
-        result = self._callFUT(serialized, secret.decode('latin-1'))
-        self.assertEqual(result, '123')
 
 
 class TestPickleSerializer(unittest.TestCase):

@@ -2,8 +2,6 @@
 source =
     pyramid
     tests
-omit =
-    src/pyramid/scaffolds/tests.py
 
 [paths]
 source =

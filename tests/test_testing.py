@@ -434,6 +434,20 @@ class Test_setUp(unittest.TestCase):
         config = self._callFUT(hook_zca=False, settings=dict(a=1))
         self.assertEqual(config.registry.settings['a'], 1)
 
+    def test_it_with_unpatched_registry(self):
+        from zope.interface.registry import Components
+
+        class DummyRegistry(Components, dict):
+            pass
+
+        dummy_registry = DummyRegistry()
+        config = self._callFUT(
+            registry=dummy_registry, hook_zca=False, settings=dict(a=1)
+        )
+        self.assertEqual(config.registry.settings['a'], 1)
+        dummy = DummyEvent()
+        self.assertIs(dummy_registry.queryAdapterOrSelf(dummy, IDummy), dummy)
+
 
 class Test_cleanUp(Test_setUp):
     def _callFUT(self, *arg, **kw):

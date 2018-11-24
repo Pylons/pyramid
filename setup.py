@@ -23,7 +23,7 @@ def readfile(name):
 README = readfile('README.rst')
 CHANGES = readfile('CHANGES.rst')
 
-VERSION = '1.10b1'
+VERSION = '2.0.dev0'
 
 install_requires = [
     'hupper',
@@ -52,11 +52,7 @@ docs_extras = [
     'sphinxcontrib-autoprogram',
 ]
 
-testing_extras = tests_require + [
-    'coverage',
-    'nose',
-    'virtualenv',  # for scaffolding tests
-]
+testing_extras = tests_require + ['coverage', 'nose']
 
 base_version = parse_version(VERSION).base_version
 
@@ -110,14 +106,9 @@ setup(
     tests_require=tests_require,
     test_suite="tests",
     entry_points="""\
-        [pyramid.scaffold]
-        starter=pyramid.scaffolds:StarterProjectTemplate
-        zodb=pyramid.scaffolds:ZODBProjectTemplate
-        alchemy=pyramid.scaffolds:AlchemyProjectTemplate
         [pyramid.pshell_runner]
         python=pyramid.scripts.pshell:python_shell_runner
         [console_scripts]
-        pcreate = pyramid.scripts.pcreate:main
         pserve = pyramid.scripts.pserve:main
         pshell = pyramid.scripts.pshell:main
         proutes = pyramid.scripts.proutes:main

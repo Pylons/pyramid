@@ -1,3 +1,0 @@
-[pytest]
-testpaths = {{package}}
-python_files = *.py

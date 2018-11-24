@@ -1,3 +1,6 @@
+.. index::
+   single: upgrading pyramid
+
 .. _upgrading_chapter:
 
 Upgrading Pyramid

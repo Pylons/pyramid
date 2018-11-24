@@ -40,6 +40,7 @@ class RoutesConfiguratorMixin(object):
         path=None,
         pregenerator=None,
         static=False,
+        inherit_slash=None,
         **predicates
     ):
         """ Add a :term:`route configuration` to the current
@@ -138,6 +139,27 @@ class RoutesConfiguratorMixin(object):
           ``static`` is ``False``.  See :ref:`static_route_narr`.
 
           .. versionadded:: 1.1
+
+        inherit_slash
+
+          This argument can only be used when the ``pattern`` is an empty
+          string (``''``). By default, the composed route pattern will always
+          include a trailing slash, but this argument provides a way to
+          opt-out if both, you (the developer invoking ``add_route``) and the
+          integrator (the developer setting the :term:`route prefix`),
+          agree that the pattern should not contain a trailing slash.
+          For example:
+
+          .. code-block:: python
+
+              with config.route_prefix_context('/users'):
+                  config.add_route('users', '', inherit_slash=True)
+
+          In this example, the resulting route pattern will be ``/users``.
+          Alternatively, if the route prefix were ``/users/``, then the
+          resulting route pattern would be ``/users/``.
+
+          .. versionadded:: 2.0
 
         Predicate Arguments
 
@@ -247,6 +269,10 @@ class RoutesConfiguratorMixin(object):
               :app:`Pyramid` 2.0. Use a list of specific media types to match
               more than one type.
 
+          .. versionchanged:: 2.0
+
+              Removed support for media ranges.
+
         effective_principals
 
           If specified, this value should be a :term:`principal` identifier or
@@ -308,24 +334,11 @@ class RoutesConfiguratorMixin(object):
 
         if accept is not None:
             if not is_nonstr_iter(accept):
-                if '*' in accept:
-                    warnings.warn(
-                        (
-                            'Passing a media range to the "accept" argument '
-                            'of Configurator.add_route is deprecated as of '
-                            'Pyramid 1.10. Use a list of explicit media types.'
-                        ),
-                        DeprecationWarning,
-                        stacklevel=3,
-                    )
-                # XXX switch this to False when range support is dropped
-                accept = [normalize_accept_offer(accept, allow_range=True)]
-
-            else:
-                accept = [
-                    normalize_accept_offer(accept_option)
-                    for accept_option in accept
-                ]
+                accept = [accept]
+            accept = [
+                normalize_accept_offer(accept_option)
+                for accept_option in accept
+            ]
 
         # these are route predicates; if they do not match, the next route
         # in the routelist will be tried
@@ -337,6 +350,11 @@ class RoutesConfiguratorMixin(object):
             pattern = path
         if pattern is None:
             raise ConfigurationError('"pattern" argument may not be None')
+
+        if inherit_slash and pattern != '':
+            raise ConfigurationError(
+                '"inherit_slash" may only be used with an empty pattern'
+            )
 
         # check for an external route; an external route is one which is
         # is a full url (e.g. 'http://example.com/{id}')
@@ -373,7 +391,12 @@ class RoutesConfiguratorMixin(object):
             static = True
 
         elif self.route_prefix:
-            pattern = self.route_prefix.rstrip('/') + '/' + pattern.lstrip('/')
+            if pattern == '' and inherit_slash:
+                pattern = self.route_prefix
+            else:
+                pattern = (
+                    self.route_prefix.rstrip('/') + '/' + pattern.lstrip('/')
+                )
 
         mapper = self.get_routes_mapper()
 
@@ -523,9 +546,8 @@ class RoutesConfiguratorMixin(object):
 
     @contextlib.contextmanager
     def route_prefix_context(self, route_prefix):
-        """ Return this configurator with the
-        :attr:`pyramid.config.Configurator.route_prefix` attribute mutated to
-        include the new ``route_prefix``.
+        """
+        Return this configurator with a :term:`route prefix` temporarily set.
 
         When the context exits, the ``route_prefix`` is reset to the original.
 

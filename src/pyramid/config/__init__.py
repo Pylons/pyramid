@@ -602,7 +602,9 @@ class Configurator(
         configuration conflict by registering something with the same
         configuration parameters.
 
-        If the ``route_prefix`` is supplied, it must be a string.  Any calls
+        If the ``route_prefix`` is supplied, it must be a string and will
+        have a similar effect to using
+        :meth:`pyramid.config.Configurator.route_prefix_context`.  Any calls
         to :meth:`pyramid.config.Configurator.add_route` within the included
         callable will have their pattern prefixed with the value of
         ``route_prefix``. This can be used to help mount a set of routes at a

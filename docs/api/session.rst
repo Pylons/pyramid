@@ -9,7 +9,7 @@
 
   .. autofunction:: BaseCookieSessionFactory
 
-  .. autoclass:: PickleSerializer
-
   .. autoclass:: JSONSerializer
+
+  .. autoclass:: PickleSerializer
 

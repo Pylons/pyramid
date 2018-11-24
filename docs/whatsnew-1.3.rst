@@ -514,7 +514,7 @@ Documentation Enhancements
 
 - Added an API docs chapter for :mod:`pyramid.scaffolds`.
 
-- Added a narrative docs chapter named :ref:`scaffolding_chapter`.
+- Added a narrative docs chapter named "Creating Pyramid Scaffolds".
 
 - Added a description of the ``prequest`` command-line script at
   :ref:`invoking_a_request`.

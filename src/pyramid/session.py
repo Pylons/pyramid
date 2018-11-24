@@ -1,10 +1,6 @@
-import base64
 import binascii
-import hashlib
-import hmac
 import os
 import time
-import warnings
 
 from zope.deprecation import deprecated
 from zope.interface import implementer
@@ -15,7 +11,6 @@ from pyramid.compat import pickle, PY2, text_, bytes_, native_
 from pyramid.csrf import check_csrf_origin, check_csrf_token
 
 from pyramid.interfaces import ISession
-from pyramid.util import strings_differ
 
 
 def manage_accessed(wrapped):
@@ -44,98 +39,6 @@ def manage_changed(wrapped):
 
     changed.__doc__ = wrapped.__doc__
     return changed
-
-
-def signed_serialize(data, secret):
-    """ Serialize any pickleable structure (``data``) and sign it
-    using the ``secret`` (must be a string).  Return the
-    serialization, which includes the signature as its first 40 bytes.
-    The ``signed_deserialize`` method will deserialize such a value.
-
-    This function is useful for creating signed cookies.  For example:
-
-    .. code-block:: python
-
-       cookieval = signed_serialize({'a':1}, 'secret')
-       response.set_cookie('signed_cookie', cookieval)
-
-    .. deprecated:: 1.10
-
-       This function will be removed in :app:`Pyramid` 2.0. It is using
-       pickle-based serialization, which is considered vulnerable to remote
-       code execution attacks and will no longer be used by the default
-       session factories at that time.
-
-    """
-    pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
-    try:
-        # bw-compat with pyramid <= 1.5b1 where latin1 is the default
-        secret = bytes_(secret)
-    except UnicodeEncodeError:
-        secret = bytes_(secret, 'utf-8')
-    sig = hmac.new(secret, pickled, hashlib.sha1).hexdigest()
-    return sig + native_(base64.b64encode(pickled))
-
-
-deprecated(
-    'signed_serialize',
-    'This function will be removed in Pyramid 2.0. It is using pickle-based '
-    'serialization, which is considered vulnerable to remote code execution '
-    'attacks.',
-)
-
-
-def signed_deserialize(serialized, secret, hmac=hmac):
-    """ Deserialize the value returned from ``signed_serialize``.  If
-    the value cannot be deserialized for any reason, a
-    :exc:`ValueError` exception will be raised.
-
-    This function is useful for deserializing a signed cookie value
-    created by ``signed_serialize``.  For example:
-
-    .. code-block:: python
-
-       cookieval = request.cookies['signed_cookie']
-       data = signed_deserialize(cookieval, 'secret')
-
-    .. deprecated:: 1.10
-
-       This function will be removed in :app:`Pyramid` 2.0. It is using
-       pickle-based serialization, which is considered vulnerable to remote
-       code execution attacks and will no longer be used by the default
-       session factories at that time.
-    """
-    # hmac parameterized only for unit tests
-    try:
-        input_sig, pickled = (
-            bytes_(serialized[:40]),
-            base64.b64decode(bytes_(serialized[40:])),
-        )
-    except (binascii.Error, TypeError) as e:
-        # Badly formed data can make base64 die
-        raise ValueError('Badly formed base64 data: %s' % e)
-
-    try:
-        # bw-compat with pyramid <= 1.5b1 where latin1 is the default
-        secret = bytes_(secret)
-    except UnicodeEncodeError:
-        secret = bytes_(secret, 'utf-8')
-    sig = bytes_(hmac.new(secret, pickled, hashlib.sha1).hexdigest())
-
-    # Avoid timing attacks (see
-    # http://seb.dbzteam.org/crypto/python-oauth-timing-hmac.pdf)
-    if strings_differ(sig, input_sig):
-        raise ValueError('Invalid signature')
-
-    return pickle.loads(pickled)
-
-
-deprecated(
-    'signed_deserialize',
-    'This function will be removed in Pyramid 2.0. It is using pickle-based '
-    'serialization, which is considered vulnerable to remote code execution '
-    'attacks.',
-)
 
 
 class PickleSerializer(object):
@@ -429,128 +332,6 @@ def BaseCookieSessionFactory(
     return CookieSession
 
 
-def UnencryptedCookieSessionFactoryConfig(
-    secret,
-    timeout=1200,
-    cookie_name='session',
-    cookie_max_age=None,
-    cookie_path='/',
-    cookie_domain=None,
-    cookie_secure=False,
-    cookie_httponly=False,
-    cookie_samesite='Lax',
-    cookie_on_exception=True,
-    signed_serialize=signed_serialize,
-    signed_deserialize=signed_deserialize,
-):
-    """
-    .. deprecated:: 1.5
-        Use :func:`pyramid.session.SignedCookieSessionFactory` instead.
-        Caveat: Cookies generated using ``SignedCookieSessionFactory`` are not
-        compatible with cookies generated using
-        ``UnencryptedCookieSessionFactory``, so existing user session data
-        will be destroyed if you switch to it.
-
-    Configure a :term:`session factory` which will provide unencrypted
-    (but signed) cookie-based sessions.  The return value of this
-    function is a :term:`session factory`, which may be provided as
-    the ``session_factory`` argument of a
-    :class:`pyramid.config.Configurator` constructor, or used
-    as the ``session_factory`` argument of the
-    :meth:`pyramid.config.Configurator.set_session_factory`
-    method.
-
-    The session factory returned by this function will create sessions
-    which are limited to storing fewer than 4000 bytes of data (as the
-    payload must fit into a single cookie).
-
-    Parameters:
-
-    ``secret``
-      A string which is used to sign the cookie.
-
-    ``timeout``
-      A number of seconds of inactivity before a session times out.
-
-    ``cookie_name``
-      The name of the cookie used for sessioning.
-
-    ``cookie_max_age``
-      The maximum age of the cookie used for sessioning (in seconds).
-      Default: ``None`` (browser scope).
-
-    ``cookie_path``
-      The path used for the session cookie.
-
-    ``cookie_domain``
-      The domain used for the session cookie.  Default: ``None`` (no domain).
-
-    ``cookie_secure``
-      The 'secure' flag of the session cookie.
-
-    ``cookie_httponly``
-      The 'httpOnly' flag of the session cookie.
-
-    ``cookie_samesite``
-      The 'samesite' option of the session cookie. Set the value to ``None``
-      to turn off the samesite option.  Default: ``'Lax'``.
-
-    ``cookie_on_exception``
-      If ``True``, set a session cookie even if an exception occurs
-      while rendering a view.
-
-    ``signed_serialize``
-      A callable which takes more or less arbitrary Python data structure and
-      a secret and returns a signed serialization in bytes.
-      Default: ``signed_serialize`` (using pickle).
-
-    ``signed_deserialize``
-      A callable which takes a signed and serialized data structure in bytes
-      and a secret and returns the original data structure if the signature
-      is valid. Default: ``signed_deserialize`` (using pickle).
-
-    .. versionchanged: 1.10
-
-       Added the ``samesite`` option and made the default ``'Lax'``.
-    """
-
-    class SerializerWrapper(object):
-        def __init__(self, secret):
-            self.secret = secret
-
-        def loads(self, bstruct):
-            return signed_deserialize(bstruct, secret)
-
-        def dumps(self, appstruct):
-            return signed_serialize(appstruct, secret)
-
-    serializer = SerializerWrapper(secret)
-
-    return BaseCookieSessionFactory(
-        serializer,
-        cookie_name=cookie_name,
-        max_age=cookie_max_age,
-        path=cookie_path,
-        domain=cookie_domain,
-        secure=cookie_secure,
-        httponly=cookie_httponly,
-        samesite=cookie_samesite,
-        timeout=timeout,
-        reissue_time=0,  # to keep session.accessed == session.renewed
-        set_on_exception=cookie_on_exception,
-    )
-
-
-deprecated(
-    'UnencryptedCookieSessionFactoryConfig',
-    'The UnencryptedCookieSessionFactoryConfig callable is deprecated as of '
-    'Pyramid 1.5.  Use ``pyramid.session.SignedCookieSessionFactory`` instead.'
-    ' Caveat: Cookies generated using SignedCookieSessionFactory are not '
-    'compatible with cookies generated using UnencryptedCookieSessionFactory, '
-    'so existing user session data will be destroyed if you switch to it.',
-)
-
-
 def SignedCookieSessionFactory(
     secret,
     cookie_name='session',
@@ -568,8 +349,6 @@ def SignedCookieSessionFactory(
     serializer=None,
 ):
     """
-    .. versionadded:: 1.5
-
     Configure a :term:`session factory` which will provide signed
     cookie-based sessions.  The return value of this
     function is a :term:`session factory`, which may be provided as
@@ -659,33 +438,29 @@ def SignedCookieSessionFactory(
       method should accept bytes and return a Python object.  The ``dumps``
       method should accept a Python object and return bytes.  A ``ValueError``
       should be raised for malformed inputs.  If a serializer is not passed,
-      the :class:`pyramid.session.PickleSerializer` serializer will be used.
+      the :class:`pyramid.session.JSONSerializer` serializer will be used.
 
     .. warning::
 
-       In :app:`Pyramid` 2.0 the default ``serializer`` option will change to
+       In :app:`Pyramid` 2.0 the default ``serializer`` option changed to
        use :class:`pyramid.session.JSONSerializer`. See
        :ref:`pickle_session_deprecation` for more information about why this
-       change is being made.
+       change was made.
 
     .. versionadded: 1.5a3
 
     .. versionchanged: 1.10
 
-       Added the ``samesite`` option and made the default ``Lax``.
+        Added the ``samesite`` option and made the default ``Lax``.
+
+    .. versionchanged: 2.0
+
+        Changed the default ``serializer`` to be an instance of
+        :class:`pyramid.session.JSONSerializer`.
 
     """
     if serializer is None:
-        serializer = PickleSerializer()
-        warnings.warn(
-            'The default pickle serializer is deprecated as of Pyramid 1.9 '
-            'and it will be changed to use pyramid.session.JSONSerializer in '
-            'version 2.0. Explicitly set the serializer to avoid future '
-            'incompatibilities. See "Upcoming Changes to ISession in '
-            'Pyramid 2.0" for more information about this change.',
-            DeprecationWarning,
-            stacklevel=1,
-        )
+        serializer = JSONSerializer()
 
     signed_serializer = SignedSerializer(
         secret, salt, hashalg, serializer=serializer
