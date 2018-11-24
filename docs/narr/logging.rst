@@ -37,9 +37,8 @@ These ``.ini`` file sections are passed to the `logging module's config file con
 PasteDeploy ``.ini`` files use the Python standard library :mod:`ConfigParser
 format <ConfigParser>`. This is the same format used as the Python
 :ref:`logging module's Configuration file format <logging-config-fileformat>`.
-The application-related and logging-related sections in the configuration file
-can coexist peacefully, and the logging-related sections in the file are used
-when you run ``pserve``.
+The application-related and logging-related sections in the configuration file can coexist peacefully.
+The logging-related sections in the file configure logging when you run ``pserve``.
 
 The ``pserve`` command calls the :func:`pyramid.paster.setup_logging` function,
 a thin wrapper around the :func:`logging.config.fileConfig` using the specified
