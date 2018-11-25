@@ -251,6 +251,21 @@ If the view execution *is* a result of a form submission (if the expression ``'f
 It then redirects to the default view of the context (the page), which will always be the ``view_page`` view.
 
 
+Modifying the ``notfound_view`` in ``notfound.py``
+--------------------------------------------------
+
+We have one more view to modify.
+Open ``tutorial/views/notfound.py`` and make the changes shown by the emphasized lines.
+
+.. literalinclude:: src/views/tutorial/views/notfound.py
+    :linenos:
+    :language: python
+    :emphasize-lines: 3-4, 9-12
+
+We need to import the ``Page`` from our models.
+We eventually return a ``Page`` object as ``page`` into the template ``layout.pt`` to display its name in the title tag.
+
+
 Adding templates
 ================
 
