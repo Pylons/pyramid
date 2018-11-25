@@ -80,7 +80,7 @@ def edit_page(context, request):
 
 
 @view_config(context='..models.Wiki', name='login',
-             renderer='templates/login.pt')
+             renderer='../templates/login.pt')
 @forbidden_view_config(renderer='../templates/login.pt')
 def login(request):
     login_url = request.resource_url(request.context, 'login')
