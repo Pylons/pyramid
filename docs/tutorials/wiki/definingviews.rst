@@ -290,7 +290,7 @@ We can do this via :term:`METAL` macros and slots.
 
 -   The cookiecutter defined a macro named ``layout`` (line 1).
     This macro consists of the entire template.
--   We changed the ``title`` tag to use the ``name`` attribute of a ``page`` object (lines 11-12).
+-   We changed the ``title`` tag to use the ``name`` attribute of a ``page`` object, or if it does not exist then the page title (lines 11-12).
 -   The cookiecutter defined a macro customization point or `slot` (line 36).
     This slot is inside the macro ``layout``.
     Therefore it can be replaced by content, customizing the macro.

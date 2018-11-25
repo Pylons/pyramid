@@ -8,7 +8,7 @@
     <meta name="author" content="Pylons Project">
     <link rel="shortcut icon" href="${request.static_url('tutorial:static/pyramid-16x16.png')}">
 
-    <title>${page.__name__} - Pyramid tutorial wiki (based on
+    <title><span tal:replace="page.__name__ | title"></span> - Pyramid tutorial wiki (based on
     TurboGears 20-Minute Wiki)</title>
 
     <!-- Bootstrap core CSS -->
