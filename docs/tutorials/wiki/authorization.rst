@@ -144,18 +144,18 @@ Open ``tutorial/__init__.py`` and add the highlighted import
 statements:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 1-8
-   :linenos:
-   :emphasize-lines: 3-6,8
-   :language: python
+    :lines: 1-8
+    :linenos:
+    :emphasize-lines: 3-6,8
+    :language: python
 
 Now add those policies to the configuration:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 15-25
-   :lineno-match:
-   :emphasize-lines: 4-6,9-10
-   :language: python
+    :lines: 15-25
+    :lineno-match:
+    :emphasize-lines: 4-6,9-10
+    :language: python
 
 Only the highlighted lines need to be added.
 
@@ -174,14 +174,14 @@ Add permission declarations
 Open ``tutorial/views/default.py`` and add a ``permission='edit'`` parameter to the ``@view_config`` decorators for ``add_page()`` and ``edit_page()``:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 49-51
-   :emphasize-lines: 2-3
-   :language: python
+    :lines: 49-51
+    :emphasize-lines: 2-3
+    :language: python
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 68-70
-   :emphasize-lines: 2-3
-   :language: python
+    :lines: 68-70
+    :emphasize-lines: 2-3
+    :language: python
 
 Only the highlighted lines, along with their preceding commas, need to be edited and added.
 
@@ -191,14 +191,14 @@ Add a ``permission='view'`` parameter to the ``@view_config`` decorator for
 ``view_wiki()`` and ``view_page()`` as follows:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 23-24
-   :emphasize-lines: 1-2
-   :language: python
+    :lines: 23-24
+    :emphasize-lines: 1-2
+    :language: python
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 28-29
-   :emphasize-lines: 1-2
-   :language: python
+    :lines: 28-29
+    :emphasize-lines: 1-2
+    :language: python
 
 Only the highlighted lines, along with their preceding commas, need to be edited and added.
 
@@ -217,46 +217,41 @@ Add login and logout views
 
 We will add a ``login`` view which renders a login form and processes the post from the login form, checking credentials.
 
-We'll also add a ``logout`` view callable to our application and provide a
-link to it.  This view will clear the credentials of the logged in user and
-redirect back to the front page.
+We will also add a ``logout`` view callable to our application and provide a link to it.
+This view will clear the credentials of the logged in user and redirect back to the front page.
 
-Add the following import statements to the head of
-``tutorial/views.py``:
+Add the following import statements to the head of ``tutorial/views/default.py``:
 
-.. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 6-17
-   :emphasize-lines: 1-12
-   :language: python
+.. literalinclude:: src/authorization/tutorial/views/default.py
+    :lines: 4-15
+    :emphasize-lines: 2-10,12
+    :lineno-match:
+    :language: python
 
 All the highlighted lines need to be added or edited.
 
-:meth:`~pyramid.view.forbidden_view_config` will be used to customize the
-default 403 Forbidden page. :meth:`~pyramid.security.remember` and
-:meth:`~pyramid.security.forget` help to create and expire an auth ticket
-cookie.
+:meth:`~pyramid.view.forbidden_view_config` will be used to customize the default 403 Forbidden page.
+:meth:`~pyramid.security.remember` and :meth:`~pyramid.security.forget` help to create and expire an auth ticket cookie.
 
 Now add the ``login`` and ``logout`` views at the end of the file:
 
-.. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 80-
-   :lineno-match:
-   :language: python
+.. literalinclude:: src/authorization/tutorial/views/default.py
+    :lines: 78-
+    :lineno-match:
+    :language: python
 
 ``login()`` has two decorators:
 
-- a ``@view_config`` decorator which associates it with the ``login`` route
-  and makes it visible when we visit ``/login``,
-- a ``@forbidden_view_config`` decorator which turns it into a
-  :term:`forbidden view`. ``login()`` will be invoked when a user tries to
-  execute a view callable for which they lack authorization.  For example, if
-  a user has not logged in and tries to add or edit a Wiki page, they will be
-  shown the login form before being allowed to continue.
+-   A ``@view_config`` decorator which associates it with the ``login`` route and makes it visible when we visit ``/login``.
+-   A ``@forbidden_view_config`` decorator which turns it into a :term:`forbidden view`.
+    ``login()`` will be invoked when a user tries to execute a view callable for which they lack authorization.
+    For example, if a user has not logged in and tries to add or edit a Wiki page, then they will be shown the login form before being allowed to continue.
 
 The order of these two :term:`view configuration` decorators is unimportant.
 
-``logout()`` is decorated with a ``@view_config`` decorator which associates
-it with the ``logout`` route.  It will be invoked when we visit ``/logout``.
+``logout()`` is decorated with a ``@view_config`` decorator which associates it with the ``logout`` route.
+It will be invoked when we visit ``/logout``.
+
 
 Add the ``login.pt`` Template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -264,10 +259,10 @@ Add the ``login.pt`` Template
 Create ``tutorial/templates/login.pt`` with the following content:
 
 .. literalinclude:: src/authorization/tutorial/templates/login.pt
-   :language: html
+    :language: html
 
-The above template is referenced in the login view that we just added in
-``views.py``.
+The above template is referenced in the login view that we just added in ``views.py``.
+
 
 Return a ``logged_in`` flag to the renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -277,19 +272,19 @@ the return value of ``view_page()``, ``add_page()``, and ``edit_page()`` as
 follows:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 46-47
-   :emphasize-lines: 1-2
-   :language: python
+    :lines: 46-47
+    :emphasize-lines: 1-2
+    :language: python
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 65-66
-   :emphasize-lines: 1-2
-   :language: python
+    :lines: 65-66
+    :emphasize-lines: 1-2
+    :language: python
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :lines: 76-78
-   :emphasize-lines: 2-3
-   :language: python
+    :lines: 76-78
+    :emphasize-lines: 2-3
+    :language: python
 
 Only the highlighted lines need to be added or edited.
 
@@ -304,9 +299,9 @@ Open ``tutorial/templates/edit.pt`` and
 indicated by the highlighted lines.
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
-   :lines: 35-39
-   :emphasize-lines: 2-4
-   :language: html
+    :lines: 35-39
+    :emphasize-lines: 2-4
+    :language: html
 
 The attribute ``tal:condition="logged_in"`` will make the element be included
 when ``logged_in`` is any user id. The link will invoke the logout view.  The
@@ -319,27 +314,27 @@ Reviewing our changes
 Our ``tutorial/__init__.py`` will look like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :linenos:
-   :emphasize-lines: 4-5,8,19-21,23-24
-   :language: python
+    :linenos:
+    :emphasize-lines: 4-5,8,19-21,23-24
+    :language: python
 
 Only the highlighted lines need to be added or edited.
 
 Our ``tutorial/models.py`` will look like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/models.py
-   :linenos:
-   :emphasize-lines: 4-7,12-13
-   :language: python
+    :linenos:
+    :emphasize-lines: 4-7,12-13
+    :language: python
 
 Only the highlighted lines need to be added or edited.
 
 Our ``tutorial/views.py`` will look like this when we're done:
 
 .. literalinclude:: src/authorization/tutorial/views.py
-   :linenos:
-   :emphasize-lines: 8,11-15,17,24,29,47,51,66,70,78,80-
-   :language: python
+    :linenos:
+    :emphasize-lines: 8,11-15,17,24,29,47,51,66,70,78,80-
+    :language: python
 
 Only the highlighted lines need to be added or edited.
 
@@ -347,9 +342,9 @@ Our ``tutorial/templates/edit.pt`` template will look like this when
 we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
-   :linenos:
-   :emphasize-lines: 36-38
-   :language: html
+    :linenos:
+    :emphasize-lines: 36-38
+    :language: html
 
 Only the highlighted lines need to be added or edited.
 
@@ -357,9 +352,9 @@ Our ``tutorial/templates/view.pt`` template will look like this when
 we're done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt
-   :linenos:
-   :emphasize-lines: 36-38
-   :language: html
+    :linenos:
+    :emphasize-lines: 36-38
+    :language: html
 
 Only the highlighted lines need to be added or edited.
 
