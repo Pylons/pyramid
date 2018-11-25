@@ -190,12 +190,12 @@ The result is that only users who possess the ``edit`` permission at the time of
 Add a ``permission='view'`` parameter to the ``@view_config`` decorator for
 ``view_wiki()`` and ``view_page()`` as follows:
 
-.. literalinclude:: src/authorization/tutorial/views.py
+.. literalinclude:: src/authorization/tutorial/views/default.py
     :lines: 23-24
     :emphasize-lines: 1-2
     :language: python
 
-.. literalinclude:: src/authorization/tutorial/views.py
+.. literalinclude:: src/authorization/tutorial/views/default.py
     :lines: 28-29
     :emphasize-lines: 1-2
     :language: python
@@ -225,7 +225,6 @@ Add the following import statements to the head of ``tutorial/views/default.py``
 .. literalinclude:: src/authorization/tutorial/views/default.py
     :lines: 4-15
     :emphasize-lines: 2-10,12
-    :lineno-match:
     :language: python
 
 All the highlighted lines need to be added or edited.
@@ -267,93 +266,90 @@ The above template is referenced in the login view that we just added in ``views
 Return a ``logged_in`` flag to the renderer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Open ``tutorial/views.py`` again. Add a ``logged_in`` parameter to
-the return value of ``view_page()``, ``add_page()``, and ``edit_page()`` as
-follows:
+Open ``tutorial/views/default.py`` again.
+Add a ``logged_in`` parameter to the return value of ``view_page()``, ``add_page()``, and ``edit_page()`` as follows:
 
-.. literalinclude:: src/authorization/tutorial/views.py
-    :lines: 46-47
+.. literalinclude:: src/authorization/tutorial/views/default.py
+    :lines: 45-46
     :emphasize-lines: 1-2
     :language: python
 
-.. literalinclude:: src/authorization/tutorial/views.py
+.. literalinclude:: src/authorization/tutorial/views/default.py
     :lines: 65-66
     :emphasize-lines: 1-2
     :language: python
 
-.. literalinclude:: src/authorization/tutorial/views.py
-    :lines: 76-78
+.. literalinclude:: src/authorization/tutorial/views/default.py
+    :lines: 77-79
     :emphasize-lines: 2-3
     :language: python
 
 Only the highlighted lines need to be added or edited.
 
-The :meth:`pyramid.request.Request.authenticated_userid` will be ``None`` if
-the user is not authenticated, or a userid if the user is authenticated.
+The :meth:`pyramid.request.Request.authenticated_userid` will be ``None`` if the user is not authenticated, or a ``userid`` if the user is authenticated.
+
 
 Add a "Logout" link when logged in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Open ``tutorial/templates/edit.pt`` and
-``tutorial/templates/view.pt`` and add the following code as
-indicated by the highlighted lines.
+Open ``tutorial/templates/edit.pt`` and ``tutorial/templates/view.pt``.
+Add the following code as indicated by the highlighted lines.
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
-    :lines: 35-39
+    :lines: 4-8
     :emphasize-lines: 2-4
     :language: html
 
-The attribute ``tal:condition="logged_in"`` will make the element be included
-when ``logged_in`` is any user id. The link will invoke the logout view.  The
-above element will not be included if ``logged_in`` is ``None``, such as when
+The attribute ``tal:condition="logged_in"`` will make the element be included when ``logged_in`` is any user id.
+The link will invoke the logout view.
+The above element will not be included if ``logged_in`` is ``None``, such as when
 a user is not authenticated.
+
 
 Reviewing our changes
 ---------------------
 
-Our ``tutorial/__init__.py`` will look like this when we're done:
+Our ``tutorial/__init__.py`` will look like this when we are done:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
     :linenos:
-    :emphasize-lines: 4-5,8,19-21,23-24
+    :emphasize-lines: 3-6,8,18-20,23-24
     :language: python
 
 Only the highlighted lines need to be added or edited.
 
-Our ``tutorial/models.py`` will look like this when we're done:
+Our ``tutorial/models.py`` will look like this when we are done:
 
-.. literalinclude:: src/authorization/tutorial/models.py
+.. literalinclude:: src/authorization/tutorial/models/__init__.py
     :linenos:
-    :emphasize-lines: 4-7,12-13
+    :emphasize-lines: 4-8,12-13
     :language: python
 
 Only the highlighted lines need to be added or edited.
 
-Our ``tutorial/views.py`` will look like this when we're done:
+Our ``tutorial/views/default.py`` will look like this when we are done:
 
-.. literalinclude:: src/authorization/tutorial/views.py
+.. literalinclude:: src/authorization/tutorial/views/default.py
     :linenos:
-    :emphasize-lines: 8,11-15,17,24,29,47,51,66,70,78,80-
+    :emphasize-lines: 5-12,15,21-22,27-28,45-46,50-51,65-66,70-71,78-
     :language: python
 
 Only the highlighted lines need to be added or edited.
 
-Our ``tutorial/templates/edit.pt`` template will look like this when
-we're done:
+Our ``tutorial/templates/edit.pt`` template will look like this when we are done:
 
 .. literalinclude:: src/authorization/tutorial/templates/edit.pt
     :linenos:
-    :emphasize-lines: 36-38
+    :emphasize-lines: 5-7
     :language: html
 
 Only the highlighted lines need to be added or edited.
 
-Our ``tutorial/templates/view.pt`` template will look like this when
-we're done:
+Our ``tutorial/templates/view.pt`` template will look like this when we are done:
 
 .. literalinclude:: src/authorization/tutorial/templates/view.pt
     :linenos:
-    :emphasize-lines: 36-38
+    :emphasize-lines: 5-7
     :language: html
 
 Only the highlighted lines need to be added or edited.
@@ -361,32 +357,28 @@ Only the highlighted lines need to be added or edited.
 Viewing the application in a browser
 ------------------------------------
 
-We can finally examine our application in a browser (See
-:ref:`wiki-start-the-application`).  Launch a browser and visit each of the
-following URLs, checking that the result is as expected:
+We can finally examine our application in a browser (See :ref:`wiki-start-the-application`).
+Launch a browser and visit each of the following URLs, checking that the result is as expected:
 
-- http://localhost:6543/ invokes the ``view_wiki`` view.  This always
-  redirects to the ``view_page`` view of the ``FrontPage`` Page resource.  It
-  is executable by any user.
+-   http://localhost:6543/ invokes the ``view_wiki`` view.
+    This always redirects to the ``view_page`` view of the ``FrontPage`` Page resource.
+    It is executable by any user.
 
-- http://localhost:6543/FrontPage invokes the ``view_page`` view of the
-  ``FrontPage`` Page resource. This is because it's the :term:`default view`
-  (a view without a ``name``) for ``Page`` resources.  It is executable by any
-  user.
+-   http://localhost:6543/FrontPage invokes the ``view_page`` view of the ``FrontPage`` Page resource.
+    This is because it is the :term:`default view` (a view without a ``name``) for ``Page`` resources.
+    It is executable by any user.
 
-- http://localhost:6543/FrontPage/edit_page invokes the edit view for the
-  FrontPage object.  It is executable by only the ``editor`` user.  If a
-  different user (or the anonymous user) invokes it, a login form will be
-  displayed.  Supplying the credentials with the username ``editor``, password
-  ``editor`` will display the edit page form.
+-   http://localhost:6543/FrontPage/edit_page invokes the edit view for the FrontPage object.
+    It is executable by only the ``editor`` user.
+    If a different user (or the anonymous user) invokes it, then a login form will be displayed.
+    Supplying the credentials with the username ``editor`` and password ``editor`` will display the edit page form.
 
-- http://localhost:6543/add_page/SomePageName invokes the add view for a page.
-  It is executable by only the ``editor`` user.  If a different user (or the
-  anonymous user) invokes it, a login form will be displayed. Supplying the
-  credentials with the username ``editor``, password ``editor`` will display
-  the edit page form.
+-   http://localhost:6543/add_page/SomePageName invokes the add view for a page.
+    It is executable by only the ``editor`` user.
+    If a different user (or the anonymous user) invokes it, a login form will be displayed.
+    Supplying the credentials with the username ``editor``, password ``editor`` will display the edit page form.
 
-- After logging in (as a result of hitting an edit or add page and submitting
-  the login form with the ``editor`` credentials), we'll see a Logout link in
-  the upper right hand corner.  When we click it, we're logged out, and
-  redirected back to the front page.
+-   After logging in (as a result of hitting an edit or add page and submitting the login form with the ``editor`` credentials), we will see a Logout link in the upper right hand corner.
+    When we click it, we are logged out, and redirected back to the front page.
+
+-   To generate a not found error, visit http://localhost:6543/wakawaka which will invoke the ``notfound_view`` view provided by the cookiecutter.
