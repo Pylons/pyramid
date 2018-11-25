@@ -4,36 +4,30 @@
 Adding authorization
 ====================
 
-:app:`Pyramid` provides facilities for :term:`authentication` and
-:term:`authorization`. We'll make use of both features to provide security to
-our application. Our application currently allows anyone with access to the
-server to view, edit, and add pages to our wiki. We'll change that to allow
-only people who are members of a *group* named ``group:editors`` to add and
-edit wiki pages, but we'll continue allowing anyone with access to the server
-to view pages.
+:app:`Pyramid` provides facilities for :term:`authentication` and :term:`authorization`.
+We will make use of both features to provide security to our application.
+Our application currently allows anyone with access to the server to view, edit, and add pages to our wiki.
+We will change that to allow only people who are members of a *group* named ``group:editors`` to add and edit wiki pages.
+We will continue to allow anyone with access to the server to view pages.
 
-We will also add a login page and a logout link on all the pages.  The login
-page will be shown when a user is denied access to any of the views that
+We will also add a login page and a logout link on all the pages.
+The login page will be shown when a user is denied access to any of the views that
 require permission, instead of a default "403 Forbidden" page.
 
 We will implement the access control with the following steps:
 
-* Add password hashing dependencies.
-* Add users and groups (``security.py``, a new module).
-* Add an :term:`ACL` (``models.py``).
-* Add an :term:`authentication policy` and an :term:`authorization policy`
-  (``__init__.py``).
-* Add :term:`permission` declarations to the ``edit_page`` and ``add_page``
-  views (``views.py``).
+-   Add password hashing dependencies.
+-   Add users and groups (``security.py``, a new module).
+-   Add an :term:`ACL` (``models.py``).
+-   Add an :term:`authentication policy` and an :term:`authorization policy` (``__init__.py``).
+-   Add :term:`permission` declarations to the ``edit_page`` and ``add_page`` views (``views.py``).
 
 Then we will add the login and logout features:
 
-* Add ``login`` and ``logout`` views (``views.py``).
-* Add a login template (``login.pt``).
-* Make the existing views return a ``logged_in`` flag to the renderer
-  (``views.py``).
-* Add a "Logout" link to be shown when logged in and viewing or editing a page
-  (``view.pt``, ``edit.pt``).
+-   Add ``login`` and ``logout`` views (``views.py``).
+-   Add a login template (``login.pt``).
+-   Make the existing views return a ``logged_in`` flag to the renderer (``views.py``).
+-   Add a "Logout" link to be shown when logged in and viewing or editing a page (``view.pt``, ``edit.pt``).
 
 
 Access control
@@ -43,7 +37,8 @@ Access control
 Add dependencies
 ~~~~~~~~~~~~~~~~
 
-Just like in :ref:`wiki_defining_views`, we need a new dependency. We need to add the `bcrypt <https://pypi.org/project/bcrypt/>`_ package, to our tutorial package's ``setup.py`` file by assigning this dependency to the ``requires`` parameter in the ``setup()`` function.
+Just like in :ref:`wiki_defining_views`, we need a new dependency.
+We need to add the `bcrypt <https://pypi.org/project/bcrypt/>`_ package to our tutorial package's ``setup.py`` file by assigning this dependency to the ``requires`` parameter in the ``setup()`` function.
 
 Open ``setup.py`` and edit it to look like the following:
 
@@ -58,7 +53,9 @@ Do not forget to run ``pip install -e .`` just like in :ref:`wiki-running-pip-in
 
 .. note::
 
-   We are using the ``bcrypt`` package from PyPI to hash our passwords securely. There are other one-way hash algorithms for passwords if bcrypt is an issue on your system. Just make sure that it's an algorithm approved for storing passwords versus a generic one-way hash.
+    We are using the ``bcrypt`` package from PyPI to hash our passwords securely.
+    There are other one-way hash algorithms for passwords if bcrypt is an issue on your system.
+    Just make sure that it is an algorithm approved for storing passwords versus a generic one-way hash.
 
 
 Add users and groups
