@@ -1,8 +1,8 @@
 .. _wiki_adding_authorization:
 
-====================
-Adding authorization
-====================
+=======================================
+Adding authorization and authentication
+=======================================
 
 :app:`Pyramid` provides facilities for :term:`authentication` and :term:`authorization`.
 We will make use of both features to provide security to our application.
