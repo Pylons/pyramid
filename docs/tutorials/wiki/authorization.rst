@@ -67,34 +67,34 @@ Create a new ``tutorial/security.py`` module with the following content:
    :linenos:
    :language: python
 
-The ``groupfinder`` function accepts a userid and a request and
-returns one of these values:
+The ``groupfinder`` function accepts a ``userid`` and a ``request``
+It returns one of these values:
 
-- If ``userid`` exists in the system, it will return a sequence of group
-  identifiers (or an empty sequence if the user isn't a member of any groups).
-- If the userid *does not* exist in the system, it will return ``None``.
+-   If ``userid`` exists in the system, it will return either a sequence of group identifiers, or an empty sequence if the user is not a member of any groups.
+-   If the userid *does not* exist in the system, it will return ``None``.
 
-For example, ``groupfinder('editor', request )`` returns ``['group:editor']``,
-``groupfinder('viewer', request)`` returns ``[]``, and ``groupfinder('admin',
-request)`` returns ``None``.  We will use ``groupfinder()`` as an
-:term:`authentication policy` "callback" that will provide the
-:term:`principal` or principals for a user.
+For example:
+
+-   ``groupfinder('editor', request )`` returns ``['group:editor']``.
+-   ``groupfinder('viewer', request)`` returns ``[]``.
+-   ``groupfinder('admin', request)`` returns ``None``.
+
+We will use ``groupfinder()`` as an :term:`authentication policy` "callback" that will provide the :term:`principal` or principals for a user.
 
 There are two helper methods that will help us later to authenticate users.
 The first is ``hash_password`` which takes a raw password and transforms it using
-bcrypt into an irreversible representation, a process known as "hashing". The
-second method, ``check_password``, will allow us to compare the hashed value of the
-submitted password against the hashed value of the password stored in the user's
-record. If the two hashed values match, then the submitted
-password is valid, and we can authenticate the user.
+bcrypt into an irreversible representation, a process known as "hashing".
+The second method, ``check_password``, will allow us to compare the hashed value of the submitted password against the hashed value of the password stored in the user's
+record.
+If the two hashed values match, then the submitted password is valid, and we can authenticate the user.
 
-We hash passwords so that it is impossible to decrypt and use them to
-authenticate in the application. If we stored passwords foolishly in clear text,
-then anyone with access to the database could retrieve any password to authenticate
-as any user.
+We hash passwords so that it is impossible to decrypt and use them to authenticate in the application.
+If we stored passwords foolishly in clear text, then anyone with access to the database could retrieve any password to authenticate as any user.
 
 In a production system, user and group data will most often be saved and come from a
-database, but here we use "dummy" data to represent user and groups sources.
+database.
+Here we use "dummy" data to represent user and groups sources.
+
 
 Add an ACL
 ~~~~~~~~~~
