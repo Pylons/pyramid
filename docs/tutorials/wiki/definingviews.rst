@@ -113,7 +113,7 @@ The ``view_wiki`` view function
 Following is the code for the ``view_wiki`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-    :lines: 12-14
+    :lines: 13-15
     :lineno-match:
     :language: python
 
@@ -144,7 +144,7 @@ The ``view_page`` view function
 Here is the code for the ``view_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-    :lines: 16-33
+    :lines: 18-35
     :lineno-match:
     :language: python
 
@@ -183,7 +183,7 @@ The ``add_page`` view function
 Here is the code for the ``add_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-    :lines: 35-50
+    :lines: 38-53
     :lineno-match:
     :language: python
 
@@ -231,7 +231,7 @@ The ``edit_page`` view function
 Here is the code for the ``edit_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-    :lines: 52-60
+    :lines: 56-64
     :lineno-match:
     :language: python
 
