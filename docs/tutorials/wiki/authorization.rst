@@ -152,44 +152,40 @@ statements:
 Now add those policies to the configuration:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
-   :lines: 18-25
+   :lines: 15-25
    :lineno-match:
-   :emphasize-lines: 2-4,6-7
+   :emphasize-lines: 4-6,9-10
    :language: python
 
 Only the highlighted lines need to be added.
 
-We are enabling an ``AuthTktAuthenticationPolicy``, which is based in an auth
-ticket that may be included in the request. We are also enabling an
-``ACLAuthorizationPolicy``, which uses an ACL to determine the *allow* or
-*deny* outcome for a view.
+We enabled an ``AuthTktAuthenticationPolicy`` which is based in an auth ticket that may be included in the request.
+We also enabled an ``ACLAuthorizationPolicy`` which uses an ACL to determine the *allow* or *deny* outcome for a view.
 
-Note that the :class:`pyramid.authentication.AuthTktAuthenticationPolicy`
-constructor accepts two arguments: ``secret`` and ``callback``.  ``secret`` is
-a string representing an encryption key used by the "authentication ticket"
-machinery represented by this policy: it is required.  The ``callback`` is the
-``groupfinder()`` function that we created before.
+Note that the :class:`pyramid.authentication.AuthTktAuthenticationPolicy` constructor accepts two arguments: ``secret`` and ``callback``.
+``secret`` is a string representing an encryption key used by the "authentication ticket" machinery represented by this policy.
+It is required.
+The ``callback`` is the ``groupfinder()`` function that we created earlier.
+
 
 Add permission declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Open ``tutorial/views.py`` and add a ``permission='edit'`` parameter
-to the ``@view_config`` decorators for ``add_page()`` and ``edit_page()``:
 
-.. literalinclude:: src/authorization/tutorial/views.py
+Open ``tutorial/views/default.py`` and add a ``permission='edit'`` parameter to the ``@view_config`` decorators for ``add_page()`` and ``edit_page()``:
+
+.. literalinclude:: src/authorization/tutorial/views/default.py
    :lines: 49-51
    :emphasize-lines: 2-3
    :language: python
 
-.. literalinclude:: src/authorization/tutorial/views.py
+.. literalinclude:: src/authorization/tutorial/views/default.py
    :lines: 68-70
    :emphasize-lines: 2-3
    :language: python
 
-Only the highlighted lines, along with their preceding commas, need to be
-edited and added.
+Only the highlighted lines, along with their preceding commas, need to be edited and added.
 
-The result is that only users who possess the ``edit`` permission at the time
-of the request may invoke those two views.
+The result is that only users who possess the ``edit`` permission at the time of the request may invoke those two views.
 
 Add a ``permission='view'`` parameter to the ``@view_config`` decorator for
 ``view_wiki()`` and ``view_page()`` as follows:
@@ -204,22 +200,22 @@ Add a ``permission='view'`` parameter to the ``@view_config`` decorator for
    :emphasize-lines: 1-2
    :language: python
 
-Only the highlighted lines, along with their preceding commas, need to be
-edited and added.
+Only the highlighted lines, along with their preceding commas, need to be edited and added.
 
 This allows anyone to invoke these two views.
 
-We are done with the changes needed to control access.  The changes that
-follow will add the login and logout feature.
+We are done with the changes needed to control access.
+The changes that follow will add the login and logout feature.
+
 
 Login, logout
 -------------
 
+
 Add login and logout views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We'll add a ``login`` view which renders a login form and processes the post
-from the login form, checking credentials.
+We will add a ``login`` view which renders a login form and processes the post from the login form, checking credentials.
 
 We'll also add a ``logout`` view callable to our application and provide a
 link to it.  This view will clear the credentials of the logged in user and
