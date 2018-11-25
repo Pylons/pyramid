@@ -235,31 +235,21 @@ Here is the code for the ``edit_page`` view function and its decorator:
     :lineno-match:
     :language: python
 
-The ``edit_page`` function is configured to respond when the context is
-a ``Page`` resource and the :term:`view name` is ``edit_page``.  We provide it
-with a ``@view_config`` decorator which names the string ``edit_page`` as its
-:term:`view name` (via ``name=``), the class ``tutorial.models.Page`` as its
-context, and the renderer named ``templates/edit.pt``.  This means that when
-a ``Page`` resource is the context, and a :term:`view name` exists as the result
-of traversal named ``edit_page``, this view will be used.  We inform
-:app:`Pyramid` this view will use the ``templates/edit.pt`` template file as
-a ``renderer``.
+The ``edit_page`` function is configured to respond when the context is a ``Page`` resource and the :term:`view name` is ``edit_page``.
+We provide it with a ``@view_config`` decorator which names the string ``edit_page`` as its :term:`view name` (via ``name=``), the class ``tutorial.models.Page`` as its context, and the renderer named ``templates/edit.pt``.
+This means that when a ``Page`` resource is the context, and a :term:`view name` exists as the result of traversal named ``edit_page``, this view will be used.
+We inform :app:`Pyramid` this view will use the ``templates/edit.pt`` template file as a ``renderer``.
 
-The ``edit_page`` function will be invoked when a user clicks the "Edit this
-Page" button on the view form.  It renders an edit form but it also acts as
-the form post view callable for the form it renders.  The ``context`` of the
-``edit_page`` view will *always* be a ``Page`` resource (never a ``Wiki`` resource).
+The ``edit_page`` function will be invoked when a user clicks the "Edit this Page" button on the view form.
+It renders an edit form.
+It also acts as the form post view callable for the form it renders.
+The ``context`` of the ``edit_page`` view will *always* be a ``Page`` resource (never a ``Wiki`` resource).
 
-If the view execution is *not* a result of a form submission (if the
-expression ``'form.submitted' in request.params`` is ``False``), the view
-simply renders the edit form, passing the page resource, and a ``save_url``
-which will be used as the action of the generated form.
+If the view execution is *not* a result of a form submission (if the expression ``'form.submitted' in request.params`` is ``False``), then the view renders the edit form, passing the page resource, and a ``save_url`` which will be used as the action of the generated form.
 
-If the view execution *is* a result of a form submission (if the expression
-``'form.submitted' in request.params`` is ``True``), the view grabs the
-``body`` element of the request parameter and sets it as the ``data``
-attribute of the page context.  It then redirects to the default view of the
-context (the page), which will always be the ``view_page`` view.
+If the view execution *is* a result of a form submission (if the expression ``'form.submitted' in request.params`` is ``True``), the view grabs the ``body`` element of the request parameter and sets it as the ``data`` attribute of the page context.
+It then redirects to the default view of the context (the page), which will always be the ``view_page`` view.
+
 
 Adding templates
 ================
