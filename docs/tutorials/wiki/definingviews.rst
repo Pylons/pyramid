@@ -76,8 +76,8 @@ Success executing this command will end with a line to the console similar to th
     Successfully installed docutils-0.14 tutorial
 
 
-Adding view functions in ``views.py``
-=====================================
+Adding view functions in the ``views`` package
+==============================================
 
 It is time for a major change.
 Open ``tutorial/views/default.py`` and edit it to look like the following:
@@ -162,12 +162,12 @@ The curried function named ``check`` is used as the first argument to ``wikiword
 If the wiki (our page's ``__parent__``) already contains a page with the matched ``WikiWord`` name, the ``check`` function generates a view link to be used as the substitution value and returns it.
 If the wiki does not already contain a page with the matched ``WikiWord`` name, the function generates an "add" link as the substitution value and returns it.
 
-As a result, the ``content`` variable is now a fully formed bit of HTML containing various view and add links for ``WikiWord``\s based on the content of our current page resource.
+As a result, the ``page_text`` variable is now a fully formed bit of HTML containing various view and add links for ``WikiWord``\s based on the content of our current page resource.
 
 We then generate an edit URL because it is easier to do here than in the template.
 Finally we wrap up a number of arguments in a dictionary and return it.
 
-The arguments we wrap into a dictionary include ``page``, ``content``, and ``edit_url``.
+The arguments we wrap into a dictionary include ``page``, ``page_text``, and ``edit_url``.
 As a result, the *template* associated with this view callable (via ``renderer=`` in its configuration) will be able to use these names to perform various rendering tasks.
 The template associated with this view callable will be a template which lives in ``templates/view.pt``.
 
@@ -254,11 +254,36 @@ It then redirects to the default view of the context (the page), which will alwa
 Adding templates
 ================
 
-The ``view_page``, ``add_page`` and ``edit_page`` views that we've added
-reference a :term:`template`.  Each template is a :term:`Chameleon`
-:term:`ZPT` template.  These templates will live in the ``templates``
-directory of our tutorial package.  Chameleon templates must have a ``.pt``
-extension to be recognized as such.
+The ``view_page``, ``add_page``, and ``edit_page`` views that we added reference a :term:`template`.
+Each template is a :term:`Chameleon` :term:`ZPT` template.
+These templates will live in the ``templates`` directory of our tutorial package.
+Chameleon templates must have a ``.pt`` extension to be recognized as such.
+
+
+The ``layout.pt`` template
+--------------------------
+
+Update ``tutorial/templates/layout.pt`` with the following content, as indicated by the emphasized lines:
+
+.. literalinclude:: src/views/tutorial/templates/layout.pt
+   :linenos:
+   :emphasize-lines: 11-12
+   :language: html
+
+Since we are using a templating engine, we can factor common boilerplate out of our page templates into reusable components.
+We can do this via :term:`METAL` macros and slots.
+
+-   The cookiecutter defined a macro named ``layout`` (Line 1).
+    This macro consists of the entire document.
+-   The cookiecutter defined a macro customization point or `slot` (Line 36).
+    This slot is inside the macro ``layout``.
+    Therefore it can be replaced by content, customizing the macro.
+-   We removed the row of icons and links from the original cookiecutter.
+
+.. seealso::
+
+    Please refer to the Chameleon documentation for more information about using `METAL <https://chameleon.readthedocs.io/en/latest/>`_ for defining and using macros and slots.
+
 
 The ``view.pt`` template
 ------------------------
@@ -268,16 +293,19 @@ Rename ``tutorial/templates/mytemplate.pt`` to ``tutorial/templates/view.pt`` an
 .. literalinclude:: src/views/tutorial/templates/view.pt
     :linenos:
     :language: html
-    :emphasize-lines: 11-12,37-52
+    :emphasize-lines: 5-19
 
 This template is used by ``view_page()`` for displaying a single
 wiki page. It includes:
 
-- A ``div`` element that is replaced with the ``content`` value provided by
-  the view (lines 37-39).  ``content`` contains HTML, so the ``structure``
-  keyword is used to prevent escaping it (i.e., changing ">" to "&gt;", etc.)
-- A link that points at the "edit" URL which invokes the ``edit_page`` view
-  for the page being viewed (lines 41-43).
+-   The use of a macro to load the entire template ``layout.pt``.
+-   The template fills the slot named ``content`` (line 2) with a ``div`` element.
+-   A ``div`` element that is replaced with the ``page_text`` value provided by the view (line 5).
+    ``page_text`` contains HTML, so the ``structure`` keyword is used to prevent escaping HTML entities, such as changing ``>`` to ``&gt;``.
+-   A link that points at the "edit" URL, which invokes the ``edit_page`` view for the page being viewed (lines 9-11).
+-   A ``span`` whose content is replaced by the name of the page, if present.
+-   A link to the FrontPage.
+
 
 The ``edit.pt`` template
 ------------------------
@@ -288,58 +316,48 @@ Copy ``tutorial/templates/view.pt`` to ``tutorial/templates/edit.pt`` and edit t
     :linenos:
     :language: html
 
-This template is used by ``add_page()`` and ``edit_page()`` for adding and
-editing a wiki page.  It displays a page containing a form that includes:
+This template is used by ``add_page()`` and ``edit_page()`` for adding and editing a wiki page.
+It displays a page containing a form that includes:
 
-- A 10-row by 60-column ``textarea`` field named ``body`` that is filled
-  with any existing page data when it is rendered (line 46).
-- A submit button that has the name ``form.submitted`` (line 49).
+- A 10-row by 60-column ``textarea`` field named ``body`` that is filled with any existing page data when it is rendered (lines 14-15).
+- A submit button that has the name ``form.submitted`` (line 18).
 
-The form POSTs back to the ``save_url`` argument supplied by the view (line
-44).  The view will use the ``body`` and ``form.submitted`` values.
+When submitted, the form sends a POST request to the ``save_url`` argument supplied by the view (line 12).
+The view will use the ``body`` and ``form.submitted`` values.
 
-.. note:: Our templates use a ``request`` object that none of our tutorial
-   views return in their dictionary. ``request`` is one of several names that
-   are available "by default" in a template when a template renderer is used.
-   See :ref:`renderer_system_values` for information about other names that
-   are available by default when a template is used as a renderer.
+.. note::
+
+    Our templates use a ``request`` object that none of our tutorial views return in their dictionary.
+    ``request`` is one of several names that are available "by default" in a template when a template renderer is used.
+    See :ref:`renderer_system_values` for information about other names that are available by default when a template is used as a renderer.
 
 
 Static assets
 -------------
 
-Our templates name static assets, including CSS and images.  We don't need
-to create these files within our package's ``static`` directory because they
-were provided at the time we created the project.
+Our templates name static assets, including CSS and images.
+We don't need to create these files within our package's ``static`` directory because they were provided by the cookiecutter at the time we created the project.
 
-As an example, the CSS file will be accessed via
-``http://localhost:6543/static/theme.css`` by virtue of the call to the
-``add_static_view`` directive we've made in the ``__init__.py`` file.  Any
-number and type of static assets can be placed in this directory (or
-subdirectories) and are just referred to by URL or by using the convenience
-method ``static_url``, e.g.,
-``request.static_url('<package>:static/foo.css')`` within templates.
+As an example, the CSS file will be accessed via ``http://localhost:6543/static/theme.css`` by virtue of the call to the ``add_static_view`` directive in the ``routes.py`` file.
+Any number and type of static assets can be placed in this directory (or subdirectories)
+They are referred to by either URL or using the convenience method ``static_url``, for example ``request.static_url('<package>:static/foo.css')``, within templates.
 
 
 Viewing the application in a browser
 ====================================
 
-We can finally examine our application in a browser (See
-:ref:`wiki-start-the-application`).  Launch a browser and visit
-each of the following URLs, checking that the result is as expected:
+We can finally examine our application in a browser (See :ref:`wiki-start-the-application`).
+Launch a browser and visit each of the following URLs, checking that the result is as expected:
 
-- http://localhost:6543/ invokes the ``view_wiki`` view.  This always
-  redirects to the ``view_page`` view of the ``FrontPage`` ``Page`` resource.
+-   http://localhost:6543/ invokes the ``view_wiki`` view.
+    This always redirects to the ``view_page`` view of the ``FrontPage`` ``Page`` resource.
 
-- http://localhost:6543/FrontPage/ invokes the ``view_page`` view of the front
-  page resource.  This is because it's the :term:`default view` (a view
-  without a ``name``) for ``Page`` resources.
+-   http://localhost:6543/FrontPage/ invokes the ``view_page`` view of the front page resource.
+    This is because it is the :term:`default view` (a view without a ``name``) for ``Page`` resources.
 
-- http://localhost:6543/FrontPage/edit_page invokes the edit view for the
-  ``FrontPage`` ``Page`` resource.
+-   http://localhost:6543/FrontPage/edit_page invokes the edit view for the ``FrontPage`` ``Page`` resource.
 
-- http://localhost:6543/add_page/SomePageName invokes the add view for a ``Page``.
+-   http://localhost:6543/add_page/SomePageName invokes the add view for a ``Page``.
 
-- To generate an error, visit http://localhost:6543/add_page which will
-  generate an ``IndexError: tuple index out of range`` error. You'll see an
-  interactive traceback facility provided by :term:`pyramid_debugtoolbar`.
+-   To generate an error, visit http://localhost:6543/add_page which will generate an ``IndexError: tuple index out of range`` error.
+    You will see an interactive traceback facility provided by :term:`pyramid_debugtoolbar`.
