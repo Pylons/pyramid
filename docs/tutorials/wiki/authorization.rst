@@ -43,9 +43,9 @@ We need to add the `bcrypt <https://pypi.org/project/bcrypt/>`_ package to our t
 Open ``setup.py`` and edit it to look like the following:
 
 .. literalinclude:: src/authorization/setup.py
-   :linenos:
-   :emphasize-lines: 23
-   :language: python
+    :linenos:
+    :emphasize-lines: 23
+    :language: python
 
 Only the highlighted line needs to be added.
 
@@ -64,8 +64,8 @@ Add users and groups
 Create a new ``tutorial/security.py`` module with the following content:
 
 .. literalinclude:: src/authorization/tutorial/security.py
-   :linenos:
-   :language: python
+    :linenos:
+    :language: python
 
 The ``groupfinder`` function accepts a ``userid`` and a ``request``
 It returns one of these values:
@@ -99,43 +99,43 @@ Here we use "dummy" data to represent user and groups sources.
 Add an ACL
 ~~~~~~~~~~
 
-Open ``tutorial/models.py`` and add the following import
-statement near the top:
+Open ``tutorial/models.py`` and add the following import statement near the top:
 
-.. literalinclude:: src/authorization/tutorial/models.py
-   :lines: 4-8
-   :lineno-match:
-   :language: python
+.. literalinclude:: src/authorization/tutorial/models/__init__.py
+    :lines: 4-8
+    :lineno-match:
+    :language: python
 
 Add the following lines to the ``Wiki`` class:
 
-.. literalinclude:: src/authorization/tutorial/models.py
-   :lines: 9-13
-   :lineno-match:
-   :emphasize-lines: 4-5
-   :language: python
+.. literalinclude:: src/authorization/tutorial/models/__init__.py
+    :lines: 9-13
+    :lineno-match:
+    :emphasize-lines: 4-5
+    :language: python
 
-We import :data:`~pyramid.security.Allow`, an action that means that
-permission is allowed, and :data:`~pyramid.security.Everyone`, a special
-:term:`principal` that is associated to all requests.  Both are used in the
-:term:`ACE` entries that make up the ACL.
+We import :data:`~pyramid.security.Allow`, an action which means that
+permission is allowed.
+We also import :data:`~pyramid.security.Everyone`, a special :term:`principal` that is associated to all requests.
+Both are used in the :term:`ACE` entries that make up the ACL.
 
-The ACL is a list that needs to be named ``__acl__`` and be an attribute of a
-class.  We define an :term:`ACL` with two :term:`ACE` entries: the first entry
-allows any user the ``view`` permission.  The second entry allows the
-``group:editors`` principal the ``edit`` permission.
+The ACL is a list that needs to be named ``__acl__`` and be an attribute of a class.
+We define an :term:`ACL` with two :term:`ACE` entries.
+The first entry allows any user the ``view`` permission.
+The second entry allows the ``group:editors`` principal the ``edit`` permission.
 
-The ``Wiki`` class that contains the ACL is the :term:`resource` constructor
-for the :term:`root` resource, which is a ``Wiki`` instance.  The ACL is
-provided to each view in the :term:`context` of the request as the ``context``
-attribute.
+The ``Wiki`` class that contains the ACL is the :term:`resource` constructor for the :term:`root` resource, which is a ``Wiki`` instance.
+The ACL is provided to each view in the :term:`context` of the request as the ``context`` attribute.
 
-It's only happenstance that we're assigning this ACL at class scope.  An ACL
-can be attached to an object *instance* too; this is how "row level security"
-can be achieved in :app:`Pyramid` applications.  We actually need only *one*
-ACL for the entire system, however, because our security requirements are
-simple, so this feature is not demonstrated.  See :ref:`assigning_acls` for
-more information about what an :term:`ACL` represents.
+It is only happenstance that we assigned this ACL at class scope.
+An ACL can be attached to an object *instance* too.
+This is how "row level security" can be achieved in :app:`Pyramid` applications.
+We actually need only *one* ACL for the entire system, however, because our security requirements are simple, so this feature is not demonstrated.
+
+.. seealso::
+
+    See :ref:`assigning_acls` for more information about what an :term:`ACL` represents.
+
 
 Add authentication and authorization policies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
