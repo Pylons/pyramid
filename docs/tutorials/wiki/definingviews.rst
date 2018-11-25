@@ -267,17 +267,19 @@ Update ``tutorial/templates/layout.pt`` with the following content, as indicated
 
 .. literalinclude:: src/views/tutorial/templates/layout.pt
    :linenos:
-   :emphasize-lines: 11-12
+   :emphasize-lines: 11-12, 37-41
    :language: html
 
 Since we are using a templating engine, we can factor common boilerplate out of our page templates into reusable components.
 We can do this via :term:`METAL` macros and slots.
 
--   The cookiecutter defined a macro named ``layout`` (Line 1).
-    This macro consists of the entire document.
--   The cookiecutter defined a macro customization point or `slot` (Line 36).
+-   The cookiecutter defined a macro named ``layout`` (line 1).
+    This macro consists of the entire template.
+-   We changed the ``title`` tag to use the ``name`` attribute of a ``page`` object (lines 11-12).
+-   The cookiecutter defined a macro customization point or `slot` (line 36).
     This slot is inside the macro ``layout``.
     Therefore it can be replaced by content, customizing the macro.
+-   We added a ``div`` element with a link to allow the user to return to the front page (lines 37-41).
 -   We removed the row of icons and links from the original cookiecutter.
 
 .. seealso::
@@ -293,7 +295,7 @@ Rename ``tutorial/templates/mytemplate.pt`` to ``tutorial/templates/view.pt`` an
 .. literalinclude:: src/views/tutorial/templates/view.pt
     :linenos:
     :language: html
-    :emphasize-lines: 5-19
+    :emphasize-lines: 5-16
 
 This template is used by ``view_page()`` for displaying a single
 wiki page. It includes:
@@ -304,7 +306,6 @@ wiki page. It includes:
     ``page_text`` contains HTML, so the ``structure`` keyword is used to prevent escaping HTML entities, such as changing ``>`` to ``&gt;``.
 -   A link that points at the "edit" URL, which invokes the ``edit_page`` view for the page being viewed (lines 9-11).
 -   A ``span`` whose content is replaced by the name of the page, if present.
--   A link to the FrontPage.
 
 
 The ``edit.pt`` template
@@ -315,14 +316,15 @@ Copy ``tutorial/templates/view.pt`` to ``tutorial/templates/edit.pt`` and edit t
 .. literalinclude:: src/views/tutorial/templates/edit.pt
     :linenos:
     :language: html
+    :emphasize-lines: 5-20
 
 This template is used by ``add_page()`` and ``edit_page()`` for adding and editing a wiki page.
 It displays a page containing a form that includes:
 
-- A 10-row by 60-column ``textarea`` field named ``body`` that is filled with any existing page data when it is rendered (lines 14-15).
-- A submit button that has the name ``form.submitted`` (line 18).
+- A 10-row by 60-column ``textarea`` field named ``body`` that is filled with any existing page data when it is rendered (lines 11-13).
+- A submit button that has the name ``form.submitted`` (lines 16-18).
 
-When submitted, the form sends a POST request to the ``save_url`` argument supplied by the view (line 12).
+When submitted, the form sends a POST request to the ``save_url`` argument supplied by the view (line 9).
 The view will use the ``body`` and ``form.submitted`` values.
 
 .. note::
@@ -361,3 +363,5 @@ Launch a browser and visit each of the following URLs, checking that the result 
 
 -   To generate an error, visit http://localhost:6543/add_page which will generate an ``IndexError: tuple index out of range`` error.
     You will see an interactive traceback facility provided by :term:`pyramid_debugtoolbar`.
+
+-   To generate a not found error, visit http://localhost:6543/wakawaka which will invoke the ``notfound_view`` view provided by the cookiecutter.
