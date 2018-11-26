@@ -65,53 +65,45 @@ See also :term:`Deployment settings`.
 This will be a dictionary of settings parsed from the ``.ini`` file, which contains
 deployment-related values, such as ``pyramid.reload_templates``, ``zodbconn.uri``, and so on.
 
-Next use an explicit transaction manager for our application.
-This prevents new transactions from being implicitly created when touching the manager outside of the ``pyramid_tm`` lifecycle.
+Next include support for ``pyramid_tm``, allowing Pyramid requests to join the active transaction as provided by the `transaction <https://pypi.org/project/transaction/>`_ package.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 15
     :lineno-match:
     :language: py
 
-Next include support for ``pyramid_tm``, allowing Pyramid requests to join the active transaction as provided by the `transaction <https://pypi.org/project/transaction/>`_ package.
+Next include support for ``pyramid_retry`` to retry a request when transient exceptions occur.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 16
     :lineno-match:
     :language: py
 
-Next include support for ``pyramid_retry`` to retry a request when transient exceptions occur.
+Next include support for ``pyramid_zodbconn``, providing integration between :term:`ZODB` and a Pyramid application.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 17
     :lineno-match:
     :language: py
 
-Next include support for ``pyramid_zodbconn``, providing integration between :term:`ZODB` and a Pyramid application.
+Next set a root factory using our function named ``root_factory``.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 18
     :lineno-match:
     :language: py
 
-Next set a root factory using our function named ``root_factory``.
+Next include support for the :term:`Chameleon` template rendering bindings, allowing us to use the ``.pt`` templates.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 19
     :lineno-match:
     :language: py
 
-Next include support for the :term:`Chameleon` template rendering bindings, allowing us to use the ``.pt`` templates.
-
-.. literalinclude:: src/basiclayout/tutorial/__init__.py
-    :lines: 20
-    :lineno-match:
-    :language: py
-
 Next include routes from the ``.routes`` module.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
-    :lines: 21
+    :lines: 20
     :lineno-match:
     :language: py
 
@@ -132,7 +124,7 @@ The third argument is an optional ``cache_max_age`` which specifies the number o
 Next perform a :term:`scan`.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
-    :lines: 22
+    :lines: 21
     :lineno-match:
     :language: py
 
@@ -144,7 +136,7 @@ The cookiecutter could have equivalently said ``config.scan('tutorial')``, but i
 Finally use the :meth:`pyramid.config.Configurator.make_wsgi_app` method to return a :term:`WSGI` application.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
-    :lines: 23
+    :lines: 22
     :lineno-match:
     :language: py
 

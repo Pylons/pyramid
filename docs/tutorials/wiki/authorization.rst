@@ -154,7 +154,7 @@ Now add those policies to the configuration:
 .. literalinclude:: src/authorization/tutorial/__init__.py
     :lines: 15-25
     :lineno-match:
-    :emphasize-lines: 4-6,9-10
+    :emphasize-lines: 4-6,8-9
     :language: python
 
 Only the highlighted lines need to be added.
@@ -313,7 +313,7 @@ Our ``tutorial/__init__.py`` will look like this when we are done:
 
 .. literalinclude:: src/authorization/tutorial/__init__.py
     :linenos:
-    :emphasize-lines: 3-6,8,18-20,23-24
+    :emphasize-lines: 3-6,8,18-20,22-23
     :language: python
 
 Only the highlighted lines need to be added or edited.
