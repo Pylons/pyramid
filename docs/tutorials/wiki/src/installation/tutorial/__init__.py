@@ -12,7 +12,6 @@ def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
     with Configurator(settings=settings) as config:
-        settings['tm.manager_hook'] = 'pyramid_tm.explicit_manager'
         config.include('pyramid_tm')
         config.include('pyramid_retry')
         config.include('pyramid_zodbconn')

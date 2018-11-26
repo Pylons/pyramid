@@ -19,7 +19,6 @@ def main(global_config, **settings):
         'sosecret', callback=groupfinder, hashalg='sha512')
     authz_policy = ACLAuthorizationPolicy()
     with Configurator(settings=settings) as config:
-        settings['tm.manager_hook'] = 'pyramid_tm.explicit_manager'
         config.set_authentication_policy(authn_policy)
         config.set_authorization_policy(authz_policy)
         config.include('pyramid_tm')
