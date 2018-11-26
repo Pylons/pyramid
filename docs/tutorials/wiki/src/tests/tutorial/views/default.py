@@ -2,30 +2,29 @@ from docutils.core import publish_parts
 import re
 
 from pyramid.httpexceptions import HTTPFound
-
-from pyramid.view import (
-    view_config,
-    forbidden_view_config,
-    )
-
 from pyramid.security import (
-    remember,
     forget,
+    remember,
+)
+from pyramid.view import (
+    forbidden_view_config,
+    view_config,
     )
 
-
-from .security import USERS, check_password
-from .models import Page
+from ..models import Page
+from ..security import check_password, USERS
 
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
-@view_config(context='.models.Wiki',
+
+@view_config(context='..models.Wiki',
              permission='view')
 def view_wiki(context, request):
     return HTTPFound(location=request.resource_url(context, 'FrontPage'))
 
-@view_config(context='.models.Page', renderer='templates/view.pt',
+
+@view_config(context='..models.Page', renderer='../templates/view.pt',
              permission='view')
 def view_page(context, request):
     wiki = context.__parent__
@@ -40,14 +39,15 @@ def view_page(context, request):
             add_url = request.application_url + '/add_page/' + word
             return '<a href="%s">%s</a>' % (add_url, word)
 
-    content = publish_parts(context.data, writer_name='html')['html_body']
-    content = wikiwords.sub(check, content)
+    page_text = publish_parts(context.data, writer_name='html')['html_body']
+    page_text = wikiwords.sub(check, page_text)
     edit_url = request.resource_url(context, 'edit_page')
-    return dict(page=context, content=content, edit_url=edit_url,
+    return dict(page=context, page_text=page_text, edit_url=edit_url,
                 logged_in=request.authenticated_userid)
 
-@view_config(name='add_page', context='.models.Wiki',
-             renderer='templates/edit.pt',
+
+@view_config(name='add_page', context='..models.Wiki',
+             renderer='../templates/edit.pt',
              permission='edit')
 def add_page(context, request):
     pagename = request.subpath[0]
@@ -65,8 +65,9 @@ def add_page(context, request):
     return dict(page=page, save_url=save_url,
                 logged_in=request.authenticated_userid)
 
-@view_config(name='edit_page', context='.models.Page',
-             renderer='templates/edit.pt',
+
+@view_config(name='edit_page', context='..models.Page',
+             renderer='../templates/edit.pt',
              permission='edit')
 def edit_page(context, request):
     if 'form.submitted' in request.params:
@@ -77,9 +78,10 @@ def edit_page(context, request):
                 save_url=request.resource_url(context, 'edit_page'),
                 logged_in=request.authenticated_userid)
 
-@view_config(context='.models.Wiki', name='login',
-             renderer='templates/login.pt')
-@forbidden_view_config(renderer='templates/login.pt')
+
+@view_config(context='..models.Wiki', name='login',
+             renderer='../templates/login.pt')
+@forbidden_view_config(renderer='../templates/login.pt')
 def login(request):
     login_url = request.resource_url(request.context, 'login')
     referrer = request.url
@@ -104,10 +106,11 @@ def login(request):
         came_from=came_from,
         login=login,
         password=password,
+        title='Login',
     )
 
 
-@view_config(context='.models.Wiki', name='logout')
+@view_config(context='..models.Wiki', name='logout')
 def logout(request):
     headers = forget(request)
     return HTTPFound(location=request.resource_url(request.context),
