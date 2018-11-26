@@ -2,8 +2,6 @@ import re
 
 from pyramid.exceptions import ConfigurationError
 
-from pyramid.compat import is_nonstr_iter
-
 from pyramid.csrf import check_csrf_token
 from pyramid.traversal import (
     find_interface,
@@ -12,7 +10,7 @@ from pyramid.traversal import (
 )
 
 from pyramid.urldispatch import _compile_route
-from pyramid.util import as_sorted_tuple, object_description
+from pyramid.util import as_sorted_tuple, is_nonstr_iter, object_description
 
 _marker = object()
 

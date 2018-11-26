@@ -1,6 +1,6 @@
 import unittest
 
-from pyramid.compat import bytes_, string_types, text_
+from pyramid.util import bytes_, text_
 
 
 class Test_exception_response(unittest.TestCase):
@@ -66,6 +66,12 @@ class Test__no_escape(unittest.TestCase):
 
     def test_not_basestring(self):
         self.assertEqual(self._callFUT(42), '42')
+
+    def test_bytes(self):
+        self.assertEqual(
+            self._callFUT(b'/La Pe\xc3\xb1a/{x}'),
+            b'/La Pe\xc3\xb1a/{x}'.decode('utf-8'),
+        )
 
     def test_unicode(self):
         class DummyUnicodeObject(object):
@@ -406,7 +412,7 @@ class TestHTTPException(unittest.TestCase):
 
     def test_allow_detail_non_str(self):
         exc = self._makeOne(detail={'error': 'This is a test'})
-        self.assertIsInstance(exc.__str__(), string_types)
+        self.assertIsInstance(exc.__str__(), str)
 
 
 class TestRenderAllExceptionsWithoutArguments(unittest.TestCase):

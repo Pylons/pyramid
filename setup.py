@@ -44,9 +44,9 @@ tests_require = [
 
 
 docs_extras = [
-    'Sphinx >= 1.8.1',
+    'Sphinx >= 1.8.1',  # Unicode characters in tree diagrams
     'docutils',
-    'pylons-sphinx-themes >= 1.0.8',
+    'pylons-sphinx-themes >= 1.0.8',  # Ethical Ads
     'pylons_sphinx_latesturl',
     'repoze.sphinx.autointerface',
     'sphinxcontrib-autoprogram',
@@ -69,7 +69,6 @@ setup(
         "Development Status :: 6 - Mature",
         "Intended Audience :: Developers",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
@@ -96,13 +95,9 @@ setup(
     package_dir={'': 'src'},
     include_package_data=True,
     zip_safe=False,
-    python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
+    python_requires='>=3.4',
     install_requires=install_requires,
-    extras_require={
-        ':python_version<"3.2"': ['repoze.lru >= 0.4'],
-        'testing': testing_extras,
-        'docs': docs_extras,
-    },
+    extras_require={'testing': testing_extras, 'docs': docs_extras},
     tests_require=tests_require,
     test_suite="tests",
     entry_points="""\

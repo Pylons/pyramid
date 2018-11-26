@@ -417,12 +417,11 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
         from pyramid.request import Request
         from pyramid.config import Configurator
         from pyramid.view import render_view
-        from webob.compat import text_type
 
         config = Configurator(settings={})
 
         def view(request):
-            request.response.text = text_type('<body></body>')
+            request.response.text = '<body></body>'
             return request.response
 
         config.add_view(name='test', view=view)

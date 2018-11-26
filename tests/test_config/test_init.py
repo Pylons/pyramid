@@ -1,9 +1,6 @@
 import os
 import unittest
 
-from pyramid.compat import im_func
-from pyramid.testing import skip_on
-
 from . import dummy_tween_factory
 from . import dummy_include
 from . import dummy_extend
@@ -1157,7 +1154,6 @@ test_config.dummy_include2"""
                 "@view_config(name='two', renderer='string')" in which
             )
 
-    @skip_on('py3')
     def test_hook_zca(self):
         from zope.component import getSiteManager
 
@@ -1173,7 +1169,6 @@ test_config.dummy_include2"""
         finally:
             getSiteManager.reset()
 
-    @skip_on('py3')
     def test_unhook_zca(self):
         from zope.component import getSiteManager
 
@@ -1208,7 +1203,7 @@ test_config.dummy_include2"""
         directives = {'foo': (foo, True)}
         config.registry._directives = directives
         foo_meth = config.foo
-        self.assertTrue(getattr(foo_meth, im_func).__docobj__ is foo)
+        self.assertTrue(getattr(foo_meth, '__func__').__docobj__ is foo)
 
     def test___getattr__matches_no_action_wrap(self):
         config = self._makeOne()
@@ -1219,7 +1214,7 @@ test_config.dummy_include2"""
         directives = {'foo': (foo, False)}
         config.registry._directives = directives
         foo_meth = config.foo
-        self.assertTrue(getattr(foo_meth, im_func) is foo)
+        self.assertTrue(getattr(foo_meth, '__func__') is foo)
 
 
 class TestConfigurator_add_directive(unittest.TestCase):

@@ -13,14 +13,17 @@ from pyramid.interfaces import (
     ISessionFactory,
 )
 
-from pyramid.compat import text_, bytes_, native_, iteritems_
-
 from pyramid.decorator import reify
 from pyramid.i18n import LocalizerRequestMixin
 from pyramid.response import Response, _get_response_factory
 from pyramid.security import AuthenticationAPIMixin, AuthorizationAPIMixin
 from pyramid.url import URLMethodsMixin
-from pyramid.util import InstancePropertyHelper, InstancePropertyMixin
+from pyramid.util import (
+    InstancePropertyHelper,
+    InstancePropertyMixin,
+    text_,
+    bytes_,
+)
 from pyramid.view import ViewMethodsMixin
 
 
@@ -281,7 +284,7 @@ def call_app_with_subpath_as_path_info(request, app):
 
     # compute new_path_info
     new_path_info = '/' + '/'.join(
-        [native_(x.encode('utf-8'), 'latin-1') for x in subpath]
+        [text_(x.encode('utf-8'), 'latin-1') for x in subpath]
     )
 
     if new_path_info != '/':  # don't want a sole double-slash
@@ -328,7 +331,7 @@ def apply_request_extensions(request, extensions=None):
     if extensions is None:
         extensions = request.registry.queryUtility(IRequestExtensions)
     if extensions is not None:
-        for name, fn in iteritems_(extensions.methods):
+        for name, fn in extensions.methods.items():
             method = fn.__get__(request, request.__class__)
             setattr(request, name, method)
 

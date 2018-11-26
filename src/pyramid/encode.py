@@ -1,17 +1,14 @@
-from pyramid.compat import (
-    text_type,
-    binary_type,
-    is_nonstr_iter,
-    url_quote as _url_quote,
-    url_quote_plus as _quote_plus,
-)
+from urllib.parse import quote as _url_quote
+from urllib.parse import quote_plus as _quote_plus
+
+from pyramid.util import is_nonstr_iter
 
 
 def url_quote(val, safe=''):  # bw compat api
     cls = val.__class__
-    if cls is text_type:
+    if cls is str:
         val = val.encode('utf-8')
-    elif cls is not binary_type:
+    elif cls is not bytes:
         val = str(val).encode('utf-8')
     return _url_quote(val, safe=safe)
 
@@ -19,9 +16,9 @@ def url_quote(val, safe=''):  # bw compat api
 # bw compat api (dnr)
 def quote_plus(val, safe=''):
     cls = val.__class__
-    if cls is text_type:
+    if cls is str:
         val = val.encode('utf-8')
-    elif cls is not binary_type:
+    elif cls is not bytes:
         val = str(val).encode('utf-8')
     return _quote_plus(val, safe=safe)
 
@@ -29,8 +26,8 @@ def quote_plus(val, safe=''):
 def urlencode(query, doseq=True, quote_via=quote_plus):
     """
     An alternate implementation of Python's stdlib
-    :func:`urllib.parse.urlencode` function which accepts unicode keys and
-    values within the ``query`` dict/sequence; all Unicode keys and values are
+    :func:`urllib.parse.urlencode` function which accepts string keys and
+    values within the ``query`` dict/sequence; all string keys and values are
     first converted to UTF-8 before being used to compose the query string.
 
     The value of ``query`` must be a sequence of two-tuples

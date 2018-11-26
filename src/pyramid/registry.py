@@ -4,14 +4,11 @@ import threading
 from zope.interface import implementer
 from zope.interface.registry import Components
 
-from pyramid.compat import text_
 from pyramid.decorator import reify
 
 from pyramid.interfaces import IIntrospector, IIntrospectable, ISettings
 
 from pyramid.path import CALLER_PACKAGE, caller_package
-
-empty = text_('')
 
 
 class Registry(Components, dict):
@@ -77,7 +74,7 @@ class Registry(Components, dict):
         return result
 
     def registerSelfAdapter(
-        self, required=None, provided=None, name=empty, info=empty, event=True
+        self, required=None, provided=None, name='', info='', event=True
     ):
         # registerAdapter analogue which always returns the object itself
         # when required is matched

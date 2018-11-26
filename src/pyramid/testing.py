@@ -8,8 +8,6 @@ from zope.interface import implementer, alsoProvides
 
 from pyramid.interfaces import IRequest, ISession
 
-from pyramid.compat import PY3, PYPY, class_types, text_
-
 from pyramid.config import Configurator
 from pyramid.decorator import reify
 from pyramid.path import caller_package
@@ -28,7 +26,7 @@ from pyramid.threadlocal import get_current_registry, manager
 from pyramid.i18n import LocalizerRequestMixin
 from pyramid.request import CallbackMethodsMixin
 from pyramid.url import URLMethodsMixin
-from pyramid.util import InstancePropertyMixin
+from pyramid.util import InstancePropertyMixin, PYPY, text_
 from pyramid.view import ViewMethodsMixin
 
 
@@ -640,11 +638,9 @@ def skip_on(*platforms):  # pragma: no  cover
             skip = True
         if platform == 'pypy' and PYPY:
             skip = True
-        if platform == 'py3' and PY3:
-            skip = True
 
     def decorator(func):
-        if isinstance(func, class_types):
+        if isinstance(func, type):
             if skip:
                 return None
             else:

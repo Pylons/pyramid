@@ -86,7 +86,6 @@ At the time of a Pyramid version release, each supports all versions of Python
 through the end of their lifespans. The end-of-life for a given version of
 Python is when security updates are no longer released.
 
-- `Python 2.7 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2020-01-01.
 - `Python 3.4 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2019-03-16	.
 - `Python 3.5 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2020-09-13	.
 - `Python 3.6 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2021-12-23.

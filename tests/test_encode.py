@@ -1,5 +1,5 @@
 import unittest
-from pyramid.compat import text_, native_
+from pyramid.util import text_
 
 
 class UrlEncodeTests(unittest.TestCase):
@@ -74,7 +74,7 @@ class URLQuoteTests(unittest.TestCase):
         self.assertEqual(result, 'La%2FPe%C3%B1a')
 
     def test_it_native(self):
-        la = native_(b'La/Pe\xc3\xb1a', 'utf-8')
+        la = text_(b'La/Pe\xc3\xb1a', 'utf-8')
         result = self._callFUT(la)
         self.assertEqual(result, 'La%2FPe%C3%B1a')
 

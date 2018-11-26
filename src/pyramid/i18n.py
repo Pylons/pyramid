@@ -8,7 +8,6 @@ from translationstring import (
     TranslationStringFactory,  # API
 )
 
-from pyramid.compat import PY2
 from pyramid.decorator import reify
 
 from pyramid.interfaces import (
@@ -46,12 +45,11 @@ class Localizer(object):
         ``translate`` method accepts three arguments: ``tstring``
         (required), ``domain`` (optional) and ``mapping`` (optional).
         When called, it will translate the ``tstring`` translation
-        string to a ``unicode`` object using the current locale.  If
-        the current locale could not be determined, the result of
-        interpolation of the default value is returned.  The optional
-        ``domain`` argument can be used to specify or override the
-        domain of the ``tstring`` (useful when ``tstring`` is a normal
-        string rather than a translation string).  The optional
+        string using the current locale.  If the current locale could not be
+        determined, the result of interpolation of the default value is
+        returned.  The optional ``domain`` argument can be used to specify
+        or override the domain of the ``tstring`` (useful when ``tstring``
+        is a normal string rather than a translation string).  The optional
         ``mapping`` argument can specify or override the ``tstring``
         interpolation mapping, useful when the ``tstring`` argument is
         a simple string instead of a translation string.
@@ -75,11 +73,11 @@ class Localizer(object):
 
     def pluralize(self, singular, plural, n, domain=None, mapping=None):
         """
-        Return a Unicode string translation by using two
+        Return a string translation by using two
         :term:`message identifier` objects as a singular/plural pair
         and an ``n`` value representing the number that appears in the
         message using gettext plural forms support.  The ``singular``
-        and ``plural`` objects should be unicode strings. There is no
+        and ``plural`` objects should be strings. There is no
         reason to use translation string objects as arguments as all
         metadata is ignored.
 
@@ -353,10 +351,7 @@ class Translations(gettext.GNUTranslations, object):
         """Like ``ugettext()``, but look the message up in the specified
         domain.
         """
-        if PY2:
-            return self._domains.get(domain, self).ugettext(message)
-        else:
-            return self._domains.get(domain, self).gettext(message)
+        return self._domains.get(domain, self).gettext(message)
 
     def dngettext(self, domain, singular, plural, num):
         """Like ``ngettext()``, but look the message up in the specified
@@ -374,14 +369,7 @@ class Translations(gettext.GNUTranslations, object):
         """Like ``ungettext()`` but look the message up in the specified
         domain.
         """
-        if PY2:
-            return self._domains.get(domain, self).ungettext(
-                singular, plural, num
-            )
-        else:
-            return self._domains.get(domain, self).ngettext(
-                singular, plural, num
-            )
+        return self._domains.get(domain, self).ngettext(singular, plural, num)
 
 
 class LocalizerRequestMixin(object):

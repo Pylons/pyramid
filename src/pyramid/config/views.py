@@ -5,6 +5,7 @@ import operator
 import os
 import warnings
 
+from urllib.parse import quote, urljoin, urlparse, urlunparse
 from webob.acceptparse import Accept
 from zope.interface import Interface, implementedBy, implementer
 from zope.interface.interfaces import IInterface
@@ -32,13 +33,6 @@ from pyramid.interfaces import (
 from pyramid import renderers
 
 from pyramid.asset import resolve_asset_spec
-from pyramid.compat import (
-    string_types,
-    urlparse,
-    url_quote,
-    WIN,
-    is_nonstr_iter,
-)
 
 from pyramid.decorator import reify
 
@@ -59,7 +53,12 @@ from pyramid.url import parse_url_overrides
 
 from pyramid.view import AppendSlashNotFoundViewFactory
 
-from pyramid.util import as_sorted_tuple, TopologicalSorter
+from pyramid.util import (
+    as_sorted_tuple,
+    is_nonstr_iter,
+    TopologicalSorter,
+    WIN,
+)
 
 import pyramid.predicates
 import pyramid.viewderivers
@@ -82,9 +81,6 @@ from pyramid.config.predicates import (
     predvalseq,
     sort_accept_offers,
 )
-
-urljoin = urlparse.urljoin
-url_parse = urlparse.urlparse
 
 DefaultViewMapper = DefaultViewMapper  # bw-compat
 preserve_view_attrs = preserve_view_attrs  # bw-compat
@@ -889,7 +885,7 @@ class ViewsConfiguratorMixin(object):
         if not IInterface.providedBy(r_context):
             r_context = implementedBy(r_context)
 
-        if isinstance(renderer, string_types):
+        if isinstance(renderer, str):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package, registry=self.registry
             )
@@ -1582,7 +1578,7 @@ class ViewsConfiguratorMixin(object):
     ):
         view = self.maybe_dotted(view)
         mapper = self.maybe_dotted(mapper)
-        if isinstance(renderer, string_types):
+        if isinstance(renderer, str):
             renderer = renderers.RendererHelper(
                 name=renderer, package=self.package, registry=self.registry
             )
@@ -2197,14 +2193,12 @@ class StaticURLInfo(object):
                     return request.route_url(route_name, **kw)
                 else:
                     app_url, qs, anchor = parse_url_overrides(request, kw)
-                    parsed = url_parse(url)
+                    parsed = urlparse(url)
                     if not parsed.scheme:
-                        url = urlparse.urlunparse(
-                            parsed._replace(
-                                scheme=request.environ['wsgi.url_scheme']
-                            )
+                        url = urlunparse(
+                            parsed._replace(scheme=request.scheme)
                         )
-                    subpath = url_quote(subpath)
+                    subpath = quote(subpath)
                     result = urljoin(url, subpath)
                     return result + qs + anchor
 
@@ -2233,7 +2227,7 @@ class StaticURLInfo(object):
             # make sure it ends with a slash
             name = name + '/'
 
-        if url_parse(name).netloc:
+        if urlparse(name).netloc:
             # it's a URL
             # url, spec, route_name
             url = name

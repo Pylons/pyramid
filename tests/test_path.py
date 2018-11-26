@@ -1,6 +1,5 @@
 import unittest
 import os
-from pyramid.compat import PY2
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -429,10 +428,7 @@ class TestDottedNameResolver(unittest.TestCase):
 
     def test_zope_dottedname_style_resolve_builtin(self):
         typ = self._makeOne()
-        if PY2:
-            result = typ._zope_dottedname_style('__builtin__.str', None)
-        else:
-            result = typ._zope_dottedname_style('builtins.str', None)
+        result = typ._zope_dottedname_style('builtins.str', None)
         self.assertEqual(result, str)
 
     def test_zope_dottedname_style_resolve_absolute(self):

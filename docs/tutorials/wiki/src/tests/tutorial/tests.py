@@ -8,12 +8,12 @@ class PageModelTests(unittest.TestCase):
         from .models import Page
         return Page
 
-    def _makeOne(self, data=u'some data'):
+    def _makeOne(self, data='some data'):
         return self._getTargetClass()(data=data)
 
     def test_constructor(self):
         instance = self._makeOne()
-        self.assertEqual(instance.data, u'some data')
+        self.assertEqual(instance.data, 'some data')
 
 class WikiModelTests(unittest.TestCase):
 
@@ -43,7 +43,7 @@ class AppmakerTests(unittest.TestCase):
 
 class ViewWikiTests(unittest.TestCase):
     def test_it(self):
-        from .views import view_wiki
+        from .views.default import view_wiki
         context = testing.DummyResource()
         request = testing.DummyRequest()
         response = view_wiki(context, request)
@@ -51,7 +51,7 @@ class ViewWikiTests(unittest.TestCase):
 
 class ViewPageTests(unittest.TestCase):
     def _callFUT(self, context, request):
-        from .views import view_page
+        from .views.default import view_page
         return view_page(context, request)
 
     def test_it(self):
@@ -64,7 +64,7 @@ class ViewPageTests(unittest.TestCase):
         info = self._callFUT(context, request)
         self.assertEqual(info['page'], context)
         self.assertEqual(
-            info['content'],
+            info['page_text'],
             '<div class="document">\n'
             '<p>Hello <a href="http://example.com/add_page/CruelWorld">'
             'CruelWorld</a> '
@@ -77,7 +77,7 @@ class ViewPageTests(unittest.TestCase):
 
 class AddPageTests(unittest.TestCase):
     def _callFUT(self, context, request):
-        from .views import add_page
+        from .views.default import add_page
         return add_page(context, request)
 
     def test_it_notsubmitted(self):
@@ -103,7 +103,7 @@ class AddPageTests(unittest.TestCase):
 
 class EditPageTests(unittest.TestCase):
     def _callFUT(self, context, request):
-        from .views import edit_page
+        from .views.default import edit_page
         return edit_page(context, request)
 
     def test_it_notsubmitted(self):

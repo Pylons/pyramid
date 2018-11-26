@@ -1,8 +1,8 @@
 import unittest
 
-from pyramid.testing import cleanUp
 from pyramid import testing
-from pyramid.compat import text_
+from pyramid.testing import cleanUp
+from pyramid.util import text_
 
 
 class TestJSON(unittest.TestCase):
@@ -774,7 +774,7 @@ class DummyResponse:
     body = b''
 
     # compat for renderer that will set unicode on py3
-    def _set_text(self, val):  # pragma: no cover
+    def _set_text(self, val):
         self.body = val.encode('utf8')
 
     text = property(fset=_set_text)

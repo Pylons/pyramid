@@ -160,8 +160,7 @@ class TestFactoriesMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         self.assertRaises(AttributeError, config.add_request_method)
 
-    def test_add_request_method_with_text_type_name(self):
-        from pyramid.compat import text_, PY2
+    def test_add_request_method_with_text_name(self):
         from pyramid.exceptions import ConfigurationError
 
         config = self._makeOne(autocommit=True)
@@ -170,11 +169,7 @@ class TestFactoriesMixin(unittest.TestCase):
             pass
 
         def get_bad_name():
-            if PY2:
-                name = text_(b'La Pe\xc3\xb1a', 'utf-8')
-            else:
-                name = b'La Pe\xc3\xb1a'
-
+            name = b'La Pe\xc3\xb1a'
             config.add_request_method(boomshaka, name=name)
 
         self.assertRaises(ConfigurationError, get_bad_name)

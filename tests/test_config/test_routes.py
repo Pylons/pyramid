@@ -2,7 +2,7 @@ import unittest
 
 from . import dummyfactory
 from . import DummyContext
-from pyramid.compat import text_
+from pyramid.util import text_
 
 
 class RoutesConfiguratorMixinTests(unittest.TestCase):

@@ -1,7 +1,7 @@
 import contextlib
+from urllib.parse import urlparse
 import warnings
 
-from pyramid.compat import urlparse
 from pyramid.interfaces import (
     IRequest,
     IRouteRequest,
@@ -358,7 +358,7 @@ class RoutesConfiguratorMixin(object):
 
         # check for an external route; an external route is one which is
         # is a full url (e.g. 'http://example.com/{id}')
-        parsed = urlparse.urlparse(pattern)
+        parsed = urlparse(pattern)
         external_url = pattern
 
         if parsed.hostname:

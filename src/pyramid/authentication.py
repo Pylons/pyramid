@@ -6,28 +6,18 @@ import hashlib
 import base64
 import re
 import time as time_mod
+from urllib.parse import quote, unquote
 import warnings
 
 from zope.interface import implementer
 
 from webob.cookies import CookieProfile
 
-from pyramid.compat import (
-    long,
-    text_type,
-    binary_type,
-    url_unquote,
-    url_quote,
-    bytes_,
-    ascii_native_,
-    native_,
-)
-
 from pyramid.interfaces import IAuthenticationPolicy, IDebugLogger
 
 from pyramid.security import Authenticated, Everyone
 
-from pyramid.util import strings_differ
+from pyramid.util import strings_differ, bytes_, ascii_, text_
 from pyramid.util import SimpleSerializer
 
 VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
@@ -727,11 +717,7 @@ class AuthTicket(object):
         )
 
     def cookie_value(self):
-        v = '%s%08x%s!' % (
-            self.digest(),
-            int(self.time),
-            url_quote(self.userid),
-        )
+        v = '%s%08x%s!' % (self.digest(), int(self.time), quote(self.userid))
         if self.tokens:
             v += self.tokens + '!'
         v += self.user_data
@@ -759,7 +745,7 @@ def parse_ticket(secret, ticket, ip, hashalg='md5'):
     If the ticket cannot be parsed, a ``BadTicket`` exception will be raised
     with an explanation.
     """
-    ticket = native_(ticket).strip('"')
+    ticket = text_(ticket).strip('"')
     digest_size = hashlib.new(hashalg).digest_size * 2
     digest = ticket[:digest_size]
     try:
@@ -770,7 +756,7 @@ def parse_ticket(secret, ticket, ip, hashalg='md5'):
         userid, data = ticket[digest_size + 8 :].split('!', 1)
     except ValueError:
         raise BadTicket('userid is not followed by !')
-    userid = url_unquote(userid)
+    userid = unquote(userid)
     if '!' in data:
         tokens, user_data = data.split('!', 1)
     else:  # pragma: no cover (never generated)
@@ -857,9 +843,8 @@ class AuthTktCookieHelper(object):
 
     userid_type_encoders = {
         int: ('int', str),
-        long: ('int', str),
-        text_type: ('b64unicode', lambda x: b64encode(utf_8_encode(x)[0])),
-        binary_type: ('b64str', lambda x: b64encode(x)),
+        str: ('b64unicode', lambda x: b64encode(utf_8_encode(x)[0])),
+        bytes: ('b64str', lambda x: b64encode(x)),
     }
 
     def __init__(
@@ -879,16 +864,13 @@ class AuthTktCookieHelper(object):
         domain=None,
         samesite='Lax',
     ):
-
-        serializer = SimpleSerializer()
-
         self.cookie_profile = CookieProfile(
             cookie_name=cookie_name,
             secure=secure,
             max_age=max_age,
             httponly=http_only,
             path=path,
-            serializer=serializer,
+            serializer=SimpleSerializer(),
             samesite=samesite,
         )
 
@@ -1048,7 +1030,7 @@ class AuthTktCookieHelper(object):
                 "type provided.".format(type(userid)),
                 RuntimeWarning,
             )
-            encoding, encoder = self.userid_type_encoders.get(text_type)
+            encoding, encoder = self.userid_type_encoders.get(str)
             userid = str(userid)
 
         userid = encoder(userid)
@@ -1056,9 +1038,9 @@ class AuthTktCookieHelper(object):
 
         new_tokens = []
         for token in tokens:
-            if isinstance(token, text_type):
+            if isinstance(token, str):
                 try:
-                    token = ascii_native_(token)
+                    token = ascii_(token)
                 except UnicodeEncodeError:
                     raise ValueError("Invalid token %r" % (token,))
             if not (isinstance(token, str) and VALID_TOKEN.match(token)):

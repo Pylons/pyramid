@@ -8,7 +8,6 @@ from pyramid.interfaces import (
     IViewClassifier,
 )
 
-from pyramid.compat import map_
 from pyramid.threadlocal import get_current_registry
 
 Everyone = 'system.Everyone'
@@ -113,7 +112,7 @@ def forget(request):
 
 def principals_allowed_by_permission(context, permission):
     """ Provided a ``context`` (a resource object), and a ``permission``
-    (a string or unicode object), if an :term:`authorization policy` is
+    string, if an :term:`authorization policy` is
     in effect, return a sequence of :term:`principal` ids that possess
     the permission in the ``context``.  If no authorization policy is
     in effect, this will return a sequence with the single value
@@ -149,7 +148,7 @@ def view_execution_permitted(context, request, name=''):
 
     """
     reg = _get_registry(request)
-    provides = [IViewClassifier] + map_(providedBy, (request, context))
+    provides = [IViewClassifier] + [providedBy(x) for x in (request, context)]
     # XXX not sure what to do here about using _find_views or analogue;
     # for now let's just keep it as-is
     view = reg.adapters.lookup(provides, ISecuredView, name=name)
@@ -341,7 +340,7 @@ class AuthorizationAPIMixin(object):
         ``request.context`` attribute.
 
         :param permission: Does this request have the given permission?
-        :type permission: unicode, str
+        :type permission: str
         :param context: A resource object or ``None``
         :type context: object
         :returns: Either :class:`pyramid.security.Allowed` or

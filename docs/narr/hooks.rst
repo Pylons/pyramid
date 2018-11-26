@@ -659,15 +659,15 @@ that implements the following interface:
             ``virtual_root``, and ``virtual_root_path``.  These values are
             typically the result of a resource tree traversal.  ``root``
             is the physical root object, ``context`` will be a resource
-            object, ``view_name`` will be the view name used (a Unicode
-            name), ``subpath`` will be a sequence of Unicode names that
+            object, ``view_name`` will be the view name used (a string),
+            ``subpath`` will be a sequence of strings that
             followed the view name but were not traversed, ``traversed``
-            will be a sequence of Unicode names that were traversed
+            will be a sequence of strings that were traversed
             (including the virtual root path, if any) ``virtual_root``
             will be a resource object representing the virtual root (or the
             physical root if traversal was not performed), and
             ``virtual_root_path`` will be a sequence representing the
-            virtual root path (a sequence of Unicode names) or None if
+            virtual root path (a sequence of strings) or ``None`` if
             traversal was not performed.
 
             Extra keys for special purpose functionality can be added as

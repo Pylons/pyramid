@@ -1,3 +1,4 @@
+from io import StringIO
 import unittest
 from . import dummy
 
@@ -134,13 +135,11 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._out, ['abc'])
 
     def test_command_method_post(self):
-        from pyramid.compat import NativeIO
-
         command = self._makeOne(
             ['', '--method=POST', 'development.ini', '/'],
             [('Content-Type', 'text/html; charset=UTF-8')],
         )
-        stdin = NativeIO()
+        stdin = StringIO()
         command.stdin = stdin
         command.run()
         self.assertEqual(self._environ['REQUEST_METHOD'], 'POST')
@@ -150,13 +149,11 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._out, ['abc'])
 
     def test_command_method_put(self):
-        from pyramid.compat import NativeIO
-
         command = self._makeOne(
             ['', '--method=PUT', 'development.ini', '/'],
             [('Content-Type', 'text/html; charset=UTF-8')],
         )
-        stdin = NativeIO()
+        stdin = StringIO()
         command.stdin = stdin
         command.run()
         self.assertEqual(self._environ['REQUEST_METHOD'], 'PUT')
@@ -166,13 +163,11 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._out, ['abc'])
 
     def test_command_method_patch(self):
-        from pyramid.compat import NativeIO
-
         command = self._makeOne(
             ['', '--method=PATCH', 'development.ini', '/'],
             [('Content-Type', 'text/html; charset=UTF-8')],
         )
-        stdin = NativeIO()
+        stdin = StringIO()
         command.stdin = stdin
         command.run()
         self.assertEqual(self._environ['REQUEST_METHOD'], 'PATCH')
@@ -182,13 +177,11 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._out, ['abc'])
 
     def test_command_method_propfind(self):
-        from pyramid.compat import NativeIO
-
         command = self._makeOne(
             ['', '--method=PROPFIND', 'development.ini', '/'],
             [('Content-Type', 'text/html; charset=UTF-8')],
         )
-        stdin = NativeIO()
+        stdin = StringIO()
         command.stdin = stdin
         command.run()
         self.assertEqual(self._environ['REQUEST_METHOD'], 'PROPFIND')
@@ -196,13 +189,11 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._out, ['abc'])
 
     def test_command_method_options(self):
-        from pyramid.compat import NativeIO
-
         command = self._makeOne(
             ['', '--method=OPTIONS', 'development.ini', '/'],
             [('Content-Type', 'text/html; charset=UTF-8')],
         )
-        stdin = NativeIO()
+        stdin = StringIO()
         command.stdin = stdin
         command.run()
         self.assertEqual(self._environ['REQUEST_METHOD'], 'OPTIONS')

@@ -1,31 +1,23 @@
 from contextlib import contextmanager
 import functools
-
-try:
-    # py2.7.7+ and py3.3+ have native comparison support
-    from hmac import compare_digest
-except ImportError:  # pragma: no cover
-    compare_digest = None
+from hmac import compare_digest
 import inspect
+import platform
 import weakref
-
-from pyramid.exceptions import ConfigurationError, CyclicDependencyError
-
-from pyramid.compat import (
-    getargspec,
-    im_func,
-    is_nonstr_iter,
-    integer_types,
-    string_types,
-    bytes_,
-    text_,
-    PY2,
-    native_,
-)
 
 from pyramid.path import DottedNameResolver as _DottedNameResolver
 
 _marker = object()
+
+WIN = platform.system() == 'Windows'
+
+try:  # pragma: no cover
+    import __pypy__
+
+    PYPY = True
+except BaseException:  # pragma: no cover
+    __pypy__ = None
+    PYPY = False
 
 
 class DottedNameResolver(_DottedNameResolver):
@@ -35,8 +27,40 @@ class DottedNameResolver(_DottedNameResolver):
         _DottedNameResolver.__init__(self, package)
 
 
+def text_(s, encoding='latin-1', errors='strict'):
+    """ If ``s`` is an instance of ``bytes``, return
+    ``s.decode(encoding, errors)``, otherwise return ``s``"""
+    if isinstance(s, bytes):
+        return s.decode(encoding, errors)
+    return s
+
+
+def bytes_(s, encoding='latin-1', errors='strict'):
+    """ If ``s`` is an instance of ``str``, return
+    ``s.encode(encoding, errors)``, otherwise return ``s``"""
+    if isinstance(s, str):
+        return s.encode(encoding, errors)
+    return s
+
+
+def ascii_(s):
+    """
+    If ``s`` is an instance of ``str``, return
+    ``s.encode('ascii')``, otherwise return ``str(s, 'ascii', 'strict')``
+    """
+    if isinstance(s, str):
+        s = s.encode('ascii')
+    return str(s, 'ascii', 'strict')
+
+
+def is_nonstr_iter(v):
+    if isinstance(v, str):
+        return False
+    return hasattr(v, '__iter__')
+
+
 def is_string_or_iterable(v):
-    if isinstance(v, string_types):
+    if isinstance(v, str):
         return True
     if hasattr(v, '__iter__'):
         return True
@@ -277,7 +301,7 @@ class WeakOrderedSet(object):
             return self._items[oid]()
 
 
-def strings_differ(string1, string2, compare_digest=compare_digest):
+def strings_differ(string1, string2):
     """Check whether two strings differ while avoiding timing attacks.
 
     This function returns True if the given strings differ and False
@@ -301,11 +325,7 @@ def strings_differ(string1, string2, compare_digest=compare_digest):
         left = string2
     right = string2
 
-    if compare_digest is not None:
-        invalid_bits += not compare_digest(left, right)
-    else:
-        for a, b in zip(left, right):
-            invalid_bits += a != b
+    invalid_bits += not compare_digest(left, right)
     return invalid_bits != 0
 
 
@@ -314,14 +334,14 @@ def object_description(object):
     usually involving a Python dotted name. For example:
 
     >>> object_description(None)
-    u'None'
+    'None'
     >>> from xml.dom import minidom
     >>> object_description(minidom)
-    u'module xml.dom.minidom'
+    'module xml.dom.minidom'
     >>> object_description(minidom.Attr)
-    u'class xml.dom.minidom.Attr'
+    'class xml.dom.minidom.Attr'
     >>> object_description(minidom.Attr.appendChild)
-    u'method appendChild of class xml.dom.minidom.Attr'
+    'method appendChild of class xml.dom.minidom.Attr'
 
     If this method cannot identify the type of the object, a generic
     description ala ``object <object.__name__>`` will be returned.
@@ -330,17 +350,14 @@ def object_description(object):
     is a boolean, an integer, a list, a tuple, a set, or ``None``, a
     (possibly shortened) string representation is returned.
     """
-    if isinstance(object, string_types):
-        return text_(object)
-    if isinstance(object, integer_types):
-        return text_(str(object))
+    if isinstance(object, str):
+        return object
+    if isinstance(object, int):
+        return str(object)
     if isinstance(object, (bool, float, type(None))):
-        return text_(str(object))
+        return str(object)
     if isinstance(object, set):
-        if PY2:
-            return shortrepr(object, ')')
-        else:
-            return shortrepr(object, '}')
+        return shortrepr(object, '}')
     if isinstance(object, tuple):
         return shortrepr(object, ')')
     if isinstance(object, list):
@@ -349,26 +366,25 @@ def object_description(object):
         return shortrepr(object, '}')
     module = inspect.getmodule(object)
     if module is None:
-        return text_('object %s' % str(object))
+        return 'object %s' % str(object)
     modulename = module.__name__
     if inspect.ismodule(object):
-        return text_('module %s' % modulename)
+        return 'module %s' % modulename
     if inspect.ismethod(object):
         oself = getattr(object, '__self__', None)
-        if oself is None:  # pragma: no cover
-            oself = getattr(object, 'im_self', None)
-        return text_(
-            'method %s of class %s.%s'
-            % (object.__name__, modulename, oself.__class__.__name__)
+        return 'method %s of class %s.%s' % (
+            object.__name__,
+            modulename,
+            oself.__class__.__name__,
         )
 
     if inspect.isclass(object):
         dottedname = '%s.%s' % (modulename, object.__name__)
-        return text_('class %s' % dottedname)
+        return 'class %s' % dottedname
     if inspect.isfunction(object):
         dottedname = '%s.%s' % (modulename, object.__name__)
-        return text_('function %s' % dottedname)
-    return text_('object %s' % str(object))
+        return 'function %s' % dottedname
+    return 'object %s' % str(object)
 
 
 def shortrepr(object, closer):
@@ -499,11 +515,17 @@ class TopologicalSorter(object):
                 has_after.add(b)
 
         if not self.req_before.issubset(has_before):
+            # avoid circular dependency
+            from pyramid.exceptions import ConfigurationError
+
             raise ConfigurationError(
                 'Unsatisfied before dependencies: %s'
                 % (', '.join(sorted(self.req_before - has_before)))
             )
         if not self.req_after.issubset(has_after):
+            # avoid circular dependency
+            from pyramid.exceptions import ConfigurationError
+
             raise ConfigurationError(
                 'Unsatisfied after dependencies: %s'
                 % (', '.join(sorted(self.req_after - has_after)))
@@ -524,6 +546,9 @@ class TopologicalSorter(object):
             del graph[root]
 
         if graph:
+            # avoid circular dependency
+            from pyramid.exceptions import CyclicDependencyError
+
             # loop in input
             cycledeps = {}
             for k, v in graph.items():
@@ -545,8 +570,11 @@ def get_callable_name(name):
     if it is not.
     """
     try:
-        return native_(name, 'ascii')
+        return ascii_(name)
     except (UnicodeEncodeError, UnicodeDecodeError):
+        # avoid circular dependency
+        from pyramid.exceptions import ConfigurationError
+
         msg = (
             '`name="%s"` is invalid. `name` must be ascii because it is '
             'used on __name__ of the method'
@@ -615,10 +643,7 @@ def takes_one_arg(callee, attr=None, argname=None):
     if inspect.isroutine(callee):
         fn = callee
     elif inspect.isclass(callee):
-        try:
-            fn = callee.__init__
-        except AttributeError:
-            return False
+        fn = callee.__init__
         ismethod = hasattr(fn, '__call__')
     else:
         try:
@@ -626,15 +651,11 @@ def takes_one_arg(callee, attr=None, argname=None):
         except AttributeError:
             return False
 
-    try:
-        argspec = getargspec(fn)
-    except TypeError:
-        return False
-
+    argspec = inspect.getfullargspec(fn)
     args = argspec[0]
 
-    if hasattr(fn, im_func) or ismethod:
-        # it's an instance method (or unbound method on py2)
+    if hasattr(fn, '__func__') or ismethod:
+        # it's an instance method
         if not args:
             return False
         args = args[1:]
@@ -660,7 +681,40 @@ def takes_one_arg(callee, attr=None, argname=None):
 
 class SimpleSerializer(object):
     def loads(self, bstruct):
-        return native_(bstruct)
+        return text_(bstruct)
 
     def dumps(self, appstruct):
         return bytes_(appstruct)
+
+
+def is_bound_method(ob):
+    return inspect.ismethod(ob) and getattr(ob, '__self__', None) is not None
+
+
+def is_unbound_method(fn):
+    """
+    This consistently verifies that the callable is bound to a
+    class.
+    """
+    is_bound = is_bound_method(fn)
+
+    if not is_bound and inspect.isroutine(fn):
+        spec = inspect.getfullargspec(fn)
+        has_self = len(spec.args) > 0 and spec.args[0] == 'self'
+
+        if inspect.isfunction(fn) and has_self:
+            return True
+
+    return False
+
+
+def reraise(tp, value, tb=None):
+    try:
+        if value is None:
+            value = tp()
+        if value.__traceback__ is not tb:
+            raise value.with_traceback(tb)
+        raise value
+    finally:
+        value = None
+        tb = None
