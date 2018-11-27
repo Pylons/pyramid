@@ -74,6 +74,8 @@ intersphinx_mapping = {
     'toolbar': ('https://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest/', None),
     'tutorials': ('https://docs.pylonsproject.org/projects/pyramid-tutorials/en/latest/', None),
     'venusian': ('https://docs.pylonsproject.org/projects/venusian/en/latest/', None),
+    'zcml': (
+    'https://docs.pylonsproject.org/projects/pyramid-zcml/en/latest/', None),
 }
 
 
