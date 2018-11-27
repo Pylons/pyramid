@@ -922,7 +922,7 @@ system, can then easily get at the data thanks to SQLAlchemy:
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Databases <qtut_databases>`, `SQLAlchemy
-    <http://www.sqlalchemy.org/>`_, :ref:`making_a_console_script`,
+    <https://www.sqlalchemy.org/>`_, :ref:`making_a_console_script`,
     :ref:`bfg_sql_wiki_tutorial`, and :ref:`Application Transactions with
     pyramid_tm <tm:overview>`.
 

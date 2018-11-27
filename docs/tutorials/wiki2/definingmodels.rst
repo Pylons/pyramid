@@ -284,7 +284,7 @@ At this point in this tutorial, we have two migration files.
 Examine them to see what Alembic will do when you upgrade or downgrade the database to a specific revision.
 Notice the revision identifiers and how they relate to one another in a chained sequence.
 
-.. seealso:: For further information, see the `Alembic documentation <http://alembic.zzzcomputing.com/en/latest/>`_.
+.. seealso:: For further information, see the `Alembic documentation <https://alembic.sqlalchemy.org/en/latest/>`_.
 
 
 Edit ``scripts/initialize_db.py``

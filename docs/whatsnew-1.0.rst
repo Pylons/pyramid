@@ -62,7 +62,7 @@ fail if you do nothing to your existing :mod:`repoze.bfg` application.
 However, you won't have to do much to use your existing BFG applications on
 Pyramid. There's automation which will change most of your import statements
 and ZCML declarations. See
-http://docs.pylonsproject.org/projects/pyramid/current/tutorials/bfg/index.html
+https://docs.pylonsproject.org/projects/pyramid/en/1.0-branch/tutorials/bfg/index.html
 for upgrade instructions.
 
 Pylons 1 users will need to do more work to use Pyramid, as Pyramid shares no
@@ -118,7 +118,7 @@ Scaffold Improvements
   
   .. seealso::
      
-     See also http://docs.repoze.org/tm2/#using-a-commit-veto.
+     See also https://repozetm2.readthedocs.io/en/latest/#using-a-commit-veto.
 
 Terminology Changes
 ~~~~~~~~~~~~~~~~~~~
@@ -250,9 +250,9 @@ ZCML Externalized
 
 - The ``load_zcml`` method of a Configurator has been removed from the
   Pyramid core.  Loading ZCML is now a feature of the :term:`pyramid_zcml`
-  package, which can be downloaded from PyPI.  Documentation for the package
-  should be available via
-  http://docs.pylonsproject.org/projects/pyramid_zcml/en/latest/, which describes how to
+  package, which can be downloaded from PyPI.  See
+  :ref:`documentation for the package <zcml:declarative_chapter>`,
+  which describes how to
   add a configuration statement to your ``main`` block to reobtain this
   method.  You will also need to add an ``install_requires`` dependency upon
   the ``pyramid_zcml`` distribution to your ``setup.py`` file.
@@ -356,7 +356,7 @@ Documentation Improvements
 
 - The "Resource Location and View Lookup" chapter has been replaced with a
   variant of Rob Miller's "Much Ado About Traversal" (originally published at
-  http://blog.nonsequitarian.org/2010/much-ado-about-traversal/).
+  https://web.archive.org/web/20150603023226/http://blog.nonsequitarian.org/2010/much-ado-about-traversal/).
 
 - Many users have contributed documentation fixes and improvements including
   Ben Bangert, Blaise Laflamme, Rob Miller, Mike Orr, Carlos de la Guardia,
@@ -564,11 +564,11 @@ Documentation Enhancements
 - The (weak) "Converting a CMF Application to Pyramid" tutorial has been
   removed from the tutorials section.  It was moved to the
   ``pyramid_tutorials`` Github repository at
-  http://docs.pylonsproject.org/projects/pyramid_tutorials/dev/.
+  https://github.com/Pylons/pyramid_tutorials/commit/38351561b54a2b07e3af5bd43f83964f72d0c05e.
 
 - Moved "Using ZODB With ZEO" and "Using repoze.catalog Within Pyramid"
   tutorials out of core documentation and into the Pyramid Tutorials site
-  (http://docs.pylonsproject.org/projects/pyramid_tutorials/dev/).
+  (https://github.com/Pylons/pyramid_tutorials/commit/86cfd11d8a4093b39cedc686fc6f005db4bccb00).
 
 - Removed API documentation for deprecated ``pyramid.testing`` APIs named
   ``registerDummySecurityPolicy``, ``registerResources``, ``registerModels``,
