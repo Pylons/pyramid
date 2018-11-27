@@ -364,7 +364,7 @@ the special name ``includeme``, which should perform configuration (like the
 :meth:`~pyramid.config.Configurator.include` can also accept a :term:`dotted
 Python name` to a function or a module.
 
-.. note:: See :ref:`the_include_tag` for a declarative alternative to the
+.. note:: See :ref:`zcml:the_include_tag` for a declarative alternative to the
    :meth:`~pyramid.config.Configurator.include` method.
 
 .. _twophase_config:
