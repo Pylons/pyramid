@@ -34,10 +34,10 @@ In order to add a feature to Pyramid:
 - The feature must be documented in both the API and narrative documentation
   (in `docs/`).
 
-- The feature must work fully on the following CPython versions: 2.7, 3.4, 3.5,
-  3.6, and 3.7 on both UNIX and Windows.
+- The feature must work fully on the following CPython versions: 3.4, 3.5, 3.6,
+  and 3.7 on both UNIX and Windows.
 
-- The feature must work on the latest version of PyPy.
+- The feature must work on the latest version of PyPy3.
 
 - The feature must not depend on any particular persistence layer (filesystem,
   SQL, etc).
@@ -65,10 +65,9 @@ Running Tests
 
     $ tox -e py37
 
-  This command will run tests on the latest versions of Python 2 and 3 with
-  coverage totaled for both versions.
+  This command will run tests on the latest version of Python 3 with coverage.
 
-    $ tox -e py2-cover,py3-cover,coverage
+    $ tox -e py3-cover,coverage
 
 - To run individual tests (i.e., during development), you can use `nosetests`
   syntax as follows, where `$VENV` is an environment variable set to the path
@@ -105,7 +104,7 @@ Test Coverage
 -------------
 
 - The codebase *must* have 100% test statement coverage after each commit.  You
-  can test coverage via `tox -epy2-cover,py3-cover,coverage`.
+  can test coverage via `tox -epy3-cover,coverage`.
 
 
 Documentation Coverage and Building HTML Documentation

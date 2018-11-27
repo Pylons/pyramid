@@ -47,10 +47,16 @@ Here's a high-level time-ordered overview of what happens when you press
    the :term:`PasteDeploy` library and returns a parser that can understand
    the format.
 
+   .. _ini_section_discovery:
+
 #. The :term:`PasteDeploy` finds a section named either ``[app:main]``,
-   ``[pipeline:main]``, or ``[composite:main]`` in the ``.ini`` file.  This
-   section represents the configuration of a :term:`WSGI` application that will
-   be served.  If you're using a simple application (e.g., ``[app:main]``), the
+   ``[pipeline:main]``, or ``[composite:main]`` in the ``.ini`` file.
+   This section configures the :term:`WSGI` webserver which serves your application.
+   As such it is the ``ini`` section for your application and can be the source for many of your application's :term:`settings`.
+
+   .. _entry_point_discovery:
+
+   If you're using a simple application (e.g., ``[app:main]``), the
    application's ``paste.app_factory`` :term:`entry point` will be named on the
    ``use=`` line within the section's configuration.  If instead of a simple
    application, you're using a WSGI :term:`pipeline` (e.g., a
@@ -63,17 +69,20 @@ Here's a high-level time-ordered overview of what happens when you press
    will have a single ``[app:main]`` section in it, and this will be the
    application served.
 
+   .. index::
+      pair: logging; startup
+
+   .. _startup_logging_initialization:
+
 #. The framework finds all :mod:`logging` related configuration in the ``.ini``
    file and uses it to configure the Python standard library logging system for
-   this application.  See :ref:`logging_config` for more information.
+   the application.  See :ref:`logging_config` for more information.
 
-#. The application's *constructor* named by the entry point referenced on the
-   ``use=`` line of the section representing your :app:`Pyramid` application is
-   passed the key/value parameters mentioned within the section in which it's
-   defined.  The constructor is meant to return a :term:`router` instance,
-   which is a :term:`WSGI` application.
+#. The application's entry point, usually the entry point referenced on the :ref:`above mentioned <entry_point_discovery>` ``use=`` line, is the application's :term:`constructor`.
+   It is passed the key/value parameters in :ref:`the application's .ini section <ini_section_discovery>`.
+   The constructor should return a :term:`router` instance, which is a :term:`WSGI` application.
 
-   For :app:`Pyramid` applications, the constructor will be a function named
+   For :app:`Pyramid` applications, the constructor is a function named
    ``main`` in the ``__init__.py`` file within the :term:`package` in which
    your application lives.  If this function succeeds, it will return a
    :app:`Pyramid` :term:`router` instance.  Here's the contents of an example

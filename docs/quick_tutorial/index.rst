@@ -4,8 +4,7 @@
 Quick Tutorial for Pyramid
 ==========================
 
-Pyramid is a web framework for Python 2 and 3. This tutorial gives a Python
-3/2-compatible, high-level tour of the major features.
+This tutorial gives a high-level tour of the major features.
 
 This hands-on tutorial covers "a little about a lot": practical introductions
 to the most common facilities. Fun, fast-paced, and most certainly not aimed at

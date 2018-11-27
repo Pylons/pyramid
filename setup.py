@@ -44,9 +44,9 @@ tests_require = [
 
 
 docs_extras = [
-    'Sphinx >= 1.8.1',
+    'Sphinx >= 1.8.1',  # Unicode characters in tree diagrams
     'docutils',
-    'pylons-sphinx-themes >= 1.0.8',
+    'pylons-sphinx-themes >= 1.0.8',  # Ethical Ads
     'pylons_sphinx_latesturl',
     'repoze.sphinx.autointerface',
     'sphinxcontrib-autoprogram',

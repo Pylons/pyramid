@@ -301,7 +301,7 @@ class WeakOrderedSet(object):
             return self._items[oid]()
 
 
-def strings_differ(string1, string2, compare_digest=compare_digest):
+def strings_differ(string1, string2):
     """Check whether two strings differ while avoiding timing attacks.
 
     This function returns True if the given strings differ and False
@@ -325,11 +325,7 @@ def strings_differ(string1, string2, compare_digest=compare_digest):
         left = string2
     right = string2
 
-    if compare_digest is not None:
-        invalid_bits += not compare_digest(left, right)
-    else:
-        for a, b in zip(left, right):
-            invalid_bits += a != b
+    invalid_bits += not compare_digest(left, right)
     return invalid_bits != 0
 
 
@@ -338,14 +334,14 @@ def object_description(object):
     usually involving a Python dotted name. For example:
 
     >>> object_description(None)
-    u'None'
+    'None'
     >>> from xml.dom import minidom
     >>> object_description(minidom)
-    u'module xml.dom.minidom'
+    'module xml.dom.minidom'
     >>> object_description(minidom.Attr)
-    u'class xml.dom.minidom.Attr'
+    'class xml.dom.minidom.Attr'
     >>> object_description(minidom.Attr.appendChild)
-    u'method appendChild of class xml.dom.minidom.Attr'
+    'method appendChild of class xml.dom.minidom.Attr'
 
     If this method cannot identify the type of the object, a generic
     description ala ``object <object.__name__>`` will be returned.
