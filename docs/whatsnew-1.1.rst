@@ -201,7 +201,7 @@ Minor Feature Additions
   JSON-decoded variant of the request body.  If the request body is not
   well-formed JSON, this property will raise an exception.
 
-- A `JSONP <http://en.wikipedia.org/wiki/JSONP>`_ renderer.  See
+- A `JSONP <https://en.wikipedia.org/wiki/JSONP>`_ renderer.  See
   :ref:`jsonp_renderer` for more details.
 
 - New authentication policy:
