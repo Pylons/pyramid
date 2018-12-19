@@ -3,7 +3,7 @@ import unittest
 
 from pyramid import testing
 
-from pyramid.compat import text_, WIN
+from pyramid.util import WIN, text_
 
 
 class TestURLMethodsMixin(unittest.TestCase):
@@ -25,6 +25,7 @@ class TestURLMethodsMixin(unittest.TestCase):
 
             def __init__(self, environ):
                 self.environ = environ
+                self.scheme = environ.get('wsgi.url_scheme', 'http')
 
         request = Request(environ)
         request.registry = self.config.registry

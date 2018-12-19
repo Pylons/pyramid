@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from functools import lru_cache
 import json
 import os
 
@@ -8,8 +9,6 @@ from pkg_resources import resource_exists, resource_filename, resource_isdir
 
 from pyramid.asset import abspath_from_asset_spec, resolve_asset_spec
 
-from pyramid.compat import lru_cache, text_
-
 from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently
 
 from pyramid.path import caller_package
@@ -17,8 +16,6 @@ from pyramid.path import caller_package
 from pyramid.response import _guess_type, FileResponse
 
 from pyramid.traversal import traversal_path_info
-
-slash = text_('/')
 
 
 class static_view(object):
@@ -91,7 +88,7 @@ class static_view(object):
         if self.use_subpath:
             path_tuple = request.subpath
         else:
-            path_tuple = traversal_path_info(request.environ['PATH_INFO'])
+            path_tuple = traversal_path_info(request.path_info)
         path = _secure_path(path_tuple)
 
         if path is None:
@@ -160,7 +157,7 @@ def _secure_path(path_tuple):
         return None
     if any([_contains_slash(item) for item in path_tuple]):
         return None
-    encoded = slash.join(path_tuple)  # will be unicode
+    encoded = '/'.join(path_tuple)  # will be unicode
     return encoded
 
 

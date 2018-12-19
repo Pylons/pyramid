@@ -8,8 +8,6 @@ environment:
       TOXENV: "py35"
     - PYTHON: "C:\\Python34"
       TOXENV: "py34"
-    - PYTHON: "C:\\Python27"
-      TOXENV: "py27"
 
 cache:
     - '%LOCALAPPDATA%\pip\Cache'

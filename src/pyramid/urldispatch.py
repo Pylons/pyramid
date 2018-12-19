@@ -3,20 +3,11 @@ from zope.interface import implementer
 
 from pyramid.interfaces import IRoutesMapper, IRoute
 
-from pyramid.compat import (
-    PY2,
-    native_,
-    text_,
-    text_type,
-    string_types,
-    binary_type,
-    is_nonstr_iter,
-    decode_path_info,
-)
-
 from pyramid.exceptions import URLDecodeError
 
 from pyramid.traversal import quote_path_segment, split_path_info, PATH_SAFE
+
+from pyramid.util import is_nonstr_iter, text_
 
 _marker = object()
 
@@ -82,10 +73,9 @@ class RoutesMapper(object):
         return self.routes[name].generate(kw)
 
     def __call__(self, request):
-        environ = request.environ
         try:
             # empty if mounted under a path in mod_wsgi, for example
-            path = decode_path_info(environ['PATH_INFO'] or '/')
+            path = request.path_info or '/'
         except KeyError:
             path = '/'
         except UnicodeDecodeError as e:
@@ -127,7 +117,7 @@ def _compile_route(route):
     # using the ASCII decoding.  We decode it using ASCII because we don't
     # want to accept bytestrings with high-order characters in them here as
     # we have no idea what the encoding represents.
-    if route.__class__ is not text_type:
+    if route.__class__ is not str:
         try:
             route = text_(route, 'ascii')
         except UnicodeDecodeError:
@@ -174,7 +164,7 @@ def _compile_route(route):
             name, reg = name.split(':', 1)
         else:
             reg = '[^/]+'
-        gen.append('%%(%s)s' % native_(name))  # native
+        gen.append('%%(%s)s' % name)  # native
         name = '(?P<%s>%s)' % (name, reg)  # unicode
         rpat.append(name)
         s = pat.pop()  # unicode
@@ -189,34 +179,22 @@ def _compile_route(route):
 
     if remainder:
         rpat.append('(?P<%s>.*?)' % remainder)  # unicode
-        gen.append('%%(%s)s' % native_(remainder))  # native
+        gen.append('%%(%s)s' % remainder)  # native
 
     pattern = ''.join(rpat) + '$'  # unicode
 
     match = re.compile(pattern).match
 
     def matcher(path):
-        # This function really wants to consume Unicode patterns natively,
-        # but if someone passes us a bytestring, we allow it by converting it
-        # to Unicode using the ASCII decoding.  We decode it using ASCII
-        # because we don't want to accept bytestrings with high-order
-        # characters in them here as we have no idea what the encoding
-        # represents.
-        if path.__class__ is not text_type:
-            path = text_(path, 'ascii')
         m = match(path)
         if m is None:
             return None
         d = {}
         for k, v in m.groupdict().items():
-            # k and v will be Unicode 2.6.4 and lower doesnt accept unicode
-            # kwargs as **kw, so we explicitly cast the keys to native
-            # strings in case someone wants to pass the result as **kw
-            nk = native_(k, 'ascii')
             if k == remainder:
-                d[nk] = split_path_info(v)
+                d[k] = split_path_info(v)
             else:
-                d[nk] = v
+                d[k] = v
         return d
 
     gen = ''.join(gen)
@@ -227,27 +205,21 @@ def _compile_route(route):
     def generator(dict):
         newdict = {}
         for k, v in dict.items():
-            if PY2:
-                if v.__class__ is text_type:
-                    # url_quote below needs bytes, not unicode on Py2
-                    v = v.encode('utf-8')
-            else:
-                if v.__class__ is binary_type:
-                    # url_quote below needs a native string, not bytes on Py3
-                    v = v.decode('utf-8')
+            if v.__class__ is bytes:
+                # url_quote below needs a native string
+                v = v.decode('utf-8')
 
             if k == remainder:
                 # a stararg argument
                 if is_nonstr_iter(v):
                     v = '/'.join([q(x) for x in v])  # native
                 else:
-                    if v.__class__ not in string_types:
+                    if v.__class__ is not str:
                         v = str(v)
                     v = q(v)
             else:
-                if v.__class__ not in string_types:
+                if v.__class__ is not str:
                     v = str(v)
-                # v may be bytes (py2) or native string (py3)
                 v = q(v)
 
             # at this point, the value will be a native string

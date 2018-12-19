@@ -1,12 +1,12 @@
 from hashlib import md5
 from webob.acceptparse import Accept
 
-from pyramid.compat import bytes_, is_nonstr_iter
 from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import IPredicateList, PHASE1_CONFIG
 from pyramid.predicates import Notted
 from pyramid.registry import predvalseq
 from pyramid.util import TopologicalSorter
+from pyramid.util import is_nonstr_iter, bytes_
 
 
 MAX_ORDER = 1 << 30

@@ -2,13 +2,15 @@ from zope.interface import implementer
 
 from pyramid.interfaces import ITweens
 
-from pyramid.compat import string_types, is_nonstr_iter
-
 from pyramid.exceptions import ConfigurationError
 
 from pyramid.tweens import MAIN, INGRESS, EXCVIEW
 
-from pyramid.util import is_string_or_iterable, TopologicalSorter
+from pyramid.util import (
+    is_nonstr_iter,
+    is_string_or_iterable,
+    TopologicalSorter,
+)
 
 from pyramid.config.actions import action_method
 
@@ -105,7 +107,7 @@ class TweensConfiguratorMixin(object):
     @action_method
     def _add_tween(self, tween_factory, under=None, over=None, explicit=False):
 
-        if not isinstance(tween_factory, string_types):
+        if not isinstance(tween_factory, str):
             raise ConfigurationError(
                 'The "tween_factory" argument to add_tween must be a '
                 'dotted name to a globally importable object, not %r'

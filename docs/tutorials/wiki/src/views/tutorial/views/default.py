@@ -4,16 +4,18 @@ import re
 from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
 
-from .models import Page
+from ..models import Page
 
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
-@view_config(context='.models.Wiki')
+
+@view_config(context='..models.Wiki')
 def view_wiki(context, request):
     return HTTPFound(location=request.resource_url(context, 'FrontPage'))
 
-@view_config(context='.models.Page', renderer='templates/view.pt')
+
+@view_config(context='..models.Page', renderer='../templates/view.pt')
 def view_page(context, request):
     wiki = context.__parent__
 
@@ -27,13 +29,14 @@ def view_page(context, request):
             add_url = request.application_url + '/add_page/' + word
             return '<a href="%s">%s</a>' % (add_url, word)
 
-    content = publish_parts(context.data, writer_name='html')['html_body']
-    content = wikiwords.sub(check, content)
+    page_text = publish_parts(context.data, writer_name='html')['html_body']
+    page_text = wikiwords.sub(check, page_text)
     edit_url = request.resource_url(context, 'edit_page')
-    return dict(page=context, content=content, edit_url=edit_url)
+    return dict(page=context, page_text=page_text, edit_url=edit_url)
 
-@view_config(name='add_page', context='.models.Wiki',
-             renderer='templates/edit.pt')
+
+@view_config(name='add_page', context='..models.Wiki',
+             renderer='../templates/edit.pt')
 def add_page(context, request):
     pagename = request.subpath[0]
     if 'form.submitted' in request.params:
@@ -49,8 +52,9 @@ def add_page(context, request):
     page.__parent__ = context
     return dict(page=page, save_url=save_url)
 
-@view_config(name='edit_page', context='.models.Page',
-             renderer='templates/edit.pt')
+
+@view_config(name='edit_page', context='..models.Page',
+             renderer='../templates/edit.pt')
 def edit_page(context, request):
     if 'form.submitted' in request.params:
         context.data = request.params['body']

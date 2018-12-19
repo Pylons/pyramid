@@ -137,22 +137,21 @@ from zope.interface import implementer
 from webob import html_escape as _html_escape
 from webob.acceptparse import create_accept_header
 
-from pyramid.compat import class_types, text_type, binary_type, text_
-
 from pyramid.interfaces import IExceptionResponse
 from pyramid.response import Response
+from pyramid.util import text_
 
 
 def _no_escape(value):
     if value is None:
         return ''
-    if not isinstance(value, text_type):
+    if not isinstance(value, str):
         if hasattr(value, '__unicode__'):
             value = value.__unicode__()
-        if isinstance(value, binary_type):
+        if isinstance(value, bytes):
             value = text_(value, 'utf-8')
         else:
-            value = text_type(value)
+            value = str(value)
     return value
 
 
@@ -326,7 +325,7 @@ ${body}'''
                     args[k.lower()] = escape(v)
             body = body_tmpl.substitute(args)
             page = page_template.substitute(status=self.status, body=body)
-            if isinstance(page, text_type):
+            if isinstance(page, str):
                 page = page.encode(self.charset if self.charset else 'UTF-8')
             self.app_iter = [page]
             self.body = page
@@ -1331,7 +1330,7 @@ status_map = {}
 code = None
 for name, value in list(globals().items()):
     if (
-        isinstance(value, class_types)
+        isinstance(value, type)
         and issubclass(value, HTTPException)
         and value not in {HTTPClientError, HTTPServerError}
         and not name.startswith('_')

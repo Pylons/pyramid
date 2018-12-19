@@ -1,6 +1,6 @@
 import unittest
 
-from pyramid.compat import text_
+from pyramid.util import text_
 
 
 class TestPredicateList(unittest.TestCase):

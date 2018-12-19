@@ -1,8 +1,8 @@
 import base64
 import json
+import pickle
 import unittest
 from pyramid import testing
-from pyramid.compat import pickle
 
 
 class SharedCookieSessionTests(object):
@@ -607,13 +607,7 @@ class DummySerializer(object):
         return base64.b64encode(json.dumps(value).encode('utf-8'))
 
     def loads(self, value):
-        try:
-            return json.loads(base64.b64decode(value).decode('utf-8'))
-
-        # base64.b64decode raises a TypeError on py2 instead of a ValueError
-        # and a ValueError is required for the session to handle it properly
-        except TypeError:
-            raise ValueError
+        return json.loads(base64.b64decode(value).decode('utf-8'))
 
 
 class DummySessionFactory(dict):

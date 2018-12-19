@@ -33,7 +33,7 @@ While you write your software, you can insert specialized markup into your
 Python code that makes it possible for the system to translate text values into
 the languages used by your application's users.  This markup creates a
 :term:`translation string`.  A translation string is an object that behaves
-mostly like a normal Unicode object, except that it also carries around extra
+mostly like a normal Unicode string, except that it also carries around extra
 information related to its job as part of the :app:`Pyramid` translation
 machinery.
 
@@ -49,7 +49,7 @@ The most primitive way to create a translation string is to use the
     from pyramid.i18n import TranslationString
     ts = TranslationString('Add')
 
-This creates a Unicode-like object that is a TranslationString.
+This creates a ``str``-like object that is a TranslationString.
 
 .. note::
 
@@ -61,9 +61,8 @@ This creates a Unicode-like object that is a TranslationString.
 
 The first argument to :class:`~pyramid.i18n.TranslationString` is the
 ``msgid``; it is required.  It represents the key into the translation mappings
-provided by a particular localization. The ``msgid`` argument must be a Unicode
-object or an ASCII string.  The msgid may optionally contain *replacement
-markers*.  For instance:
+provided by a particular localization. The ``msgid`` argument must be a string.
+The ``msgid`` may optionally contain *replacement markers*.  For instance:
 
 .. code-block:: python
     :linenos:
@@ -81,14 +80,14 @@ may be supplied at the same time as the replacement marker itself:
     from pyramid.i18n import TranslationString
     ts = TranslationString('Add ${number}', mapping={'number':1})
 
-Any number of replacement markers can be present in the msgid value, any number
+Any number of replacement markers can be present in the ``msgid`` value, any number
 of times.  Only markers which can be replaced by the values in the *mapping*
 will be replaced at translation time.  The others will not be interpolated and
 will be output literally.
 
 A translation string should also usually carry a *domain*.  The domain
 represents a translation category to disambiguate it from other translations of
-the same msgid, in case they conflict.
+the same ``msgid``, in case they conflict.
 
 .. code-block:: python
     :linenos:
@@ -100,7 +99,7 @@ the same msgid, in case they conflict.
 The above translation string named a domain of ``form``.  A :term:`translator`
 function will often use the domain to locate the right translator file on the
 filesystem which contains translations for a given domain.  In this case, if it
-were trying to translate our msgid to German, it might try to find a
+were trying to translate our ``msgid`` to German, it might try to find a
 translation from a :term:`gettext` file within a :term:`translation directory`
 like this one:
 
@@ -429,7 +428,7 @@ Performing a Translation
 
 A :term:`localizer` has a ``translate`` method which accepts either a
 :term:`translation string` or a Unicode string and which returns a Unicode
-object representing the translation.  Generating a translation in a view
+string representing the translation.  Generating a translation in a view
 component of an application might look like so:
 
 .. code-block:: python

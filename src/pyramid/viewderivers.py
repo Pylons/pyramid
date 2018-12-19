@@ -17,11 +17,14 @@ from pyramid.interfaces import (
     IViewMapperFactory,
 )
 
-from pyramid.compat import is_bound_method, is_unbound_method
-
 from pyramid.exceptions import ConfigurationError
 from pyramid.httpexceptions import HTTPForbidden
-from pyramid.util import object_description, takes_one_arg
+from pyramid.util import (
+    object_description,
+    takes_one_arg,
+    is_bound_method,
+    is_unbound_method,
+)
 from pyramid.view import render_view_to_response
 from pyramid import renderers
 

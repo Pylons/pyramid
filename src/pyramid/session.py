@@ -1,5 +1,6 @@
 import binascii
 import os
+import pickle
 import time
 
 from zope.deprecation import deprecated
@@ -7,10 +8,11 @@ from zope.interface import implementer
 
 from webob.cookies import JSONSerializer, SignedSerializer
 
-from pyramid.compat import pickle, PY2, text_, bytes_, native_
 from pyramid.csrf import check_csrf_origin, check_csrf_token
 
 from pyramid.interfaces import ISession
+
+from pyramid.util import text_, bytes_
 
 
 def manage_accessed(wrapped):
@@ -255,12 +257,6 @@ def BaseCookieSessionFactory(
         __len__ = manage_accessed(dict.__len__)
         __iter__ = manage_accessed(dict.__iter__)
 
-        if PY2:
-            iteritems = manage_accessed(dict.iteritems)
-            itervalues = manage_accessed(dict.itervalues)
-            iterkeys = manage_accessed(dict.iterkeys)
-            has_key = manage_accessed(dict.has_key)
-
         # modifying dictionary methods
         clear = manage_changed(dict.clear)
         update = manage_changed(dict.update)
@@ -309,7 +305,7 @@ def BaseCookieSessionFactory(
                     exception is not None
                 ):  # dont set a cookie during exceptions
                     return False
-            cookieval = native_(
+            cookieval = text_(
                 serializer.dumps((self.accessed, self.created, dict(self)))
             )
             if len(cookieval) > 4064:

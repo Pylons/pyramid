@@ -3,11 +3,11 @@ import unittest
 from zope.interface import implementer
 
 from pyramid import testing
-from pyramid.compat import im_func, text_
 from pyramid.exceptions import ConfigurationError
 from pyramid.exceptions import ConfigurationExecutionError
 from pyramid.exceptions import ConfigurationConflictError
 from pyramid.interfaces import IResponse, IRequest, IMultiView
+from pyramid.util import text_
 
 from . import IDummy
 from . import dummy_view
@@ -1357,6 +1357,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             request_method='POST',
         )
         request = self._makeRequest(config)
+        request.path_info = '/'
         request.method = 'POST'
         request.params = {}
         router = Router(config.registry)
@@ -1412,6 +1413,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             request_method='POST',
         )
         request = self._makeRequest(config)
+        request.path_info = '/'
         request.method = 'POST'
         request.params = {}
         router = Router(config.registry)
@@ -2722,7 +2724,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             view, renderer=null_renderer, append_slash=True
         )
         request = self._makeRequest(config)
-        request.environ['PATH_INFO'] = '/foo'
+        request.path_info = '/foo'
         request.query_string = 'a=1&b=2'
         request.path = '/scriptname/foo'
         view = self._getViewCallable(
@@ -2751,7 +2753,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             view, renderer=null_renderer, append_slash=HTTPMovedPermanently
         )
         request = self._makeRequest(config)
-        request.environ['PATH_INFO'] = '/foo'
+        request.path_info = '/foo'
         request.query_string = 'a=1&b=2'
         request.path = '/scriptname/foo'
         view = self._getViewCallable(
@@ -2795,15 +2797,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request = self._makeRequest(config)
         self.assertRaises(PredicateMismatch, wrapper, context, request)
 
-    # Since Python 3 has to be all cool and fancy and different...
-    def _assertBody(self, response, value):
-        from pyramid.compat import text_type
-
-        if isinstance(value, text_type):  # pragma: no cover
-            self.assertEqual(response.text, value)
-        else:  # pragma: no cover
-            self.assertEqual(response.body, value)
-
     def test_add_notfound_view_with_renderer(self):
         from zope.interface import implementedBy
         from pyramid.interfaces import IRequest
@@ -2820,7 +2813,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             request_iface=IRequest,
         )
         result = view(None, request)
-        self._assertBody(result, '{}')
+        self.assertEqual(result.text, '{}')
 
     def test_add_forbidden_view_with_renderer(self):
         from zope.interface import implementedBy
@@ -2838,7 +2831,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             request_iface=IRequest,
         )
         result = view(None, request)
-        self._assertBody(result, '{}')
+        self.assertEqual(result.text, '{}')
 
     def test_set_view_mapper(self):
         from pyramid.interfaces import IViewMapperFactory
@@ -3732,16 +3725,16 @@ class Test_preserve_view_attrs(unittest.TestCase):
         self.assertTrue(view1.__module__ is view2.__module__)
         self.assertTrue(view1.__name__ is view2.__name__)
         self.assertTrue(
-            getattr(view1.__call_permissive__, im_func)
-            is getattr(view2.__call_permissive__, im_func)
+            getattr(view1.__call_permissive__, '__func__')
+            is getattr(view2.__call_permissive__, '__func__')
         )
         self.assertTrue(
-            getattr(view1.__permitted__, im_func)
-            is getattr(view2.__permitted__, im_func)
+            getattr(view1.__permitted__, '__func__')
+            is getattr(view2.__permitted__, '__func__')
         )
         self.assertTrue(
-            getattr(view1.__predicated__, im_func)
-            is getattr(view2.__predicated__, im_func)
+            getattr(view1.__predicated__, '__func__')
+            is getattr(view2.__predicated__, '__func__')
         )
 
 

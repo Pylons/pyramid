@@ -7,7 +7,6 @@ import re
 from zope.interface import Interface
 
 from pyramid.paster import bootstrap
-from pyramid.compat import string_types
 from pyramid.interfaces import IRouteRequest
 from pyramid.config import not_
 
@@ -188,7 +187,7 @@ def get_route_data(route, registry):
                         view_request_methods[view_module] = []
                         view_request_methods_order.append(view_module)
 
-                    if isinstance(request_method, string_types):
+                    if isinstance(request_method, str):
                         request_method = (request_method,)
                     elif isinstance(request_method, not_):
                         request_method = ('!%s' % request_method.value,)

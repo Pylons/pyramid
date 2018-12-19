@@ -165,7 +165,7 @@ Glossary
      An object representing a node in the :term:`resource tree` of an
      application.  If :term:`traversal` is used, a resource is an element in
      the resource tree traversed by the system.  When traversal is used, a
-     resource becomes the :term:`context` of a :term:`view`.  If :term:`url
+     resource becomes the :term:`context` of a :term:`view`.  If :term:`URL
      dispatch` is used, a single resource is generated for each request and
      is used as the context resource of a view.
 
@@ -232,7 +232,7 @@ Glossary
      object *location-aware*.
 
    permission
-     A string or Unicode object that represents an action being taken against
+     A string that represents an action being taken against
      a :term:`context` resource.  A permission is associated with a view name
      and a resource type by the developer.  Resources are decorated with
      security declarations (e.g. an :term:`ACL`), which reference these
@@ -289,7 +289,7 @@ Glossary
      :term:`authorization policy`.
 
    principal
-     A *principal* is a string or Unicode object representing an entity,
+     A *principal* is a string representing an entity,
      typically a user or group. Principals are provided by an
      :term:`authentication policy`. For example, if a user has the
      :term:`userid` `bob`, and is a member of two groups named `group foo` and
@@ -298,7 +298,7 @@ Glossary
      foo` and `group bar`.
 
    userid
-     A *userid* is a string or Unicode object used to identify and authenticate
+     A *userid* is a string used to identify and authenticate
      a real-world user or client. A userid is supplied to an
      :term:`authentication policy` in order to discover the user's
      :term:`principals <principal>`. In the authentication policies which
@@ -359,7 +359,7 @@ Glossary
      library created by Ian Bicking.
 
    PasteDeploy
-     `PasteDeploy <https://pastedeploy.readthedocs.io/en/latest/>`_ is a library used by
+     `PasteDeploy <https://docs.pylonsproject.org/projects/pastedeploy/en/latest/>`_ is a library used by
      :app:`Pyramid` which makes it possible to configure
      :term:`WSGI` components together declaratively within an ``.ini``
      file.  It was developed by Ian Bicking.
@@ -405,13 +405,13 @@ Glossary
      the Routes syntax (which was inspired by Ruby On Rails pattern syntax).
 
    route
-     A single pattern matched by the :term:`url dispatch` subsystem,
+     A single pattern matched by the :term:`URL dispatch` subsystem,
      which generally resolves to a :term:`root factory` (and then
      ultimately a :term:`view`).
 
      .. seealso::
 
-        See also :term:`url dispatch`.
+        See also :term:`URL dispatch`.
 
    route configuration
      Route configuration is the act of associating request parameters with a
@@ -523,8 +523,8 @@ Glossary
      from the :term:`physical root`.  For example, the physical path of the
      ``abc`` subobject of the physical root object is ``/abc``.  Physical paths
      can also be specified as tuples where the first element is the empty
-     string (representing the root), and every other element is a Unicode
-     object, e.g. ``('', 'abc')``.  Physical paths are also sometimes called
+     string (representing the root), and every other element is a Unicode string,
+     e.g. ``('', 'abc')``.  Physical paths are also sometimes called
      "traversal paths".
 
    lineage
@@ -552,7 +552,7 @@ Glossary
      mappings, and does not (knowingly) use traversal otherwise.
 
    SQLAlchemy
-     `SQLAlchemy <http://www.sqlalchemy.org/>`_ is an object
+     `SQLAlchemy <https://www.sqlalchemy.org/>`_ is an object
      relational mapper used in tutorials within this documentation.
 
    JSON
@@ -755,7 +755,7 @@ Glossary
 
    Translation String
      An instance of :class:`pyramid.i18n.TranslationString`, which
-     is a class that behaves like a Unicode string, but has several
+     is a class that behaves like a string, but has several
      extra attributes such as ``domain``, ``msgid``, and ``mapping``
      for use during translation.  Translation strings are usually
      created by hand within software, but are sometimes created on the
@@ -779,7 +779,7 @@ Glossary
 
    Translator
      A callable which receives a :term:`translation string` and returns a
-     translated Unicode object for the purposes of internationalization.  A
+     translated string for the purposes of internationalization.  A
      :term:`localizer` supplies a translator to a :app:`Pyramid` application
      accessible via its :class:`~pyramid.i18n.Localizer.translate` method.
 
@@ -903,7 +903,7 @@ Glossary
       that a provided token is acceptable.
 
    Mako
-     `Mako <http://www.makotemplates.org/>`_ is a template language
+     `Mako <https://www.makotemplates.org/>`_ is a template language
      which refines the familiar ideas of componentized layout and inheritance
      using Python with Python scoping and calling semantics.
 
@@ -912,7 +912,7 @@ Glossary
      :meth:`pyramid.config.Configurator.add_route` and
      :meth:`pyramid.config.Configurator.add_view` to make it more convenient
      to register a collection of views as a single class when using
-     :term:`url dispatch`.  View handlers ship as part of the
+     :term:`URL dispatch`.  View handlers ship as part of the
      :term:`pyramid_handlers` add-on package.
 
    Deployment settings
@@ -1071,7 +1071,7 @@ Glossary
 
    Green Unicorn
       Aka ``gunicorn``, a fast :term:`WSGI` server that runs on Unix under
-      Python 2.6+ or Python 3.1+.  See https://gunicorn.org/ for detailed
+      Python 2.6+ or Python 3.4+.  See https://gunicorn.org/ for detailed
       information.
 
    predicate factory
@@ -1196,7 +1196,7 @@ Glossary
       A context manager is an object that defines the runtime context to be established when executing a :ref:`with <python:with>` statement in Python. The context manager handles the entry into, and the exit from, the desired runtime context for the execution of the block of code. Context managers are normally invoked using the ``with`` statement, but can also be used by directly invoking their methods. Pyramid adds context managers for :class:`pyramid.config.Configurator`, :meth:`pyramid.interfaces.IRouter.request_context`, :func:`pyramid.paster.bootstrap`, :func:`pyramid.scripting.prepare`, and :func:`pyramid.testing.testConfig`. See also the Python documentation for :ref:`With Statement Context Managers <python:context-managers>` and :pep:`343`.
 
    Alembic
-      `Alembic <http://alembic.zzzcomputing.com/en/latest/>`_ is a lightweight database migration tool for usage with the SQLAlchemy Database Toolkit for Python.
+      `Alembic <https://alembic.sqlalchemy.org/en/latest/>`_ is a lightweight database migration tool for usage with the SQLAlchemy Database Toolkit for Python.
 
    media type
        A label representing the type of some content.
@@ -1219,3 +1219,10 @@ Glossary
       Settings are collected at application startup.
       They can affect all the components which make up the the application.
       Pyramid itself, any tweens or Pyramid add-ons used, and :ref:`your own code may reference <deployment_settings>` and act on settings.
+
+   constructor
+      A function returning a Pyramid :term:`WSGI` application.
+      Every Pyramid application has a single constructor function named ``main``.
+      It returns a Pyramid :term:`router` generated by a :term:`configurator`, and is written by you.
+      The Pyramid constructor is the application's :term:`entry point`.
+

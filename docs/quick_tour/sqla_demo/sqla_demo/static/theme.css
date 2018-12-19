@@ -17,6 +17,9 @@ h6 {
 p {
   font-weight: 300;
 }
+button, input, optgroup, select, textarea {
+  color: black;
+}
 .font-normal {
   font-weight: 400;
 }

@@ -15,9 +15,6 @@ exclude = '''
   | dist
   | build
   | docs
-  | src/pyramid/scaffolds/alchemy
-  | src/pyramid/scaffolds/starter
-  | src/pyramid/scaffolds/zodb
 )/
 '''
 

@@ -83,7 +83,7 @@ Feature Additions
   override_with='/abs/path/')``. The ``myapp:static`` asset spec is completely
   made up and does not need to exist—it is used for generating URLs via
   ``request.static_url('myapp:static/foo.png')``. See
-  https://github.com/Pylons/pyramid/issues/1252
+  https://github.com/Pylons/pyramid/pull/1252
 
 - Added :meth:`~pyramid.config.Configurator.set_response_factory` and the
   ``response_factory`` keyword argument to the constructor of

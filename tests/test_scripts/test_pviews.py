@@ -53,7 +53,8 @@ class TestPViewsCommand(unittest.TestCase):
         class View1(object):
             pass
 
-        request = dummy.DummyRequest({'PATH_INFO': '/a'})
+        request = dummy.DummyRequest()
+        request.path_info = '/a'
         root = DefaultRootFactory(request)
         root_iface = providedBy(root)
         registry.registerAdapter(
@@ -78,7 +79,8 @@ class TestPViewsCommand(unittest.TestCase):
         def view1():  # pragma: no cover
             pass
 
-        request = dummy.DummyRequest({'PATH_INFO': '/a'})
+        request = dummy.DummyRequest()
+        request.path_info = '/a'
         root = DefaultRootFactory(request)
         root_iface = providedBy(root)
         registry.registerAdapter(
@@ -105,7 +107,8 @@ class TestPViewsCommand(unittest.TestCase):
         class View1(object):
             pass
 
-        request = dummy.DummyRequest({'PATH_INFO': '/a'})
+        request = dummy.DummyRequest()
+        request.path_info = '/a'
         root = DefaultRootFactory(request)
         root_iface = providedBy(root)
         view = View1()
@@ -267,7 +270,8 @@ class TestPViewsCommand(unittest.TestCase):
             dummy.DummyRoute('b', '/a', factory=factory, matchdict={}),
         ]
         mapper = dummy.DummyMapper(*routes)
-        request = dummy.DummyRequest({'PATH_INFO': '/a'})
+        request = dummy.DummyRequest()
+        request.path_info = '/a'
         result = command._find_multi_routes(mapper, request)
         self.assertEqual(
             result,
@@ -288,7 +292,8 @@ class TestPViewsCommand(unittest.TestCase):
             dummy.DummyRoute('b', '/a', factory=factory, matchdict={}),
         ]
         mapper = dummy.DummyMapper(*routes)
-        request = dummy.DummyRequest({'PATH_INFO': '/a'})
+        request = dummy.DummyRequest()
+        request.path_info = '/a'
         result = command._find_multi_routes(mapper, request)
         self.assertEqual(result, [{'match': {}, 'route': routes[1]}])
 
@@ -303,7 +308,8 @@ class TestPViewsCommand(unittest.TestCase):
             dummy.DummyRoute('b', '/a', factory=factory),
         ]
         mapper = dummy.DummyMapper(*routes)
-        request = dummy.DummyRequest({'PATH_INFO': '/a'})
+        request = dummy.DummyRequest()
+        request.path_info = '/a'
         result = command._find_multi_routes(mapper, request)
         self.assertEqual(result, [])
 

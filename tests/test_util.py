@@ -1,5 +1,6 @@
+import sys
 import unittest
-from pyramid.compat import PY2, text_, bytes_
+from pyramid.util import text_, bytes_
 
 
 class Test_InstancePropertyHelper(unittest.TestCase):
@@ -170,14 +171,10 @@ class Test_InstancePropertyHelper(unittest.TestCase):
         self.assertEqual(2, foo.y)
 
     def test_make_property_unicode(self):
-        from pyramid.compat import text_
         from pyramid.exceptions import ConfigurationError
 
         cls = self._getTargetClass()
-        if PY2:
-            name = text_(b'La Pe\xc3\xb1a', 'utf-8')
-        else:
-            name = b'La Pe\xc3\xb1a'
+        name = b'La Pe\xc3\xb1a'
 
         def make_bad_name():
             cls.make_property(lambda x: 1, name=name, reify=True)
@@ -439,37 +436,11 @@ class Test_strings_differ(unittest.TestCase):
         self.assertFalse(self._callFUT('123', '123'))
         self.assertTrue(self._callFUT('123', '1234'))
 
-    def test_it_with_internal_comparator(self):
-        result = self._callFUT(b'foo', b'foo', compare_digest=None)
+    def test_it(self):
+        result = self._callFUT(b'foo', b'foo')
         self.assertFalse(result)
 
-        result = self._callFUT(b'123', b'abc', compare_digest=None)
-        self.assertTrue(result)
-
-    def test_it_with_external_comparator(self):
-        class DummyComparator(object):
-            called = False
-
-            def __init__(self, ret_val):
-                self.ret_val = ret_val
-
-            def __call__(self, a, b):
-                self.called = True
-                return self.ret_val
-
-        dummy_compare = DummyComparator(True)
-        result = self._callFUT(b'foo', b'foo', compare_digest=dummy_compare)
-        self.assertTrue(dummy_compare.called)
-        self.assertFalse(result)
-
-        dummy_compare = DummyComparator(False)
-        result = self._callFUT(b'123', b'345', compare_digest=dummy_compare)
-        self.assertTrue(dummy_compare.called)
-        self.assertTrue(result)
-
-        dummy_compare = DummyComparator(False)
-        result = self._callFUT(b'abc', b'abc', compare_digest=dummy_compare)
-        self.assertTrue(dummy_compare.called)
+        result = self._callFUT(b'123', b'abc')
         self.assertTrue(result)
 
 
@@ -498,10 +469,7 @@ class Test_object_description(unittest.TestCase):
         self.assertEqual(self._callFUT(('a', 'b')), "('a', 'b')")
 
     def test_set(self):
-        if PY2:
-            self.assertEqual(self._callFUT(set(['a'])), "set(['a'])")
-        else:
-            self.assertEqual(self._callFUT(set(['a'])), "{'a'}")
+        self.assertEqual(self._callFUT(set(['a'])), "{'a'}")
 
     def test_list(self):
         self.assertEqual(self._callFUT(['a']), "['a']")
@@ -839,31 +807,26 @@ class TestSentinel(unittest.TestCase):
 
 
 class TestCallableName(unittest.TestCase):
-    def test_valid_ascii(self):
+    def _callFUT(self, val):
         from pyramid.util import get_callable_name
-        from pyramid.compat import text_
 
-        if PY2:
-            name = text_(b'hello world', 'utf-8')
-        else:
-            name = b'hello world'
+        return get_callable_name(val)
 
-        self.assertEqual(get_callable_name(name), 'hello world')
+    def test_valid_ascii_bytes(self):
+        name = b'hello world'
+        self.assertEqual(self._callFUT(name), 'hello world')
 
-    def test_invalid_ascii(self):
-        from pyramid.util import get_callable_name
-        from pyramid.compat import text_
+    def test_valid_ascii_string(self):
         from pyramid.exceptions import ConfigurationError
 
-        def get_bad_name():
-            if PY2:
-                name = text_(b'La Pe\xc3\xb1a', 'utf-8')
-            else:
-                name = b'La Pe\xc3\xb1a'
+        name = b'La Pe\xc3\xb1a'.decode('utf-8')
+        self.assertRaises(ConfigurationError, self._callFUT, name)
 
-            get_callable_name(name)
+    def test_invalid_ascii(self):
+        from pyramid.exceptions import ConfigurationError
 
-        self.assertRaises(ConfigurationError, get_bad_name)
+        name = b'La Pe\xc3\xb1a'
+        self.assertRaises(ConfigurationError, self._callFUT, name)
 
 
 class Test_hide_attrs(unittest.TestCase):
@@ -1240,3 +1203,77 @@ class TestSimpleSerializer(unittest.TestCase):
     def test_dumps(self):
         inst = self._makeOne()
         self.assertEqual(inst.dumps('abc'), bytes_('abc'))
+
+
+class TestUnboundMethods(unittest.TestCase):
+    class Dummy(object):
+        def run(self):  # pragma: no cover
+            return 'OK'
+
+    def _callFUT(self, val):
+        from pyramid.util import is_unbound_method
+
+        return is_unbound_method(val)
+
+    def test_bound_method(self):
+        self.assertFalse(self._callFUT(self.Dummy().run))
+
+    def test_unbound_method(self):
+        self.assertTrue(self._callFUT(self.Dummy.run))
+
+    def test_normal_func_unbound(self):
+        def func():  # pragma: no cover
+            return 'OK'
+
+        self.assertFalse(self._callFUT(func))
+
+
+class TestReraise(unittest.TestCase):
+    def _callFUT(self, *args):
+        from pyramid.util import reraise
+
+        return reraise(*args)
+
+    def test_it(self):
+        # tests cribbed from six.py
+        def get_next(tb):
+            return tb.tb_next.tb_next.tb_next
+
+        e = Exception('blah')
+        try:
+            raise e
+        except Exception:
+            tp, val, tb = sys.exc_info()
+
+        try:
+            self._callFUT(tp, val, tb)
+        except Exception:
+            tp2, val2, tb2 = sys.exc_info()
+        self.assertIs(tp2, Exception)
+        self.assertIs(val2, e)
+        self.assertIs(get_next(tb2), tb)
+
+        try:
+            self._callFUT(tp, val)
+        except Exception:
+            tp2, val2, tb2 = sys.exc_info()
+        self.assertIs(tp2, Exception)
+        self.assertIs(val2, e)
+        self.assertIsNot(get_next(tb2), tb)
+
+        try:
+            self._callFUT(tp, val, tb2)
+        except Exception:
+            tp2, val2, tb3 = sys.exc_info()
+        self.assertIs(tp2, Exception)
+        self.assertIs(val2, e)
+        self.assertIs(get_next(tb3), tb2)
+
+        try:
+            self._callFUT(tp, None, tb)
+        except Exception:
+            tp2, val2, tb2 = sys.exc_info()
+        self.assertIs(tp2, Exception)
+        self.assertIsNot(val2, val)
+        self.assertIsInstance(val2, Exception)
+        self.assertIs(get_next(tb2), tb)

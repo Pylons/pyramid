@@ -188,15 +188,10 @@ of them.  Here are a couple that might be useful:
 Text (Unicode)
 ++++++++++++++
 
-Many of the properties of the request object will be text values (``unicode``
-under Python 2 or ``str`` under Python 3) if the request encoding/charset is
-provided.  If it is provided, the values in ``req.POST``, ``req.GET``,
-``req.params``, and ``req.cookies`` will contain text.  The client *can*
-indicate the charset with something like ``Content-Type:
-application/x-www-form-urlencoded; charset=utf8``, but browsers seldom set
-this.  You can reset the charset of an existing request with ``newreq =
-req.decode('utf-8')``, or during instantiation with ``Request(environ,
-charset='utf8')``.
+Most of the properties of the request object will be text values.
+The values in ``req.POST``, ``req.GET``, ``req.params``, and ``req.cookies`` will contain text and are generated assuming a UTF-8 charset.
+The client *can* indicate the charset with something like ``Content-Type: application/x-www-form-urlencoded; charset=utf8``, but browsers seldom set this.
+You can reset the charset of an existing request with ``newreq = req.decode('utf-8')``, or during instantiation with ``Request(environ, charset='utf8')``.
 
 .. index::
    single: multidict (WebOb)
@@ -264,7 +259,7 @@ to a :app:`Pyramid` application:
     jQuery.ajax({type:'POST',
                  url: 'http://localhost:6543/', // the pyramid server
                  data: JSON.stringify({'a':1}),
-                 contentType: 'application/json; charset=utf-8'});
+                 contentType: 'application/json'});
 
 When such a request reaches a view in your application, the
 ``request.json_body`` attribute will be available in the view callable body.
@@ -280,7 +275,7 @@ For the above view, printed to the console will be:
 
 .. code-block:: python
 
-    {u'a': 1}
+    {'a': 1}
 
 For bonus points, here's a bit of client-side code that will produce a request
 that has a body suitable for reading via ``request.json_body`` using Python's
@@ -386,8 +381,8 @@ A response object has three fundamental parts:
 
 ``response.app_iter``
     An iterable (such as a list or generator) that will produce the content of
-    the response.  This is also accessible as ``response.body`` (a string),
-    ``response.text`` (a unicode object, informed by ``response.charset``), and
+    the response.  This is also accessible as ``response.body`` (bytes),
+    ``response.text`` (a Unicode string, informed by ``response.charset``), and
     ``response.body_file`` (a file-like object; writing to it appends to
     ``app_iter``).
 

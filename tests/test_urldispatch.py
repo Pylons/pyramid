@@ -1,6 +1,6 @@
 import unittest
 from pyramid import testing
-from pyramid.compat import text_, PY2
+from pyramid.util import text_
 
 
 class TestRoute(unittest.TestCase):
@@ -59,9 +59,7 @@ class RoutesMapperTests(unittest.TestCase):
     def _getRequest(self, **kw):
         from pyramid.threadlocal import get_current_registry
 
-        environ = {'SERVER_NAME': 'localhost', 'wsgi.url_scheme': 'http'}
-        environ.update(kw)
-        request = DummyRequest(environ)
+        request = DummyRequest(**kw)
         reg = get_current_registry()
         request.registry = reg
         return request
@@ -83,7 +81,7 @@ class RoutesMapperTests(unittest.TestCase):
 
     def test_no_route_matches(self):
         mapper = self._makeOne()
-        request = self._getRequest(PATH_INFO='/')
+        request = self._getRequest(path_info='/')
         result = mapper(request)
         self.assertEqual(result['match'], None)
         self.assertEqual(result['route'], None)
@@ -130,19 +128,39 @@ class RoutesMapperTests(unittest.TestCase):
 
     def test___call__pathinfo_cant_be_decoded(self):
         from pyramid.exceptions import URLDecodeError
+        from pyramid.threadlocal import get_current_registry
+
+        class DummyRequest:
+            @property
+            def path_info(self):
+                return b'\xff\xfe\xe6\x00'.decode('utf-8')
 
         mapper = self._makeOne()
-        if PY2:
-            path_info = b'\xff\xfe\xe6\x00'
-        else:
-            path_info = b'\xff\xfe\xe6\x00'.decode('latin-1')
-        request = self._getRequest(PATH_INFO=path_info)
+        request = DummyRequest()
+        request.registry = get_current_registry()
         self.assertRaises(URLDecodeError, mapper, request)
+
+    def test___call__pathinfo_KeyError(self):
+        from pyramid.threadlocal import get_current_registry
+
+        class DummyRequest:
+            @property
+            def path_info(self):
+                # if the PATH_INFO is missing from the environ
+                raise KeyError
+
+        mapper = self._makeOne()
+        mapper.connect('root', '')
+        request = DummyRequest()
+        request.registry = get_current_registry()
+        result = mapper(request)
+        self.assertEqual(result['route'], mapper.routes['root'])
+        self.assertEqual(result['match'], {})
 
     def test___call__route_matches(self):
         mapper = self._makeOne()
         mapper.connect('foo', 'archives/:action/:article')
-        request = self._getRequest(PATH_INFO='/archives/action1/article1')
+        request = self._getRequest(path_info='/archives/action1/article1')
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['foo'])
         self.assertEqual(result['match']['action'], 'action1')
@@ -153,7 +171,7 @@ class RoutesMapperTests(unittest.TestCase):
         mapper.connect(
             'foo', 'archives/:action/:article', predicates=[lambda *arg: True]
         )
-        request = self._getRequest(PATH_INFO='/archives/action1/article1')
+        request = self._getRequest(path_info='/archives/action1/article1')
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['foo'])
         self.assertEqual(result['match']['action'], 'action1')
@@ -167,7 +185,7 @@ class RoutesMapperTests(unittest.TestCase):
             predicates=[lambda *arg: True, lambda *arg: False],
         )
         mapper.connect('bar', 'archives/:action/:article')
-        request = self._getRequest(PATH_INFO='/archives/action1/article1')
+        request = self._getRequest(path_info='/archives/action1/article1')
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['bar'])
         self.assertEqual(result['match']['action'], 'action1')
@@ -182,7 +200,7 @@ class RoutesMapperTests(unittest.TestCase):
             return True
 
         mapper.connect('foo', 'archives/:action/article1', predicates=[pred])
-        request = self._getRequest(PATH_INFO='/archives/action1/article1')
+        request = self._getRequest(path_info='/archives/action1/article1')
         mapper(request)
 
     def test_cc_bug(self):
@@ -194,13 +212,13 @@ class RoutesMapperTests(unittest.TestCase):
             'juri', 'licenses/:license_code/:license_version/:jurisdiction'
         )
 
-        request = self._getRequest(PATH_INFO='/licenses/1/v2/rdf')
+        request = self._getRequest(path_info='/licenses/1/v2/rdf')
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['rdf'])
         self.assertEqual(result['match']['license_code'], '1')
         self.assertEqual(result['match']['license_version'], 'v2')
 
-        request = self._getRequest(PATH_INFO='/licenses/1/v2/usa')
+        request = self._getRequest(path_info='/licenses/1/v2/usa')
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['juri'])
         self.assertEqual(result['match']['license_code'], '1')
@@ -210,7 +228,7 @@ class RoutesMapperTests(unittest.TestCase):
     def test___call__root_route_matches(self):
         mapper = self._makeOne()
         mapper.connect('root', '')
-        request = self._getRequest(PATH_INFO='/')
+        request = self._getRequest(path_info='/')
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['root'])
         self.assertEqual(result['match'], {})
@@ -218,7 +236,7 @@ class RoutesMapperTests(unittest.TestCase):
     def test___call__root_route_matches2(self):
         mapper = self._makeOne()
         mapper.connect('root', '/')
-        request = self._getRequest(PATH_INFO='/')
+        request = self._getRequest(path_info='/')
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['root'])
         self.assertEqual(result['match'], {})
@@ -226,7 +244,7 @@ class RoutesMapperTests(unittest.TestCase):
     def test___call__root_route_when_path_info_empty(self):
         mapper = self._makeOne()
         mapper.connect('root', '/')
-        request = self._getRequest(PATH_INFO='')
+        request = self._getRequest(path_info='')
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['root'])
         self.assertEqual(result['match'], {})
@@ -234,7 +252,7 @@ class RoutesMapperTests(unittest.TestCase):
     def test___call__root_route_when_path_info_notempty(self):
         mapper = self._makeOne()
         mapper.connect('root', '/')
-        request = self._getRequest(PATH_INFO='/')
+        request = self._getRequest(path_info='/')
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['root'])
         self.assertEqual(result['match'], {})
@@ -242,7 +260,7 @@ class RoutesMapperTests(unittest.TestCase):
     def test___call__no_path_info(self):
         mapper = self._makeOne()
         mapper.connect('root', '/')
-        request = self._getRequest()
+        request = self._getRequest(path_info='')
         result = mapper(request)
         self.assertEqual(result['route'], mapper.routes['root'])
         self.assertEqual(result['match'], {})
@@ -646,8 +664,10 @@ class DummyContext(object):
 
 
 class DummyRequest(object):
-    def __init__(self, environ):
-        self.environ = environ
+    scheme = 'http'
+
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
 
 
 class DummyRoute(object):
