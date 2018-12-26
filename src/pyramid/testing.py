@@ -94,7 +94,7 @@ class DummySecurityPolicy(object):
         if self.permissive:
             return self.effective_principals(None)
         else:
-            return None
+            return []
 
 
 class DummyTemplateRenderer(object):
