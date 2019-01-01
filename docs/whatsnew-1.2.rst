@@ -63,7 +63,7 @@ Scaffolding Changes
   at all; configuration in the ``production.ini`` file which used to require
   its ``error_catcher`` :term:`middleware` has been removed.  Configuring
   error catching / email sending is now the domain of the ``pyramid_exclog``
-  package (see http://docs.pylonsproject.org/projects/pyramid_exclog/dev/).
+  package (see https://docs.pylonsproject.org/projects/pyramid_exclog/en/latest/).
 
 - All scaffolds now send the ``cache_max_age`` parameter to the
   ``add_static_view`` method.

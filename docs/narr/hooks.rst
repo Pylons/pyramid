@@ -755,9 +755,7 @@ The API that must be implemented by a class that provides
             self.physical_path_tuple =  some_function_of(resource, request)
 
 The default context URL generator is available for perusal as the class
-:class:`pyramid.traversal.ResourceURL` in the `traversal module
-<https://github.com/Pylons/pyramid/blob/master/pyramid/traversal.py>`_ of the
-:term:`Pylons` GitHub Pyramid repository.
+:class:`pyramid.traversal.ResourceURL` in the `traversal module <../_modules/pyramid/traversal.html>`_.
 
 See :meth:`pyramid.config.Configurator.add_resource_url_adapter` for more
 information.
