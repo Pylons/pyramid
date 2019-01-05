@@ -283,17 +283,6 @@
 
    .. automethod:: resource_path
 
-   .. attribute:: json_body
-
-       This property will return the JSON-decoded variant of the request
-       body.  If the request body is not well-formed JSON, or there is no
-       body associated with this request, this property will raise an
-       exception.
-       
-       .. seealso::
-       
-           See also :ref:`request_json_body`.
-
    .. method:: set_property(callable, name=None, reify=False)
 
        Add a callable or a property descriptor to the request instance.

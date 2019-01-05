@@ -31,6 +31,10 @@ Features
   to ``add_route`` is the empty string (``''``).
   See https://github.com/Pylons/pyramid/pull/3420
 
+- No longer define ``pyramid.request.Request.json_body`` which is already
+  provided by WebOb. This allows the attribute to now be settable.
+  See https://github.com/Pylons/pyramid/pull/3447
+
 Bug Fixes
 ---------
 
