@@ -100,19 +100,22 @@ setup(
     extras_require={'testing': testing_extras, 'docs': docs_extras},
     tests_require=tests_require,
     test_suite="tests",
-    entry_points="""\
-        [pyramid.pshell_runner]
-        python=pyramid.scripts.pshell:python_shell_runner
-        [console_scripts]
-        pserve = pyramid.scripts.pserve:main
-        pshell = pyramid.scripts.pshell:main
-        proutes = pyramid.scripts.proutes:main
-        pviews = pyramid.scripts.pviews:main
-        ptweens = pyramid.scripts.ptweens:main
-        prequest = pyramid.scripts.prequest:main
-        pdistreport = pyramid.scripts.pdistreport:main
-        [paste.server_runner]
-        wsgiref = pyramid.scripts.pserve:wsgiref_server_runner
-        cherrypy = pyramid.scripts.pserve:cherrypy_server_runner
-      """,
+    entry_points={
+        'paste.server_runner': [
+            'wsgiref = pyramid.scripts.pserve:wsgiref_server_runner',
+            'cherrypy = pyramid.scripts.pserve:cherrypy_server_runner',
+        ],
+        'pyramid.pshell_runner': [
+            'python = pyramid.scripts.pshell:python_shell_runner'
+        ],
+        'console_scripts': [
+            'pserve = pyramid.scripts.pserve:main',
+            'pshell = pyramid.scripts.pshell:main',
+            'proutes = pyramid.scripts.proutes:main',
+            'pviews = pyramid.scripts.pviews:main',
+            'ptweens = pyramid.scripts.ptweens:main',
+            'prequest = pyramid.scripts.prequest:main',
+            'pdistreport = pyramid.scripts.pdistreport:main',
+        ],
+    },
 )
