@@ -120,31 +120,6 @@ class TestFileIter(unittest.TestCase):
         self.assertTrue(f.closed)
 
 
-class Test_patch_mimetypes(unittest.TestCase):
-    def _callFUT(self, module):
-        from pyramid.response import init_mimetypes
-
-        return init_mimetypes(module)
-
-    def test_has_init(self):
-        class DummyMimetypes(object):
-            def init(self):
-                self.initted = True
-
-        module = DummyMimetypes()
-        result = self._callFUT(module)
-        self.assertEqual(result, True)
-        self.assertEqual(module.initted, True)
-
-    def test_missing_init(self):
-        class DummyMimetypes(object):
-            pass
-
-        module = DummyMimetypes()
-        result = self._callFUT(module)
-        self.assertEqual(result, False)
-
-
 class TestResponseAdapter(unittest.TestCase):
     def setUp(self):
         registry = Dummy()
