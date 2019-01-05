@@ -35,9 +35,6 @@ Features
   provided by WebOb. This allows the attribute to now be settable.
   See https://github.com/Pylons/pyramid/pull/3447
 
-Bug Fixes
----------
-
 Deprecations
 ------------
 
