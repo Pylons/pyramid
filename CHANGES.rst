@@ -1,3 +1,11 @@
+unreleased
+==========
+
+- Fix a bug in ``pyramid.testing.DummySecurityPolicy`` in which
+  ``principals_allows_by_permission`` would return all principals instead
+  of an empty list if ``permissive`` is ``False``.
+  See https://github.com/Pylons/pyramid/pull/3450
+
 .. _changes_1.10.1:
 
 1.10.1 (2018-11-06)
@@ -15,9 +23,6 @@
 
 1.10b1 (2018-10-28)
 ===================
-
-Bug Fixes
----------
 
 - Fix the ``pyramid.testing.DummyRequest`` to support the new
   ``request.accept`` API so that ``acceptable_offers`` is available even
