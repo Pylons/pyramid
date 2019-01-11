@@ -93,7 +93,10 @@ class DummySecurityPolicy(object):
         return self.permissive
 
     def principals_allowed_by_permission(self, context, permission):
-        return self.effective_principals(None)
+        if self.permissive:
+            return self.effective_principals(None)
+        else:
+            return []
 
 class DummyTemplateRenderer(object):
     """

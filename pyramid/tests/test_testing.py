@@ -51,6 +51,13 @@ class TestDummySecurityPolicy(unittest.TestCase):
         result = policy.principals_allowed_by_permission(None, None)
         self.assertEqual(result, [Everyone, Authenticated, 'user', 'group1'])
 
+    def test_principals_allowed_by_permission_not_permissive(self):
+        policy = self._makeOne('user', ('group1',))
+        policy.permissive = False
+
+        result = policy.principals_allowed_by_permission(None, None)
+        self.assertEqual(result, [])
+
     def test_forget(self):
         policy = self._makeOne()
         self.assertEqual(policy.forget(None), [])
