@@ -168,9 +168,13 @@ Using ``config.commit()``
 
 You can manually commit a configuration by using the
 :meth:`~pyramid.config.Configurator.commit` method between configuration calls.
+After a commit, more :term:`configuration declaration`\s may be added to a :term:`configurator`.
+New declarations will not conflict with committed declarations.
+The new declarations will override committed declarations.
+
 For example, we prevent conflicts from occurring in the application we examined
-previously as the result of adding a ``commit``.  Here's the application that
-generates conflicts:
+previously by adding a ``commit``.
+Here's the application that generates conflicts:
 
 .. code-block:: python
     :linenos:
@@ -360,7 +364,7 @@ the special name ``includeme``, which should perform configuration (like the
 :meth:`~pyramid.config.Configurator.include` can also accept a :term:`dotted
 Python name` to a function or a module.
 
-.. note:: See :ref:`the_include_tag` for a declarative alternative to the
+.. note:: See :ref:`zcml:the_include_tag` for a declarative alternative to the
    :meth:`~pyramid.config.Configurator.include` method.
 
 .. _twophase_config:

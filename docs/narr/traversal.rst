@@ -237,19 +237,19 @@ uses this algorithm to find a :term:`context` resource and a :term:`view name`.
 
     The traversal algorithm by default attempts to first URL-unquote and then
     Unicode-decode each path segment derived from ``PATH_INFO`` from its
-    natural byte string (``str`` type) representation.  URL unquoting is
+    natural string representation.  URL unquoting is
     performed using the Python standard library ``urllib.unquote`` function.
     Conversion from a URL-decoded string into Unicode is attempted using the
     UTF-8 encoding.  If any URL-unquoted path segment in ``PATH_INFO`` is not
     decodeable using the UTF-8 decoding, a :exc:`TypeError` is raised.  A
-    segment will be fully URL-unquoted and UTF8-decoded before it is passed in
+    segment will be fully URL-unquoted and UTF-8-decoded before it is passed in
     to the ``__getitem__`` of any resource during traversal.
 
     Thus a request with a ``PATH_INFO`` variable of ``/a/b/c`` maps to the
-    traversal sequence ``[u'a', u'b', u'c']``.
+    traversal sequence ``['a', 'b', 'c']``.
 
 #.  :term:`Traversal` begins at the root resource returned by the root factory.
-    For the traversal sequence ``[u'a', u'b', u'c']``, the root resource's
+    For the traversal sequence ``['a', 'b', 'c']``, the root resource's
     ``__getitem__`` is called with the name ``'a'``.  Traversal continues
     through the sequence.  In our example, if the root resource's
     ``__getitem__`` called with the name ``a`` returns a resource (a.k.a. 

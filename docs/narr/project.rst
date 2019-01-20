@@ -139,8 +139,8 @@ or install your application for deployment or development.
 
 An ``.ini`` file named ``development.ini`` will be created in the project
 directory.  You will use this ``.ini`` file to configure a server, to run your
-application, and to debug your application.  It contains configuration that
-enables an interactive debugger and settings optimized for development.
+application, and to debug your application.
+It contains configuration that enables an interactive debugger and :term:`settings` optimized for development.
 
 Another ``.ini`` file named ``production.ini`` will also be created in the
 project directory.  It contains configuration that disables any interactive
@@ -297,7 +297,7 @@ path to the module on which we want to run tests and coverage.
    single: running an application
    single: pserve
    single: reload
-   single: startup
+   single: starting
 
 .. _running_the_project_application:
 
@@ -658,12 +658,10 @@ only (``127.0.0.1``).
 .. _myproject_ini_logging:
 
 The sections after ``# logging configuration`` represent Python's standard
-library :mod:`logging` module configuration for your application.  These
-sections are passed to the `logging module's config file configuration engine
-<https://docs.python.org/2/howto/logging.html#configuring-logging>`_ when the
-``pserve`` or ``pshell`` commands are executed.  The default configuration
+library :mod:`logging` module configuration for your application.
+The default configuration
 sends application logging output to the standard error output of your terminal.
-For more information about logging configuration, see :ref:`logging_chapter`.
+For more information see :ref:`logging_chapter`.
 
 See the :term:`PasteDeploy` documentation for more information about other
 types of things you can put into this ``.ini`` file, such as other
@@ -856,7 +854,7 @@ also informs Python that the directory which contains it is a *package*.
    WSGI application.  This function is meant to be called by the
    :term:`PasteDeploy` framework as a result of running ``pserve``.
 
-   Within this function, application configuration is performed.
+   The ``main`` function configures the application.
 
    Line 7 opens a context manager with an instance of a :term:`Configurator`.
 
@@ -870,6 +868,10 @@ also informs Python that the directory which contains it is a *package*.
 
    Line 11 returns a :term:`WSGI` application to the caller of the function
    (Pyramid's pserve).
+
+.. seealso::
+   
+   See :ref:`the_startup_process` for more about the application's :ref:`settings <startup_settings>` and ``main``\'s :ref:`arguments <startup_constructor_arguments>` and statements.
 
 
 .. index::

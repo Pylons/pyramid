@@ -40,7 +40,7 @@ The majority of the code in Pyramid is supplied under this license:
     SUCH DAMAGE.
 
 Portions of the code in Pyramid are supplied under the ZPL (headers
-within individiual files indicate that these portions are licensed
+within individual files indicate that these portions are licensed
 under the ZPL):
 
   Zope Public License (ZPL) Version 2.1

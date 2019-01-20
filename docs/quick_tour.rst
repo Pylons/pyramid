@@ -15,12 +15,9 @@ If you would prefer to cut and paste the example code in this tour you may brows
 Installation
 ============
 
-Once you have a standard Python environment setup, getting started with Pyramid
-is a breeze. Unfortunately "standard" is not so simple in Python. For this
-Quick Tour, it means `Python <https://www.python.org/downloads/>`_, :mod:`python:venv` (or `virtualenv for
-Python 2.7 <https://virtualenv.pypa.io/en/stable/>`_),
-`pip <https://pypi.org/project/pip/>`_, and `Setuptools
-<https://pypi.org/project/setuptools/>`_.
+Once you have a standard Python environment setup, getting started with Pyramid is a breeze.
+Unfortunately "standard" is not so simple in Python.
+For this Quick Tour, it means `Python <https://www.python.org/downloads/>`_, :mod:`python:venv`, `pip <https://pypi.org/project/pip/>`_, and `Setuptools <https://pypi.org/project/setuptools/>`_.
 
 To save a little bit of typing and to be certain that we use the modules,
 scripts, and packages installed in our virtual environment, we'll set an
@@ -52,10 +49,8 @@ For Windows:
     # or for a specific released version
     c:\\> %VENV%\\Scripts\\pip install "pyramid==\ |release|\ "
 
-Of course Pyramid runs fine on Python 2.7+, as do the examples in this *Quick
-Tour*. We're showing Python 3 for simplicity. (Pyramid had production support
-for Python 3 in October 2011.) Also for simplicity, the remaining examples will
-show only Unix commands.
+As of version 2.0, Pyramid runs on Python 3 only.
+For simplicity, the remaining examples will show only Unix commands.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial section on Requirements <qtut_requirements>`,
@@ -927,7 +922,7 @@ system, can then easily get at the data thanks to SQLAlchemy:
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Databases <qtut_databases>`, `SQLAlchemy
-    <http://www.sqlalchemy.org/>`_, :ref:`making_a_console_script`,
+    <https://www.sqlalchemy.org/>`_, :ref:`making_a_console_script`,
     :ref:`bfg_sql_wiki_tutorial`, and :ref:`Application Transactions with
     pyramid_tm <tm:overview>`.
 

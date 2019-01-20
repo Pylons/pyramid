@@ -73,9 +73,9 @@ class TestFileResponse(unittest.TestCase):
         # function returns Unicode for the content_type, unlike any previous
         # version of Python.  See https://github.com/Pylons/pyramid/issues/1360
         # for more information.
-        from pyramid.compat import text_
         import mimetypes as old_mimetypes
         from pyramid import response
+        from pyramid.util import text_
 
         class FakeMimetypesModule(object):
             def guess_type(self, *arg, **kw):
@@ -118,31 +118,6 @@ class TestFileIter(unittest.TestCase):
         inst = self._makeOne(f, 1)
         inst.close()
         self.assertTrue(f.closed)
-
-
-class Test_patch_mimetypes(unittest.TestCase):
-    def _callFUT(self, module):
-        from pyramid.response import init_mimetypes
-
-        return init_mimetypes(module)
-
-    def test_has_init(self):
-        class DummyMimetypes(object):
-            def init(self):
-                self.initted = True
-
-        module = DummyMimetypes()
-        result = self._callFUT(module)
-        self.assertEqual(result, True)
-        self.assertEqual(module.initted, True)
-
-    def test_missing_init(self):
-        class DummyMimetypes(object):
-            pass
-
-        module = DummyMimetypes()
-        result = self._callFUT(module)
-        self.assertEqual(result, False)
 
 
 class TestResponseAdapter(unittest.TestCase):

@@ -15,9 +15,6 @@ from pyramid.interfaces import (
     IExceptionViewClassifier,
 )
 
-from pyramid.compat import decode_path_info
-from pyramid.compat import reraise as reraise_
-
 from pyramid.exceptions import ConfigurationError, PredicateMismatch
 
 from pyramid.httpexceptions import (
@@ -29,6 +26,7 @@ from pyramid.httpexceptions import (
 from pyramid.threadlocal import get_current_registry, manager
 
 from pyramid.util import hide_attrs
+from pyramid.util import reraise as reraise_
 
 _marker = object()
 
@@ -305,7 +303,7 @@ class AppendSlashNotFoundViewFactory(object):
         self.redirect_class = redirect_class
 
     def __call__(self, context, request):
-        path = decode_path_info(request.environ['PATH_INFO'] or '/')
+        path = request.path_info
         registry = request.registry
         mapper = registry.queryUtility(IRoutesMapper)
         if mapper is not None and not path.endswith('/'):

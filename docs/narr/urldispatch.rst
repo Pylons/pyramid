@@ -165,8 +165,8 @@ The above pattern will match these URLs, generating the following matchdicts:
 
 .. code-block:: text
 
-    foo/1/2        -> {'baz':u'1', 'bar':u'2'}
-    foo/abc/def    -> {'baz':u'abc', 'bar':u'def'}
+    foo/1/2        -> {'baz': '1', 'bar': '2'}
+    foo/abc/def    -> {'baz': 'abc', 'bar': 'def'}
 
 It will not match the following patterns however:
 
@@ -184,7 +184,7 @@ instance, if this route pattern was used:
     foo/{name}.html
 
 The literal path ``/foo/biz.html`` will match the above route pattern, and the
-match result will be ``{'name':u'biz'}``.  However, the literal path
+match result will be ``{'name': 'biz'}``.  However, the literal path
 ``/foo/biz`` will not match, because it does not contain a literal ``.html`` at
 the end of the segment represented by ``{name}.html`` (it only contains
 ``biz``, not ``biz.html``).
@@ -242,7 +242,7 @@ The matchdict will look like so (the value is URL-decoded / UTF-8 decoded):
 
 .. code-block:: text
 
-    {'bar':u'La Pe\xf1a'}
+    {'bar': 'La Pe\xf1a'}
 
 Literal strings in the path segment should represent the *decoded* value of the
 ``PATH_INFO`` provided to Pyramid.  You don't want to use a URL-encoded value
@@ -303,10 +303,10 @@ The above pattern will match these URLs, generating the following matchdicts:
 .. code-block:: text
 
     foo/1/2/           ->
-             {'baz':u'1', 'bar':u'2', 'fizzle':()}
+             {'baz': '1', 'bar': '2', 'fizzle': ()}
 
     foo/abc/def/a/b/c  ->
-             {'baz':u'abc', 'bar':u'def', 'fizzle':(u'a', u'b', u'c')}
+             {'baz': 'abc', 'bar': 'def', 'fizzle': ('a', 'b', 'c')}
 
 Note that when a ``*stararg`` remainder match is matched, the value put into
 the matchdict is turned into a tuple of path segments representing the
@@ -327,7 +327,7 @@ Will generate the following matchdict:
 
 .. code-block:: text
 
-    {'fizzle':(u'La Pe\xf1a', u'a', u'b', u'c')}
+    {'fizzle': ('La Pe\xf1a', 'a', 'b', 'c')}
 
 By default, the ``*stararg`` will parse the remainder sections into a tuple
 split by segment. Changing the regular expression used to match a marker can
@@ -341,8 +341,8 @@ The above pattern will match these URLs, generating the following matchdicts:
 
 .. code-block:: text
 
-    foo/1/2/           -> {'baz':u'1', 'bar':u'2', 'fizzle':u''}
-    foo/abc/def/a/b/c  -> {'baz':u'abc', 'bar':u'def', 'fizzle': u'a/b/c'}
+    foo/1/2/           -> {'baz': '1', 'bar': '2', 'fizzle': ''}
+    foo/abc/def/a/b/c  -> {'baz': 'abc', 'bar': 'def', 'fizzle': 'a/b/c'}
 
 This occurs because the default regular expression for a marker is ``[^/]+``
 which will match everything up to the first ``/``, while ``{fizzle:.*}`` will
@@ -513,7 +513,7 @@ When the ``/site/{id}`` route pattern matches during a request, the
 When this route matches, a ``matchdict`` will be generated and attached to the
 request as ``request.matchdict``.  If the specific URL matched is ``/site/1``,
 the ``matchdict`` will be a dictionary with a single key, ``id``; the value
-will be the string ``'1'``, ex.: ``{'id':'1'}``.
+will be the string ``'1'``, ex.: ``{'id': '1'}``.
 
 The ``mypackage.views`` module referred to above might look like so:
 
@@ -562,12 +562,12 @@ Here is an example of a corresponding ``mypackage.views`` module:
     @view_config(route_name='user')
     def user_view(request):
         user = request.matchdict['user']
-        return Response(u'The user is {}.'.format(user))
+        return Response('The user is {}.'.format(user))
 
     @view_config(route_name='tag')
     def tag_view(request):
         tag = request.matchdict['tag']
-        return Response(u'The tag is {}.'.format(tag))
+        return Response('The tag is {}.'.format(tag))
     
 The above configuration will allow :app:`Pyramid` to service URLs in these
 forms:
@@ -581,17 +581,17 @@ forms:
 - When a URL matches the pattern ``/ideas/{idea}``, the view callable
   available at the dotted Python pathname ``mypackage.views.idea_view`` will
   be called.  For the specific URL ``/ideas/1``, the ``matchdict`` generated
-  and attached to the :term:`request` will consist of ``{'idea':'1'}``.
+  and attached to the :term:`request` will consist of ``{'idea': '1'}``.
 
 - When a URL matches the pattern ``/users/{user}``, the view callable
   available at the dotted Python pathname ``mypackage.views.user_view`` will be
   called.  For the specific URL ``/users/1``, the ``matchdict`` generated and
-  attached to the :term:`request` will consist of ``{'user':'1'}``.
+  attached to the :term:`request` will consist of ``{'user': '1'}``.
 
 - When a URL matches the pattern ``/tags/{tag}``, the view callable available
   at the dotted Python pathname ``mypackage.views.tag_view`` will be called.
   For the specific URL ``/tags/1``, the ``matchdict`` generated and attached to
-  the :term:`request` will consist of ``{'tag':'1'}``.
+  the :term:`request` will consist of ``{'tag': '1'}``.
 
 In this example we've again associated each of our routes with a :term:`view
 callable` directly.  In all cases, the request, which will have a ``matchdict``
@@ -714,13 +714,13 @@ Therefore, if you've added a route like so:
 
 .. code-block:: python
 
-    config.add_route('la', u'/La Peña/{city}')
+    config.add_route('la', '/La Peña/{city}')
 
 And you later generate a URL using ``route_path`` or ``route_url`` like so:
 
 .. code-block:: python
 
-    url = request.route_path('la', city=u'Québec')
+    url = request.route_path('la', city='Québec')
 
 You will wind up with the path encoded to UTF-8 and URL-quoted like so:
 
@@ -739,7 +739,7 @@ And you later generate a URL using ``route_path`` or ``route_url`` using a
 
 .. code-block:: python
 
-    url = request.route_path('abc', foo=u'Québec/biz')
+    url = request.route_path('abc', foo='Québec/biz')
 
 The value you pass will be URL-quoted except for embedded slashes in the
 result:
@@ -752,7 +752,7 @@ You can get a similar result by passing a tuple composed of path elements:
 
 .. code-block:: python
 
-    url = request.route_path('abc', foo=(u'Québec', u'biz'))
+    url = request.route_path('abc', foo=('Québec', 'biz'))
 
 Each value in the tuple will be URL-quoted and joined by slashes in this case:
 

@@ -7,20 +7,6 @@ from webob import Response as _Response
 from zope.interface import implementer
 from pyramid.interfaces import IResponse, IResponseFactory
 
-
-def init_mimetypes(mimetypes):
-    # this is a function so it can be unittested
-    if hasattr(mimetypes, 'init'):
-        mimetypes.init()
-        return True
-    return False
-
-
-# See http://bugs.python.org/issue5853 which is a recursion bug
-# that seems to effect Python 2.6, Python 2.6.1, and 2.6.2 (a fix
-# has been applied on the Python 2 trunk).
-init_mimetypes(mimetypes)
-
 _BLOCK_SIZE = 4096 * 64  # 256K
 
 
@@ -100,13 +86,11 @@ class FileIter(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         val = self.file.read(self.block_size)
         if not val:
             raise StopIteration
         return val
-
-    __next__ = next  # py3
 
     def close(self):
         self.file.close()
@@ -214,8 +198,4 @@ def _guess_type(path):
     content_type, content_encoding = mimetypes.guess_type(path, strict=False)
     if content_type is None:
         content_type = 'application/octet-stream'
-    # str-ifying content_type is a workaround for a bug in Python 2.7.7
-    # on Windows where mimetypes.guess_type returns unicode for the
-    # content_type.
-    content_type = str(content_type)
     return content_type, content_encoding

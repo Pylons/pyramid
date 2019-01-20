@@ -4,14 +4,15 @@ import gc
 import locale
 import os
 import unittest
+from urllib.parse import quote
 from webtest import TestApp
 from zope.interface import Interface
 
-from pyramid.wsgi import wsgiapp
-from pyramid.view import view_config
 from pyramid.static import static_view
 from pyramid.testing import skip_on
-from pyramid.compat import text_, url_quote
+from pyramid.util import text_
+from pyramid.view import view_config
+from pyramid.wsgi import wsgiapp
 
 from .pkgs.exceptionviewapp.models import AnException, NotAnException
 
@@ -108,7 +109,7 @@ class StaticAppBase(IntegrationBase):
                 os.makedirs(pathdir)
                 with open(path, 'wb') as fp:
                     fp.write(body)
-                url = url_quote('/static/héhé/index.html')
+                url = quote('/static/héhé/index.html')
                 res = self.testapp.get(url, status=200)
                 self.assertEqual(res.body, body)
             finally:
@@ -123,7 +124,7 @@ class StaticAppBase(IntegrationBase):
             with open(path, 'wb') as fp:
                 fp.write(body)
             try:
-                url = url_quote('/static/héhé.html')
+                url = quote('/static/héhé.html')
                 res = self.testapp.get(url, status=200)
                 self.assertEqual(res.body, body)
             finally:
@@ -725,8 +726,8 @@ class UnicodeInURLTest(unittest.TestCase):
         res = testapp.get(request_path, status=404)
 
         # Pyramid default 404 handler outputs:
-        # u'404 Not Found\n\nThe resource could not be found.\n\n\n'
-        # u'/avalia\xe7\xe3o_participante\n\n'
+        # '404 Not Found\n\nThe resource could not be found.\n\n\n'
+        # '/avalia\xe7\xe3o_participante\n\n'
         self.assertTrue(request_path_unicode in res.text)
 
     def test_unicode_in_url_200(self):

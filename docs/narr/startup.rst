@@ -21,6 +21,8 @@ on your keyboard after typing ``pserve development.ini`` and the time the lines
    single: startup process
    pair: settings; .ini
 
+.. _the_startup_process:
+
 The Startup Process
 -------------------
 
@@ -45,10 +47,16 @@ Here's a high-level time-ordered overview of what happens when you press
    the :term:`PasteDeploy` library and returns a parser that can understand
    the format.
 
+   .. _ini_section_discovery:
+
 #. The :term:`PasteDeploy` finds a section named either ``[app:main]``,
-   ``[pipeline:main]``, or ``[composite:main]`` in the ``.ini`` file.  This
-   section represents the configuration of a :term:`WSGI` application that will
-   be served.  If you're using a simple application (e.g., ``[app:main]``), the
+   ``[pipeline:main]``, or ``[composite:main]`` in the ``.ini`` file.
+   This section configures the :term:`WSGI` webserver which serves your application.
+   As such it is the ``ini`` section for your application and can be the source for many of your application's :term:`settings`.
+
+   .. _entry_point_discovery:
+
+   If you're using a simple application (e.g., ``[app:main]``), the
    application's ``paste.app_factory`` :term:`entry point` will be named on the
    ``use=`` line within the section's configuration.  If instead of a simple
    application, you're using a WSGI :term:`pipeline` (e.g., a
@@ -61,17 +69,20 @@ Here's a high-level time-ordered overview of what happens when you press
    will have a single ``[app:main]`` section in it, and this will be the
    application served.
 
+   .. index::
+      pair: logging; startup
+
+   .. _startup_logging_initialization:
+
 #. The framework finds all :mod:`logging` related configuration in the ``.ini``
    file and uses it to configure the Python standard library logging system for
-   this application.  See :ref:`logging_config` for more information.
+   the application.  See :ref:`logging_config` for more information.
 
-#. The application's *constructor* named by the entry point referenced on the
-   ``use=`` line of the section representing your :app:`Pyramid` application is
-   passed the key/value parameters mentioned within the section in which it's
-   defined.  The constructor is meant to return a :term:`router` instance,
-   which is a :term:`WSGI` application.
+#. The application's entry point, usually the entry point referenced on the :ref:`above mentioned <entry_point_discovery>` ``use=`` line, is the application's :term:`constructor`.
+   It is passed the key/value parameters in :ref:`the application's .ini section <ini_section_discovery>`.
+   The constructor should return a :term:`router` instance, which is a :term:`WSGI` application.
 
-   For :app:`Pyramid` applications, the constructor will be a function named
+   For :app:`Pyramid` applications, the constructor is a function named
    ``main`` in the ``__init__.py`` file within the :term:`package` in which
    your application lives.  If this function succeeds, it will return a
    :app:`Pyramid` :term:`router` instance.  Here's the contents of an example
@@ -80,6 +91,12 @@ Here's a high-level time-ordered overview of what happens when you press
    .. literalinclude:: myproject/myproject/__init__.py
       :language: python
       :linenos:
+
+   .. index::
+      single: ini file
+      pair: PasteDeploy; configuration
+
+   .. _startup_constructor_arguments:
 
    Note that the constructor function accepts a ``global_config`` argument,
    which is a dictionary of key/value pairs mentioned in the ``[DEFAULT]``
@@ -106,15 +123,17 @@ Here's a high-level time-ordered overview of what happens when you press
    pyramid.includes = pyramid_debugtoolbar}``.  See :ref:`environment_chapter`
    for the meanings of these keys.
 
-#. The ``main`` function first constructs a
-   :class:`~pyramid.config.Configurator` instance, passing the ``settings``
-   dictionary captured via the ``**settings`` kwarg as its ``settings``
-   argument.
+#. The ``main`` function begins by making a :term:`configurator`.
+   The dictionary captured via the ``**settings`` kwarg is passed to the :class:`~pyramid.config.Configurator` constructor in its ``settings`` argument.
+   The new configurator holds the application's :term:`settings` and is able to :term:`commit` any :term:`configuration declaration`\s the settings contain.
+
+   .. _startup_settings:
 
    The ``settings`` dictionary contains all the options in the ``[app:main]``
    section of our .ini file except the ``use`` option (which is internal to
    PasteDeploy) such as ``pyramid.reload_templates``,
    ``pyramid.debug_authorization``, etc.
+   It is :ref:`available for use <deployment_settings>` in your code.
 
 #. The ``main`` function then calls various methods on the instance of the
    class :class:`~pyramid.config.Configurator` created in the previous step.
@@ -158,9 +177,6 @@ Here's a high-level time-ordered overview of what happens when you press
 Deployment Settings
 -------------------
 
-Note that an augmented version of the values passed as ``**settings`` to the
-:class:`~pyramid.config.Configurator` constructor will be available in
-:app:`Pyramid` :term:`view callable` code as ``request.registry.settings``. You
-can create objects you wish to access later from view code, and put them into
-the dictionary you pass to the configurator as ``settings``.  They will then be
-present in the ``request.registry.settings`` dictionary at application runtime.
+Note that an augmented version of the values passed as ``**settings`` to the :class:`~pyramid.config.Configurator` constructor is available in :app:`Pyramid` :term:`view callable` code as ``request.registry.settings``.
+You can create objects you wish to access later from view code, and put them into the dictionary you pass to the configurator as ``settings``.
+They will then be present in the ``request.registry.settings`` dictionary at application runtime.

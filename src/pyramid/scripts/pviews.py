@@ -70,7 +70,7 @@ class PViewsCommand(object):
 
     def _find_multi_routes(self, mapper, request):
         infos = []
-        path = request.environ['PATH_INFO']
+        path = request.path_info
         # find all routes that match path, regardless of predicates
         for route in mapper.get_routes():
             match = route.match(path)

@@ -1,13 +1,14 @@
 """ Utility functions for dealing with URLs in pyramid """
 
+from functools import lru_cache
 import os
 
 from pyramid.interfaces import IResourceURL, IRoutesMapper, IStaticURLInfo
 
-from pyramid.compat import bytes_, lru_cache, string_types
 from pyramid.encode import url_quote, urlencode
 from pyramid.path import caller_package
 from pyramid.threadlocal import get_current_registry
+from pyramid.util import bytes_
 
 from pyramid.traversal import (
     ResourceURL,
@@ -45,7 +46,7 @@ def parse_url_overrides(request, kw):
 
     qs = ''
     if query:
-        if isinstance(query, string_types):
+        if isinstance(query, str):
             qs = '?' + url_quote(query, QUERY_SAFE)
         else:
             qs = '?' + urlencode(query, doseq=True)

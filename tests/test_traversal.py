@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import unittest
+from urllib.parse import quote
 
 from pyramid.testing import cleanUp
 
-from pyramid.compat import text_, native_, text_type, url_quote, PY2
+from pyramid.util import text_
 
 
 class TraversalPathTests(unittest.TestCase):
@@ -14,7 +15,7 @@ class TraversalPathTests(unittest.TestCase):
 
     def test_utf8(self):
         la = b'La Pe\xc3\xb1a'
-        encoded = url_quote(la)
+        encoded = quote(la)
         decoded = text_(la, 'utf-8')
         path = '/'.join([encoded, encoded])
         result = self._callFUT(path)
@@ -24,7 +25,7 @@ class TraversalPathTests(unittest.TestCase):
         from pyramid.exceptions import URLDecodeError
 
         la = text_(b'La Pe\xc3\xb1a', 'utf-8').encode('utf-16')
-        encoded = url_quote(la)
+        encoded = quote(la)
         path = '/'.join([encoded, encoded])
         self.assertRaises(URLDecodeError, self._callFUT, path)
 
@@ -71,8 +72,8 @@ class TraversalPathInfoTests(unittest.TestCase):
 
     def test_segments_are_unicode(self):
         result = self._callFUT('/foo/bar')
-        self.assertEqual(type(result[0]), text_type)
-        self.assertEqual(type(result[1]), text_type)
+        self.assertEqual(type(result[0]), str)
+        self.assertEqual(type(result[1]), str)
 
     def test_same_value_returned_if_cached(self):
         result1 = self._callFUT('/foo/bar')
@@ -86,15 +87,14 @@ class TraversalPathInfoTests(unittest.TestCase):
 
     def test_highorder(self):
         la = b'La Pe\xc3\xb1a'
-        latin1 = native_(la)
+        latin1 = text_(la)
         result = self._callFUT(latin1)
         self.assertEqual(result, (text_(la, 'utf-8'),))
 
     def test_highorder_undecodeable(self):
         from pyramid.exceptions import URLDecodeError
 
-        la = text_(b'La Pe\xc3\xb1a', 'utf-8')
-        notlatin1 = native_(la)
+        notlatin1 = text_(b'La Pe\xc3\xb1a', 'utf-8')
         self.assertRaises(URLDecodeError, self._callFUT, notlatin1)
 
 
@@ -346,10 +346,7 @@ class ResourceTreeTraverserTests(unittest.TestCase):
         foo = DummyContext(bar, path)
         root = DummyContext(foo, 'root')
         policy = self._makeOne(root)
-        if PY2:
-            vhm_root = b'/Qu\xc3\xa9bec'
-        else:
-            vhm_root = b'/Qu\xc3\xa9bec'.decode('latin-1')
+        vhm_root = b'/Qu\xc3\xa9bec'.decode('latin-1')
         environ = self._getEnviron(HTTP_X_VHM_ROOT=vhm_root)
         request = DummyRequest(environ, path_info=text_('/bar'))
         result = policy(request)
@@ -680,7 +677,7 @@ class FindResourceTests(unittest.TestCase):
 
     def test_absolute_unicode_found(self):
         # test for bug wiggy found in wild, traceback stack:
-        # root = u'/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF'
+        # root = '/%E6%B5%81%E8%A1%8C%E8%B6%8B%E5%8A%BF'
         # wiggy's code: section=find_resource(page, root)
         # find_resource L76: D = traverse(resource, path)
         # traverse L291: return traverser(request)
@@ -872,15 +869,6 @@ class QuotePathSegmentTests(unittest.TestCase):
         s = 12345
         result = self._callFUT(s)
         self.assertEqual(result, '12345')
-
-    def test_long(self):
-        from pyramid.compat import long
-        import sys
-
-        s = long(sys.maxsize + 1)
-        result = self._callFUT(s)
-        expected = str(s)
-        self.assertEqual(result, expected)
 
     def test_other(self):
         class Foo(object):
@@ -1226,18 +1214,18 @@ class Test__join_path_tuple(unittest.TestCase):
 
     def test_segments_with_unsafes(self):
         safe_segments = tuple(
-            u"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-            u"-._~!$&'()*+,;=:@"
+            "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+            "-._~!$&'()*+,;=:@"
         )
         result = self._callFUT(safe_segments)
-        self.assertEqual(result, u'/'.join(safe_segments))
+        self.assertEqual(result, '/'.join(safe_segments))
         unsafe_segments = tuple(
             chr(i) for i in range(0x20, 0x80) if not chr(i) in safe_segments
-        ) + (u'あ',)
+        ) + ('あ',)
         result = self._callFUT(unsafe_segments)
         self.assertEqual(
             result,
-            u'/'.join(
+            '/'.join(
                 ''.join(
                     '%%%02X' % (ord(c) if isinstance(c, str) else c)
                     for c in unsafe_segment.encode('utf-8')
