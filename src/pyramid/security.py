@@ -364,3 +364,58 @@ class AuthorizationAPIMixin(object):
             )  # should never happen
         principals = authn_policy.effective_principals(self)
         return authz_policy.permits(context, principals, permission)
+
+
+@implementer(IUserIdentity)
+class PlainUserIdentity(object):
+    def __init__(self, id):
+        self.id = id
+
+
+@implementer(ISecurityPolicy)
+class CompatibilitySecurityPolicy(object):
+    def __init__(self, authn_policy, authz_policy):
+        self.authn_policy = authn_policy
+        self.authz_policy = authz_policy
+
+    def identify(self, request):
+        userid = self.authn_policy.authenticated_userid(request)
+        return PlainUserIdentity(userid)
+
+    def remember(self, request, userid, **kw):
+        return self.authn_policy.remember(request, userid, **kw)
+
+    def forget(self, request):
+        return self.authn_policy.forget(request)
+
+    def permits(self, request, context, identity, permission):
+        principles = self.authn_policy.effective_principles(request)
+        return self.authz_policy.permits(principles)
+
+
+@implementer(ISecurityPolicy)
+class SessionSecurityPolicy(object):
+    def __init__(self, prefix='auth.'):
+        self.prefix = prefix or ''
+        self.userid_key = prefix + 'userid'
+
+    def identify(self, request):
+        userid = request.session[self.userid_key]
+        return PlainUserIdentity(userid)
+
+    def remember(self, request, userid, **kw):
+        """ Store a userid in the session."""
+        request.session[self.userid_key] = userid
+        return []
+
+    def forget(self, request):
+        """ Remove the stored userid from the session."""
+        if self.userid_key in request.session:
+            del request.session[self.userid_key]
+        return []
+
+    def permits(self, request, context, identity, permission):
+        raise NotImplementedError(
+            '`SessionSecurityPolicy` does not provide an implementation for '
+            '`permits`.'
+        )

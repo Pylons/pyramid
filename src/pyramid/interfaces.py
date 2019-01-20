@@ -497,8 +497,34 @@ class IViewMapperFactory(Interface):
         """
 
 
+class IUserIdentity(Interface):
+    """ An object representing a users identity. """
+
+    id = Attribute(
+        """ The ID of the user. """
+    )
+
+
+class ISecurityPolicy(Interface):
+    def identify(request):
+        """ Return a trusted and verified :class:`IUserIdentity` object. """
+
+    def permits(request, identity, context, permission):
+        """ Return an instance of :class:`pyramid.security.Allowed` if a user
+        of the given identity is allowed the ``permission`` in the current
+        ``context``, else return an instance of
+        :class:`pyramid.security.Denied`.
+        """
+
+
 class IAuthenticationPolicy(Interface):
-    """ An object representing a Pyramid authentication policy. """
+    """ An object representing a Pyramid authentication policy.
+
+    .. deprecated:: 2.0
+
+        Use :class:`ISecurityPolicy`.
+
+    """
 
     def authenticated_userid(request):
         """ Return the authenticated :term:`userid` or ``None`` if
@@ -551,7 +577,13 @@ class IAuthenticationPolicy(Interface):
 
 
 class IAuthorizationPolicy(Interface):
-    """ An object representing a Pyramid authorization policy. """
+    """ An object representing a Pyramid authorization policy.
+
+    .. deprecated:: 2.0
+
+        Use :class:`ISecurityPolicy`.
+
+    """
 
     def permits(context, principals, permission):
         """ Return an instance of :class:`pyramid.security.Allowed` if any
