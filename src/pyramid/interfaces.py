@@ -493,6 +493,20 @@ class ISecurityPolicy(Interface):
         :class:`pyramid.security.Denied`.
         """
 
+    def remember(request, userid, **kw):
+        """ Return a set of headers suitable for 'remembering' the
+        :term:`userid` named ``userid`` when set in a response.  An
+        individual authentication policy and its consumers can
+        decide on the composition and meaning of ``**kw``.
+
+        """
+
+    def forget(request):
+        """ Return a set of headers suitable for 'forgetting' the
+        current user on subsequent requests.
+
+        """
+
 
 class IAuthenticationPolicy(Interface):
     """ An object representing a Pyramid authentication policy.
