@@ -482,19 +482,11 @@ class IViewMapperFactory(Interface):
         """
 
 
-class IUserIdentity(Interface):
-    """ An object representing a users identity. """
-
-    id = Attribute(
-        """ The ID of the user. """
-    )
-
-
 class ISecurityPolicy(Interface):
     def identify(request):
-        """ Return a trusted and verified :class:`IUserIdentity` object. """
+        """ Return an object identifying a trusted and verified user. """
 
-    def permits(request, identity, context, permission):
+    def permits(context, request, identity, permission):
         """ Return an instance of :class:`pyramid.security.Allowed` if a user
         of the given identity is allowed the ``permission`` in the current
         ``context``, else return an instance of

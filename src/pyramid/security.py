@@ -365,12 +365,6 @@ class AuthorizationAPIMixin(object):
         return authz_policy.permits(context, principals, permission)
 
 
-@implementer(IUserIdentity)
-class PlainUserIdentity(object):
-    def __init__(self, id):
-        self.id = id
-
-
 @implementer(ISecurityPolicy)
 class CompatibilitySecurityPolicy(object):
     def __init__(self, authn_policy, authz_policy):
@@ -378,8 +372,7 @@ class CompatibilitySecurityPolicy(object):
         self.authz_policy = authz_policy
 
     def identify(self, request):
-        userid = self.authn_policy.authenticated_userid(request)
-        return PlainUserIdentity(userid)
+        return self.authn_policy.authenticated_userid(request)
 
     def remember(self, request, userid, **kw):
         return self.authn_policy.remember(request, userid, **kw)
@@ -387,34 +380,33 @@ class CompatibilitySecurityPolicy(object):
     def forget(self, request):
         return self.authn_policy.forget(request)
 
-    def permits(self, request, context, identity, permission):
+    def permits(self, context, request, identity, permission):
         principles = self.authn_policy.effective_principles(request)
-        return self.authz_policy.permits(principles)
+        return self.authz_policy.permits(context, principles, permission)
 
 
 @implementer(ISecurityPolicy)
 class SessionSecurityPolicy(object):
     def __init__(self, prefix='auth.'):
         self.prefix = prefix or ''
-        self.userid_key = prefix + 'userid'
+        self.identity_key = prefix + 'identity'
 
     def identify(self, request):
-        userid = request.session[self.userid_key]
-        return PlainUserIdentity(userid)
+        return request.session[self.identity_key]
 
-    def remember(self, request, userid, **kw):
+    def remember(self, request, identity, **kw):
         """ Store a userid in the session."""
-        request.session[self.userid_key] = userid
+        request.session[self.identity_key] = identity
         return []
 
     def forget(self, request):
         """ Remove the stored userid from the session."""
-        if self.userid_key in request.session:
-            del request.session[self.userid_key]
+        if self.identity_key in request.session:
+            del request.session[self.identity_key]
         return []
 
-    def permits(self, request, context, identity, permission):
+    def permits(self, context, request, identity, permission):
         raise NotImplementedError(
             '`SessionSecurityPolicy` does not provide an implementation for '
-            '`permits`.'
+            '`permits`.  You may wish to make your own subclass.'
         )
