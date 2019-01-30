@@ -132,14 +132,14 @@ class ACLAuthorizationPolicy(object):
                     if ace_principal not in denied_here:
                         allowed_here.add(ace_principal)
                 if (ace_action == Deny) and (permission in ace_permissions):
-                        denied_here.add(ace_principal)
-                        if ace_principal == Everyone:
-                            # clear the entire allowed set, as we've hit a
-                            # deny of Everyone ala (Deny, Everyone, ALL)
-                            allowed = set()
-                            break
-                        elif ace_principal in allowed:
-                            allowed.remove(ace_principal)
+                    denied_here.add(ace_principal)
+                    if ace_principal == Everyone:
+                        # clear the entire allowed set, as we've hit a
+                        # deny of Everyone ala (Deny, Everyone, ALL)
+                        allowed = set()
+                        break
+                    elif ace_principal in allowed:
+                        allowed.remove(ace_principal)
 
             allowed.update(allowed_here)
 
