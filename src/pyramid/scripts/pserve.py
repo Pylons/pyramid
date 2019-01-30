@@ -184,7 +184,11 @@ class PServeCommand(object):
         app_name = self.args.app_name
 
         loader = self._get_config_loader(config_uri)
-        loader.setup_logging(config_vars)
+
+        # setup logging only in the worker process incase the logging config
+        # opens files which should not be opened by multiple processes at once
+        if not self.args.reload or hupper.is_active():
+            loader.setup_logging(config_vars)
 
         self.pserve_file_config(loader, global_conf=config_vars)
 
