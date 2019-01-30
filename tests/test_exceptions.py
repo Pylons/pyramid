@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import unittest
 
 
@@ -72,7 +73,9 @@ class TestConfigurationConflictError(unittest.TestCase):
         return ConfigurationConflictError(conflicts)
 
     def test_str(self):
-        conflicts = {'a': ('1', '2', '3'), 'b': ('4', '5', '6')}
+        conflicts = OrderedDict()
+        conflicts['a'] = ('1', '2', '3')
+        conflicts['b'] = ('4', '5', '6')
         exc = self._makeOne(conflicts)
         self.assertEqual(
             str(exc),
@@ -83,6 +86,25 @@ Conflicting configuration actions
     2
     3
   For: b
+    4
+    5
+    6""",
+        )
+
+    def test_non_sortable_discriminators_in_str(self):
+        conflicts = OrderedDict()
+        conflicts['a'] = ('1', '2', '3')
+        conflicts[None] = ('4', '5', '6')
+        exc = self._makeOne(conflicts)
+        self.assertEqual(
+            str(exc),
+            """\
+Conflicting configuration actions
+  For: a
+    1
+    2
+    3
+  For: None
     4
     5
     6""",

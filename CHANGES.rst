@@ -6,6 +6,11 @@ unreleased
   of an empty list if ``permissive`` is ``False``.
   See https://github.com/Pylons/pyramid/pull/3450
 
+- Fix a bug in which ``pyramid.exceptions.ConfigurationConflictError`` may
+  not render the appropriate error message on certain conflicts that were
+  not sortable on Python 3 due to differing types.
+  See https://github.com/Pylons/pyramid/pull/3457
+
 .. _changes_1.10.1:
 
 1.10.1 (2018-11-06)
