@@ -1,5 +1,7 @@
-unreleased
-==========
+.. _changes_1.10.2:
+
+1.10.2 (2019-01-30)
+===================
 
 - Fix a bug in ``pyramid.testing.DummySecurityPolicy`` in which
   ``principals_allows_by_permission`` would return all principals instead

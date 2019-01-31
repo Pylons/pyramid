@@ -17,6 +17,7 @@ Pyramid 1.10 was released on 2018-10-31.
 The following bug fix releases were made since then. Bug fix releases also include documentation improvements and other minor feature changes.
 
 - :ref:`changes_1.10.1`
+- :ref:`changes_1.10.2`
 
 Feature Additions
 -----------------
