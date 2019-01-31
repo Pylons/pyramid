@@ -13,6 +13,7 @@ The following bug fix releases were made since then. Bug fix releases also inclu
 - :ref:`changes_1.9.1`
 - :ref:`changes_1.9.2`
 - :ref:`changes_1.9.3`
+- :ref:`changes_1.9.4`
 
 Major Feature Additions
 -----------------------

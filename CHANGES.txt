@@ -1,5 +1,7 @@
-unreleased
-==========
+.. _changes_1.9.4:
+
+1.9.4 (2019-01-30)
+==================
 
 - Fix a bug in ``pyramid.testing.DummySecurityPolicy`` in which
   ``principals_allows_by_permission`` would return all principals instead
@@ -11,7 +13,7 @@ unreleased
   not sortable on Python 3 due to differing types.
   See https://github.com/Pylons/pyramid/pull/3458
 
-- Avoid configuring logging in the monitor process usin the logging config
+- Avoid configuring logging in the monitor process using the logging config
   intended for the application. This avoids opening files for writing in both
   processes which can cause issues on some systems.
   See https://github.com/Pylons/pyramid/pull/3461
