@@ -1,5 +1,27 @@
-unreleased
-==========
+.. _changes_1.10.2:
+
+1.10.2 (2019-01-30)
+===================
+
+- Fix a bug in ``pyramid.testing.DummySecurityPolicy`` in which
+  ``principals_allows_by_permission`` would return all principals instead
+  of an empty list if ``permissive`` is ``False``.
+  See https://github.com/Pylons/pyramid/pull/3450
+
+- Fix a bug in which ``pyramid.exceptions.ConfigurationConflictError`` may
+  not render the appropriate error message on certain conflicts that were
+  not sortable on Python 3 due to differing types.
+  See https://github.com/Pylons/pyramid/pull/3457
+
+- Avoid configuring logging in the monitor process usin the logging config
+  intended for the application. This avoids opening files for writing in both
+  processes which can cause issues on some systems.
+  See https://github.com/Pylons/pyramid/pull/3460
+
+.. _changes_1.10.1:
+
+1.10.1 (2018-11-06)
+===================
 
 - Fix an issue when passing a duck-typed registry object into
   ``pyramid.testing.setUp(registry=...)`` in which the registry wasn't
@@ -13,9 +35,6 @@ unreleased
 
 1.10b1 (2018-10-28)
 ===================
-
-Bug Fixes
----------
 
 - Fix the ``pyramid.testing.DummyRequest`` to support the new
   ``request.accept`` API so that ``acceptable_offers`` is available even

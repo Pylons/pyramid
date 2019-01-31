@@ -9,6 +9,16 @@ This article explains the new features in :app:`Pyramid` version 1.10 as compare
     Bug fixes will continue to be backported until at least 2020-01-01 when Python 2.7 reaches end of life.
     New features and backports will be reviewed and accepted for the 1.x series of Pyramid but new development will be focused on Pyramid 2.x.
 
+Bug Fix Releases
+----------------
+
+Pyramid 1.10 was released on 2018-10-31.
+
+The following bug fix releases were made since then. Bug fix releases also include documentation improvements and other minor feature changes.
+
+- :ref:`changes_1.10.1`
+- :ref:`changes_1.10.2`
+
 Feature Additions
 -----------------
 
