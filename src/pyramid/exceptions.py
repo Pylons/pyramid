@@ -3,8 +3,6 @@ from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound, HTTPForbidden
 NotFound = HTTPNotFound  # bw compat
 Forbidden = HTTPForbidden  # bw compat
 
-CR = '\n'
-
 
 class BadCSRFOrigin(HTTPBadRequest):
     """
@@ -92,14 +90,13 @@ class ConfigurationConflictError(ConfigurationError):
 
     def __str__(self):
         r = ["Conflicting configuration actions"]
-        items = sorted(self._conflicts.items())
-        for discriminator, infos in items:
+        for discriminator, infos in self._conflicts.items():
             r.append("  For: %s" % (discriminator,))
             for info in infos:
-                for line in str(info).rstrip().split(CR):
+                for line in str(info).rstrip().split('\n'):
                     r.append("    " + line)
 
-        return CR.join(r)
+        return '\n'.join(r)
 
 
 class ConfigurationExecutionError(ConfigurationError):

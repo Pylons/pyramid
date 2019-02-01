@@ -1,5 +1,4 @@
 from collections import deque
-import json
 
 from zope.interface import implementer
 from zope.interface.interface import InterfaceClass
@@ -228,10 +227,6 @@ class Request(
         if adapted is None:
             return False
         return adapted is ob
-
-    @property
-    def json_body(self):
-        return json.loads(text_(self.body, self.charset))
 
 
 def route_request_iface(name, bases=()):

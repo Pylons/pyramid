@@ -7,20 +7,6 @@ from webob import Response as _Response
 from zope.interface import implementer
 from pyramid.interfaces import IResponse, IResponseFactory
 
-
-def init_mimetypes(mimetypes):
-    # this is a function so it can be unittested
-    if hasattr(mimetypes, 'init'):
-        mimetypes.init()
-        return True
-    return False
-
-
-# See http://bugs.python.org/issue5853 which is a recursion bug
-# that seems to effect Python 2.6, Python 2.6.1, and 2.6.2 (a fix
-# has been applied on the Python 2 trunk).
-init_mimetypes(mimetypes)
-
 _BLOCK_SIZE = 4096 * 64  # 256K
 
 
