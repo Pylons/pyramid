@@ -486,7 +486,7 @@ class ISecurityPolicy(Interface):
     def identify(request):
         """ Return an object identifying a trusted and verified user. """
 
-    def permits(context, request, identity, permission):
+    def permits(request, context, identity, permission):
         """ Return an instance of :class:`pyramid.security.Allowed` if a user
         of the given identity is allowed the ``permission`` in the current
         ``context``, else return an instance of

@@ -366,7 +366,7 @@ class AuthorizationAPIMixin(object):
 
 
 @implementer(ISecurityPolicy)
-class CompatibilitySecurityPolicy(object):
+class LegacySecurityPolicy(object):
     def __init__(self, authn_policy, authz_policy):
         self.authn_policy = authn_policy
         self.authz_policy = authz_policy
@@ -381,12 +381,11 @@ class CompatibilitySecurityPolicy(object):
         return self.authn_policy.forget(request)
 
     def permits(self, context, request, identity, permission):
-        principles = self.authn_policy.effective_principles(request)
+        principals = self.authn_policy.effective_principals(request)
         return self.authz_policy.permits(context, principles, permission)
 
 
-@implementer(ISecurityPolicy)
-class SessionSecurityPolicy(object):
+class SessionSecurityHelper(object):
     def __init__(self, prefix='auth.'):
         self.prefix = prefix or ''
         self.identity_key = prefix + 'identity'
@@ -404,9 +403,3 @@ class SessionSecurityPolicy(object):
         if self.identity_key in request.session:
             del request.session[self.identity_key]
         return []
-
-    def permits(self, context, request, identity, permission):
-        raise NotImplementedError(
-            '`SessionSecurityPolicy` does not provide an implementation for '
-            '`permits`.  You may wish to make your own subclass.'
-        )
