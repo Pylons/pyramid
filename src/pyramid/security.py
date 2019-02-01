@@ -380,7 +380,7 @@ class LegacySecurityPolicy(object):
     def forget(self, request):
         return self.authn_policy.forget(request)
 
-    def permits(self, context, request, identity, permission):
+    def permits(self, request, context, identity, permission):
         principals = self.authn_policy.effective_principals(request)
         return self.authz_policy.permits(context, principles, permission)
 
