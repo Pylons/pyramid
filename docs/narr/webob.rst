@@ -287,7 +287,7 @@ that has a body suitable for reading via ``request.json_body`` using Python's
     import json
 
     json_payload = json.dumps({'a':1})
-    headers = {'Content-Type':'application/json; charset=utf-8'}
+    headers = {'Content-Type':'application/json'}
     req = urllib2.Request('http://localhost:6543/', json_payload, headers)
     resp = urllib2.urlopen(req)
 
