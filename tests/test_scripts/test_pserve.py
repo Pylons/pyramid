@@ -124,6 +124,7 @@ class TestPServeCommand(unittest.TestCase):
                     'argv': ['pserve', '--reload', 'development.ini'],
                     'quiet': False,
                 },
+                'exclude_prefixes': set(),
             },
         )
 
