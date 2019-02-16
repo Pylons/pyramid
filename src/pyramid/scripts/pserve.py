@@ -154,7 +154,9 @@ class PServeCommand(object):
         config_path = self.get_config_path(loader)
         here = os.path.dirname(config_path)
         watch_files = aslist(settings.get('watch_files', ''), flatten=False)
-        self.exclude_prefixes = set(aslist(settings.get('exclude_prefixes', ''), flatten=False))
+        self.exclude_prefixes = set(
+            aslist(settings.get('exclude_prefixes', ''), flatten=False)
+        )
 
         # track file paths relative to the ini file
         resolver = AssetResolver(package=None)
