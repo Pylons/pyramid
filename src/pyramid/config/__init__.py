@@ -139,13 +139,17 @@ class Configurator(
     :term:`dotted Python name` to the same.  If it is ``None``, a default
     root factory will be used.
 
+    If ``security_policy`` is passed, it should be an instance of a
+    :term:`security policy` or a :term:`dotted Python name` to the same.
+
     If ``authentication_policy`` is passed, it should be an instance
     of an :term:`authentication policy` or a :term:`dotted Python
-    name` to the same.
+    name` to the same.  (Deprecated as of Pyramid 2.0 in favor of
+    ``security_policy``.)
 
     If ``authorization_policy`` is passed, it should be an instance of
     an :term:`authorization policy` or a :term:`dotted Python name` to
-    the same.
+    the same.  (Deprecated as of Pyramid 2.0 in favor of ``security_policy``.)
 
     .. note:: A ``ConfigurationError`` will be raised when an
        authorization policy is supplied without also supplying an
@@ -278,6 +282,7 @@ class Configurator(
         package=None,
         settings=None,
         root_factory=None,
+        security_policy=None,
         authentication_policy=None,
         authorization_policy=None,
         renderers=None,
@@ -315,6 +320,7 @@ class Configurator(
                 root_factory=root_factory,
                 authentication_policy=authentication_policy,
                 authorization_policy=authorization_policy,
+                security_policy=security_policy,
                 renderers=renderers,
                 debug_logger=debug_logger,
                 locale_negotiator=locale_negotiator,
@@ -330,6 +336,7 @@ class Configurator(
         self,
         settings=None,
         root_factory=None,
+        security_policy=None,
         authentication_policy=None,
         authorization_policy=None,
         renderers=None,
@@ -414,6 +421,9 @@ class Configurator(
 
         if authentication_policy:
             self.set_authentication_policy(authentication_policy)
+
+        if security_policy:
+            self.set_security_policy(security_policy)
 
         if default_view_mapper is not None:
             self.set_view_mapper(default_view_mapper)

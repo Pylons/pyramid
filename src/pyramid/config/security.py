@@ -6,6 +6,7 @@ from pyramid.interfaces import (
     ICSRFStoragePolicy,
     IDefaultCSRFOptions,
     IDefaultPermission,
+    ISecurityPolicy,
     PHASE1_CONFIG,
     PHASE2_CONFIG,
 )
@@ -20,6 +21,38 @@ from pyramid.config.actions import action_method
 class SecurityConfiguratorMixin(object):
     def add_default_security(self):
         self.set_csrf_storage_policy(LegacySessionCSRFStoragePolicy())
+
+    @action_method
+    def set_security_policy(self, policy):
+        """ Override the :app:`Pyramid` :term:`security policy` in the current
+        configuration.  The ``policy`` argument must be an instance
+        of a security policy or a :term:`dotted Python name`
+        that points at an instance of a security policy.
+
+        .. note::
+
+           Using the ``security_policy`` argument to the
+           :class:`pyramid.config.Configurator` constructor can be used to
+           achieve the same purpose.
+
+        """
+
+        def register():
+            self._set_security_policy(policy)
+
+        intr = self.introspectable(
+            'security policy',
+            None,
+            self.object_description(policy),
+            'security policy',
+        )
+        intr['policy'] = policy
+        # authentication policy used by view config (phase 3)
+        self.action(IAuthenticationPolicy, register, introspectables=(intr,))
+
+    def _set_security_policy(self, policy):
+        policy = self.maybe_dotted(policy)
+        self.registry.registerUtility(policy, ISecurityPolicy)
 
     @action_method
     def set_authentication_policy(self, policy):

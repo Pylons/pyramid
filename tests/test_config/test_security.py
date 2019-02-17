@@ -11,6 +11,15 @@ class ConfiguratorSecurityMethodsTests(unittest.TestCase):
         config = Configurator(*arg, **kw)
         return config
 
+    def test_set_security_policy(self):
+        from pyramid.interfaces import ISecurityPolicy
+
+        config = self._makeOne()
+        policy = object()
+        config.set_security_policy(policy)
+        config.commit()
+        self.assertEqual(config.registry.getUtility(ISecurityPolicy), policy)
+
     def test_set_authentication_policy_no_authz_policy(self):
         config = self._makeOne()
         policy = object()
