@@ -482,8 +482,40 @@ class IViewMapperFactory(Interface):
         """
 
 
+class ISecurityPolicy(Interface):
+    def identify(request):
+        """ Return an object identifying a trusted and verified user. """
+
+    def permits(request, context, identity, permission):
+        """ Return an instance of :class:`pyramid.security.Allowed` if a user
+        of the given identity is allowed the ``permission`` in the current
+        ``context``, else return an instance of
+        :class:`pyramid.security.Denied`.
+        """
+
+    def remember(request, userid, **kw):
+        """ Return a set of headers suitable for 'remembering' the
+        :term:`userid` named ``userid`` when set in a response.  An
+        individual authentication policy and its consumers can
+        decide on the composition and meaning of ``**kw``.
+
+        """
+
+    def forget(request):
+        """ Return a set of headers suitable for 'forgetting' the
+        current user on subsequent requests.
+
+        """
+
+
 class IAuthenticationPolicy(Interface):
-    """ An object representing a Pyramid authentication policy. """
+    """ An object representing a Pyramid authentication policy.
+
+    .. deprecated:: 2.0
+
+        Use :class:`ISecurityPolicy`.
+
+    """
 
     def authenticated_userid(request):
         """ Return the authenticated :term:`userid` or ``None`` if
@@ -536,7 +568,13 @@ class IAuthenticationPolicy(Interface):
 
 
 class IAuthorizationPolicy(Interface):
-    """ An object representing a Pyramid authorization policy. """
+    """ An object representing a Pyramid authorization policy.
+
+    .. deprecated:: 2.0
+
+        Use :class:`ISecurityPolicy`.
+
+    """
 
     def permits(context, principals, permission):
         """ Return an instance of :class:`pyramid.security.Allowed` if any
