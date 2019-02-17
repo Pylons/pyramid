@@ -306,6 +306,16 @@ Glossary
      a principal, but this is not strictly necessary in custom policies that
      define their principals differently.
 
+   identity
+     An identity is an opaque identifier of the user associated with the
+     current request.
+
+   security policy
+     A security policy in :app:`Pyramid` terms is a bit of code which has an
+     API which identifies the user associated with the current request (perhaps
+     via a cookie or ``Authorization`` header) and determines whether or not
+     that user is permitted to access the requested resource.
+
    authorization policy
      An authorization policy in :app:`Pyramid` terms is a bit of
      code which has an API which determines whether or not the
@@ -313,10 +323,18 @@ Glossary
      associated with a permission, based on the information found on the
      :term:`context` resource.
 
+     .. deprecated:: 2.0
+       Authorization policies have been deprecated in favor of a
+       :term:`security policy`.
+
    authentication policy
      An authentication policy in :app:`Pyramid` terms is a bit of
      code which has an API which determines the current
      :term:`principal` (or principals) associated with a request.
+
+     .. deprecated:: 2.0
+       Authentication policies have been deprecated in favor of a
+       :term:`security policy`.
 
    WSGI
      `Web Server Gateway Interface <https://wsgi.readthedocs.io/en/latest/>`_.
