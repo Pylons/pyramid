@@ -140,7 +140,7 @@ class PServeCommand(object):
         if self.args.reload:
             self.worker_kwargs = {'argv': argv, "quiet": quiet}
         self.watch_files = set()
-        self.exclude_prefixes = set()
+        self.ignore_files = set()
 
     def out(self, msg):  # pragma: no cover
         if self.args.verbose > 0:
@@ -154,8 +154,8 @@ class PServeCommand(object):
         config_path = self.get_config_path(loader)
         here = os.path.dirname(config_path)
         watch_files = aslist(settings.get('watch_files', ''), flatten=False)
-        self.exclude_prefixes = set(
-            aslist(settings.get('exclude_prefixes', ''), flatten=False)
+        self.ignore_files = set(
+            aslist(settings.get('ignore_files', ''), flatten=False)
         )
 
         # track file paths relative to the ini file
@@ -243,7 +243,7 @@ class PServeCommand(object):
                 reload_interval=int(self.args.reload_interval),
                 verbose=self.args.verbose,
                 worker_kwargs=self.worker_kwargs,
-                exclude_prefixes=self.exclude_prefixes,
+                ignore_files=self.ignore_files,
             )
             return 0
 
