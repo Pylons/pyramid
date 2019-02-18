@@ -473,6 +473,58 @@ class TestHasPermission(unittest.TestCase):
         self.assertRaises(AttributeError, request.has_permission, 'view')
 
 
+class TestLegacySecurityPolicy(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def test_identity(self):
+        from pyramid.security import LegacySecurityPolicy
+
+        request = _makeRequest()
+        policy = LegacySecurityPolicy()
+        _registerAuthenticationPolicy(request.registry, 'userid')
+
+        self.assertEqual(policy.identify(request), 'userid')
+
+    def test_remember(self):
+        from pyramid.security import LegacySecurityPolicy
+
+        request = _makeRequest()
+        policy = LegacySecurityPolicy()
+        _registerAuthenticationPolicy(request.registry, None)
+
+        self.assertEqual(
+            policy.remember(request, 'userid'), [('X-Pyramid-Test', 'userid')]
+        )
+
+    def test_forget(self):
+        from pyramid.security import LegacySecurityPolicy
+
+        request = _makeRequest()
+        policy = LegacySecurityPolicy()
+        _registerAuthenticationPolicy(request.registry, None)
+
+        self.assertEqual(
+            policy.forget(request), [('X-Pyramid-Test', 'logout')]
+        )
+
+    def test_permits(self):
+        from pyramid.security import LegacySecurityPolicy
+
+        request = _makeRequest()
+        policy = LegacySecurityPolicy()
+        _registerAuthenticationPolicy(request.registry, ['p1', 'p2'])
+        _registerAuthorizationPolicy(request.registry, True)
+
+        self.assertIs(
+            policy.permits(request, request.context, 'userid', 'permission'),
+            True,
+        )
+
+
 _TEST_HEADER = 'X-Pyramid-Test'
 
 

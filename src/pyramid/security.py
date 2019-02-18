@@ -1,6 +1,7 @@
-from zope.interface import providedBy
+from zope.interface import implementer, providedBy
 
 from pyramid.interfaces import (
+    ISecurityPolicy,
     IAuthenticationPolicy,
     IAuthorizationPolicy,
     ISecuredView,
@@ -363,3 +364,36 @@ class AuthorizationAPIMixin(object):
             )  # should never happen
         principals = authn_policy.effective_principals(self)
         return authz_policy.permits(context, principals, permission)
+
+
+@implementer(ISecurityPolicy)
+class LegacySecurityPolicy:
+    """
+    A :term:`security policy` which provides a backwards compatibility shim for
+    the :term:`authentication policy` and the :term:`authorization policy`.
+
+    """
+
+    def _get_authn_policy(self, request):
+        return request.registry.getUtility(IAuthenticationPolicy)
+
+    def _get_authz_policy(self, request):
+        return request.registry.getUtility(IAuthorizationPolicy)
+
+    def identify(self, request):
+        authn = self._get_authn_policy(request)
+        return authn.authenticated_userid(request)
+
+    def remember(self, request, userid, **kw):
+        authn = self._get_authn_policy(request)
+        return authn.remember(request, userid, **kw)
+
+    def forget(self, request):
+        authn = self._get_authn_policy(request)
+        return authn.forget(request)
+
+    def permits(self, request, context, identity, permission):
+        authn = self._get_authn_policy(request)
+        authz = self._get_authz_policy(request)
+        principals = authn.effective_principals(request)
+        return authz.permits(context, principals, permission)
