@@ -14,6 +14,7 @@ from pyramid.interfaces import (
 from pyramid.csrf import LegacySessionCSRFStoragePolicy
 from pyramid.exceptions import ConfigurationError
 from pyramid.util import as_sorted_tuple
+from pyramid.security import LegacySecurityPolicy
 
 from pyramid.config.actions import action_method
 
@@ -77,6 +78,7 @@ class SecurityConfiguratorMixin(object):
                     'also configuring an authorization policy '
                     '(use the set_authorization_policy method)'
                 )
+            self._set_legacy_policy()
 
         intr = self.introspectable(
             'authentication policy',
@@ -96,6 +98,15 @@ class SecurityConfiguratorMixin(object):
     def _set_authentication_policy(self, policy):
         policy = self.maybe_dotted(policy)
         self.registry.registerUtility(policy, IAuthenticationPolicy)
+
+    def _set_legacy_policy(self):
+        if self.registry.queryUtility(ISecurityPolicy) is not None:
+            raise ConfigurationError(
+                'Cannot configure an authentication and authorization policy '
+                'with a configured security policy.'
+            )
+        policy = LegacySecurityPolicy()
+        self.registry.registerUtility(policy, ISecurityPolicy)
 
     @action_method
     def set_authorization_policy(self, policy):
