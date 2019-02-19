@@ -170,7 +170,7 @@ Adding Configuration
    :lines: 12-13
 
 The first line above calls the :meth:`pyramid.config.Configurator.add_route`
-method, which registers a :term:`route` to root (``/``) URL path.
+method, which registers a :term:`route` to the root (``/``) URL path.
 
 The second line registers the ``hello_world`` function as a :term:`view
 callable` and makes sure that it will be called when the ``hello`` route is
