@@ -20,10 +20,12 @@ class TestPServeCommand(unittest.TestCase):
 
         return PServeCommand
 
-    def _makeOne(self, *args):
+    def _makeOne(self, *args, **kwargs):
         effargs = ['pserve']
         effargs.extend(args)
-        cmd = self._getTargetClass()(effargs)
+        cmd = self._getTargetClass()(
+            effargs, extant_ignore_files=kwargs.get('extant_ignore_files')
+        )
         cmd.out = self.out
         self.loader = dummy.DummyLoader()
         cmd._get_config_loader = self.loader
@@ -49,6 +51,34 @@ class TestPServeCommand(unittest.TestCase):
 
         inst.run()
         self.assertEqual(app.global_conf, {'a': '1', 'b': '2'})
+
+    def test_extant_ignore_files(self):
+        inst = self._makeOne('development.ini')
+        app = dummy.DummyApp()
+
+        def get_app(name, global_conf):
+            app.name = name
+            app.global_conf = global_conf
+            return app
+
+        self.loader.get_wsgi_app = get_app
+        self.loader.server = lambda x: x
+        self.loader.settings = {'pserve': {'ignore_files': '*.txt'}}
+
+        msg = 'A change to "ignore_files" was detected'
+
+        inst.run()
+        self.assertNotRegexpMatches(self.out_.getvalue(), msg)
+
+        inst = self._makeOne('development.ini', extant_ignore_files={'*.txt'})
+        app = dummy.DummyApp()
+
+        self.loader.get_wsgi_app = get_app
+        self.loader.server = lambda x: x
+        self.loader.settings = {'pserve': {'ignore_files': 'foo/*.txt'}}
+
+        inst.run()
+        self.assertRegexpMatches(self.out_.getvalue(), msg)
 
     def test_parse_vars_bad(self):
         inst = self._makeOne('development.ini', 'a')
@@ -123,6 +153,7 @@ class TestPServeCommand(unittest.TestCase):
                 'worker_kwargs': {
                     'argv': ['pserve', '--reload', 'development.ini'],
                     'quiet': False,
+                    'extant_ignore_files': set(),
                 },
                 'ignore_files': set(),
             },
