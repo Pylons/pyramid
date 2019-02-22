@@ -27,9 +27,9 @@ from pyramid.path import AssetResolver
 from pyramid.settings import aslist
 
 
-def main(argv=sys.argv, quiet=False, extant_ignore_files=None):
+def main(argv=sys.argv, quiet=False, original_ignore_files=None):
     command = PServeCommand(
-        argv, quiet=quiet, extant_ignore_files=extant_ignore_files
+        argv, quiet=quiet, original_ignore_files=original_ignore_files
     )
     return command.run()
 
@@ -135,7 +135,7 @@ class PServeCommand(object):
 
     _scheme_re = re.compile(r'^[a-z][a-z]+:', re.I)
 
-    def __init__(self, argv, quiet=False, extant_ignore_files=None):
+    def __init__(self, argv, quiet=False, original_ignore_files=None):
         self.args = self.parser.parse_args(argv[1:])
         if quiet:
             self.args.verbose = 0
@@ -143,7 +143,7 @@ class PServeCommand(object):
             self.worker_kwargs = {'argv': argv, "quiet": quiet}
         self.watch_files = set()
         self.ignore_files = set()
-        self.extant_ignore_files = extant_ignore_files
+        self.original_ignore_files = original_ignore_files
 
     def out(self, msg):  # pragma: no cover
         if self.args.verbose > 0:
@@ -241,7 +241,7 @@ class PServeCommand(object):
         if self.args.reload and not hupper.is_active():
             if self.args.verbose > 1:
                 self.out('Running reloading file monitor')
-            self.worker_kwargs['extant_ignore_files'] = self.ignore_files
+            self.worker_kwargs['original_ignore_files'] = self.ignore_files
             hupper.start_reloader(
                 'pyramid.scripts.pserve.main',
                 reload_interval=int(self.args.reload_interval),
@@ -262,8 +262,8 @@ class PServeCommand(object):
             reloader.watch_files(list(self.watch_files))
 
         if (
-            self.extant_ignore_files is not None
-            and self.extant_ignore_files != self.ignore_files
+            self.original_ignore_files is not None
+            and self.original_ignore_files != self.ignore_files
         ):
             self.out(
                 'A change to "ignore_files" was detected but it will not take'

@@ -23,9 +23,7 @@ class TestPServeCommand(unittest.TestCase):
     def _makeOne(self, *args, **kwargs):
         effargs = ['pserve']
         effargs.extend(args)
-        cmd = self._getTargetClass()(
-            effargs, extant_ignore_files=kwargs.get('extant_ignore_files')
-        )
+        cmd = self._getTargetClass()(effargs, **kwargs)
         cmd.out = self.out
         self.loader = dummy.DummyLoader()
         cmd._get_config_loader = self.loader
@@ -52,31 +50,29 @@ class TestPServeCommand(unittest.TestCase):
         inst.run()
         self.assertEqual(app.global_conf, {'a': '1', 'b': '2'})
 
-    def test_extant_ignore_files(self):
-        inst = self._makeOne('development.ini')
-        app = dummy.DummyApp()
+    def test_original_ignore_files(self):
+        msg = 'A change to "ignore_files" was detected'
 
         def get_app(name, global_conf):
             app.name = name
             app.global_conf = global_conf
             return app
 
+        inst = self._makeOne('development.ini')
+        app = dummy.DummyApp()
         self.loader.get_wsgi_app = get_app
         self.loader.server = lambda x: x
         self.loader.settings = {'pserve': {'ignore_files': '*.txt'}}
-
-        msg = 'A change to "ignore_files" was detected'
-
         inst.run()
         self.assertNotIn(msg, self.out_.getvalue())
 
-        inst = self._makeOne('development.ini', extant_ignore_files={'*.txt'})
+        inst = self._makeOne(
+            'development.ini', original_ignore_files={'*.txt'}
+        )
         app = dummy.DummyApp()
-
         self.loader.get_wsgi_app = get_app
         self.loader.server = lambda x: x
         self.loader.settings = {'pserve': {'ignore_files': 'foo/*.txt'}}
-
         inst.run()
         self.assertIn(msg, self.out_.getvalue())
 
@@ -153,7 +149,7 @@ class TestPServeCommand(unittest.TestCase):
                 'worker_kwargs': {
                     'argv': ['pserve', '--reload', 'development.ini'],
                     'quiet': False,
-                    'extant_ignore_files': set(),
+                    'original_ignore_files': set(),
                 },
                 'ignore_files': set(),
             },
