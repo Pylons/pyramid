@@ -68,7 +68,7 @@ class TestPServeCommand(unittest.TestCase):
         msg = 'A change to "ignore_files" was detected'
 
         inst.run()
-        self.assertNotRegexpMatches(self.out_.getvalue(), msg)
+        self.assertNotIn(msg, self.out_.getvalue())
 
         inst = self._makeOne('development.ini', extant_ignore_files={'*.txt'})
         app = dummy.DummyApp()
@@ -78,7 +78,7 @@ class TestPServeCommand(unittest.TestCase):
         self.loader.settings = {'pserve': {'ignore_files': 'foo/*.txt'}}
 
         inst.run()
-        self.assertRegexpMatches(self.out_.getvalue(), msg)
+        self.assertIn(msg, self.out_.getvalue())
 
     def test_parse_vars_bad(self):
         inst = self._makeOne('development.ini', 'a')
