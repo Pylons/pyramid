@@ -44,6 +44,11 @@ def _get_registry(request):
     return reg
 
 
+def _get_security_policy(request):
+    registry = _get_registry(request)
+    return registry.queryUtility(ISecurityPolicy)
+
+
 def _get_authentication_policy(request):
     registry = _get_registry(request)
     return registry.queryUtility(IAuthenticationPolicy)
@@ -281,6 +286,20 @@ class ACLAllowed(ACLPermitsResult, Allowed):
     """
 
 
+class SecurityAPIMixin(object):
+    @property
+    def identity(self):
+        """
+        Return an opaque object identifying the current user or ``None`` if no
+        user is authenticated or there is no :term:`security policy` in effect.
+
+        """
+        policy = _get_security_policy(self)
+        if policy is None:
+            return None
+        return policy.identify(self)
+
+
 class AuthenticationAPIMixin(object):
     @property
     def authenticated_userid(self):
@@ -288,7 +307,10 @@ class AuthenticationAPIMixin(object):
         ``None`` if there is no :term:`authentication policy` in effect or
         there is no currently authenticated user.
 
-        .. versionadded:: 1.5
+        .. deprecated:: 2.0
+
+            Use ``request.identity`` instead.
+
         """
         policy = _get_authentication_policy(self)
         if policy is None:
@@ -305,7 +327,10 @@ class AuthenticationAPIMixin(object):
         effective authentication policy will not ensure that a record
         associated with the userid exists in persistent storage.
 
-        .. versionadded:: 1.5
+        .. deprecated:: 2.0
+
+            Use ``request.identity`` instead.
+
         """
         policy = _get_authentication_policy(self)
         if policy is None:
@@ -319,7 +344,8 @@ class AuthenticationAPIMixin(object):
         this will return a one-element list containing the
         :data:`pyramid.security.Everyone` principal.
 
-        .. versionadded:: 1.5
+        .. deprecated:: 2.0
+
         """
         policy = _get_authentication_policy(self)
         if policy is None:

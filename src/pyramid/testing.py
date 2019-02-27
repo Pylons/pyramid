@@ -17,6 +17,7 @@ from pyramid.registry import Registry
 from pyramid.security import (
     Authenticated,
     Everyone,
+    SecurityAPIMixin,
     AuthenticationAPIMixin,
     AuthorizationAPIMixin,
 )
@@ -303,6 +304,7 @@ class DummyRequest(
     CallbackMethodsMixin,
     InstancePropertyMixin,
     LocalizerRequestMixin,
+    SecurityAPIMixin,
     AuthenticationAPIMixin,
     AuthorizationAPIMixin,
     ViewMethodsMixin,

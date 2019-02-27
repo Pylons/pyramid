@@ -338,6 +338,23 @@ class TestViewExecutionPermitted(unittest.TestCase):
         self.assertTrue(result)
 
 
+class TestIdentity(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def test_identity_no_security_policy(self):
+        request = _makeRequest()
+        self.assertEquals(request.identity, None)
+
+    def test_identity(self):
+        request = _makeRequest()
+        _registerSecurityPolicy(request.registry, 'yo')
+        self.assertEqual(request.identity, 'yo')
+
+
 class TestAuthenticatedUserId(unittest.TestCase):
     def setUp(self):
         testing.setUp()
@@ -533,6 +550,27 @@ class DummyContext:
         self.__dict__.update(kw)
 
 
+class DummySecurityPolicy:
+    def __init__(self, result):
+        self.result = result
+
+    def identify(self, request):
+        return self.result
+
+    def permits(self, request, context, identity, permission):
+        return self.result
+
+    def remember(self, request, userid, **kw):
+        headers = [(_TEST_HEADER, userid)]
+        self._header_remembered = headers[0]
+        return headers
+
+    def forget(self, request):
+        headers = [(_TEST_HEADER, 'logout')]
+        self._header_forgotten = headers[0]
+        return headers
+
+
 class DummyAuthenticationPolicy:
     def __init__(self, result):
         self.result = result
@@ -566,6 +604,14 @@ class DummyAuthorizationPolicy:
 
     def principals_allowed_by_permission(self, context, permission):
         return self.result
+
+
+def _registerSecurityPolicy(reg, result):
+    from pyramid.interfaces import ISecurityPolicy
+
+    policy = DummySecurityPolicy(result)
+    reg.registerUtility(policy, ISecurityPolicy)
+    return policy
 
 
 def _registerAuthenticationPolicy(reg, result):
