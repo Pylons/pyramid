@@ -369,6 +369,12 @@ class TestAuthenticatedUserId(unittest.TestCase):
     def test_with_authentication_policy(self):
         request = _makeRequest()
         _registerAuthenticationPolicy(request.registry, 'yo')
+        _registerSecurityPolicy(request.registry, 'wat')
+        self.assertEqual(request.authenticated_userid, 'yo')
+
+    def test_with_security_policy(self):
+        request = _makeRequest()
+        _registerSecurityPolicy(request.registry, 'yo')
         self.assertEqual(request.authenticated_userid, 'yo')
 
     def test_with_authentication_policy_no_reg_on_request(self):
@@ -395,6 +401,12 @@ class TestUnAuthenticatedUserId(unittest.TestCase):
     def test_with_authentication_policy(self):
         request = _makeRequest()
         _registerAuthenticationPolicy(request.registry, 'yo')
+        _registerSecurityPolicy(request.registry, 'wat')
+        self.assertEqual(request.unauthenticated_userid, 'yo')
+
+    def test_with_security_policy(self):
+        request = _makeRequest()
+        _registerSecurityPolicy(request.registry, 'yo')
         self.assertEqual(request.unauthenticated_userid, 'yo')
 
     def test_with_authentication_policy_no_reg_on_request(self):

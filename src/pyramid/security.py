@@ -312,10 +312,14 @@ class AuthenticationAPIMixin(object):
             Use ``request.identity`` instead.
 
         """
-        policy = _get_authentication_policy(self)
-        if policy is None:
+        authn = _get_authentication_policy(self)
+        security = _get_security_policy(self)
+        if authn is not None:
+            return authn.authenticated_userid(self)
+        elif security is not None:
+            return security.identify(self)
+        else:
             return None
-        return policy.authenticated_userid(self)
 
     @property
     def unauthenticated_userid(self):
@@ -332,10 +336,14 @@ class AuthenticationAPIMixin(object):
             Use ``request.identity`` instead.
 
         """
-        policy = _get_authentication_policy(self)
-        if policy is None:
+        authn = _get_authentication_policy(self)
+        security = _get_security_policy(self)
+        if authn is not None:
+            return authn.unauthenticated_userid(self)
+        elif security is not None:
+            return security.identify(self)
+        else:
             return None
-        return policy.unauthenticated_userid(self)
 
     @property
     def effective_principals(self):
