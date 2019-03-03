@@ -187,32 +187,22 @@ class TestRemember(unittest.TestCase):
 
         return remember(*arg, **kwarg)
 
-    def test_no_authentication_policy(self):
+    def test_no_security_policy(self):
         request = _makeRequest()
         result = self._callFUT(request, 'me')
         self.assertEqual(result, [])
 
-    def test_with_authentication_policy(self):
+    def test_with_security_policy(self):
         request = _makeRequest()
         registry = request.registry
-        _registerAuthenticationPolicy(registry, 'yo')
-        result = self._callFUT(request, 'me')
-        self.assertEqual(result, [('X-Pyramid-Test', 'me')])
-
-    def test_with_authentication_policy_no_reg_on_request(self):
-        from pyramid.threadlocal import get_current_registry
-
-        registry = get_current_registry()
-        request = _makeRequest()
-        del request.registry
-        _registerAuthenticationPolicy(registry, 'yo')
+        _registerSecurityPolicy(registry, 'yo')
         result = self._callFUT(request, 'me')
         self.assertEqual(result, [('X-Pyramid-Test', 'me')])
 
     def test_with_missing_arg(self):
         request = _makeRequest()
         registry = request.registry
-        _registerAuthenticationPolicy(registry, 'yo')
+        _registerSecurityPolicy(registry, 'yo')
         self.assertRaises(TypeError, lambda: self._callFUT(request))
 
 
@@ -228,24 +218,14 @@ class TestForget(unittest.TestCase):
 
         return forget(*arg)
 
-    def test_no_authentication_policy(self):
+    def test_no_security_policy(self):
         request = _makeRequest()
         result = self._callFUT(request)
         self.assertEqual(result, [])
 
-    def test_with_authentication_policy(self):
+    def test_with_security_policy(self):
         request = _makeRequest()
-        _registerAuthenticationPolicy(request.registry, 'yo')
-        result = self._callFUT(request)
-        self.assertEqual(result, [('X-Pyramid-Test', 'logout')])
-
-    def test_with_authentication_policy_no_reg_on_request(self):
-        from pyramid.threadlocal import get_current_registry
-
-        registry = get_current_registry()
-        request = _makeRequest()
-        del request.registry
-        _registerAuthenticationPolicy(registry, 'yo')
+        _registerSecurityPolicy(request.registry, 'yo')
         result = self._callFUT(request)
         self.assertEqual(result, [('X-Pyramid-Test', 'logout')])
 

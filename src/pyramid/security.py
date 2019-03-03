@@ -60,7 +60,7 @@ def remember(request, userid, **kw):
     on this request's response.
     These headers are suitable for 'remembering' a set of credentials
     implied by the data passed as ``userid`` and ``*kw`` using the
-    current :term:`authentication policy`.  Common usage might look
+    current :term:`security policy`.  Common usage might look
     like so within the body of a view function (``response`` is
     assumed to be a :term:`WebOb` -style :term:`response` object
     computed previously by the view code):
@@ -73,10 +73,10 @@ def remember(request, userid, **kw):
        response.headerlist.extend(headers)
        return response
 
-    If no :term:`authentication policy` is in use, this function will
+    If no :term:`security policy` is in use, this function will
     always return an empty sequence. If used, the composition and
     meaning of ``**kw`` must be agreed upon by the calling code and
-    the effective authentication policy.
+    the effective security policy.
 
     .. versionchanged:: 1.6
         Deprecated the ``principal`` argument in favor of ``userid`` to clarify
@@ -85,7 +85,7 @@ def remember(request, userid, **kw):
     .. versionchanged:: 1.10
         Removed the deprecated ``principal`` argument.
     """
-    policy = _get_authentication_policy(request)
+    policy = _get_security_policy(request)
     if policy is None:
         return []
     return policy.remember(request, userid, **kw)
@@ -107,10 +107,10 @@ def forget(request):
        response.headerlist.extend(headers)
        return response
 
-    If no :term:`authentication policy` is in use, this function will
+    If no :term:`security policy` is in use, this function will
     always return an empty sequence.
     """
-    policy = _get_authentication_policy(request)
+    policy = _get_security_policy(request)
     if policy is None:
         return []
     return policy.forget(request)
@@ -132,6 +132,7 @@ def principals_allowed_by_permission(context, permission):
        required machinery for this function; those will cause a
        :exc:`NotImplementedError` exception to be raised when this
        function is invoked.
+
     """
     reg = get_current_registry()
     policy = reg.queryUtility(IAuthorizationPolicy)
