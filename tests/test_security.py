@@ -455,42 +455,24 @@ class TestHasPermission(unittest.TestCase):
         testing.tearDown()
 
     def _makeOne(self):
-        from pyramid.security import AuthorizationAPIMixin
+        from pyramid.security import SecurityAPIMixin
         from pyramid.registry import Registry
 
-        mixin = AuthorizationAPIMixin()
+        mixin = SecurityAPIMixin()
         mixin.registry = Registry()
         mixin.context = object()
         return mixin
 
-    def test_no_authentication_policy(self):
+    def test_no_security_policy(self):
         request = self._makeOne()
         result = request.has_permission('view')
         self.assertTrue(result)
-        self.assertEqual(result.msg, 'No authentication policy in use.')
+        self.assertEqual(result.msg, 'No security policy in use.')
 
-    def test_with_no_authorization_policy(self):
+    def test_with_security_registered(self):
         request = self._makeOne()
-        _registerAuthenticationPolicy(request.registry, None)
-        self.assertRaises(
-            ValueError, request.has_permission, 'view', context=None
-        )
-
-    def test_with_authn_and_authz_policies_registered(self):
-        request = self._makeOne()
-        _registerAuthenticationPolicy(request.registry, None)
-        _registerAuthorizationPolicy(request.registry, 'yo')
+        _registerSecurityPolicy(request.registry, 'yo')
         self.assertEqual(request.has_permission('view', context=None), 'yo')
-
-    def test_with_no_reg_on_request(self):
-        from pyramid.threadlocal import get_current_registry
-
-        registry = get_current_registry()
-        request = self._makeOne()
-        del request.registry
-        _registerAuthenticationPolicy(registry, None)
-        _registerAuthorizationPolicy(registry, 'yo')
-        self.assertEqual(request.has_permission('view'), 'yo')
 
     def test_with_no_context_passed(self):
         request = self._makeOne()

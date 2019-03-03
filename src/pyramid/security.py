@@ -299,6 +299,34 @@ class SecurityAPIMixin(object):
             return None
         return policy.identify(self)
 
+    def has_permission(self, permission, context=None):
+        """ Given a permission and an optional context, returns an instance of
+        :data:`pyramid.security.Allowed` if the permission is granted to this
+        request with the provided context, or the context already associated
+        with the request.  Otherwise, returns an instance of
+        :data:`pyramid.security.Denied`.  This method delegates to the current
+        security policy.  Returns
+        :data:`pyramid.security.Allowed` unconditionally if no security
+        policy has been registered for this request.  If ``context`` is not
+        supplied or is supplied as ``None``, the context used is the
+        ``request.context`` attribute.
+
+        :param permission: Does this request have the given permission?
+        :type permission: str
+        :param context: A resource object or ``None``
+        :type context: object
+        :returns: Either :class:`pyramid.security.Allowed` or
+                  :class:`pyramid.security.Denied`.
+
+        """
+        if context is None:
+            context = self.context
+        policy = _get_security_policy(self)
+        if policy is None:
+            return Allowed('No security policy in use.')
+        identity = policy.identify(self)
+        return policy.permits(self, context, identity, permission)
+
 
 class AuthenticationAPIMixin(object):
     @property
@@ -359,45 +387,6 @@ class AuthenticationAPIMixin(object):
         if policy is None:
             return [Everyone]
         return policy.effective_principals(self)
-
-
-class AuthorizationAPIMixin(object):
-    def has_permission(self, permission, context=None):
-        """ Given a permission and an optional context, returns an instance of
-        :data:`pyramid.security.Allowed` if the permission is granted to this
-        request with the provided context, or the context already associated
-        with the request.  Otherwise, returns an instance of
-        :data:`pyramid.security.Denied`.  This method delegates to the current
-        authentication and authorization policies.  Returns
-        :data:`pyramid.security.Allowed` unconditionally if no authentication
-        policy has been registered for this request.  If ``context`` is not
-        supplied or is supplied as ``None``, the context used is the
-        ``request.context`` attribute.
-
-        :param permission: Does this request have the given permission?
-        :type permission: str
-        :param context: A resource object or ``None``
-        :type context: object
-        :returns: Either :class:`pyramid.security.Allowed` or
-                  :class:`pyramid.security.Denied`.
-
-        .. versionadded:: 1.5
-
-        """
-        if context is None:
-            context = self.context
-        reg = _get_registry(self)
-        authn_policy = reg.queryUtility(IAuthenticationPolicy)
-        if authn_policy is None:
-            return Allowed('No authentication policy in use.')
-        authz_policy = reg.queryUtility(IAuthorizationPolicy)
-        if authz_policy is None:
-            raise ValueError(
-                'Authentication policy registered without '
-                'authorization policy'
-            )  # should never happen
-        principals = authn_policy.effective_principals(self)
-        return authz_policy.permits(context, principals, permission)
 
 
 @implementer(ISecurityPolicy)

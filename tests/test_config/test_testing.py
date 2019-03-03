@@ -1,7 +1,7 @@
 import unittest
 from zope.interface import implementer
 
-from pyramid.security import AuthenticationAPIMixin, AuthorizationAPIMixin
+from pyramid.security import SecurityAPIMixin, AuthenticationAPIMixin
 from pyramid.util import text_
 from . import IDummy
 
@@ -232,7 +232,7 @@ class DummyEvent:
     pass
 
 
-class DummyRequest(AuthenticationAPIMixin, AuthorizationAPIMixin):
+class DummyRequest(SecurityAPIMixin, AuthenticationAPIMixin):
     def __init__(self, environ=None):
         if environ is None:
             environ = {}

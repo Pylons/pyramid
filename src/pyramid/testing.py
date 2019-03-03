@@ -19,7 +19,6 @@ from pyramid.security import (
     Everyone,
     SecurityAPIMixin,
     AuthenticationAPIMixin,
-    AuthorizationAPIMixin,
 )
 
 from pyramid.threadlocal import get_current_registry, manager
@@ -306,7 +305,6 @@ class DummyRequest(
     LocalizerRequestMixin,
     SecurityAPIMixin,
     AuthenticationAPIMixin,
-    AuthorizationAPIMixin,
     ViewMethodsMixin,
 ):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.
