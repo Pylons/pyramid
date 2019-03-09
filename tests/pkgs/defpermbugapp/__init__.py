@@ -25,6 +25,6 @@ def includeme(config):
     authn_policy = AuthTktAuthenticationPolicy('seekt1t', hashalg='sha512')
     authz_policy = ACLAuthorizationPolicy()
     config.scan('tests.pkgs.defpermbugapp')
-    config._set_authentication_policy(authn_policy)
-    config._set_authorization_policy(authz_policy)
+    config.set_authentication_policy(authn_policy)
+    config.set_authorization_policy(authz_policy)
     config.set_default_permission('private')

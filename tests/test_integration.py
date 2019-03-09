@@ -581,10 +581,12 @@ class TestConflictApp(unittest.TestCase):
     def test_overridden_authorization_policy(self):
         config = self._makeConfig()
         config.include(self.package)
-        from pyramid.testing import DummySecurityPolicy
 
-        config.set_authorization_policy(DummySecurityPolicy('fred'))
-        config.set_authentication_policy(DummySecurityPolicy(permissive=True))
+        class DummySecurityPolicy:
+            def permits(self, context, principals, permission):
+                return True
+
+        config.set_authorization_policy(DummySecurityPolicy())
         app = config.make_wsgi_app()
         self.testapp = TestApp(app)
         res = self.testapp.get('/protected', status=200)

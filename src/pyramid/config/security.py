@@ -49,7 +49,7 @@ class SecurityConfiguratorMixin(object):
         )
         intr['policy'] = policy
         # authentication policy used by view config (phase 3)
-        self.action(IAuthenticationPolicy, register, introspectables=(intr,))
+        self.action(ISecurityPolicy, register, introspectables=(intr,))
 
     def _set_security_policy(self, policy):
         policy = self.maybe_dotted(policy)
