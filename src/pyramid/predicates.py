@@ -291,6 +291,13 @@ class PhysicalPathPredicate(object):
 
 
 class EffectivePrincipalsPredicate(object):
+    """
+    .. deprecated:: 2.0
+
+        No longer applicable with the new :term:`security policy`.
+
+    """
+
     def __init__(self, val, config):
         if is_nonstr_iter(val):
             self.val = set(val)
