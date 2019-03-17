@@ -39,8 +39,9 @@ class SecurityConfiguratorMixin(object):
         """
 
         def register():
-            self._set_security_policy(policy)
+            self.registry.registerUtility(policy, ISecurityPolicy)
 
+        policy = self.maybe_dotted(policy)
         intr = self.introspectable(
             'security policy',
             None,
@@ -50,10 +51,6 @@ class SecurityConfiguratorMixin(object):
         intr['policy'] = policy
         # authentication policy used by view config (phase 3)
         self.action(ISecurityPolicy, register, introspectables=(intr,))
-
-    def _set_security_policy(self, policy):
-        policy = self.maybe_dotted(policy)
-        self.registry.registerUtility(policy, ISecurityPolicy)
 
     @action_method
     def set_authentication_policy(self, policy):
@@ -71,15 +68,22 @@ class SecurityConfiguratorMixin(object):
         """
 
         def register():
-            self._set_authentication_policy(policy)
+            self.registry.registerUtility(policy, IAuthenticationPolicy)
             if self.registry.queryUtility(IAuthorizationPolicy) is None:
                 raise ConfigurationError(
                     'Cannot configure an authentication policy without '
                     'also configuring an authorization policy '
                     '(use the set_authorization_policy method)'
                 )
-            self._set_legacy_policy()
+            if self.registry.queryUtility(ISecurityPolicy) is not None:
+                raise ConfigurationError(
+                    'Cannot configure an authentication and authorization'
+                    'policy with a configured security policy.'
+                )
+            security_policy = LegacySecurityPolicy()
+            self.registry.registerUtility(security_policy, ISecurityPolicy)
 
+        policy = self.maybe_dotted(policy)
         intr = self.introspectable(
             'authentication policy',
             None,
@@ -94,19 +98,6 @@ class SecurityConfiguratorMixin(object):
             order=PHASE2_CONFIG,
             introspectables=(intr,),
         )
-
-    def _set_authentication_policy(self, policy):
-        policy = self.maybe_dotted(policy)
-        self.registry.registerUtility(policy, IAuthenticationPolicy)
-
-    def _set_legacy_policy(self):
-        if self.registry.queryUtility(ISecurityPolicy) is not None:
-            raise ConfigurationError(
-                'Cannot configure an authentication and authorization policy '
-                'with a configured security policy.'
-            )
-        policy = LegacySecurityPolicy()
-        self.registry.registerUtility(policy, ISecurityPolicy)
 
     @action_method
     def set_authorization_policy(self, policy):
@@ -123,7 +114,7 @@ class SecurityConfiguratorMixin(object):
         """
 
         def register():
-            self._set_authorization_policy(policy)
+            self.registry.registerUtility(policy, IAuthorizationPolicy)
 
         def ensure():
             if self.autocommit:
@@ -135,6 +126,7 @@ class SecurityConfiguratorMixin(object):
                     '(use the set_authorization_policy method)'
                 )
 
+        policy = self.maybe_dotted(policy)
         intr = self.introspectable(
             'authorization policy',
             None,
@@ -151,10 +143,6 @@ class SecurityConfiguratorMixin(object):
             introspectables=(intr,),
         )
         self.action(None, ensure)
-
-    def _set_authorization_policy(self, policy):
-        policy = self.maybe_dotted(policy)
-        self.registry.registerUtility(policy, IAuthorizationPolicy)
 
     @action_method
     def set_default_permission(self, permission):
