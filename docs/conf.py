@@ -205,6 +205,7 @@ latex_documents = [
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
 latex_toplevel_sectioning = "section"
+latex_use_xindy = False
 
 # If false, no module index is generated.
 latex_domain_indices = False
