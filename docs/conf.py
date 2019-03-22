@@ -188,6 +188,9 @@ htmlhelp_basename = 'pyramid'
 # Options for LaTeX output
 # ------------------------
 
+latex_engine = 'xelatex'
+latex_use_xindy = False
+
 # The paper size ('letter' or 'a4').
 latex_paper_size = 'letter'
 
