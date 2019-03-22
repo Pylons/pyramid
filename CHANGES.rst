@@ -91,3 +91,5 @@ Backward Incompatibilities
 Documentation Changes
 ---------------------
 
+- Restore build of PDF on Read The Docs.
+  See https://github.com/Pylons/pyramid/issues/3290
