@@ -265,18 +265,6 @@ See also
     See :ref:`Quick Tutorial section on Requirements <qtut_requirements>`.
 
 
-.. _typographical-conventions-todo:
-
-Todo
-----
-
-Todo items designated tasks that require further work.
-
-.. todo::
-
-    This is a todo item.
-
-
 .. _typographical-conventions-cross-references:
 
 Cross-references
