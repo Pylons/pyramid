@@ -47,7 +47,7 @@ In a world filled with web frameworks, why should you choose :app:`Pyramid`\ ?
 Modern
 ~~~~~~
 
-:app:`Pyramid` is fully compatible with Python 3. If you develop a :app:`Pyramid` application today, you can rest assured that you'll be able to use the most modern features of your favorite language. And in the years to come, you'll continue to bed working on a framework that is up-to-date and forward-looking.
+:app:`Pyramid` is fully compatible with Python 3. If you develop a :app:`Pyramid` application today, you can rest assured that you'll be able to use the most modern features of your favorite language. And in the years to come, you'll continue to be working on a framework that is up-to-date and forward-looking.
 
 Tested
 ~~~~~~
