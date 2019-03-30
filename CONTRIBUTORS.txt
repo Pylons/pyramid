@@ -334,3 +334,5 @@ Contributors
 - Colin Dunklau, 2018/09/19
 
 - Alexandre Yukio Harano, 2018/10/05
+
+- Eric Atkin, 2019/02/15
