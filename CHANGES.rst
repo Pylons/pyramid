@@ -1,5 +1,12 @@
 .. _changes_1.10.2:
 
+1.10.3 (unreleased)
+===================
+
+- Fix docs build for Sphinx 2.0.
+  See https://github.com/Pylons/pyramid/pull/3481
+
+
 1.10.2 (2019-01-30)
 ===================
 
