@@ -28,6 +28,7 @@ from sphinx.writers.latex import LaTeXTranslator
 
 from docutils import nodes
 from docutils import utils
+from docutils.parsers.rst import Directive
 
 
 def raw(*arg):
@@ -326,7 +327,6 @@ _PREAMBLE = r"""
 
 latex_elements = {
     'preamble': _PREAMBLE,
-    'date': '',
     'releasename': 'Version',
     'title': r'The Pyramid Web Framework',
 #    'pointsize':'12pt', # uncomment for 12pt version
@@ -345,25 +345,25 @@ latex_elements = {
 #subparagraph  5
 
 
-def frontmatter(name, arguments, options, content, lineno,
-                content_offset, block_text, state, state_machine):
-    return [nodes.raw(
-        '',
-        format='latex')]
+class FrontMatter(Directive):
+    def run(self):
+        return [nodes.raw(
+            '',
+            format='latex')]
 
 
-def mainmatter(name, arguments, options, content, lineno,
-               content_offset, block_text, state, state_machine):
-    return [nodes.raw(
-        '',
-        format='latex')]
+class MainMatter(Directive):
+    def run(self):
+        return [nodes.raw(
+            '',
+            format='latex')]
 
 
-def backmatter(name, arguments, options, content, lineno,
-              content_offset, block_text, state, state_machine):
-    return [nodes.raw(
-        '',
-        format='latex')]
+class BackMatter(Directive):
+    def run(self):
+        return [nodes.raw(
+            '',
+            format='latex')]
 
 
 def app_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
@@ -378,9 +378,9 @@ def app_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
 
 def setup(app):
     app.add_role('app', app_role)
-    app.add_directive('frontmatter', frontmatter, 1, (0, 0, 0))
-    app.add_directive('mainmatter', mainmatter, 1, (0, 0, 0))
-    app.add_directive('backmatter', backmatter, 1, (0, 0, 0))
+    app.add_directive('frontmatter', FrontMatter, 1, (0, 0, 0))
+    app.add_directive('mainmatter', MainMatter, 1, (0, 0, 0))
+    app.add_directive('backmatter', BackMatter, 1, (0, 0, 0))
     app.connect('autodoc-process-signature', resig)
 
 
