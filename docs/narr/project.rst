@@ -149,7 +149,7 @@ number of debugging settings.  You can use this file to put your application
 into production.
 
 The ``myproject`` project directory contains an additional subdirectory named
-``myproject`` (note the case difference) representing a Python :term:`package`
+``myproject`` representing a Python :term:`package`
 which holds very simple :app:`Pyramid` sample code.  This is where you'll edit
 your application's Python code and templates.
 
