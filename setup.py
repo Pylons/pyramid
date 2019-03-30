@@ -26,7 +26,7 @@ CHANGES = readfile('CHANGES.rst')
 VERSION = '2.0.dev0'
 
 install_requires = [
-    'hupper',
+    'hupper >= 1.5',  # ignore_files support
     'plaster',
     'plaster_pastedeploy',
     'setuptools',
