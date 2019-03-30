@@ -2,11 +2,7 @@ from zope.interface import implementer
 
 from pyramid.interfaces import IAuthorizationPolicy
 
-from pyramid.location import lineage
-
-from pyramid.security import ACLAllowed, ACLDenied, Allow, Deny, Everyone
-
-from pyramid.util import is_nonstr_iter
+from pyramid.security import ACLHelper
 
 
 @implementer(IAuthorizationPolicy)
@@ -61,80 +57,21 @@ class ACLAuthorizationPolicy(object):
     :class:`pyramid.interfaces.IAuthorizationPolicy` interface.
     """
 
+    def __init__(self):
+        self.helper = ACLHelper()
+
     def permits(self, context, principals, permission):
         """ Return an instance of
         :class:`pyramid.security.ACLAllowed` instance if the policy
         permits access, return an instance of
         :class:`pyramid.security.ACLDenied` if not."""
-
-        acl = '<No ACL found on any object in resource lineage>'
-
-        for location in lineage(context):
-            try:
-                acl = location.__acl__
-            except AttributeError:
-                continue
-
-            if acl and callable(acl):
-                acl = acl()
-
-            for ace in acl:
-                ace_action, ace_principal, ace_permissions = ace
-                if ace_principal in principals:
-                    if not is_nonstr_iter(ace_permissions):
-                        ace_permissions = [ace_permissions]
-                    if permission in ace_permissions:
-                        if ace_action == Allow:
-                            return ACLAllowed(
-                                ace, acl, permission, principals, location
-                            )
-                        else:
-                            return ACLDenied(
-                                ace, acl, permission, principals, location
-                            )
-
-        # default deny (if no ACL in lineage at all, or if none of the
-        # principals were mentioned in any ACE we found)
-        return ACLDenied(
-            '<default deny>', acl, permission, principals, context
-        )
+        return self.helper.permits(context, principals, permission)
 
     def principals_allowed_by_permission(self, context, permission):
         """ Return the set of principals explicitly granted the
         permission named ``permission`` according to the ACL directly
         attached to the ``context`` as well as inherited ACLs based on
         the :term:`lineage`."""
-        allowed = set()
-
-        for location in reversed(list(lineage(context))):
-            # NB: we're walking *up* the object graph from the root
-            try:
-                acl = location.__acl__
-            except AttributeError:
-                continue
-
-            allowed_here = set()
-            denied_here = set()
-
-            if acl and callable(acl):
-                acl = acl()
-
-            for ace_action, ace_principal, ace_permissions in acl:
-                if not is_nonstr_iter(ace_permissions):
-                    ace_permissions = [ace_permissions]
-                if (ace_action == Allow) and (permission in ace_permissions):
-                    if ace_principal not in denied_here:
-                        allowed_here.add(ace_principal)
-                if (ace_action == Deny) and (permission in ace_permissions):
-                    denied_here.add(ace_principal)
-                    if ace_principal == Everyone:
-                        # clear the entire allowed set, as we've hit a
-                        # deny of Everyone ala (Deny, Everyone, ALL)
-                        allowed = set()
-                        break
-                    elif ace_principal in allowed:
-                        allowed.remove(ace_principal)
-
-            allowed.update(allowed_here)
-
-        return allowed
+        return self.helper.principals_allowed_by_permission(
+            context, permission
+        )
