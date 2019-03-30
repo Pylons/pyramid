@@ -153,11 +153,9 @@ Comprehensive reference material for every public API exposed by
 :app:`Pyramid`:
 
 .. toctree::
-   :maxdepth: 1
-   :glob:
+   :maxdepth: 2
 
    api/index
-   api/*
 
 
 ``p*`` Scripts Documentation
@@ -166,11 +164,9 @@ Comprehensive reference material for every public API exposed by
 ``p*`` scripts included with :app:`Pyramid`.
 
 .. toctree::
-   :maxdepth: 1
-   :glob:
+   :maxdepth: 2
 
    pscripts/index
-   pscripts/*
 
 
 Change History
