@@ -891,6 +891,7 @@ ADMINISTRATOR_PERMS = MODERATOR_PERMS + (ADMINISTER,)
 class TestSessionAuthenticationHelper(unittest.TestCase):
     def _makeRequest(self, session=None):
         from types import SimpleNamespace
+
         if session is None:
             session = dict()
         return SimpleNamespace(session=session)
