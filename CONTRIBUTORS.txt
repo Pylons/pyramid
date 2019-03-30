@@ -340,3 +340,5 @@ Contributors
 - Eric Atkin, 2019/02/15
 
 - Arijit Basu, 2019/02/19
+
+- Theron Luhn, 2019/03/30
