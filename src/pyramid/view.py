@@ -1,5 +1,6 @@
 import itertools
 import sys
+import inspect
 
 import venusian
 
@@ -218,6 +219,13 @@ class view_config(object):
             if settings.get('context') is None:
                 settings['context'] = settings['for_']
         self.__dict__.update(settings)
+        self._get_info()
+
+    def _get_info(self):
+        depth = self.__dict__.get('_depth', 0)
+        frameinfo = inspect.stack()[depth + 2]
+        sourceline = frameinfo[4][0].strip()
+        self._info = frameinfo[1], frameinfo[2], frameinfo[3], sourceline
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
@@ -239,14 +247,13 @@ class view_config(object):
             if settings.get('attr') is None:
                 settings['attr'] = wrapped.__name__
 
-        settings['_info'] = info.codeinfo  # fbo "action_method"
         return wrapped
 
 
 bfg_view = view_config  # bw compat (forever)
 
 
-class view_defaults(view_config):
+def view_defaults(**settings):
     """ A class :term:`decorator` which, when applied to a class, will
     provide defaults for all view configurations that use the class.  This
     decorator accepts all the arguments accepted by
@@ -255,9 +262,11 @@ class view_defaults(view_config):
     See :ref:`view_defaults` for more information.
     """
 
-    def __call__(self, wrapped):
-        wrapped.__view_defaults__ = self.__dict__.copy()
+    def wrap(wrapped):
+        wrapped.__view_defaults__ = settings
         return wrapped
+
+    return wrap
 
 
 class AppendSlashNotFoundViewFactory(object):
