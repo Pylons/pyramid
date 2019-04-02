@@ -220,10 +220,9 @@ class view_config(object):
         self._get_info()
 
     def _get_info(self):
-        frame = sys._getframe(2)
-        frameinfo = inspect.getframeinfo(frame)
-        sourceline = frameinfo[3][0].strip()
-        self._info = frameinfo[0], frameinfo[1], frameinfo[2], sourceline
+        frameinfo = inspect.stack()[2]
+        sourceline = frameinfo[4][0].strip()
+        self._info = frameinfo[1], frameinfo[2], frameinfo[3], sourceline
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
