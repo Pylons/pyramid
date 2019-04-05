@@ -516,6 +516,17 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(info[2], 'test_create_info')
         self.assertEqual(info[3], 'decorator = target()')
 
+    def test_create_info_depth(self):
+        target = self._getTargetClass()
+
+        def make():
+            return target(_depth=1)
+
+        decorator = make()
+        info = decorator._info
+        self.assertEqual(info[2], 'test_create_info_depth')
+        self.assertEqual(info[3], 'decorator = make()')
+
     def test_create_context_trumps_for(self):
         decorator = self._makeOne(context='123', for_='456')
         self.assertEqual(decorator.context, '123')

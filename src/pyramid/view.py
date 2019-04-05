@@ -220,7 +220,8 @@ class view_config(object):
         self._get_info()
 
     def _get_info(self):
-        frameinfo = inspect.stack()[2]
+        depth = self.__dict__.get('_depth', 0)
+        frameinfo = inspect.stack()[depth + 2]
         sourceline = frameinfo[4][0].strip()
         self._info = frameinfo[1], frameinfo[2], frameinfo[3], sourceline
 

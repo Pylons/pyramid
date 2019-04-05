@@ -35,6 +35,9 @@ Features
   provided by WebOb. This allows the attribute to now be settable.
   See https://github.com/Pylons/pyramid/pull/3447
 
+- Improve debugging info from ``pyramid.view.view_config`` decorator.
+  See https://github.com/Pylons/pyramid/pull/3483
+
 Deprecations
 ------------
 
