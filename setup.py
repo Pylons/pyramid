@@ -54,11 +54,11 @@ docs_extras = [
 
 testing_extras = tests_require + ['coverage', 'nose']
 
-major_version = ".".join(VERSION.split(".")[:2])
+branch_version = ".".join(VERSION.split(".")[:2])
 
 # black is refusing to make anything under 80 chars so just splitting it up
 docs_fmt = 'https://docs.pylonsproject.org/projects/pyramid/en/{}-branch/'
-docs_url = docs_fmt.format(major_version)
+docs_url = docs_fmt.format(branch_version)
 
 setup(
     name='pyramid',
@@ -87,7 +87,7 @@ setup(
     url="https://trypyramid.com",
     project_urls={
         'Documentation': docs_url,
-        'Changelog': '{}whatsnew-{}.html'.format(docs_url, major_version),
+        'Changelog': '{}whatsnew-{}.html'.format(docs_url, branch_version),
         'Issue Tracker': 'https://github.com/Pylons/pyramid/issues',
     },
     license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
