@@ -58,11 +58,13 @@ testing_extras = tests_require + [
     'virtualenv',  # for scaffolding tests
 ]
 
-base_version = parse_version(VERSION).base_version
+major_version = ".".join(
+    str(v) for v in parse_version(VERSION)._version.release[:2]
+)
 
 # black is refusing to make anything under 80 chars so just splitting it up
 docs_fmt = 'https://docs.pylonsproject.org/projects/pyramid/en/{}-branch/'
-docs_url = docs_fmt.format(base_version)
+docs_url = docs_fmt.format(major_version)
 
 setup(
     name='pyramid',
@@ -92,7 +94,7 @@ setup(
     url="https://trypyramid.com",
     project_urls={
         'Documentation': docs_url,
-        'Changelog': '{}whatsnew-{}.html'.format(docs_url, base_version),
+        'Changelog': '{}whatsnew-{}.html'.format(docs_url, major_version),
         'Issue Tracker': 'https://github.com/Pylons/pyramid/issues',
     },
     license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
