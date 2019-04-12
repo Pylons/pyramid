@@ -3,6 +3,10 @@
 1.10.3 (unreleased)
 ===================
 
+- Add ``ignore_files`` option to ``[pserve]`` settings which will tell
+  ``pserve`` to ignore certain files/globs when using ``--reload``.
+  See https://github.com/Pylons/pyramid/pull/3464
+
 - Fix docs build for Sphinx 2.0.
   See https://github.com/Pylons/pyramid/pull/3481
 
