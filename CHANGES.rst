@@ -1,5 +1,3 @@
-.. _changes_1.10.2:
-
 1.10.3 (unreleased)
 ===================
 
@@ -12,6 +10,8 @@
 
 - Improve debugging info from ``pyramid.view.view_config`` decorator.
   See https://github.com/Pylons/pyramid/pull/3485
+
+.. _changes_1.10.2:
 
 1.10.2 (2019-01-30)
 ===================
