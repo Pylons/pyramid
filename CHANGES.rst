@@ -6,6 +6,8 @@
 - Fix docs build for Sphinx 2.0.
   See https://github.com/Pylons/pyramid/pull/3481
 
+- Improve debugging info from ``pyramid.view.view_config`` decorator.
+  See https://github.com/Pylons/pyramid/pull/3485
 
 1.10.2 (2019-01-30)
 ===================

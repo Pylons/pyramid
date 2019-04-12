@@ -14,8 +14,7 @@
   .. autoclass:: view_config
      :members:
 
-  .. autoclass:: view_defaults
-     :members:
+  .. autofunction:: view_defaults
 
   .. autoclass:: notfound_view_config
      :members:
