@@ -1,4 +1,6 @@
-1.10.3 (unreleased)
+.. _changes_1.10.3:
+
+1.10.3 (2019-04-12)
 ===================
 
 - Add ``ignore_files`` option to ``[pserve]`` settings which will tell

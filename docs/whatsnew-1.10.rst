@@ -18,6 +18,7 @@ The following bug fix releases were made since then. Bug fix releases also inclu
 
 - :ref:`changes_1.10.1`
 - :ref:`changes_1.10.2`
+- :ref:`changes_1.10.3`
 
 Feature Additions
 -----------------
