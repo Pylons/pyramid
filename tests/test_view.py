@@ -507,7 +507,25 @@ class TestViewConfigDecorator(unittest.TestCase):
 
     def test_create_defaults(self):
         decorator = self._makeOne()
-        self.assertEqual(decorator.__dict__, {})
+        self.assertEqual(list(decorator.__dict__.keys()), ['_info'])
+
+    def test_create_info(self):
+        target = self._getTargetClass()
+        decorator = target()
+        info = decorator._info
+        self.assertEqual(info[2], 'test_create_info')
+        self.assertEqual(info[3], 'decorator = target()')
+
+    def test_create_info_depth(self):
+        target = self._getTargetClass()
+
+        def make():
+            return target(_depth=1)
+
+        decorator = make()
+        info = decorator._info
+        self.assertEqual(info[2], 'test_create_info_depth')
+        self.assertEqual(info[3], 'decorator = make()')
 
     def test_create_context_trumps_for(self):
         decorator = self._makeOne(context='123', for_='456')
@@ -560,7 +578,6 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(len(settings[0]), 3)
         self.assertEqual(settings[0]['venusian'], venusian)
         self.assertEqual(settings[0]['view'], None)  # comes from call_venusian
-        self.assertEqual(settings[0]['_info'], 'codeinfo')
 
     def test_call_class(self):
         decorator = self._makeOne()
@@ -580,7 +597,6 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(settings[0]['venusian'], venusian)
         self.assertEqual(settings[0]['view'], None)  # comes from call_venusian
         self.assertEqual(settings[0]['attr'], 'foo')
-        self.assertEqual(settings[0]['_info'], 'codeinfo')
 
     def test_call_class_attr_already_set(self):
         decorator = self._makeOne(attr='abc')
@@ -600,7 +616,6 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(settings[0]['venusian'], venusian)
         self.assertEqual(settings[0]['view'], None)  # comes from call_venusian
         self.assertEqual(settings[0]['attr'], 'abc')
-        self.assertEqual(settings[0]['_info'], 'codeinfo')
 
     def test_stacking(self):
         decorator1 = self._makeOne(name='1')
