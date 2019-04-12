@@ -54,9 +54,7 @@ docs_extras = [
 
 testing_extras = tests_require + ['coverage', 'nose']
 
-major_version = ".".join(
-    str(v) for v in parse_version(VERSION)._version.release[:2]
-)
+major_version = ".".join(VERSION.split(".")[:2])
 
 # black is refusing to make anything under 80 chars so just splitting it up
 docs_fmt = 'https://docs.pylonsproject.org/projects/pyramid/en/{}-branch/'
