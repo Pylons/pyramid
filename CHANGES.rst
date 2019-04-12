@@ -26,7 +26,7 @@
   not sortable on Python 3 due to differing types.
   See https://github.com/Pylons/pyramid/pull/3457
 
-- Avoid configuring logging in the monitor process usin the logging config
+- Avoid configuring logging in the monitor process using the logging config
   intended for the application. This avoids opening files for writing in both
   processes which can cause issues on some systems.
   See https://github.com/Pylons/pyramid/pull/3460
