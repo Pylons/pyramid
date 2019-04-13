@@ -12,7 +12,6 @@
 #
 ##############################################################################
 from setuptools import find_packages, setup
-from pkg_resources import parse_version
 
 
 def readfile(name):
