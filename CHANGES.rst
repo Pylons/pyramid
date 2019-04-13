@@ -19,7 +19,7 @@
 ===================
 
 - Fix a bug in ``pyramid.testing.DummySecurityPolicy`` in which
-  ``principals_allows_by_permission`` would return all principals instead
+  ``principals_allowed_by_permission`` would return all principals instead
   of an empty list if ``permissive`` is ``False``.
   See https://github.com/Pylons/pyramid/pull/3450
 
