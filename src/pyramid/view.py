@@ -221,9 +221,10 @@ class view_config(object):
 
     def _get_info(self):
         depth = self.__dict__.get('_depth', 0)
-        frameinfo = inspect.stack()[depth + 2]
-        sourceline = frameinfo[4][0].strip()
-        self._info = frameinfo[1], frameinfo[2], frameinfo[3], sourceline
+        frame = sys._getframe(depth + 2)
+        frameinfo = inspect.getframeinfo(frame)
+        sourceline = frameinfo[3][0].strip()
+        self._info = frameinfo[0], frameinfo[1], frameinfo[2], sourceline
 
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
