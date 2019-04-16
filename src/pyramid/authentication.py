@@ -1099,23 +1099,19 @@ class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
 
     def __init__(self, prefix='auth.', callback=None, debug=False):
         self.callback = callback
-        self.prefix = prefix or ''
-        self.userid_key = prefix + 'userid'
         self.debug = debug
+        self.helper = SessionAuthenticationHelper(prefix)
 
     def remember(self, request, userid, **kw):
         """ Store a userid in the session."""
-        request.session[self.userid_key] = userid
-        return []
+        return self.helper.remember(request, userid, **kw)
 
     def forget(self, request):
         """ Remove the stored userid from the session."""
-        if self.userid_key in request.session:
-            del request.session[self.userid_key]
-        return []
+        return self.helper.forget(request)
 
     def unauthenticated_userid(self, request):
-        return request.session.get(self.userid_key)
+        return self.helper.identify(request)
 
 
 class SessionAuthenticationHelper:
