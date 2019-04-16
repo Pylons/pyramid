@@ -49,8 +49,12 @@ class SecurityConfiguratorMixin(object):
             'security policy',
         )
         intr['policy'] = policy
-        # authentication policy used by view config (phase 3)
-        self.action(ISecurityPolicy, register, introspectables=(intr,))
+        self.action(
+            ISecurityPolicy,
+            register,
+            order=PHASE2_CONFIG,
+            introspectables=(intr,),
+        )
 
     @action_method
     def set_authentication_policy(self, policy):
