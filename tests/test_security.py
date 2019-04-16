@@ -357,8 +357,9 @@ class TestAuthenticatedUserId(unittest.TestCase):
 
     def test_with_security_policy(self):
         request = _makeRequest()
-        _registerSecurityPolicy(request.registry, 'yo')
-        self.assertEqual(request.authenticated_userid, 'yo')
+        # Ensure the identity is stringified.
+        _registerSecurityPolicy(request.registry, 123)
+        self.assertEqual(request.authenticated_userid, '123')
 
     def test_with_authentication_policy_no_reg_on_request(self):
         from pyramid.threadlocal import get_current_registry
