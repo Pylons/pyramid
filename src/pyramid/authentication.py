@@ -1118,6 +1118,37 @@ class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
         return request.session.get(self.userid_key)
 
 
+class SessionAuthenticationHelper:
+    """ A helper for use with a :term:`security policy` which stores user data
+    in the configured :term:`session`.
+
+    Constructor Arguments
+
+    ``prefix``
+
+       A prefix used when storing the authentication parameters in the
+       session. Defaults to 'auth.'. Optional.
+
+    """
+
+    def __init__(self, prefix='auth.'):
+        self.userid_key = prefix + 'userid'
+
+    def remember(self, request, userid, **kw):
+        """ Store a userid in the session."""
+        request.session[self.userid_key] = userid
+        return []
+
+    def forget(self, request):
+        """ Remove the stored userid from the session."""
+        if self.userid_key in request.session:
+            del request.session[self.userid_key]
+        return []
+
+    def identify(self, request):
+        return request.session.get(self.userid_key)
+
+
 @implementer(IAuthenticationPolicy)
 class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
     """ A :app:`Pyramid` authentication policy which uses HTTP standard basic

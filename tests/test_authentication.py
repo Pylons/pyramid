@@ -1693,6 +1693,56 @@ class TestSessionAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(result, [])
 
 
+class TestSessionAuthenticationHelper(unittest.TestCase):
+    def _makeRequest(self, session=None):
+        from types import SimpleNamespace
+
+        if session is None:
+            session = dict()
+        return SimpleNamespace(session=session)
+
+    def _makeOne(self, prefix=''):
+        from pyramid.authentication import SessionAuthenticationHelper
+
+        return SessionAuthenticationHelper(prefix=prefix)
+
+    def test_identify(self):
+        request = self._makeRequest({'userid': 'fred'})
+        helper = self._makeOne()
+        self.assertEqual(helper.identify(request), 'fred')
+
+    def test_identify_with_prefix(self):
+        request = self._makeRequest({'foo.userid': 'fred'})
+        helper = self._makeOne(prefix='foo.')
+        self.assertEqual(helper.identify(request), 'fred')
+
+    def test_identify_none(self):
+        request = self._makeRequest()
+        helper = self._makeOne()
+        self.assertEqual(helper.identify(request), None)
+
+    def test_remember(self):
+        request = self._makeRequest()
+        helper = self._makeOne()
+        result = helper.remember(request, 'fred')
+        self.assertEqual(request.session.get('userid'), 'fred')
+        self.assertEqual(result, [])
+
+    def test_forget(self):
+        request = self._makeRequest({'userid': 'fred'})
+        helper = self._makeOne()
+        result = helper.forget(request)
+        self.assertEqual(request.session.get('userid'), None)
+        self.assertEqual(result, [])
+
+    def test_forget_no_identity(self):
+        request = self._makeRequest()
+        helper = self._makeOne()
+        result = helper.forget(request)
+        self.assertEqual(request.session.get('userid'), None)
+        self.assertEqual(result, [])
+
+
 class TestBasicAuthAuthenticationPolicy(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.authentication import BasicAuthAuthenticationPolicy as cls
