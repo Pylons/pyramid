@@ -1,5 +1,11 @@
 .. _changes_1.10.3:
 
+Unreleased
+==========
+
+- Fix performance regression in ``pyramid.view.view_config`` decorator.  See
+  https://github.com/Pylons/pyramid/pull/3490
+
 1.10.3 (2019-04-12)
 ===================
 
