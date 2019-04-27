@@ -521,6 +521,48 @@ class TestExceptionViewsApp(IntegrationBase, unittest.TestCase):
         self.assertTrue(b'caught' in res.body)
 
 
+class TestSecurityApp(IntegrationBase, unittest.TestCase):
+    package = 'tests.pkgs.securityapp'
+
+    def test_public(self):
+        res = self.testapp.get('/public', status=200)
+        self.assertEqual(res.body, b'Hello')
+
+    def test_private_denied(self):
+        self.testapp.get('/private', status=403)
+
+    def test_private_allowed(self):
+        self.testapp.extra_environ = {'REMOTE_USER': 'bob'}
+        res = self.testapp.get('/private', status=200)
+        self.assertEqual(res.body, b'Secret')
+
+    def test_inaccessible(self):
+        self.testapp.get('/inaccessible', status=403)
+        self.testapp.extra_environ = {'REMOTE_USER': 'bob'}
+        self.testapp.get('/inaccessible', status=403)
+
+
+class TestLegacySecurityApp(IntegrationBase, unittest.TestCase):
+    package = 'tests.pkgs.legacysecurityapp'
+
+    def test_public(self):
+        res = self.testapp.get('/public', status=200)
+        self.assertEqual(res.body, b'Hello')
+
+    def test_private_denied(self):
+        self.testapp.get('/private', status=403)
+
+    def test_private_allowed(self):
+        self.testapp.extra_environ = {'REMOTE_USER': 'bob'}
+        res = self.testapp.get('/private', status=200)
+        self.assertEqual(res.body, b'Secret')
+
+    def test_inaccessible(self):
+        self.testapp.get('/inaccessible', status=403)
+        self.testapp.extra_environ = {'REMOTE_USER': 'bob'}
+        self.testapp.get('/inaccessible', status=403)
+
+
 class TestConflictApp(unittest.TestCase):
     package = 'tests.pkgs.conflictapp'
 
