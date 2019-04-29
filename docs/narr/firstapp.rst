@@ -38,9 +38,9 @@ On Windows:
     %VENV%\Scripts\python helloworld.py
 
 This command will not return and nothing will be printed to the console. When
-port 6543 is visited by a browser on the URL ``/hello/world``, the server will
+port 6543 is visited by a browser on the URL ``/``, the server will
 simply serve up the text "Hello world!".  If your application is running on
-your local system, using `<http://localhost:6543/hello/world>`_ in a browser
+your local system, using `<http://localhost:6543/>`_ in a browser
 will show this result.
 
 Each time you visit a URL served by the application in a browser, a logging
