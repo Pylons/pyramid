@@ -318,7 +318,7 @@ class TestViewExecutionPermitted(unittest.TestCase):
         self.assertTrue(result)
 
 
-class TestIdentity(unittest.TestCase):
+class TestAuthenticatedIdentity(unittest.TestCase):
     def setUp(self):
         testing.setUp()
 
@@ -327,12 +327,12 @@ class TestIdentity(unittest.TestCase):
 
     def test_identity_no_security_policy(self):
         request = _makeRequest()
-        self.assertEquals(request.identity, None)
+        self.assertEquals(request.authenticated_identity, None)
 
     def test_identity(self):
         request = _makeRequest()
         _registerSecurityPolicy(request.registry, 'yo')
-        self.assertEqual(request.identity, 'yo')
+        self.assertEqual(request.authenticated_identity, 'yo')
 
 
 class TestAuthenticatedUserId(unittest.TestCase):

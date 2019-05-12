@@ -279,7 +279,7 @@ class ACLAllowed(ACLPermitsResult, Allowed):
 
 class SecurityAPIMixin(object):
     @property
-    def identity(self):
+    def authenticated_identity(self):
         """
         Return an opaque object identifying the current user or ``None`` if no
         user is authenticated or there is no :term:`security policy` in effect.
