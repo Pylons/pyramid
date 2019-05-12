@@ -307,8 +307,9 @@ Glossary
      define their principals differently.
 
    identity
-     An identity is an opaque identifier of the user associated with the
-     current request.
+     An identity is an object identify the user associated with the
+     current request.  The identity can be any object, but should implement a
+     ``__str__`` method for logging and debugging purposes.
 
    security policy
      A security policy in :app:`Pyramid` terms is a bit of code which has an

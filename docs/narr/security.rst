@@ -6,17 +6,12 @@
 Security
 ========
 
-:app:`Pyramid` provides an optional, declarative, security system. Security in
-:app:`Pyramid` is separated into authentication and authorization. The two
-systems communicate via :term:`principal` identifiers. Authentication is merely
-the mechanism by which credentials provided in the :term:`request` are resolved
-to one or more :term:`principal` identifiers. These identifiers represent the
-users and groups that are in effect during the request. Authorization then
-determines access based on the :term:`principal` identifiers, the requested
-:term:`permission`, and a :term:`context`.
+:app:`Pyramid` provides an optional, declarative security system.  The system
+determines the identity of the current user (authentication) and whether or not
+the user has access to certain resources (authorization).
 
 The :app:`Pyramid` authorization system can prevent a :term:`view` from being
-invoked based on an :term:`authorization policy`. Before a view is invoked, the
+invoked based on the :term:`security policy`. Before a view is invoked, the
 authorization system can use the credentials in the :term:`request` along with
 the :term:`context` resource to determine if access will be allowed.  Here's
 how it works at a high level:
@@ -37,89 +32,124 @@ how it works at a high level:
 - A :term:`view callable` is located by :term:`view lookup` using the context
   as well as other attributes of the request.
 
-- If an :term:`authentication policy` is in effect, it is passed the request.
-  It will return some number of :term:`principal` identifiers. To do this, the
-  policy would need to determine the authenticated :term:`userid` present in
-  the request.
+- If a :term:`security policy` is in effect, it is passed the request and
+  returns the :term:`identity` of the current user.
 
-- If an :term:`authorization policy` is in effect and the :term:`view
+- If a :term:`security policy` is in effect and the :term:`view
   configuration` associated with the view callable that was found has a
-  :term:`permission` associated with it, the authorization policy is passed the
-  :term:`context`, some number of :term:`principal` identifiers returned by the
-  authentication policy, and the :term:`permission` associated with the view;
-  it will allow or deny access.
+  :term:`permission` associated with it, the policy is passed the
+  :term:`context`, the current :term:`identity`, and the :term:`permission`
+  associated with the view; it will allow or deny access.
 
-- If the authorization policy allows access, the view callable is invoked.
+- If the security policy allows access, the view callable is invoked.
 
-- If the authorization policy denies access, the view callable is not invoked.
+- If the security policy denies access, the view callable is not invoked.
   Instead the :term:`forbidden view` is invoked.
 
-Authorization is enabled by modifying your application to include an
-:term:`authentication policy` and :term:`authorization policy`. :app:`Pyramid`
-comes with a variety of implementations of these policies.  To provide maximal
-flexibility, :app:`Pyramid` also allows you to create custom authentication
-policies and authorization policies.
+The security system is enabled by modifying your application to include a
+:term:`security policy`. :app:`Pyramid` comes with a variety of helpers to
+assist in the creation of this policy.
 
 .. index::
-   single: authorization policy
+   single: security policy
 
-.. _enabling_authorization_policy:
+.. _writing_security_policy:
 
-Enabling an Authorization Policy
---------------------------------
+Writing a Security Policy
+-------------------------
 
-:app:`Pyramid` does not enable any authorization policy by default.  All views
-are accessible by completely anonymous users.  In order to begin protecting
-views from execution based on security settings, you need to enable an
-authorization policy.
+:app:`Pyramid` does not enable any security policy by default.  All views are
+accessible by completely anonymous users.  In order to begin protecting views
+from execution based on security settings, you need to write a security policy.
 
-Enabling an Authorization Policy Imperatively
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Security policies are simple classes implementing a
+:class:`pyramid.interfaces.ISecurityPolicy`, defined as follows:
 
-Use the :meth:`~pyramid.config.Configurator.set_authorization_policy` method of
-the :class:`~pyramid.config.Configurator` to enable an authorization policy.
+.. autointerface:: pyramid.interfaces.ISecurityPolicy
+  :members:
 
-You must also enable an :term:`authentication policy` in order to enable the
-authorization policy.  This is because authorization, in general, depends upon
-authentication.  Use the
-:meth:`~pyramid.config.Configurator.set_authentication_policy` method during
-application setup to specify the authentication policy.
-
-For example:
+A simple security policy might look like the following:
 
 .. code-block:: python
     :linenos:
 
-    from pyramid.config import Configurator
-    from pyramid.authentication import AuthTktAuthenticationPolicy
-    from pyramid.authorization import ACLAuthorizationPolicy
-    authn_policy = AuthTktAuthenticationPolicy('seekrit', hashalg='sha512')
-    authz_policy = ACLAuthorizationPolicy()
-    config = Configurator()
-    config.set_authentication_policy(authn_policy)
-    config.set_authorization_policy(authz_policy)
+    from pyramid.security import Allowed
 
-.. note:: The ``authentication_policy`` and ``authorization_policy`` arguments
-   may also be passed to their respective methods mentioned above as
-   :term:`dotted Python name` values, each representing the dotted name path to
-   a suitable implementation global defined at Python module scope.
+    class SessionSecurityPolicy:
+        def identify(self, request):
+            """ Return the user ID stored in the session. """
+            return request.session.get('userid')
 
-The above configuration enables a policy which compares the value of an "auth
-ticket" cookie passed in the request's environment which contains a reference
-to a single :term:`userid`, and matches that userid's :term:`principals
-<principal>` against the principals present in any :term:`ACL` found in the
-resource tree when attempting to call some :term:`view`.
+        def permits(self, request, context, identity, permission):
+            """ Indiscriminately allow access to everything. """
+            return Allowed('User is signed in.')
 
-While it is possible to mix and match different authentication and
-authorization policies, it is an error to configure a Pyramid application with
-an authentication policy but without the authorization policy or vice versa. If
-you do this, you'll receive an error at application startup time.
+        def remember(request, userid, **kw):
+            request.session.get('userid')
+            return []
 
-.. seealso::
+        def forget(request):
+            del request.session['userid']
+            return []
 
-    See also the :mod:`pyramid.authorization` and :mod:`pyramid.authentication`
-    modules for alternative implementations of authorization and authentication
-    policies.
+Use the :meth:`~pyramid.config.Configurator.set_security_policy` method of
+the :class:`~pyramid.config.Configurator` to enforce the security policy on
+your application.
+
+Writing a Security Policy Using Helpers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To assist in writing common security policy, Pyramid provides several helpers.
+The following authentication helpers assist with implementing ``identity``,
+``remember``, and ``forget``.
+
+* :class:`pyramid.authentication.SessionAuthenticationHelper`
+
+* :class:`pyramid.authentication.AuthTktCookieHelper`
+
+The following authorization helper assists with implementing ``permits``.
+
+* :class:`pyramid.authorization.ACLHelper`
+
+For example, our above security policy can leverage these helpers like so:
+
+.. code-block:: python
+    :linenos:
+
+    from pyramid.security import Allowed
+    from pyramid.authentication import SessionAuthenticationHelper
+
+    class SessionSecurityPolicy:
+        def __init__(self):
+            self.helper = SessionAuthenticationHelper()
+
+        def identify(self, request):
+            """ Return the user ID stored in the session. """
+            return self.helper.identify(request)
+
+        def permits(self, request, context, identity, permission):
+            """ Indiscriminately allow access to everything. """
+            return Allowed('User is signed in.')
+
+        def remember(request, userid, **kw):
+            return self.helper.remember(request, userid, **kw)
+
+        def forget(request):
+            return self.helper.forget(request)
+
+Helpers are intended to be used with application-specific code, so perhaps your
+authentication also queries to database to ensure the identity is valid.
+
+.. code-block:: python
+    :linenos:
+
+        def identify(self, request):
+            """ Return the user ID stored in the session. """
+            user_id = self.helper.identify(request)
+            if validate_user_id(user_id):
+                return user_id
+            else:
+                return None
 
 .. index::
    single: permissions
@@ -165,11 +195,16 @@ performed via the ``@view_config`` decorator:
         pass
 
 As a result of any of these various view configuration statements, if an
-authorization policy is in place when the view callable is found during normal
-application operations, the requesting user will need to possess the ``add``
-permission against the :term:`context` resource in order to be able to invoke
-the ``blog_entry_add_view`` view.  If they do not, the :term:`Forbidden view`
-will be invoked.
+security policy is in place when the view callable is found during normal
+application operations, the security policy will be queried to see if the
+requesting user is allowed the ``add`` permission within the current
+:term:`context`.  If the policy allows access, ``blog_entry_add_view`` will be
+invoked.  If not, the :term:`Forbidden view` will be invoked.
+
+Allowing and Denying Access With a Security Policy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The security policy's ``permits`` function is queried 
 
 .. index::
    pair: permission; default

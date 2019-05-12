@@ -484,13 +484,18 @@ class IViewMapperFactory(Interface):
 
 class ISecurityPolicy(Interface):
     def identify(request):
-        """ Return an object identifying a trusted and verified user. """
+        """ Return an object identifying a trusted and verified user.  This
+        object may be anything, but should implement a ``__str__`` method for
+        logging and debugging purposes.
+
+        """
 
     def permits(request, context, identity, permission):
         """ Return an instance of :class:`pyramid.security.Allowed` if a user
         of the given identity is allowed the ``permission`` in the current
         ``context``, else return an instance of
         :class:`pyramid.security.Denied`.
+
         """
 
     def remember(request, userid, **kw):
