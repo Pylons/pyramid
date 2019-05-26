@@ -1142,6 +1142,7 @@ class SessionAuthenticationHelper:
         return []
 
     def identify(self, request):
+        """ Return the stored userid."""
         return request.session.get(self.userid_key)
 
 

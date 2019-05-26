@@ -3,10 +3,27 @@
 :mod:`pyramid.authentication`
 --------------------------------
 
-Authentication Policies
-~~~~~~~~~~~~~~~~~~~~~~~
+Helper Classes
+~~~~~~~~~~~~~~
 
 .. automodule:: pyramid.authentication
+
+  .. autoclass:: SessionAuthenticationHelper
+     :members:
+
+  .. autoclass:: AuthTktCookieHelper
+     :members:
+
+  .. autoclass:: HTTPBasicCredentials
+     :members:
+
+Helper Functions
+~~~~~~~~~~~~~~~~
+
+  .. autofunction:: extract_http_basic_credentials
+
+Authentication Policies
+~~~~~~~~~~~~~~~~~~~~~~~
 
   .. autoclass:: AuthTktAuthenticationPolicy
      :members:
@@ -27,17 +44,3 @@ Authentication Policies
   .. autoclass:: RepozeWho1AuthenticationPolicy
      :members:
      :inherited-members:
-
-Helper Classes
-~~~~~~~~~~~~~~
-
-  .. autoclass:: AuthTktCookieHelper
-     :members:
-
-  .. autoclass:: HTTPBasicCredentials
-     :members:
-
-Helper Functions
-~~~~~~~~~~~~~~~~
-
-  .. autofunction:: extract_http_basic_credentials
