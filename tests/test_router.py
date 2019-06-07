@@ -1561,7 +1561,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.body, b'foo')
 
-    def test_execution_policy_handles_exception(self):
+    def test_execution_policy_bubbles_exception(self):
         from pyramid.interfaces import IViewClassifier
         from pyramid.interfaces import IExceptionViewClassifier
         from pyramid.interfaces import IRequest
@@ -1591,8 +1591,7 @@ class TestRouter(unittest.TestCase):
         environ = self._makeEnviron(PATH_INFO='/archives/action1/article1')
         start_response = DummyStartResponse()
         router = self._makeOne()
-        result = router(environ, start_response)
-        self.assertEqual(result, ["Hello, world"])
+        self.assertRaises(Exception2, lambda: router(environ, start_response))
 
     def test_request_context_with_statement(self):
         from pyramid.threadlocal import get_current_request
