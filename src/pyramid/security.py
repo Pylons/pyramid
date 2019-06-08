@@ -360,7 +360,7 @@ class AuthenticationAPIMixin(object):
         if authn is not None:
             return authn.unauthenticated_userid(self)
         elif security is not None:
-            return security.identify(self)
+            return str(security.identify(self))
         else:
             return None
 
