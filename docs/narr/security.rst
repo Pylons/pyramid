@@ -300,8 +300,8 @@ When a default permission is registered:
 
 .. _assigning_acls:
 
-Implement ACL Authorization
----------------------------
+Implementing ACL Authorization
+------------------------------
 
 A common way to implement authorization is using an :term:`ACL`.  An ACL is a
 :term:`context`-specific list of access control entries, which allow or deny
