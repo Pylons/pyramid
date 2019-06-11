@@ -91,6 +91,10 @@ Backward Incompatibilities
   documentation for more information about why this change was made.
   See https://github.com/Pylons/pyramid/pull/3413
 
+- ``pyramid.request.Request.invoke_exception_view`` will no longer be called
+  by the default execution policy.
+  See https://github.com/Pylons/pyramid/pull/3496
+
 Documentation Changes
 ---------------------
 
