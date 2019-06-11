@@ -273,7 +273,4 @@ class Router(object):
 
 def default_execution_policy(environ, router):
     with router.request_context(environ) as request:
-        try:
-            return router.invoke_request(request)
-        except Exception:
-            return request.invoke_exception_view(reraise=True)
+        return router.invoke_request(request)
