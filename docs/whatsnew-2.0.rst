@@ -59,19 +59,23 @@ Pyramid does not provide any built-in security policies.  Similiar
 functionality of the authentication and authorization policies is now provided
 by helpers, which can be utilized to easily implement your own security policy.
 The functionality of the legacy authencation policies roughly correspond to the
-following helpers
+following helpers:
 
-* :class:`pyramid.authentication.SessionAuthenticationPolicy`:
-  :class:`pyramid.authentication.SessionAuthenticationHelper`
-* :class:`pyramid.authentication.AuthTktAuthenticationPolicy`:
-  :class:`pyramid.authentication.AuthTktCookieHelper`
-* :class:`pyramid.authentication.BasicAuthAuthenticationPolicy`:
-  Use :func:`pyramid.authentication.extract_http_basic_credentials` to retrieve
-  credentials.
-* :class:`pyramid.authentication.RemoteUserAuthenticationPolicy`:
-  ``REMOTE_USER`` can be accessed with ``request.environ.get('REMOTE_USER')``.
-* :class:`pyramid.authentication.RepozeWho1AuthenticationPolicy`:
-  No equivalent.
++----------------------------------------------------------------+-------------------------------------------------------------------+
+| Authentication Policy                                          | Security Policy Helper                                            |
++================================================================+===================================================================+
+| :class:`pyramid.authentication.SessionAuthenticationPolicy`    | :class:`pyramid.authentication.SessionAuthenticationHelper`       |
++----------------------------------------------------------------+-------------------------------------------------------------------+
+| :class:`pyramid.authentication.AuthTktAuthenticationPolicy`    | :class:`pyramid.authentication.AuthTktCookieHelper`               |
++----------------------------------------------------------------+-------------------------------------------------------------------+
+| :class:`pyramid.authentication.BasicAuthAuthenticationPolicy`  | Use :func:`pyramid.authentication.extract_http_basic_credentials` |
+|                                                                | to retrieve credentials.                                          |
++----------------------------------------------------------------+-------------------------------------------------------------------+
+| :class:`pyramid.authentication.RemoteUserAuthenticationPolicy` | ``REMOTE_USER`` can be accessed with                              |
+|                                                                | ``request.environ.get('REMOTE_USER')``.                           |
++----------------------------------------------------------------+-------------------------------------------------------------------+
+| :class:`pyramid.authentication.RepozeWho1AuthenticationPolicy` | No equivalent.                                                    |
++----------------------------------------------------------------+-------------------------------------------------------------------+
 
 For further documentation on implementing security policies, see
 :ref:`writing_security_policy`.
