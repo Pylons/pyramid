@@ -42,8 +42,9 @@ The new security policy should implement
 
 The new security policy merges ``unauthenticated_userid`` and
 ``authenticated_userid`` into an :term:`identity` object.  This object can be
-of any shape, such as a simple ID string or an ORM object, but should   The
-identity can be accessed via
+of any shape, such as a simple ID string or an ORM object, but should have a
+string representation (i.e. a ``__str__`` method) useful for debugging.
+The identity can be accessed via
 :attr:`pyramid.request.Request.authenticated_identity`.
 
 The concept of :term:`principals <principal>` has been removed; the
@@ -57,8 +58,8 @@ ACL, see :ref:`assigning_acls`.
 
 Pyramid does not provide any built-in security policies.  Similiar
 functionality of the authentication and authorization policies is now provided
-by helpers, which can be utilized to easily implement your own security policy.
-The functionality of the legacy authencation policies roughly correspond to the
+by helpers, which can be utilized to implement your own security policy.  The
+functionality of the legacy authentication policies roughly correspond to the
 following helpers:
 
 +----------------------------------------------------------------+-------------------------------------------------------------------+
