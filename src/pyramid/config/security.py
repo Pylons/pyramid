@@ -1,4 +1,5 @@
 from zope.interface import implementer
+from zope.deprecation import deprecate
 
 from pyramid.interfaces import (
     IAuthorizationPolicy,
@@ -56,6 +57,13 @@ class SecurityConfiguratorMixin(object):
             introspectables=(intr,),
         )
 
+    @deprecate(
+        'Authentication and authorization policies have been deprecated in '
+        'favor of security policies.  See '
+        'https://docs.pylonsproject.org/projects/pyramid/en/latest'
+        '/whatsnew-2.0.html#upgrading-authentication-authorization '
+        'for more information.'
+    )
     @action_method
     def set_authentication_policy(self, policy):
         """

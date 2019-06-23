@@ -1,4 +1,5 @@
 from zope.interface import implementer, providedBy
+from zope.deprecation import deprecated
 
 from pyramid.interfaces import (
     ISecurityPolicy,
@@ -135,6 +136,15 @@ def principals_allowed_by_permission(context, permission):
     if policy is None:
         return [Everyone]
     return policy.principals_allowed_by_permission(context, permission)
+
+
+deprecated(
+    'principals_allowed_by_permission',
+    'The new security policy has removed the concept of principals.  See '
+    'https://docs.pylonsproject.org/projects/pyramid/en/latest'
+    '/whatsnew-2.0.html#upgrading-authentication-authorization '
+    'for more information.',
+)
 
 
 def view_execution_permitted(context, request, name=''):
@@ -394,6 +404,14 @@ class AuthenticationAPIMixin(object):
         if policy is None:
             return [Everyone]
         return policy.effective_principals(self)
+
+    effective_principals = deprecated(
+        effective_principals,
+        'The new security policy has removed the concept of principals.  See '
+        'https://docs.pylonsproject.org/projects/pyramid/en/latest'
+        '/whatsnew-2.0.html#upgrading-authentication-authorization '
+        'for more information.',
+    )
 
 
 @implementer(ISecurityPolicy)
