@@ -1,9 +1,28 @@
-Upgrading to Pyramid 2.0
-========================
+What's New in Pyramid 2.0
+=========================
 
-Pyramid 2.0 is largely backwards compatible with the 1.x series, so minimal
-changes should be necessary.  However, some 1.x functionality has been
-deprecated and it is recommended to upgrade from the legacy systems.
+This article explains the new features in :app:`Pyramid` version 2.0 as
+compared to its predecessor, :app:`Pyramid` 1.10. It also documents backwards
+incompatibilities between the two versions and deprecations added to
+:app:`Pyramid` 2.0, as well as software dependency changes and notable
+documentation additions.
+
+Feature Additions
+-----------------
+
+The feature additions in Pyramid 2.0 are as follows:
+
+- The authentication and authorization policies of Pyramid 1.x have been merged
+  into a single :term:`security policy` in Pyramid 2.0.  For details on how to
+  migrate to the new security policy, see :ref:`upgrading_auth`.
+  Authentication and authorization policies can still be used and will continue
+  to function normally for the time being.
+
+Deprecations
+------------
+
+- Authentication and authorization policies have been deprecated in favor of
+  the new :term:`security policy`.
 
 .. _upgrading_auth:
 
@@ -17,7 +36,7 @@ normally, however they have been deprecated and support may be removed in
 upcoming versions.
 
 The new security policy should implement
-:interface:`pyramid.interfaces.ISecurityPolicy` and can be set via the
+:class:`pyramid.interfaces.ISecurityPolicy` and can be set via the
 ``security_policy`` argument of :class:`pyramid.config.Configurator` or
 :meth:`pyramid.config.Configurator.set_security_policy`.
 
@@ -25,7 +44,7 @@ The new security policy merges ``unauthenticated_userid`` and
 ``authenticated_userid`` into an :term:`identity` object.  This object can be
 of any shape, such as a simple ID string or an ORM object, but should   The
 identity can be accessed via
-:prop:`pyramid.request.Request.authenticated_identity`.
+:attr:`pyramid.request.Request.authenticated_identity`.
 
 The concept of :term:`principals <principal>` has been removed; the
 ``permits`` method is passed an identity object.  This change gives much more
@@ -57,18 +76,20 @@ following helpers
 For further documentation on implementing security policies, see
 :ref:`writing_security_policy`.
 
+.. _behavior_of_legacy_auth:
+
 Behavior of the Legacy System
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Legacy authentication and authorization policies will continue to function as
 normal, as well as all related :class:`pyramid.request.Request` properties.
-The new :prop:`pyramid.request.Request.authenticated_identity` property will
-output the same result as :prop:`pyramid.request.Request.authenticated_userid`.
+The new :attr:`pyramid.request.Request.authenticated_identity` property will
+output the same result as :attr:`pyramid.request.Request.authenticated_userid`.
 
 If using a security policy,
-:prop:`pyramid.request.Request.unauthenticated_userid` and
-:prop:`pyramid.request.Request.authenticated_userid` will both return the
+:attr:`pyramid.request.Request.unauthenticated_userid` and
+:attr:`pyramid.request.Request.authenticated_userid` will both return the
 string representation of the :term:`identity`.
-:prop:`pyramid.request.Request.effective_principals` will always return a
+:attr:`pyramid.request.Request.effective_principals` will always return a
 one-element list containing the :data:`pyramid.security.Everyone` principal, as
 there is no equivalent in the new security policy.
