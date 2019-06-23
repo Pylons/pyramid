@@ -107,7 +107,13 @@ def forget(request):
 
 
 def principals_allowed_by_permission(context, permission):
-    """ Provided a ``context`` (a resource object), and a ``permission``
+    """
+    .. deprecated:: 2.0
+
+        The new security policy has removed the concept of principals.  See
+        :ref:`upgrading_auth` for more information.
+
+    Provided a ``context`` (a resource object), and a ``permission``
     string, if an :term:`authorization policy` is
     in effect, return a sequence of :term:`principal` ids that possess
     the permission in the ``context``.  If no authorization policy is
@@ -322,13 +328,16 @@ class SecurityAPIMixin(object):
 class AuthenticationAPIMixin(object):
     @property
     def authenticated_userid(self):
-        """ Return the userid of the currently authenticated user or
-        ``None`` if there is no :term:`authentication policy` in effect or
-        there is no currently authenticated user.
-
+        """
         .. deprecated:: 2.0
 
-            Use ``request.identity`` instead.
+            ``authenticated_userid`` has been replaced by
+            :attr:`authenticated_identity` in the new security system.  See
+            :ref:`upgrading_auth` for more information.
+
+        Return the userid of the currently authenticated user or
+        ``None`` if there is no :term:`authentication policy` in effect or
+        there is no currently authenticated user.
 
         """
         authn = _get_authentication_policy(self)
@@ -342,17 +351,20 @@ class AuthenticationAPIMixin(object):
 
     @property
     def unauthenticated_userid(self):
-        """ Return an object which represents the *claimed* (not verified) user
+        """
+        .. deprecated:: 2.0
+
+            ``unauthenticated_userid`` has been replaced by
+            :attr:`authenticated_identity` in the new security system.  See
+            :ref:`upgrading_auth` for more information.
+
+        Return an object which represents the *claimed* (not verified) user
         id of the credentials present in the request. ``None`` if there is no
         :term:`authentication policy` in effect or there is no user data
         associated with the current request.  This differs from
         :attr:`~pyramid.request.Request.authenticated_userid`, because the
         effective authentication policy will not ensure that a record
         associated with the userid exists in persistent storage.
-
-        .. deprecated:: 2.0
-
-            Use ``request.identity`` instead.
 
         """
         authn = _get_authentication_policy(self)
@@ -366,12 +378,16 @@ class AuthenticationAPIMixin(object):
 
     @property
     def effective_principals(self):
-        """ Return the list of 'effective' :term:`principal` identifiers
+        """
+        .. deprecated:: 2.0
+
+            The new security policy has removed the concept of principals.  See
+            :ref:`upgrading_auth` for more information.
+
+        Return the list of 'effective' :term:`principal` identifiers
         for the ``request``. If no :term:`authentication policy` is in effect,
         this will return a one-element list containing the
         :data:`pyramid.security.Everyone` principal.
-
-        .. deprecated:: 2.0
 
         """
         policy = _get_authentication_policy(self)

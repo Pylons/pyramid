@@ -294,7 +294,8 @@ class EffectivePrincipalsPredicate(object):
     """
     .. deprecated:: 2.0
 
-        No longer applicable with the new :term:`security policy`.
+        The new security system has removed the concept of principals.  See
+        :ref:`upgrading_auth` for more information.
 
     """
 

@@ -144,12 +144,11 @@ class Configurator(
 
     If ``authentication_policy`` is passed, it should be an instance
     of an :term:`authentication policy` or a :term:`dotted Python
-    name` to the same.  (Deprecated as of Pyramid 2.0 in favor of
-    ``security_policy``.)
+    name` to the same.
 
     If ``authorization_policy`` is passed, it should be an instance of
     an :term:`authorization policy` or a :term:`dotted Python name` to
-    the same.  (Deprecated as of Pyramid 2.0 in favor of ``security_policy``.)
+    the same.
 
     .. note:: A ``ConfigurationError`` will be raised when an
        authorization policy is supplied without also supplying an
