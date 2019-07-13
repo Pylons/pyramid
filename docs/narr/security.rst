@@ -10,7 +10,7 @@ Security
 determines the identity of the current user (authentication) and whether or not
 the user has access to certain resources (authorization).
 
-The :app:`Pyramid` authorization system can prevent a :term:`view` from being
+The :app:`Pyramid` security system can prevent a :term:`view` from being
 invoked based on the :term:`security policy`. Before a view is invoked, the
 authorization system can use the credentials in the :term:`request` along with
 the :term:`context` resource to determine if access will be allowed.  Here's
@@ -107,17 +107,26 @@ your application.
 Writing a Security Policy Using Helpers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To assist in writing common security policy, Pyramid provides several helpers.
-The following authentication helpers assist with implementing ``identity``,
-``remember``, and ``forget``.
+To assist in writing common security policies, Pyramid provides several
+helpers.  The following authentication helpers assist with implementing
+``identity``, ``remember``, and ``forget``.
 
-* :class:`pyramid.authentication.SessionAuthenticationHelper`
-
-* :class:`pyramid.authentication.AuthTktCookieHelper`
-
-The following authorization helper assists with implementing ``permits``.
-
-* :class:`pyramid.authorization.ACLHelper`
++-------------------------------+-------------------------------------------------------------------+
+| Use Case                      | Helper                                                            |
++===============================+===================================================================+
+| Store the :term:`userid`      | :class:`pyramid.authentication.SessionAuthenticationHelper`       |
+| in the :term:`session`.       |                                                                   |
++-------------------------------+-------------------------------------------------------------------+
+| Store the :term:`userid`      | :class:`pyramid.authentication.AuthTktCookieHelper`               |
+| with an "auth ticket" cookie. |                                                                   |
++-------------------------------+-------------------------------------------------------------------+
+| Retrieve user credentials     | Use :func:`pyramid.authentication.extract_http_basic_credentials` |
+| using HTTP Basic Auth.        | to retrieve credentials.                                          |
++-------------------------------+-------------------------------------------------------------------+
+| Retrieve the :term:`userid`   | ``REMOTE_USER`` can be accessed with                              |
+| from ``REMOTE_USER`` in the   | ``request.environ.get('REMOTE_USER')``.                           |
+| WSGI environment.             |                                                                   |
++-------------------------------+-------------------------------------------------------------------+
 
 For example, our above security policy can leverage these helpers like so:
 
