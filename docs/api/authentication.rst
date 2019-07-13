@@ -14,16 +14,19 @@ Helper Classes
   .. autoclass:: AuthTktCookieHelper
      :members:
 
-  .. autoclass:: HTTPBasicCredentials
-     :members:
-
 Helper Functions
 ~~~~~~~~~~~~~~~~
 
   .. autofunction:: extract_http_basic_credentials
 
+  .. autoclass:: HTTPBasicCredentials
+     :members:
+
 Authentication Policies
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+Authentication policies have been deprecated by the new security system.  See
+:ref:`upgrading_auth` for more information.
 
   .. autoclass:: AuthTktAuthenticationPolicy
      :members:
