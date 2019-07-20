@@ -342,3 +342,5 @@ Contributors
 - Arijit Basu, 2019/02/19
 
 - Theron Luhn, 2019/03/30
+
+- Mandar Vaze, 2019/07/20
