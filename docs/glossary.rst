@@ -298,18 +298,14 @@ Glossary
      foo` and `group bar`.
 
    userid
-     A *userid* is a string used to identify and authenticate
-     a real-world user or client. A userid is supplied to an
-     :term:`authentication policy` in order to discover the user's
-     :term:`principals <principal>`. In the authentication policies which
-     :app:`Pyramid` provides, the default behavior returns the user's userid as
-     a principal, but this is not strictly necessary in custom policies that
-     define their principals differently.
+     A *userid* is the string representation of an :term:`identity`.  Just like
+     the identity, it should identify the user associated with the current
+     request.  Oftentimes this is the ID of the user object in a database.
 
    identity
      An identity is an object identify the user associated with the
      current request.  The identity can be any object, but should implement a
-     ``__str__`` method for logging and debugging purposes.
+     ``__str__`` method that outputs a corresponding :term:`userid`.
 
    security policy
      A security policy in :app:`Pyramid` terms is a bit of code which has an

@@ -40,12 +40,15 @@ The new security policy should implement
 ``security_policy`` argument of :class:`pyramid.config.Configurator` or
 :meth:`pyramid.config.Configurator.set_security_policy`.
 
-The new security policy merges ``unauthenticated_userid`` and
-``authenticated_userid`` into an :term:`identity` object.  This object can be
-of any shape, such as a simple ID string or an ORM object, but should have a
-string representation (i.e. a ``__str__`` method) useful for debugging.
-The identity can be accessed via
-:attr:`pyramid.request.Request.authenticated_identity`.
+The new security policy adds the concept of an :term:`identity`, which is an
+object representing the user associated with the current request.  The identity
+can be accessed via :attr:`pyramid.request.Request.authenticated_identity`.
+The object can be of any shape, such as a simple ID string or an ORM object,
+but should implement a ``__str__`` method that outputs a string identifying the
+current user, e.g. the ID of the user object in a database.  The string
+representation is return as
+:attr:`pyramid.request.Request.authenticated_userid`.
+(:attr:`pyramid.request.Request.unauthenticated_userid` has been deprecated.)
 
 The concept of :term:`principals <principal>` has been removed; the
 ``permits`` method is passed an identity object.  This change gives much more

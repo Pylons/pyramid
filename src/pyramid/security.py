@@ -306,6 +306,28 @@ class SecurityAPIMixin(object):
             return None
         return policy.identify(self)
 
+    @property
+    def authenticated_userid(self):
+        """
+        Return the :term:`userid` of the currently authenticated user or
+        ``None`` if there is no :term:`security policy` in effect or there is
+        no currently authenticated user.
+
+        .. versionchanged:: 2.0
+
+            When using the new security system, this property outputs the
+            string representation of the :term:`identity`.
+
+        """
+        authn = _get_authentication_policy(self)
+        security = _get_security_policy(self)
+        if authn is not None:
+            return authn.authenticated_userid(self)
+        elif security is not None:
+            return str(security.identify(self))
+        else:
+            return None
+
     def has_permission(self, permission, context=None):
         """ Given a permission and an optional context, returns an instance of
         :data:`pyramid.security.Allowed` if the permission is granted to this
@@ -337,36 +359,14 @@ class SecurityAPIMixin(object):
 
 class AuthenticationAPIMixin(object):
     @property
-    def authenticated_userid(self):
-        """
-        .. deprecated:: 2.0
-
-            ``authenticated_userid`` has been replaced by
-            :attr:`authenticated_identity` in the new security system.  See
-            :ref:`upgrading_auth` for more information.
-
-        Return the userid of the currently authenticated user or
-        ``None`` if there is no :term:`authentication policy` in effect or
-        there is no currently authenticated user.
-
-        """
-        authn = _get_authentication_policy(self)
-        security = _get_security_policy(self)
-        if authn is not None:
-            return authn.authenticated_userid(self)
-        elif security is not None:
-            return str(security.identify(self))
-        else:
-            return None
-
-    @property
     def unauthenticated_userid(self):
         """
         .. deprecated:: 2.0
 
-            ``unauthenticated_userid`` has been replaced by
-            :attr:`authenticated_identity` in the new security system.  See
-            :ref:`upgrading_auth` for more information.
+            ``unauthenticated_userid`` does not have an equivalent in the new
+            security system.  Use :attr:`.authenticated_userid` or
+            :attr:`.identity` instead.  See :ref:`upgrading_auth` for more
+            information.
 
         Return an object which represents the *claimed* (not verified) user
         id of the credentials present in the request. ``None`` if there is no

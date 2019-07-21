@@ -485,8 +485,8 @@ class IViewMapperFactory(Interface):
 class ISecurityPolicy(Interface):
     def identify(request):
         """ Return an object identifying a trusted and verified user.  This
-        object may be anything, but should implement a ``__str__`` method for
-        logging and debugging purposes.
+        object may be anything, but should implement a ``__str__`` method that
+        outputs a corresponding :term:`userid`.
 
         """
 
