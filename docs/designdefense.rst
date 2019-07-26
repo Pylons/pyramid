@@ -988,7 +988,7 @@ the following:
   traverses by registering one or more adapters.  As a result of being able
   to either replace the larger component entirely or turn knobs on the
   default implementation of the larger component, no one understands when (or
-  whether) they should ever override the larger component entrirely.  This
+  whether) they should ever override the larger component entirely.  This
   results, over time, in a rusting together of the larger "replaceable"
   component and the framework itself because people come to depend on the
   availability of the default component in order just to turn its knobs. The

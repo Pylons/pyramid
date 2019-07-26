@@ -227,7 +227,7 @@ class TestDummyRequest(unittest.TestCase):
         self.assertEqual(request.method, 'POST')
         self.assertEqual(request.POST, POST)
         # N.B.:  Unlike a normal request, passing 'post' should *not* put
-        #        explict POST data into params: doing so masks a possible
+        #        explicit POST data into params: doing so masks a possible
         #        XSS bug in the app.  Tests for apps which don't care about
         #        the distinction should just use 'params'.
         self.assertEqual(request.params, {})
