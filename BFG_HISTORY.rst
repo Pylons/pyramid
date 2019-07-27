@@ -574,7 +574,7 @@ Features
   will be the exception object).
 
 Documentation
---------------
+-------------
 
 - Expanded the "Cleaning Up After a Request" section of the URL
   Dispatch narrative chapter.
@@ -642,7 +642,7 @@ Backwards Incompatibilities
   depended upon may no longer happen.
 
 Documentation
---------------
+-------------
 
 - Added description of the ``repoze.bfg.events.subscriber`` decorator
   to the Events narrative chapter.
@@ -917,7 +917,7 @@ Documentation
   the exceptions chapter of the API documentation.
 
 Backwards Incompatibilities
-----------------------------
+---------------------------
 
 - in previous releases, when a URL could not be decoded from UTF-8
   during traversal, a ``TypeError`` was raised.  Now the error which
@@ -1671,7 +1671,7 @@ Internal
   function was never an API.
 
 Documentation
-------------
+-------------
 
 - Doc-deprecated most helper functions in the ``repoze.bfg.testing``
   module.  These helper functions likely won't be removed any time
@@ -2132,7 +2132,7 @@ Internals
   registry from the threadlocal API.
 
 Backwards Incompatibilities
---------------------------
+---------------------------
 
 - Unit tests which use ``zope.testing.cleanup.cleanUp`` for the
   purpose of isolating tests from one another may now begin to fail
