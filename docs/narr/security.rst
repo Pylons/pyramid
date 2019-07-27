@@ -772,7 +772,7 @@ Preventing Cross-Site Request Forgery Attacks
 
 `Cross-site request forgery
 <https://en.wikipedia.org/wiki/Cross-site_request_forgery>`_ attacks are a
-phenomenon whereby a user who is logged in to your website might inadvertantly
+phenomenon whereby a user who is logged in to your website might inadvertently
 load a URL because it is linked from, or embedded in, an attacker's website.
 If the URL is one that may modify or delete data, the consequences can be dire.
 

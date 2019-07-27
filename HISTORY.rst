@@ -123,7 +123,7 @@ Bug Fixes
 Deprecations
 ------------
 
-- The ``pyramid.intefaces.ISession`` interface will move to require
+- The ``pyramid.interfaces.ISession`` interface will move to require
   JSON-serializable objects in Pyramid 2.0. See
   "Upcoming Changes to ISession in Pyramid 2.0" in the "Sessions" chapter
   of the documentation for more information about this change.
@@ -1066,7 +1066,7 @@ Bug Fixes
 
 - ``pshell`` will now preserve the capitalization of variables in the
   ``[pshell]`` section of the INI file. This makes exposing classes to the
-  shell a little more straightfoward.
+  shell a little more straightforward.
   See https://github.com/Pylons/pyramid/pull/1883
 
 - Fixed usage of ``pserve --monitor-restart --daemon`` which would fail in
@@ -1218,7 +1218,7 @@ Features
 - ``pserve`` can now take a ``-b`` or ``--browser`` option to open the server
   URL in a web browser. See https://github.com/Pylons/pyramid/pull/1533
 
-- Overall improvments for the ``proutes`` command. Added ``--format`` and
+- Overall improvements for the ``proutes`` command. Added ``--format`` and
   ``--glob`` arguments to the command, introduced the ``method``
   column for displaying available request methods, and improved the ``view``
   output by showing the module instead of just ``__repr__``.
@@ -1774,7 +1774,7 @@ Backwards Incompatibilities
   since Pyramid 1.1.  Use methods of ``request.environ`` (a real dictionary)
   instead.
 
-- Removed ancient backwards compatibily hack in
+- Removed ancient backwards compatibility hack in
   ``pyramid.traversal.DefaultRootFactory`` which populated the ``__dict__`` of
   the factory with the matchdict values for compatibility with BFG 0.9.
 
@@ -2432,7 +2432,7 @@ Features
   whole-path match.  It's useful when you want to always potentially show a
   view when some object is traversed to, but you can't be sure about what kind
   of object it will be, so you can't use the ``context`` predicate.  The
-  individual path elements inbetween slash characters or in tuple elements
+  individual path elements in between slash characters or in tuple elements
   should be the Unicode representation of the name of the resource and should
   not be encoded in any way.
 
@@ -2501,7 +2501,7 @@ Bug Fixes
   https://github.com/Pylons/pyramid/pull/620
 
 - Forward-port from 1.3 branch: when registering multiple views with an
-  ``accept`` predicate in a Pyramid application runing under Python 3, you
+  ``accept`` predicate in a Pyramid application running under Python 3, you
   might have received a ``TypeError: unorderable types: function() <
   function()`` exception.
 
@@ -3873,7 +3873,7 @@ Backwards Incompatibilities
     config.add_view('my.pkg.someview', route_name='foo')
 
   This won't effect "normal" users, only people who have legacy BFG codebases
-  that used an autommitting configurator and possibly tests that use the
+  that used an autocommitting configurator and possibly tests that use the
   configurator API (the configurator returned by ``pyramid.testing.setUp`` is
   an autocommitting configurator).  The right way to get around this is to
   use a non-autocommitting configurator (the default), which does not have
@@ -4400,7 +4400,7 @@ Documentation
 
 - The term "template" used to refer to both "paster templates" and "rendered
   templates" (templates created by a rendering engine.  i.e. Mako, Chameleon,
-  Jinja, etc.).  "Paster templates" will now be refered to as "scaffolds",
+  Jinja, etc.).  "Paster templates" will now be referred to as "scaffolds",
   whereas the name for "rendered templates" will remain as "templates."
 
 - The ``wiki`` (ZODB+Traversal) tutorial was updated slightly.
@@ -4973,7 +4973,7 @@ Backwards Incompatibilities
   react to ``403 Forbidden``.
 
 - The default value for the ``cookie_on_exception`` parameter to
-  ``pyramid.session.UnencyrptedCookieSessionFactory`` is now ``True``.  This
+  ``pyramid.session.UnencryptedCookieSessionFactory`` is now ``True``.  This
   means that when view code causes an exception to be raised, and the session
   has been mutated, a cookie will be sent back in the response.  Previously
   its default value was ``False``.
@@ -5427,7 +5427,7 @@ Terminology Changes
 Bug Fixes
 ---------
 
-- Make it possible to succesfully run all tests via ``nosetests`` command
+- Make it possible to successfully run all tests via ``nosetests`` command
   directly (rather than indirectly via ``python setup.py nosetests``).
 
 - When a configuration conflict is encountered during scanning, the conflict
@@ -5534,7 +5534,7 @@ Features
 
 - The ``pyramid.testing.setUp`` function now accepts an ``autocommit``
   keyword argument, which defaults to ``True``.  If it is passed ``False``,
-  the Config object returned by ``setUp`` will be a non-autocommiting Config
+  the Config object returned by ``setUp`` will be a non-autocommitting Config
   object.
 
 - Add logging configuration to all paster templates.

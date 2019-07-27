@@ -103,7 +103,7 @@ a newer Pyramid release is always to read the :ref:`changelog` to find the
 deprecations and removals for each release between the release you're currently
 running and the one to which you wish to upgrade.  The change history notes
 every deprecation within a ``Deprecation`` section and every removal within a
-``Backwards Incompatibilies`` section for each release.
+``Backwards Incompatibilities`` section for each release.
 
 The change history often contains instructions for changing your code to avoid
 deprecation warnings and how to change docs-deprecated spellings to newer ones.

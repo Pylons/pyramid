@@ -232,7 +232,7 @@ Backwards Incompatibilities
      config.add_view('my.pkg.someview', route_name='foo')
 
   This won't effect "normal" users, only people who have legacy BFG codebases
-  that used an autommitting configurator and possibly tests that use the
+  that used an autocommitting configurator and possibly tests that use the
   configurator API (the configurator returned by
   :func:`pyramid.testing.setUp` is an autocommitting configurator).  The
   right way to get around this is to use a default non-autocommitting

@@ -751,7 +751,7 @@ class ViewsConfiguratorMixin(object):
           It's useful when you want to always potentially show a view when some
           object is traversed to, but you can't be sure about what kind of
           object it will be, so you can't use the ``context`` predicate.  The
-          individual path elements inbetween slash characters or in tuple
+          individual path elements in between slash characters or in tuple
           elements should be the Unicode representation of the name of the
           resource and should not be encoded in any way.
 

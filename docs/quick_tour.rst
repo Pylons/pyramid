@@ -95,7 +95,7 @@ explanation:
 As shown in this example, the :term:`configurator` plays a central role in
 Pyramid development. Building an application from loosely-coupled parts via
 :doc:`../narr/configuration` is a central idea in Pyramid, one that we will
-revisit regurlarly in this *Quick Tour*.
+revisit regularly in this *Quick Tour*.
 
 .. seealso:: See also:
    :ref:`Quick Tutorial Hello World <qtut_hello_world>`,
