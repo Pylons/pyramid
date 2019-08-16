@@ -84,7 +84,7 @@ Speaking of the :app:`Pyramid` structured :meth:`~pyramid.config.Configurator.in
 If you need, you can extend or override the configuration of an existing application by including its configuration in your own and then modifying it.
 
 
-For example, if you want to reuse an existing application that already has a bunch of routes, you can just use the ``include`` statement with a ``route_prefix``. All the routes of that application will be availabe, prefixed as you requested:
+For example, if you want to reuse an existing application that already has a bunch of routes, you can just use the ``include`` statement with a ``route_prefix``. All the routes of that application will be available, prefixed as you requested:
 
 .. code-block:: python
     :linenos:
