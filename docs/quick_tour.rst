@@ -337,7 +337,7 @@ passed the view response through the ``pyramid_jinja2`` renderer.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Jinja2 <qtut_jinja2>`, `Jinja2 homepage
-    <http://jinja.pocoo.org/>`_, and :ref:`pyramid_jinja2 Overview
+    <https://palletsprojects.com/p/jinja/>`_, and :ref:`pyramid_jinja2 Overview
     <jinja2:overview>`.
 
 

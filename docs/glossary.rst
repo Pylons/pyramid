@@ -38,9 +38,9 @@ Glossary
      "Repoze" is essentially a "brand" of software developed by `Agendaless
      Consulting <https://agendaless.com>`_ and a set of contributors.  The
      term has no special intrinsic meaning.  The project's `website
-     <http://repoze.org>`_ has more information.  The software developed
+     <https://web.archive.org/web/20190127155548/http://repoze.org/>`_ has more information.  The software developed
      "under the brand" is available in a `Subversion repository
-     <http://svn.repoze.org>`_.  Pyramid was originally known as
+     <https://web.archive.org/web/20190103024221/http://svn.repoze.org/>`_.  Pyramid was originally known as
      :mod:`repoze.bfg`.
 
    Setuptools
@@ -337,7 +337,7 @@ Glossary
      server, a WSGI application, with a set of :term:`middleware` in-between.
 
    Zope
-     `The Z Object Publishing Framework <http://www.zope.org/en/latest/>`_, a
+     `The Z Object Publishing Framework <https://www.zope.org/>`_, a
      full-featured Python web framework.
 
    Grok
@@ -382,12 +382,12 @@ Glossary
      the box in ZPT and text flavors.
 
    ZPT
-     The `Zope Page Template <https://zope.readthedocs.io/en/latest/zope2book/ZPT.html>`_
+     The `Zope Page Template <https://zope.readthedocs.io/en/latest/zopebook/ZPT.html>`_
      templating language.
 
    METAL
      `Macro Expansion for TAL
-     <https://zope.readthedocs.io/en/latest/zope2book/AppendixC.html#metal-overview>`_, a
+     <https://zope.readthedocs.io/en/latest/zopebook/AppendixC.html#metal-overview>`_, a
      part of :term:`ZPT` which makes it possible to share common look and feel
      between templates.
 
@@ -396,7 +396,7 @@ Glossary
      by Christopher Lenz.
 
    Jinja2
-     A `text templating language <http://jinja.pocoo.org/>`_ by Armin Ronacher.
+     A `text templating language <https://palletsprojects.com/p/jinja/>`_ by Armin Ronacher.
 
    Routes
      A `system by Ben Bangert <https://routes.readthedocs.io/en/latest/>`_
@@ -488,13 +488,13 @@ Glossary
 
    repoze.lemonade
      Zope2 CMF-like `data structures and helper facilities
-     <http://docs.repoze.org/lemonade>`_ for CA-and-ZODB-based
+     <https://web.archive.org/web/20180903140246/http://docs.repoze.org/lemonade/>`_ for CA-and-ZODB-based
      applications useful within :app:`Pyramid` applications.
 
    repoze.catalog
      An indexing and search facility (fielded and full-text) based on
      `zope.index <https://pypi.org/project/zope.index/>`_.  See `the
-     documentation <http://docs.repoze.org/catalog>`_ for more
+     documentation <https://web.archive.org/web/20181214215757/http://docs.repoze.org/catalog/>`_ for more
      information.
 
    repoze.who
@@ -504,7 +504,7 @@ Glossary
 
    repoze.workflow
      `Barebones workflow for Python apps
-     <http://docs.repoze.org/workflow>`_ .  It can be used by
+     <https://web.archive.org/web/20181117003329/http://docs.repoze.org/workflow/>`_ .  It can be used by
      :app:`Pyramid` to form a workflow system.
 
    virtual root
@@ -717,7 +717,7 @@ Glossary
          See also `Agendaless Consulting <https://agendaless.com>`_.
 
    Jython
-     A `Python implementation <http://www.jython.org/>`_ written for
+     A `Python implementation <https://www.jython.org/>`_ written for
      the Java Virtual Machine.
 
    Python

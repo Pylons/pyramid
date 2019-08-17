@@ -452,7 +452,7 @@ templating languages including the following:
 .. _pyramid_chameleon:
    https://docs.pylonsproject.org/projects/pyramid-chameleon/en/latest/
 
-.. _Jinja2: http://jinja.pocoo.org/docs/dev/
+.. _Jinja2: https://jinja.palletsprojects.com/en/2.10.x/
 .. _pyramid_jinja2:
    https://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
 
