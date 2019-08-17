@@ -98,7 +98,7 @@ class CookieCSRFStoragePolicy(object):
     """ An alternative CSRF implementation that stores its information in
     unauthenticated cookies, known as the 'Double Submit Cookie' method in the
     `OWASP CSRF guidelines
-     <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie>`_.
+    <https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie>`_.
     This gives some additional flexibility with
     regards to scaling as the tokens can be generated and verified by a
     front-end server.
