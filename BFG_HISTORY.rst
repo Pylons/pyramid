@@ -390,7 +390,7 @@ Bug Fixes
 - The route pattern registered internally for a local "static view"
   (either via the ``static`` ZCML directive or via the
   ``add_static_view`` method of the configurator) was incorrect.  It
-  was regsistered for e.g. ``static*traverse``, while it should have
+  was registered for e.g. ``static*traverse``, while it should have
   been registered for ``static/*traverse``.  Symptom: two static views
   could not reliably be added to a system when they both shared the
   same path prefix (e.g. ``/static`` and ``/static2``).
@@ -450,7 +450,7 @@ Features
   constructor argument set to the value passed to ``with_package``.
   This feature will make it easier for future BFG versions to allow
   dotted names as arguments in places where currently only object
-  references are allowed (the work to allow dotted names isntead of
+  references are allowed (the work to allow dotted names instead of
   object references everywhere has not yet been done, however).
 
 - The new ``repoze.bfg.configuration.Configurator.maybe_dotted``
@@ -479,7 +479,7 @@ Backwards Incompatibilities
   The ``request`` argument is still a keyword argument, however.
 
 - The functions in ``repoze.bfg.renderers`` named ``render`` and
-  ``render_to_response`` now accept an additonal keyword argument
+  ``render_to_response`` now accept an additional keyword argument
   named ``package``.
 
 - The ``get_renderer`` API in ``repoze.bfg.renderers`` now accepts a
@@ -516,7 +516,7 @@ Internal
 
 - Use ``imp.get_suffixes`` indirection in
   ``repoze.bfg.path.package_name`` instead of hardcoded ``.py``
-  ``.pyc`` and ``.pyo`` to use for comparison when attemtping to
+  ``.pyc`` and ``.pyo`` to use for comparison when attempting to
   decide if a directory is a package.
 
 - Make tests runnable again under Jython (although they do not all
@@ -574,7 +574,7 @@ Features
   will be the exception object).
 
 Documentation
---------------
+-------------
 
 - Expanded the "Cleaning Up After a Request" section of the URL
   Dispatch narrative chapter.
@@ -642,7 +642,7 @@ Backwards Incompatibilities
   depended upon may no longer happen.
 
 Documentation
---------------
+-------------
 
 - Added description of the ``repoze.bfg.events.subscriber`` decorator
   to the Events narrative chapter.
@@ -917,7 +917,7 @@ Documentation
   the exceptions chapter of the API documentation.
 
 Backwards Incompatibilities
-----------------------------
+---------------------------
 
 - in previous releases, when a URL could not be decoded from UTF-8
   during traversal, a ``TypeError`` was raised.  Now the error which
@@ -1207,7 +1207,7 @@ Internal
 --------
 
 - View registrations and lookups are now done with three "requires"
-  arguments instead of two to accomodate orthogonality of exception
+  arguments instead of two to accommodate orthogonality of exception
   views.
 
 - The ``repoze.bfg.interfaces.IForbiddenView`` and
@@ -1670,8 +1670,8 @@ Internal
 - Remove the ``repoze.bfg.testing.registerTraverser`` function.  This
   function was never an API.
 
-Documenation
-------------
+Documentation
+-------------
 
 - Doc-deprecated most helper functions in the ``repoze.bfg.testing``
   module.  These helper functions likely won't be removed any time
@@ -1892,7 +1892,7 @@ Features
   of a package nor the use of non-imperative configuration is required
   to create a simple ``repoze.bfg`` application any longer.
 
-  Imperative configuration makes ``repoze.bfg`` competetive with
+  Imperative configuration makes ``repoze.bfg`` competitive with
   "microframeworks" such as `Bottle <http://bottle.paws.de/>`_ and
   `Tornado <http://www.tornadoweb.org/>`_.  ``repoze.bfg`` has a good
   deal of functionality that most microframeworks lack, so this is
@@ -2131,8 +2131,8 @@ Internals
   current ``repoze.bfg`` registry.  They fall back to obtaining the
   registry from the threadlocal API.
 
-Backwards Incompatibilites
---------------------------
+Backwards Incompatibilities
+---------------------------
 
 - Unit tests which use ``zope.testing.cleanup.cleanUp`` for the
   purpose of isolating tests from one another may now begin to fail
@@ -2323,7 +2323,7 @@ Deprecations
   the paster templates, code samples, and documentation now make
   reference to ``settings`` rather than ``options``.  This
   change/deprecation was mainly made for purposes of clarity and
-  symmetry with the ``get_settings()`` API and dicussions of
+  symmetry with the ``get_settings()`` API and discussions of
   "settings" in various places in the docs: we want to use the same
   name to refer to the same thing everywhere.
 
@@ -2866,7 +2866,7 @@ Features
   e.g. ``repoze.bfg.url.route_url`` in unit tests.
 
 - The ``notfound`` and ``forbidden`` ZCML directives now accept the
-  following addtional attributes: ``attr``, ``renderer``, and
+  following additional attributes: ``attr``, ``renderer``, and
   ``wrapper``.  These have the same meaning as they do in the context
   of a ZCML ``view`` directive.
 
@@ -3214,7 +3214,7 @@ Features
   ``view_permission``.  Any attribute which starts with ``view_`` can
   now be spelled without the ``view_`` prefix, so ``view_for`` can be
   spelled as ``for`` now, etc.  Both forms are documented in the
-  urldispatch narraitve documentation chapter.
+  urldispatch narrative documentation chapter.
 
 - The ``request_param`` ZCML view directive attribute (and its
   ``bfg_view`` decorator cousin) can now specify both a key and a
@@ -3498,7 +3498,7 @@ Deprecations
   ``remoteuserauthenticationpolicy`` and
   ``authtktauthenticationpolicy``) and the `aclauthorizationpolicy``
   authorization policy directive as described in the changes to the
-  "Security" narrative documenation chapter and the wiki tutorials.
+  "Security" narrative documentation chapter and the wiki tutorials.
 
 Features
 --------
@@ -3800,7 +3800,7 @@ Backwards Incompatibilities
   authentication policies named ``RepozeWho1AuthenticationPolicy``,
   ``RemoteUserAuthenticationPolicy``, and
   ``AuthTktAuthenticationPolicy`` now must accept two positional
-  arguments: the orginal argument accepted by each (userid or
+  arguments: the original argument accepted by each (userid or
   identity) plus a second argument, which will be the current request.
   Apologies, this is required to service finding groups when there is
   no "global" database connection.
@@ -3894,7 +3894,7 @@ Features
   defined ``route`` statement.  When it is specified, the view will
   only be called when that route matches during a request.
 
-- It is now possible to perfom traversal *after* a route has matched.
+- It is now possible to perform traversal *after* a route has matched.
   Use the pattern ``*traverse`` in a ``<route>`` ``path`` attribute
   within ZCML, and the path remainder which it matches will be used as
   a traversal path.
@@ -5077,7 +5077,7 @@ Backwards Incompatibilities
   e.g. ``/foo /bar``.  Now it returns a string, where each segment is
   a UTF-8 encoded and URL-quoted element e.g. ``/foo%20/bar``.  This
   change was (as discussed briefly on the repoze-dev maillist)
-  necessary to accomodate model objects which themselves have
+  necessary to accommodate model objects which themselves have
   ``__name__`` attributes that contain the ``/`` character.
 
   For people that have no models that have high-order Unicode
@@ -5720,7 +5720,7 @@ Backwards Incompatibilities
   will contain UTF-8 encoded path segments as necessary, so any URL
   generated by BFG itself will be decodeable by the traverser.  If another
   application generates URLs to a BFG application, to be resolved
-  successully, it should generate the URL with UTF-8 encoded path segments
+  successfully, it should generate the URL with UTF-8 encoded path segments
   to be successfully resolved.  The decoder is not at all magical: if a
   non-UTF-8-decodeable path segment (e.g. one encoded using UTF-16 or some
   other insanity) is passed in the URL, BFG will raise a ``TypeError`` with
@@ -5774,7 +5774,7 @@ Features
   ``testing.registerDummyRenderer`` is used, it instead registers a dummy
   implementation using ``ITemplateRenderer`` interface, which is checked
   for when the built-in templating facilities do rendering.  This change
-  also allows developers to make explcit named utility registrations in
+  also allows developers to make explicit named utility registrations in
   the ZCML registry against ``ITemplateRenderer``; these will be found
   before any on-disk template is looked up.
 

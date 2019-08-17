@@ -18,7 +18,7 @@ class PRequestCommand(object):
     description = """\
     Submit a HTTP request to a web application.
 
-    This command makes an artifical request to a web application that uses a
+    This command makes an artificial request to a web application that uses a
     PasteDeploy (.ini) configuration file for the server and application.
 
     Use "prequest config.ini /path" to request "/path".

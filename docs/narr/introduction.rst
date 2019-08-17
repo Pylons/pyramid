@@ -245,7 +245,7 @@ When you use a :term:`renderer` with your view callable, you are freed from need
 
 .. index::
    pair: renderer; explicitly calling
-   pair: view renderer; explictly calling
+   pair: view renderer; explicitly calling
 
 .. _example_render_to_response_call:
 

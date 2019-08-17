@@ -115,7 +115,7 @@ In addition, the system that handles authentication and authorization is flexibl
 Build Trees of Resources
 ------------------------
 
-:app:`Pyramid` supports :term:`traversal`, a way of mapping URLs to a concrete :term:`resource tree`. If your application naturally consists of an arbitrary heirarchy of different types of content (like a CMS or a Document Management System), traversal is for you. If you have a requirement for a highly granular security model ("Jane can edit documents in *this* folder, but not *that* one"), traversal can be a powerful approach.
+:app:`Pyramid` supports :term:`traversal`, a way of mapping URLs to a concrete :term:`resource tree`. If your application naturally consists of an arbitrary hierarchy of different types of content (like a CMS or a Document Management System), traversal is for you. If you have a requirement for a highly granular security model ("Jane can edit documents in *this* folder, but not *that* one"), traversal can be a powerful approach.
 
 .. seealso::
 

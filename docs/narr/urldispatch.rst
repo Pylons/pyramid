@@ -513,7 +513,7 @@ When the ``/site/{id}`` route pattern matches during a request, the
 When this route matches, a ``matchdict`` will be generated and attached to the
 request as ``request.matchdict``.  If the specific URL matched is ``/site/1``,
 the ``matchdict`` will be a dictionary with a single key, ``id``; the value
-will be the string ``'1'``, ex.: ``{'id':'1'}``.
+will be the string ``'1'``, ex.: ``{'id': '1'}``.
 
 The ``mypackage.views`` module referred to above might look like so:
 
@@ -581,17 +581,17 @@ forms:
 - When a URL matches the pattern ``/ideas/{idea}``, the view callable
   available at the dotted Python pathname ``mypackage.views.idea_view`` will
   be called.  For the specific URL ``/ideas/1``, the ``matchdict`` generated
-  and attached to the :term:`request` will consist of ``{'idea':'1'}``.
+  and attached to the :term:`request` will consist of ``{'idea': '1'}``.
 
 - When a URL matches the pattern ``/users/{user}``, the view callable
   available at the dotted Python pathname ``mypackage.views.user_view`` will be
   called.  For the specific URL ``/users/1``, the ``matchdict`` generated and
-  attached to the :term:`request` will consist of ``{'user':'1'}``.
+  attached to the :term:`request` will consist of ``{'user': '1'}``.
 
 - When a URL matches the pattern ``/tags/{tag}``, the view callable available
   at the dotted Python pathname ``mypackage.views.tag_view`` will be called.
   For the specific URL ``/tags/1``, the ``matchdict`` generated and attached to
-  the :term:`request` will consist of ``{'tag':'1'}``.
+  the :term:`request` will consist of ``{'tag': '1'}``.
 
 In this example we've again associated each of our routes with a :term:`view
 callable` directly.  In all cases, the request, which will have a ``matchdict``
@@ -971,7 +971,7 @@ application from small and potentially reusable components.
 The :meth:`pyramid.config.Configurator.include` method accepts an argument
 named ``route_prefix`` which can be useful to authors of URL-dispatch-based
 applications.  If ``route_prefix`` is supplied to the include method, it must
-be a string.  This string represents a route prefix that will be prepended to
+be a string.  This string represents a :term:`route prefix` that will be prepended to
 all route patterns added by the *included* configuration.  Any calls to
 :meth:`pyramid.config.Configurator.add_route` within the included callable will
 have their pattern prefixed with the value of ``route_prefix``. This can be

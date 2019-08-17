@@ -71,7 +71,7 @@ class TweensConfiguratorMixin(object):
 
         If all options for ``under`` (or ``over``) cannot be found in the
         current configuration, it is an error. If some options are specified
-        purely for compatibilty with other tweens, just add a fallback of
+        purely for compatibility with other tweens, just add a fallback of
         MAIN or INGRESS. For example, ``under=('mypkg.someothertween',
         'mypkg.someothertween2', INGRESS)``.  This constraint will require
         the tween to be located under both the 'mypkg.someothertween' tween,

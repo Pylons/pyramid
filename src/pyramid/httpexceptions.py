@@ -368,7 +368,7 @@ class HTTPRedirection(HTTPException):
 
     This is an abstract base class for 3xx redirection.  It indicates
     that further action needs to be taken by the user agent in order
-    to fulfill the request.  It does not necessarly signal an error
+    to fulfill the request.  It does not necessarily signal an error
     condition.
     """
 
@@ -1041,7 +1041,7 @@ class HTTPExpectationFailed(HTTPClientError):
     """
     subclass of :class:`~HTTPClientError`
 
-    This indidcates that the expectation given in an Expect
+    This indicates that the expectation given in an Expect
     request-header field could not be met by this server.
 
     code: 417, title: Expectation Failed

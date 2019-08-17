@@ -456,6 +456,6 @@ templating languages including the following:
 .. _pyramid_jinja2:
    https://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/
 
-.. _Mako: http://www.makotemplates.org/
+.. _Mako: https://www.makotemplates.org/
 .. _pyramid_mako:
    https://docs.pylonsproject.org/projects/pyramid-mako/en/latest/

@@ -452,7 +452,7 @@ For example:
     route_and_view_attached    /                           app1.standard_views.route_and_view_attached   *
     method_conflicts           /conflicts                  app1.standard_conflicts                       <route mismatch>
     multiview                  /multiview                  app1.standard_views.multiview                 GET,PATCH
-    not_post                   /not_post                   app1.standard_views.multview                  !POST,*
+    not_post                   /not_post                   app1.standard_views.multiview                 !POST,*
 
 ``proutes`` generates a table with four columns: *Name*, *Pattern*, *View*, and
 *Method*.  The items listed in the Name column are route names, the items

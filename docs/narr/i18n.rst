@@ -81,14 +81,14 @@ may be supplied at the same time as the replacement marker itself:
     from pyramid.i18n import TranslationString
     ts = TranslationString('Add ${number}', mapping={'number':1})
 
-Any number of replacement markers can be present in the msgid value, any number
+Any number of replacement markers can be present in the ``msgid`` value, any number
 of times.  Only markers which can be replaced by the values in the *mapping*
 will be replaced at translation time.  The others will not be interpolated and
 will be output literally.
 
 A translation string should also usually carry a *domain*.  The domain
 represents a translation category to disambiguate it from other translations of
-the same msgid, in case they conflict.
+the same ``msgid``, in case they conflict.
 
 .. code-block:: python
     :linenos:
@@ -100,7 +100,7 @@ the same msgid, in case they conflict.
 The above translation string named a domain of ``form``.  A :term:`translator`
 function will often use the domain to locate the right translator file on the
 filesystem which contains translations for a given domain.  In this case, if it
-were trying to translate our msgid to German, it might try to find a
+were trying to translate our ``msgid`` to German, it might try to find a
 translation from a :term:`gettext` file within a :term:`translation directory`
 like this one:
 

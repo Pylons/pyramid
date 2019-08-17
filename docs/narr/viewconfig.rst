@@ -196,7 +196,7 @@ Non-Predicate Arguments
 ``require_csrf``
 
   CSRF checks will affect any request method that is not defined as a "safe"
-  method by RFC2616. In pratice this means that GET, HEAD, OPTIONS, and TRACE
+  method by RFC2616. In practice this means that GET, HEAD, OPTIONS, and TRACE
   methods will pass untouched and all others methods will require CSRF. This
   option is used in combination with the ``pyramid.require_default_csrf``
   setting to control which request parameters are checked for CSRF tokens.
