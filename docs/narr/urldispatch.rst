@@ -971,7 +971,7 @@ application from small and potentially reusable components.
 The :meth:`pyramid.config.Configurator.include` method accepts an argument
 named ``route_prefix`` which can be useful to authors of URL-dispatch-based
 applications.  If ``route_prefix`` is supplied to the include method, it must
-be a string.  This string represents a :term:`route prefix` that will be prepended to
+be a string.  This string represents a route prefix that will be prepended to
 all route patterns added by the *included* configuration.  Any calls to
 :meth:`pyramid.config.Configurator.add_route` within the included callable will
 have their pattern prefixed with the value of ``route_prefix``. This can be
