@@ -357,9 +357,9 @@ When a view is called that uses a JSONP renderer:
 
 Javscript library AJAX functionality will help you make JSONP requests.
 For example, JQuery has a `getJSON function
-<http://api.jquery.com/jQuery.getJSON/>`_, and has equivalent (but more
+<https://api.jquery.com/jQuery.getJSON/>`_, and has equivalent (but more
 complicated) functionality in its `ajax function
-<http://api.jquery.com/jQuery.ajax/>`_.
+<https://api.jquery.com/jQuery.ajax/>`_.
 
 For example (JavaScript):
 

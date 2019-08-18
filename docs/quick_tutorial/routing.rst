@@ -31,7 +31,7 @@ Previously we saw the basics of routing URLs to views in Pyramid.
     explicit in ordering. Pyramid also gives facilities to avoid the problem.
     It's relatively easy to build a system that uses implicit route ordering
     with Pyramid too. See `The Groundhog series of screencasts
-    <http://static.repoze.org/casts/videotags.html>`_ if you're interested in
+    <https://web.archive.org/web/20190118040819/http://static.repoze.org/casts/videotags.html>`_ if you're interested in
     doing so.
 
 

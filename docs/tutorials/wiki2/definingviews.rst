@@ -350,7 +350,7 @@ template inheritance via blocks.
 - We have defined two placeholders in the layout template where a child
   template can override the content. These blocks are named ``subtitle`` (line
   11) and ``content`` (line 36).
-- Please refer to the `Jinja2 documentation <http://jinja.pocoo.org/>`_ for more information about template
+- Please refer to the `Jinja2 documentation <https://palletsprojects.com/p/jinja/>`_ for more information about template
   inheritance.
 
 

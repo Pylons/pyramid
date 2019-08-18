@@ -1004,8 +1004,8 @@ Documentation
   via a group rather than via a direct username.
 
 - Redirect requests for tutorial sources to
-  http://docs.repoze.org/bfgwiki-1.3 and
-  http://docs.repoze.org/bfgwiki2-1.3/ respectively.
+  https://docs.pylonsproject.org/projects/pyramid/en/latest/tutorials/wiki/index.html and
+  https://docs.pylonsproject.org/projects/pyramid/en/latest/tutorials/wiki2/index.html respectively.
 
 - A section named ``Custom Route Predicates`` was added to the URL
   Dispatch narrative chapter.
@@ -1140,8 +1140,8 @@ Features
 
   This feature was kindly contributed by Andrey Popp.
 
-- Use "Venusian" (`http://docs.repoze.org/venusian
-  <http://docs.repoze.org/venusian>`_) to perform ``bfg_view``
+- Use "Venusian" (`https://docs.pylonsproject.org/projects/venusian/en/latest/
+  <https://docs.pylonsproject.org/projects/venusian/en/latest/>`_) to perform ``bfg_view``
   decorator scanning rather than relying on a BFG-internal decorator
   scanner.  (Truth be told, Venusian is really just a generalization
   of the BFG-internal decorator scanner).
@@ -1525,10 +1525,10 @@ Documentation Licensing
 - Loosen the documentation licensing to allow derivative works: it is
   now offered under the `Creative Commons
   Attribution-Noncommercial-Share Alike 3.0 United States License
-  <http://creativecommons.org/licenses/by-nc-sa/3.0/us/>`_.  This is
+  <https://creativecommons.org/licenses/by-nc-sa/3.0/us/>`_.  This is
   only a documentation licensing change; the ``repoze.bfg`` software
   continues to be offered under the Repoze Public License at
-  http://repoze.org/license.html (BSD-like).
+  https://web.archive.org/web/20190401024809/http://repoze.org/license.html (BSD-like).
 
 1.2a9 (2009-12-27)
 ==================
@@ -1540,10 +1540,10 @@ Documentation Licensing
   within the ``docs`` directory) in this release is now offered under
   the Creative Commons Attribution-Noncommercial-No Derivative Works
   3.0 United States License as described by
-  http://creativecommons.org/licenses/by-nc-nd/3.0/us/ .  This is only
+  https://creativecommons.org/licenses/by-nc-nd/3.0/us/ .  This is only
   a licensing change for the documentation; the ``repoze.bfg``
   software continues to be offered under the Repoze Public License
-  at http://repoze.org/license.html (BSD-like).
+  at https://web.archive.org/web/20190401024809/http://repoze.org/license.html (BSD-like).
 
 Documentation
 -------------
@@ -1893,8 +1893,8 @@ Features
   to create a simple ``repoze.bfg`` application any longer.
 
   Imperative configuration makes ``repoze.bfg`` competitive with
-  "microframeworks" such as `Bottle <http://bottle.paws.de/>`_ and
-  `Tornado <http://www.tornadoweb.org/>`_.  ``repoze.bfg`` has a good
+  "microframeworks" such as `Bottle <https://bottlepy.org/docs/dev/>`_ and
+  `Tornado <https://www.tornadoweb.org/en/stable/>`_.  ``repoze.bfg`` has a good
   deal of functionality that most microframeworks lack, so this is
   hopefully a "best of both worlds" feature.
 
@@ -2976,7 +2976,7 @@ Documentation
   ``repoze.bfg`` application.
 
 - Added a tutorial which explains how to run a ``repoze.bfg``
-  application under `mod_wsgi <http://code.google.com/p/modwsgi/>`_.
+  application under `mod_wsgi <https://modwsgi.readthedocs.io/en/develop/>`_.
   See "Running a repoze.bfg Application under mod_wsgi" in the
   tutorials section of the documentation.
 
@@ -3406,7 +3406,7 @@ Backwards Incompatibilities
 - Added a workaround for a bug in Python 2.6, 2.6.1, and 2.6.2 having
   to do with a recursion error in the mimetypes module when trying to
   serve static files from Paste's FileApp:
-  http://bugs.python.org/issue5853.  Symptom: File
+  https://bugs.python.org/issue5853.  Symptom: File
   "/usr/lib/python2.6/mimetypes.py", line 244, in guess_type return
   guess_type(url, strict) RuntimeError: maximum recursion depth
   exceeded.  Thanks to Armin Ronacher for identifying the symptom and
@@ -4610,8 +4610,7 @@ Bug Fixes
   To resolve this issue, the urldispatch module was fixed, and a fork
   of the Routes trunk was put into the "dev" index named
   ``Routes-1.11dev-chrism-home``.  The source for the fork exists at
-  `http://bitbucket.org/chrism/routes-home/
-  <http://bitbucket.org/chrism/routes-home/>`_ (broken link);
+  ``http://bitbucket.org/chrism/routes-home/`` (broken link);
   its contents have been merged into the Routes trunk
   (what will be Routes 1.11).
 
@@ -4752,8 +4751,7 @@ Incompatibilities related to making ``repoze.bfg`` "C-free":
   opposed to pure Python) and the ``repoze.bfg`` core is "C-free" as
   of this release. You may get Genshi-style Chameleon support back by
   installing the ``repoze.bfg.chameleon_genshi`` package availalable
-  from http://svn.repoze.org/repoze.bfg.chameleon_genshi (also
-  available in the index at http://dist.repoze.org/bfg/0.8/simple).
+  from https://pypi.org/project/repoze.bfg.chameleon_genshi/.
   All existing code that depended on the ``chameleon_genshi`` module
   prior to this release of ``repoze.bfg`` should work without change
   after this addon is installed.
@@ -4763,8 +4761,10 @@ Incompatibilities related to making ``repoze.bfg`` "C-free":
   which is implemented in C, and the ``repoze.bfg`` core is "C-free"
   as of this release.  You bay get XSL templating back by installing
   the ``repoze.bfg.xslt`` package available from
-  http://svn.repoze.org/repoze.bfg.xslt/ (also available in the index
-  at http://dist.repoze.org/bfg/0.8/simple).  All existing code that
+  ``http://svn.repoze.org/repoze.bfg.xslt/`` (broken link)
+  (also available in the index
+  at ``http://dist.repoze.org/bfg/0.8/simple)`` (broken link).
+  All existing code that
   depended upon the ``xslt`` module prior to this release of
   ``repoze.bfg`` should work without modification after this addon is
   installed.
@@ -4796,10 +4796,10 @@ Index-Related
 -------------
 
 - The canonical package index location for ``repoze.bfg`` has changed.
-  The "old" index (http://dist.repoze.org/lemonade/dev/simple) has
-  been superseded by a new index location
-  (`http://dist.repoze.org/bfg/current/simple
-  <http://dist.repoze.org/bfg/current/simple>`_).  The installation
+  The "old" index (``http://dist.repoze.org/lemonade/dev/simple``) (broken link)
+  has been superseded by a new index location
+  ``http://dist.repoze.org/bfg/current/simple`` (broken link).
+  The installation
   documentation has been updated as well as the ``setup.cfg`` file in
   this package.  The "lemonade" index still exists, but it is not
   guaranteed to have the latest BFG software in it, nor will it be
@@ -4927,7 +4927,7 @@ Backwards Incompatibilities
   default ``ModelGraphTraverser``. To use this feature, you will need
   to install the ``repoze.bfg.traversalwrapper`` package (an add-on
   package, available at
-  http://svn.repoze.org/repoze.bfg.traversalwrapper) Then change your
+  https://pypi.org/project/repoze.bfg.traversalwrapper/) Then change your
   application's ``configure.zcml`` to include the following stanza:
 
     <adapter
@@ -5356,7 +5356,7 @@ Features
 - URL-dispatch has been overhauled: it is no longer necessary to
   manually create a RoutesMapper in your application's entry point
   callable in order to use URL-dispatch (aka `Routes
-  <http://routes.groovie.org>`_).  A new ``route`` directive has been
+  <https://routes.readthedocs.io/en/latest/>`_).  A new ``route`` directive has been
   added to the available list of ZCML directives.  Each ``route``
   directive inserted into your application's ``configure.zcml``
   establishes a Routes mapper connection.  If any ``route``
@@ -5498,7 +5498,7 @@ Features
   requests (and this is indeed the default).  All requests implement
   ``IRequest``. The HTTP-verb-matching idea was pioneered by
   `repoze.bfg.restrequest
-  <http://pypi.python.org/pypi/repoze.bfg.restrequest/1.0.1>`_ . That
+  <https://pypi.org/project/repoze.bfg.restrequest/1.0.1/>`_ . That
   package is no longer required, but still functions fine.
 
 Bug Fixes
@@ -5606,8 +5606,8 @@ Features
   keyword argument named ``query``.  The value of this argument
   will be used to compose a query string, which will be attached to
   the generated URL before it is returned.  See the API docs (in
-  the docs directory or `on the web
-  <http://static.repoze.org/bfgdocs>`_) for more information.
+  the docs directory or on the web
+  ``http://static.repoze.org/bfgdocs``) (broken URL) for more information.
 
 0.6 (2008-12-26)
 ================
@@ -5618,7 +5618,7 @@ Backwards Incompatibilities
 - Rather than prepare the "stock" implementations of the ZCML directives
   from the ``zope.configuration`` package for use under ``repoze.bfg``,
   ``repoze.bfg`` now makes available the implementations of directives
-  from the ``repoze.zcml`` package (see http://static.repoze.org/zcmldocs).
+  from the ``repoze.zcml`` package (see https://pypi.org/project/repoze.zcml/).
   As a result, the ``repoze.bfg`` package now depends on the
   ``repoze.zcml`` package, and no longer depends directly on the
   ``zope.component``, ``zope.configuration``, ``zope.interface``, or
@@ -5642,7 +5642,7 @@ Backwards Incompatibilities
   package="zope.component" file="meta.zcml">``) and include the
   ``zope.security`` package as an ``install_requires`` dependency or 2)
   change the ZCML in their applications to use the declarations from
-  `repoze.zcml <http://static.repoze.org/zcmldocs/>`_ instead of the stock
+  `repoze.zcml <https://pypi.org/project/repoze.zcml/>`_ instead of the stock
   declarations.  ``repoze.zcml`` only makes available the ``adapter``,
   ``subscriber`` and ``utility`` directives.
 
