@@ -755,9 +755,7 @@ The API that must be implemented by a class that provides
             self.physical_path_tuple =  some_function_of(resource, request)
 
 The default context URL generator is available for perusal as the class
-:class:`pyramid.traversal.ResourceURL` in the `traversal module
-<https://github.com/Pylons/pyramid/blob/master/pyramid/traversal.py>`_ of the
-:term:`Pylons` GitHub Pyramid repository.
+:class:`pyramid.traversal.ResourceURL` in the `traversal module <../_modules/pyramid/traversal.html>`_.
 
 See :meth:`pyramid.config.Configurator.add_resource_url_adapter` for more
 information.
@@ -1337,7 +1335,7 @@ Specifying neither ``over`` nor ``under`` is equivalent to specifying
 
 If all options for ``under`` (or ``over``) cannot be found in the current
 configuration, it is an error. If some options are specified purely for
-compatibilty with other tweens, just add a fallback of ``MAIN`` or ``INGRESS``.
+compatibility with other tweens, just add a fallback of ``MAIN`` or ``INGRESS``.
 For example, ``under=('someothertween', 'someothertween2', INGRESS)``. This
 constraint will require the tween to be located under the ``someothertween``
 tween, the ``someothertween2`` tween, and ``INGRESS``. If any of these is not
@@ -1414,7 +1412,7 @@ time.
 Displaying Tween Ordering
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``ptweens`` command-line utility can be used to report the current implict
+The ``ptweens`` command-line utility can be used to report the current implicit
 and explicit tween chains used by an application.  See
 :ref:`displaying_tweens`.
 

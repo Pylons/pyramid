@@ -180,7 +180,7 @@ class DummyResource:
         should be an interface object or tuple of interface objects
         that will be attached to the resulting resource via
         :func:`zope.interface.alsoProvides`. Any extra keywords passed
-        in the ``kw`` argumnent will be set as direct attributes of
+        in the ``kw`` argument will be set as direct attributes of
         the resource object.
 
         .. note:: For backwards compatibility purposes, this class can also

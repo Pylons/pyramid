@@ -168,7 +168,7 @@ class ActionState(object):
 
         Return True if processing is needed and False otherwise. If
         the callable needs to be processed, it will be marked as
-        processed, assuming that the caller will procces the callable if
+        processed, assuming that the caller will process the callable if
         it needs to be processed.
         """
         if spec in self._seen_files:

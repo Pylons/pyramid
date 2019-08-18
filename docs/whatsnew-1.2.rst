@@ -63,7 +63,7 @@ Scaffolding Changes
   at all; configuration in the ``production.ini`` file which used to require
   its ``error_catcher`` :term:`middleware` has been removed.  Configuring
   error catching / email sending is now the domain of the ``pyramid_exclog``
-  package (see http://docs.pylonsproject.org/projects/pyramid_exclog/dev/).
+  package (see https://docs.pylonsproject.org/projects/pyramid_exclog/en/latest/).
 
 - All scaffolds now send the ``cache_max_age`` parameter to the
   ``add_static_view`` method.
@@ -232,7 +232,7 @@ Backwards Incompatibilities
      config.add_view('my.pkg.someview', route_name='foo')
 
   This won't effect "normal" users, only people who have legacy BFG codebases
-  that used an autommitting configurator and possibly tests that use the
+  that used an autocommitting configurator and possibly tests that use the
   configurator API (the configurator returned by
   :func:`pyramid.testing.setUp` is an autocommitting configurator).  The
   right way to get around this is to use a default non-autocommitting

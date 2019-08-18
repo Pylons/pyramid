@@ -495,7 +495,7 @@ the above call to ``request.resource_path`` would generate ``/mysection/``. See
 :ref:`virtual_root_support` for more information.
 
 If the route you're trying to use needs simple dynamic part values to be filled
-in to succesfully generate the URL, you can pass these as the ``route_kw``
+in to successfully generate the URL, you can pass these as the ``route_kw``
 argument to ``resource_url`` and ``resource_path``.  For example, assuming that
 the route definition is like so:
 

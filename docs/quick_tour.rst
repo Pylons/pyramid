@@ -100,7 +100,7 @@ explanation:
 As shown in this example, the :term:`configurator` plays a central role in
 Pyramid development. Building an application from loosely-coupled parts via
 :doc:`../narr/configuration` is a central idea in Pyramid, one that we will
-revisit regurlarly in this *Quick Tour*.
+revisit regularly in this *Quick Tour*.
 
 .. seealso:: See also:
    :ref:`Quick Tutorial Hello World <qtut_hello_world>`,
@@ -927,7 +927,7 @@ system, can then easily get at the data thanks to SQLAlchemy:
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Databases <qtut_databases>`, `SQLAlchemy
-    <http://www.sqlalchemy.org/>`_, :ref:`making_a_console_script`,
+    <https://www.sqlalchemy.org/>`_, :ref:`making_a_console_script`,
     :ref:`bfg_sql_wiki_tutorial`, and :ref:`Application Transactions with
     pyramid_tm <tm:overview>`.
 
