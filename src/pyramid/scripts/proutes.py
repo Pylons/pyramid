@@ -285,7 +285,7 @@ class PRoutesCommand(object):
             if fmt not in self.available_formats:
                 invalid_formats.append(fmt)
 
-        msg = 'You provided invalid formats %s, ' 'Available formats are %s'
+        msg = 'You provided invalid formats %s. Available formats are %s'
 
         if invalid_formats:
             msg = msg % (invalid_formats, self.available_formats)

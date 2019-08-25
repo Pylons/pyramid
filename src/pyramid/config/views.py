@@ -859,7 +859,7 @@ class ViewsConfiguratorMixin(object):
 
             else:
                 raise ConfigurationError(
-                    '"view" was not specified and ' 'no "renderer" specified'
+                    '"view" was not specified and no "renderer" specified'
                 )
 
         if request_type is not None:

@@ -914,9 +914,7 @@ class HTTPConflict(HTTPClientError):
 
     code = 409
     title = 'Conflict'
-    explanation = (
-        'There was a conflict when trying to complete ' 'your request.'
-    )
+    explanation = 'There was a conflict when trying to complete your request.'
 
 
 class HTTPGone(HTTPClientError):

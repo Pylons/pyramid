@@ -426,7 +426,7 @@ class IRendererInfo(Interface):
     )
     type = Attribute('The renderer type name')
     registry = Attribute(
-        'The "current" application registry when the ' 'renderer was created'
+        'The "current" application registry when the renderer was created'
     )
     settings = Attribute(
         'The deployment settings dictionary related '
@@ -1274,7 +1274,7 @@ class IIntrospectable(Interface):
     )
     category_name = Attribute('introspection category name')
     discriminator = Attribute(
-        'introspectable discriminator (within category) ' '(must be hashable)'
+        'introspectable discriminator (within category) (must be hashable)'
     )
     discriminator_hash = Attribute('an integer hash of the discriminator')
     action_info = Attribute(
@@ -1415,7 +1415,7 @@ class IViewDeriverInfo(Interface):
     :term:`view deriver` during configuration."""
 
     registry = Attribute(
-        'The "current" application registry where the ' 'view was created'
+        'The "current" application registry where the view was created'
     )
     package = Attribute(
         'The "current package" where the view '
