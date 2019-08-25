@@ -687,7 +687,7 @@ class TestPRoutesCommand(unittest.TestCase):
         command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         expected = (
-            "You provided invalid formats ['predicates'], "
+            "You provided invalid formats ['predicates']. "
             "Available formats are ['name', 'pattern', 'view', 'method']"
         )
         result = command.run()
