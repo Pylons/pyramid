@@ -268,9 +268,11 @@ class PRoutesCommand(object):
         'config_vars',
         nargs='*',
         default=(),
-        help="Variables required by the config file. For example, "
-        "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
-        "passed here.",
+        help=(
+            "Variables required by the config file. For example, "
+            "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
+            "passed here.",
+        ),
     )
 
     def __init__(self, argv, quiet=False):
