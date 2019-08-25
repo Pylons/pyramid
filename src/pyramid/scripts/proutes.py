@@ -271,7 +271,7 @@ class PRoutesCommand(object):
         help=(
             "Variables required by the config file. For example, "
             "`http_port=%%(http_port)s` would expect `http_port=8080` to be "
-            "passed here.",
+            "passed here."
         ),
     )
 
