@@ -158,7 +158,7 @@ For example, our above security policy can leverage these helpers like so:
             return self.helper.forget(request)
 
 Helpers are intended to be used with application-specific code, so perhaps your
-authentication also queries to database to ensure the identity is valid.
+authentication also queries the database to ensure the identity is valid.
 
 .. code-block:: python
     :linenos:
