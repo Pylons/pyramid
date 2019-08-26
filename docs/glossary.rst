@@ -303,7 +303,7 @@ Glossary
      request.  Oftentimes this is the ID of the user object in a database.
 
    identity
-     An identity is an object identify the user associated with the
+     An identity is an object identifying the user associated with the
      current request.  The identity can be any object, but should implement a
      ``__str__`` method that outputs a corresponding :term:`userid`.
 
