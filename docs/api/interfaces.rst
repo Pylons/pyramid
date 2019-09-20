@@ -109,3 +109,24 @@ Other Interfaces
 
   .. autointerface:: IViewDeriverInfo
      :members:
+
+  .. autointerface:: IPredicateFactory
+     :members:
+
+  .. autointerface:: IPredicateInfo
+     :members:
+
+  .. autointerface:: IPredicate
+     :members:
+
+  .. autointerface:: IRoutePredicate
+     :inherited-members:
+     :members:
+
+  .. autointerface:: ISubscriberPredicate
+     :inherited-members:
+     :members:
+
+  .. autointerface:: IViewPredicate
+     :inherited-members:
+     :members:

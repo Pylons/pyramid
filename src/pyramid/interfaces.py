@@ -1440,6 +1440,91 @@ class IPredicateList(Interface):
     """ Interface representing a predicate list """
 
 
+class IPredicateInfo(Interface):
+    package = Attribute(
+        'The "current package" where the predicate '
+        'configuration statement was found'
+    )
+    registry = Attribute(
+        'The "current" application registry where the predicate was invoked'
+    )
+    settings = Attribute(
+        'The deployment settings dictionary related '
+        'to the current application'
+    )
+
+    def maybe_dotted(value):
+        """ Resolve the :term:`dotted Python name` ``dotted`` to a
+        global Python object.  If ``dotted`` is not a string, return
+        it without attempting to do any name resolution.  If
+        ``dotted`` is a relative dotted name (e.g. ``.foo.bar``,
+        consider it relative to the ``package``."""
+
+
+class IPredicateFactory(Interface):
+    def __call__(value, info):
+        """
+        Create a a :class:`.IPredicate` instance for a specific value.
+
+        """
+
+
+class IPredicate(Interface):
+    def text():
+        """
+        A textual description of the predicate used in the introspector.
+
+        For example, ``'content_type = application/json'`` for a
+        ``ContentTypePredicate`` with a ``value == 'application/json'``.
+
+        """
+
+    def phash():
+        """
+        A unique string for the predicate containing both the name and value.
+
+        Often implementations simply set ``phash = text``.
+
+        """
+
+
+class IRoutePredicate(IPredicate):
+    def __call__(info, request):
+        """
+        The ``info`` object is a dictionary containing two keys:
+
+        - "match" is a dictionary of parameters that becomes
+          ``request.matchdict`` if the route is selected
+          (all route predicates match).
+
+        - "route" is the :class:`.IRoute` object being matched.
+
+        Return ``True`` if the route should be selected or ``False`` otherwise.
+
+        """
+
+
+class ISubscriberPredicate(IPredicate):
+    def __call__(*args):
+        """
+        The ``args`` is usually just a single ``event`` argument sent to
+        ``registry.notify``.
+
+        Return ``True`` if the subscriber should be executed for the given
+        arguments or ``False`` otherwise.
+
+        """
+
+
+class IViewPredicate(IPredicate):
+    def __call__(context, request):
+        """
+        Return ``True`` if the view should be selected for the given
+        arguments or ``False`` otherwise.
+
+        """
+
+
 class IViewDeriver(Interface):
     options = Attribute(
         'A list of supported options to be passed to '
