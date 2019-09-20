@@ -197,6 +197,7 @@ class SecurityConfiguratorMixin(object):
         token='csrf_token',
         header='X-CSRF-Token',
         safe_methods=('GET', 'HEAD', 'OPTIONS', 'TRACE'),
+        allow_no_origin=False,
         callback=None,
     ):
         """
@@ -238,7 +239,12 @@ class SecurityConfiguratorMixin(object):
 
         """
         options = DefaultCSRFOptions(
-            require_csrf, token, header, safe_methods, callback
+            require_csrf=require_csrf,
+            token=token,
+            header=header,
+            safe_methods=safe_methods,
+            allow_no_origin=allow_no_origin,
+            callback=callback,
         )
 
         def register():
@@ -287,9 +293,18 @@ class SecurityConfiguratorMixin(object):
 
 @implementer(IDefaultCSRFOptions)
 class DefaultCSRFOptions(object):
-    def __init__(self, require_csrf, token, header, safe_methods, callback):
+    def __init__(
+        self,
+        require_csrf,
+        token,
+        header,
+        safe_methods,
+        allow_no_origin,
+        callback,
+    ):
         self.require_csrf = require_csrf
         self.token = token
         self.header = header
         self.safe_methods = frozenset(safe_methods)
+        self.allow_no_origin = allow_no_origin
         self.callback = callback

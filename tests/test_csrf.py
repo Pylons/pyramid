@@ -363,6 +363,12 @@ class Test_check_csrf_origin(unittest.TestCase):
         request.registry.settings = {}
         self.assertTrue(self._callFUT(request))
 
+    def test_success_with_allow_no_origin(self):
+        request = testing.DummyRequest()
+        request.scheme = "https"
+        request.referrer = None
+        self.assertTrue(self._callFUT(request, allow_no_origin=True))
+
     def test_fails_with_wrong_host(self):
         from pyramid.exceptions import BadCSRFOrigin
 
