@@ -222,6 +222,9 @@ class SecurityConfiguratorMixin(object):
         never be automatically checked for CSRF tokens.
         Default: ``('GET', 'HEAD', 'OPTIONS', TRACE')``.
 
+        ``allow_no_origin`` is a boolean.  If false, a request lacking both an
+        ``Origin`` and ``Referer`` header will fail the CSRF check.'
+
         If ``callback`` is set, it must be a callable accepting ``(request)``
         and returning ``True`` if the request should be checked for a valid
         CSRF token. This callback allows an application to support
@@ -236,6 +239,9 @@ class SecurityConfiguratorMixin(object):
 
         .. versionchanged:: 1.8
            Added the ``callback`` option.
+
+        .. versionchanged:: 2.0
+           Added the ``allow_no_origin`` option.
 
         """
         options = DefaultCSRFOptions(
