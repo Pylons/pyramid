@@ -946,7 +946,7 @@ is the current host, however additional origins may be configured by setting
 are non-standard). If a host in the list of domains starts with a ``.`` then
 that will allow all subdomains as well as the domain without the ``.``.  If no
 ``Referer`` or ``Origin`` header is present in an HTTPS request, the CSRF check
-will fail unless the ``allow_no_origin`` is set.
+will fail unless ``allow_no_origin`` is set.
 
 If CSRF checks fail then a :class:`pyramid.exceptions.BadCSRFToken` or
 :class:`pyramid.exceptions.BadCSRFOrigin` exception will be raised. This

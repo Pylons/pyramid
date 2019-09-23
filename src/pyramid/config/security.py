@@ -223,7 +223,7 @@ class SecurityConfiguratorMixin(object):
         Default: ``('GET', 'HEAD', 'OPTIONS', TRACE')``.
 
         ``allow_no_origin`` is a boolean.  If false, a request lacking both an
-        ``Origin`` and ``Referer`` header will fail the CSRF check.'
+        ``Origin`` and ``Referer`` header will fail the CSRF check.
 
         If ``callback`` is set, it must be a callable accepting ``(request)``
         and returning ``True`` if the request should be checked for a valid
