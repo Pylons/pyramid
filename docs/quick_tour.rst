@@ -828,7 +828,7 @@ Now make a "factory" and pass it to the :term:`configurator`'s
     :emphasize-lines: 2-3
 
 Pyramid's :term:`request` object now has a ``session`` attribute that we can
-use in our view code in ``views.py``:
+use in our view code in ``views/default.py``:
 
 .. literalinclude:: quick_tour/sessions/hello_world/views/default.py
     :language: python
