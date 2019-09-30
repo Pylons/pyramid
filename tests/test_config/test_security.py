@@ -126,6 +126,7 @@ class ConfiguratorSecurityMethodsTests(unittest.TestCase):
             list(sorted(result.safe_methods)),
             ['GET', 'HEAD', 'OPTIONS', 'TRACE'],
         )
+        self.assertFalse(result.allow_no_origin)
         self.assertTrue(result.callback is None)
 
     def test_changing_set_default_csrf_options(self):
@@ -141,6 +142,7 @@ class ConfiguratorSecurityMethodsTests(unittest.TestCase):
             token='DUMMY',
             header=None,
             safe_methods=('PUT',),
+            allow_no_origin=True,
             callback=callback,
         )
         result = config.registry.getUtility(IDefaultCSRFOptions)
@@ -148,4 +150,5 @@ class ConfiguratorSecurityMethodsTests(unittest.TestCase):
         self.assertEqual(result.token, 'DUMMY')
         self.assertEqual(result.header, None)
         self.assertEqual(list(sorted(result.safe_methods)), ['PUT'])
+        self.assertTrue(result.allow_no_origin)
         self.assertTrue(result.callback is callback)

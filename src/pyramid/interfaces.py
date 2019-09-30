@@ -1055,6 +1055,10 @@ class IDefaultCSRFOptions(Interface):
     header = Attribute('The header to be matched with the CSRF token.')
     safe_methods = Attribute('A set of safe methods that skip CSRF checks.')
     callback = Attribute('A callback to disable CSRF checks per-request.')
+    allow_no_origin = Attribute(
+        'Boolean.  If false, a request lacking both an ``Origin`` and '
+        '``Referer`` header will fail the CSRF check.'
+    )
 
 
 class ISessionFactory(Interface):

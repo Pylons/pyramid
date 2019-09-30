@@ -247,7 +247,9 @@ def check_csrf_token(
     return True
 
 
-def check_csrf_origin(request, trusted_origins=None, raises=True):
+def check_csrf_origin(
+    request, trusted_origins=None, allow_no_origin=False, raises=True
+):
     """
     Check the ``Origin`` of the request to see if it is a cross site request or
     not.
@@ -302,9 +304,13 @@ def check_csrf_origin(request, trusted_origins=None, raises=True):
         if origin is None:
             origin = request.referrer
 
-        # Fail if we were not able to locate an origin at all
+        # If we can't find an origin, fail or pass immediately depending on
+        # ``allow_no_origin``
         if not origin:
-            return _fail("Origin checking failed - no Origin or Referer.")
+            if allow_no_origin:
+                return True
+            else:
+                return _fail("Origin checking failed - no Origin or Referer.")
 
         # Parse our origin so we we can extract the required information from
         # it.

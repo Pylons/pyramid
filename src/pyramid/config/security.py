@@ -197,6 +197,7 @@ class SecurityConfiguratorMixin(object):
         token='csrf_token',
         header='X-CSRF-Token',
         safe_methods=('GET', 'HEAD', 'OPTIONS', 'TRACE'),
+        allow_no_origin=False,
         callback=None,
     ):
         """
@@ -221,6 +222,9 @@ class SecurityConfiguratorMixin(object):
         never be automatically checked for CSRF tokens.
         Default: ``('GET', 'HEAD', 'OPTIONS', TRACE')``.
 
+        ``allow_no_origin`` is a boolean.  If false, a request lacking both an
+        ``Origin`` and ``Referer`` header will fail the CSRF check.
+
         If ``callback`` is set, it must be a callable accepting ``(request)``
         and returning ``True`` if the request should be checked for a valid
         CSRF token. This callback allows an application to support
@@ -236,9 +240,17 @@ class SecurityConfiguratorMixin(object):
         .. versionchanged:: 1.8
            Added the ``callback`` option.
 
+        .. versionchanged:: 2.0
+           Added the ``allow_no_origin`` option.
+
         """
         options = DefaultCSRFOptions(
-            require_csrf, token, header, safe_methods, callback
+            require_csrf=require_csrf,
+            token=token,
+            header=header,
+            safe_methods=safe_methods,
+            allow_no_origin=allow_no_origin,
+            callback=callback,
         )
 
         def register():
@@ -287,9 +299,18 @@ class SecurityConfiguratorMixin(object):
 
 @implementer(IDefaultCSRFOptions)
 class DefaultCSRFOptions(object):
-    def __init__(self, require_csrf, token, header, safe_methods, callback):
+    def __init__(
+        self,
+        require_csrf,
+        token,
+        header,
+        safe_methods,
+        allow_no_origin,
+        callback,
+    ):
         self.require_csrf = require_csrf
         self.token = token
         self.header = header
         self.safe_methods = frozenset(safe_methods)
+        self.allow_no_origin = allow_no_origin
         self.callback = callback
