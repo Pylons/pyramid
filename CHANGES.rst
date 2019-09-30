@@ -38,6 +38,14 @@ Features
 - Improve debugging info from ``pyramid.view.view_config`` decorator.
   See https://github.com/Pylons/pyramid/pull/3483
 
+- A new parameter, ``allow_no_origin``, was added to
+  ``pyramid.config.Configurator.set_default_csrf_options`` as well as
+  ``pyramid.csrf.check_csrf_origin``. This option controls whether a
+  request is rejected if it has no ``Origin`` or ``Referer`` header -
+  often the result of a configuring their browser not to send a
+  ``Referer`` header for privacy reasons.
+  See https://github.com/Pylons/pyramid/pull/3512
+
 Deprecations
 ------------
 
