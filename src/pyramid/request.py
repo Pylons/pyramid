@@ -15,7 +15,7 @@ from pyramid.interfaces import (
 from pyramid.decorator import reify
 from pyramid.i18n import LocalizerRequestMixin
 from pyramid.response import Response, _get_response_factory
-from pyramid.security import AuthenticationAPIMixin, AuthorizationAPIMixin
+from pyramid.security import SecurityAPIMixin, AuthenticationAPIMixin
 from pyramid.url import URLMethodsMixin
 from pyramid.util import (
     InstancePropertyHelper,
@@ -147,8 +147,8 @@ class Request(
     CallbackMethodsMixin,
     InstancePropertyMixin,
     LocalizerRequestMixin,
+    SecurityAPIMixin,
     AuthenticationAPIMixin,
-    AuthorizationAPIMixin,
     ViewMethodsMixin,
 ):
     """

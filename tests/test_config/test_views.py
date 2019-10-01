@@ -2059,22 +2059,19 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         outerself = self
 
         class DummyPolicy(object):
-            def effective_principals(self, r):
+            def identify(self, r):
                 outerself.assertEqual(r, request)
-                return ['abc']
+                return 123
 
-            def permits(self, context, principals, permission):
+            def permits(self, r, context, identity, permission):
+                outerself.assertEqual(r, request)
                 outerself.assertEqual(context, None)
-                outerself.assertEqual(principals, ['abc'])
+                outerself.assertEqual(identity, 123)
                 outerself.assertEqual(permission, 'view')
                 return True
 
         policy = DummyPolicy()
-        config = self._makeOne(
-            authorization_policy=policy,
-            authentication_policy=policy,
-            autocommit=True,
-        )
+        config = self._makeOne(security_policy=policy, autocommit=True)
         config.add_view(view=view1, permission='view', renderer=null_renderer)
         view = self._getViewCallable(config)
         request = self._makeRequest(config)
@@ -2087,22 +2084,20 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         outerself = self
 
         class DummyPolicy(object):
-            def effective_principals(self, r):
+            def identify(self, r):
                 outerself.assertEqual(r, request)
-                return ['abc']
+                return 123
 
-            def permits(self, context, principals, permission):
+            def permits(self, r, context, identity, permission):
+                outerself.assertEqual(r, request)
                 outerself.assertEqual(context, None)
-                outerself.assertEqual(principals, ['abc'])
+                outerself.assertEqual(identity, 123)
                 outerself.assertEqual(permission, 'view')
                 return True
 
         policy = DummyPolicy()
         config = self._makeOne(
-            authorization_policy=policy,
-            authentication_policy=policy,
-            default_permission='view',
-            autocommit=True,
+            security_policy=policy, default_permission='view', autocommit=True
         )
         config.add_view(view=view1, renderer=null_renderer)
         view = self._getViewCallable(config)

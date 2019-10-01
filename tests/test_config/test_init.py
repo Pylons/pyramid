@@ -205,6 +205,15 @@ class ConfiguratorTests(unittest.TestCase):
         result = config.registry.getUtility(IDebugLogger)
         self.assertEqual(logger, result)
 
+    def test_ctor_security_policy(self):
+        from pyramid.interfaces import ISecurityPolicy
+
+        policy = object()
+        config = self._makeOne(security_policy=policy)
+        config.commit()
+        result = config.registry.getUtility(ISecurityPolicy)
+        self.assertEqual(policy, result)
+
     def test_ctor_authentication_policy(self):
         from pyramid.interfaces import IAuthenticationPolicy
 

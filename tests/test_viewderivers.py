@@ -28,12 +28,11 @@ class TestDeriveView(unittest.TestCase):
         return logger
 
     def _registerSecurityPolicy(self, permissive):
-        from pyramid.interfaces import IAuthenticationPolicy
-        from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.interfaces import ISecurityPolicy
 
         policy = DummySecurityPolicy(permissive)
-        self.config.registry.registerUtility(policy, IAuthenticationPolicy)
-        self.config.registry.registerUtility(policy, IAuthorizationPolicy)
+        self.config.registry.registerUtility(policy, ISecurityPolicy)
+        return policy
 
     def test_function_returns_non_adaptable(self):
         def view(request):
@@ -421,7 +420,7 @@ class TestDeriveView(unittest.TestCase):
         self.assertFalse(hasattr(result, '__call_permissive__'))
         self.assertEqual(result(None, None), response)
 
-    def test_with_debug_authorization_no_authpol(self):
+    def test_with_debug_authorization_no_security_policy(self):
         response = DummyResponse()
         view = lambda *arg: response
         self.config.registry.settings = dict(
@@ -442,59 +441,7 @@ class TestDeriveView(unittest.TestCase):
             logger.messages[0],
             "debug_authorization of url url (view name "
             "'view_name' against context None): Allowed "
-            "(no authorization policy in use)",
-        )
-
-    def test_with_debug_authorization_authn_policy_no_authz_policy(self):
-        response = DummyResponse()
-        view = lambda *arg: response
-        self.config.registry.settings = dict(debug_authorization=True)
-        from pyramid.interfaces import IAuthenticationPolicy
-
-        policy = DummySecurityPolicy(False)
-        self.config.registry.registerUtility(policy, IAuthenticationPolicy)
-        logger = self._registerLogger()
-        result = self.config._derive_view(view, permission='view')
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertFalse(hasattr(result, '__call_permissive__'))
-        request = self._makeRequest()
-        request.view_name = 'view_name'
-        request.url = 'url'
-        self.assertEqual(result(None, request), response)
-        self.assertEqual(len(logger.messages), 1)
-        self.assertEqual(
-            logger.messages[0],
-            "debug_authorization of url url (view name "
-            "'view_name' against context None): Allowed "
-            "(no authorization policy in use)",
-        )
-
-    def test_with_debug_authorization_authz_policy_no_authn_policy(self):
-        response = DummyResponse()
-        view = lambda *arg: response
-        self.config.registry.settings = dict(debug_authorization=True)
-        from pyramid.interfaces import IAuthorizationPolicy
-
-        policy = DummySecurityPolicy(False)
-        self.config.registry.registerUtility(policy, IAuthorizationPolicy)
-        logger = self._registerLogger()
-        result = self.config._derive_view(view, permission='view')
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertFalse(hasattr(result, '__call_permissive__'))
-        request = self._makeRequest()
-        request.view_name = 'view_name'
-        request.url = 'url'
-        self.assertEqual(result(None, request), response)
-        self.assertEqual(len(logger.messages), 1)
-        self.assertEqual(
-            logger.messages[0],
-            "debug_authorization of url url (view name "
-            "'view_name' against context None): Allowed "
-            "(no authorization policy in use)",
+            "(no security policy in use)",
         )
 
     def test_with_debug_authorization_no_permission(self):
@@ -665,32 +612,11 @@ class TestDeriveView(unittest.TestCase):
             "'view_name' against context Exception()): True",
         )
 
-    def test_secured_view_authn_policy_no_authz_policy(self):
+    def test_secured_view_authn_policy_no_security_policy(self):
         response = DummyResponse()
         view = lambda *arg: response
         self.config.registry.settings = {}
-        from pyramid.interfaces import IAuthenticationPolicy
 
-        policy = DummySecurityPolicy(False)
-        self.config.registry.registerUtility(policy, IAuthenticationPolicy)
-        result = self.config._derive_view(view, permission='view')
-        self.assertEqual(view.__module__, result.__module__)
-        self.assertEqual(view.__doc__, result.__doc__)
-        self.assertEqual(view.__name__, result.__name__)
-        self.assertFalse(hasattr(result, '__call_permissive__'))
-        request = self._makeRequest()
-        request.view_name = 'view_name'
-        request.url = 'url'
-        self.assertEqual(result(None, request), response)
-
-    def test_secured_view_authz_policy_no_authn_policy(self):
-        response = DummyResponse()
-        view = lambda *arg: response
-        self.config.registry.settings = {}
-        from pyramid.interfaces import IAuthorizationPolicy
-
-        policy = DummySecurityPolicy(False)
-        self.config.registry.registerUtility(policy, IAuthorizationPolicy)
         result = self.config._derive_view(view, permission='view')
         self.assertEqual(view.__module__, result.__module__)
         self.assertEqual(view.__doc__, result.__doc__)
@@ -702,53 +628,41 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(result(None, request), response)
 
     def test_secured_view_raises_forbidden_no_name(self):
-        from pyramid.interfaces import IAuthenticationPolicy
-        from pyramid.interfaces import IAuthorizationPolicy
         from pyramid.httpexceptions import HTTPForbidden
 
         response = DummyResponse()
         view = lambda *arg: response
         self.config.registry.settings = {}
-        policy = DummySecurityPolicy(False)
-        self.config.registry.registerUtility(policy, IAuthenticationPolicy)
-        self.config.registry.registerUtility(policy, IAuthorizationPolicy)
+        self._registerSecurityPolicy(False)
         result = self.config._derive_view(view, permission='view')
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
-        try:
+        with self.assertRaises(HTTPForbidden) as cm:
             result(None, request)
-        except HTTPForbidden as e:
-            self.assertEqual(
-                e.message, 'Unauthorized: <lambda> failed permission check'
-            )
-        else:  # pragma: no cover
-            raise AssertionError
+        self.assertEqual(
+            cm.exception.message,
+            'Unauthorized: <lambda> failed permission check',
+        )
 
     def test_secured_view_raises_forbidden_with_name(self):
-        from pyramid.interfaces import IAuthenticationPolicy
-        from pyramid.interfaces import IAuthorizationPolicy
         from pyramid.httpexceptions import HTTPForbidden
 
         def myview(request):  # pragma: no cover
             pass
 
         self.config.registry.settings = {}
-        policy = DummySecurityPolicy(False)
-        self.config.registry.registerUtility(policy, IAuthenticationPolicy)
-        self.config.registry.registerUtility(policy, IAuthorizationPolicy)
+        self._registerSecurityPolicy(False)
         result = self.config._derive_view(myview, permission='view')
         request = self._makeRequest()
         request.view_name = 'view_name'
         request.url = 'url'
-        try:
+        with self.assertRaises(HTTPForbidden) as cm:
             result(None, request)
-        except HTTPForbidden as e:
-            self.assertEqual(
-                e.message, 'Unauthorized: myview failed permission check'
-            )
-        else:  # pragma: no cover
-            raise AssertionError
+        self.assertEqual(
+            cm.exception.message,
+            'Unauthorized: myview failed permission check',
+        )
 
     def test_secured_view_skipped_by_default_on_exception_view(self):
         from pyramid.request import Request
@@ -794,12 +708,8 @@ class TestDeriveView(unittest.TestCase):
         app = self.config.make_wsgi_app()
         request = Request.blank('/foo', base_url='http://example.com')
         request.method = 'POST'
-        try:
+        with self.assertRaises(HTTPForbidden):
             request.get_response(app)
-        except HTTPForbidden:
-            pass
-        else:  # pragma: no cover
-            raise AssertionError
 
     def test_secured_view_passed_on_explicit_exception_view(self):
         from pyramid.request import Request
@@ -2151,10 +2061,10 @@ class DummySecurityPolicy:
     def __init__(self, permitted=True):
         self.permitted = permitted
 
-    def effective_principals(self, request):
-        return []
+    def identify(self, request):
+        return 123
 
-    def permits(self, context, principals, permission):
+    def permits(self, request, context, identity, permission):
         return self.permitted
 
 

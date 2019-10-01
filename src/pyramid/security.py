@@ -1,6 +1,8 @@
-from zope.interface import providedBy
+from zope.interface import implementer, providedBy
+from zope.deprecation import deprecated
 
 from pyramid.interfaces import (
+    ISecurityPolicy,
     IAuthenticationPolicy,
     IAuthorizationPolicy,
     ISecuredView,
@@ -35,17 +37,12 @@ DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)
 NO_PERMISSION_REQUIRED = '__no_permission_required__'
 
 
-def _get_registry(request):
-    try:
-        reg = request.registry
-    except AttributeError:
-        reg = get_current_registry()  # b/c
-    return reg
+def _get_security_policy(request):
+    return request.registry.queryUtility(ISecurityPolicy)
 
 
 def _get_authentication_policy(request):
-    registry = _get_registry(request)
-    return registry.queryUtility(IAuthenticationPolicy)
+    return request.registry.queryUtility(IAuthenticationPolicy)
 
 
 def remember(request, userid, **kw):
@@ -54,7 +51,7 @@ def remember(request, userid, **kw):
     on this request's response.
     These headers are suitable for 'remembering' a set of credentials
     implied by the data passed as ``userid`` and ``*kw`` using the
-    current :term:`authentication policy`.  Common usage might look
+    current :term:`security policy`.  Common usage might look
     like so within the body of a view function (``response`` is
     assumed to be a :term:`WebOb` -style :term:`response` object
     computed previously by the view code):
@@ -67,10 +64,10 @@ def remember(request, userid, **kw):
        response.headerlist.extend(headers)
        return response
 
-    If no :term:`authentication policy` is in use, this function will
+    If no :term:`security policy` is in use, this function will
     always return an empty sequence. If used, the composition and
     meaning of ``**kw`` must be agreed upon by the calling code and
-    the effective authentication policy.
+    the effective security policy.
 
     .. versionchanged:: 1.6
         Deprecated the ``principal`` argument in favor of ``userid`` to clarify
@@ -79,7 +76,7 @@ def remember(request, userid, **kw):
     .. versionchanged:: 1.10
         Removed the deprecated ``principal`` argument.
     """
-    policy = _get_authentication_policy(request)
+    policy = _get_security_policy(request)
     if policy is None:
         return []
     return policy.remember(request, userid, **kw)
@@ -101,17 +98,23 @@ def forget(request):
        response.headerlist.extend(headers)
        return response
 
-    If no :term:`authentication policy` is in use, this function will
+    If no :term:`security policy` is in use, this function will
     always return an empty sequence.
     """
-    policy = _get_authentication_policy(request)
+    policy = _get_security_policy(request)
     if policy is None:
         return []
     return policy.forget(request)
 
 
 def principals_allowed_by_permission(context, permission):
-    """ Provided a ``context`` (a resource object), and a ``permission``
+    """
+    .. deprecated:: 2.0
+
+        The new security policy has removed the concept of principals.  See
+        :ref:`upgrading_auth` for more information.
+
+    Provided a ``context`` (a resource object), and a ``permission``
     string, if an :term:`authorization policy` is
     in effect, return a sequence of :term:`principal` ids that possess
     the permission in the ``context``.  If no authorization policy is
@@ -126,12 +129,22 @@ def principals_allowed_by_permission(context, permission):
        required machinery for this function; those will cause a
        :exc:`NotImplementedError` exception to be raised when this
        function is invoked.
+
     """
     reg = get_current_registry()
     policy = reg.queryUtility(IAuthorizationPolicy)
     if policy is None:
         return [Everyone]
     return policy.principals_allowed_by_permission(context, permission)
+
+
+deprecated(
+    'principals_allowed_by_permission',
+    'The new security policy has removed the concept of principals.  See '
+    'https://docs.pylonsproject.org/projects/pyramid/en/latest'
+    '/whatsnew-2.0.html#upgrading-authentication-authorization '
+    'for more information.',
+)
 
 
 def view_execution_permitted(context, request, name=''):
@@ -147,7 +160,7 @@ def view_execution_permitted(context, request, name=''):
        An exception is raised if no view is found.
 
     """
-    reg = _get_registry(request)
+    reg = request.registry
     provides = [IViewClassifier] + [providedBy(x) for x in (request, context)]
     # XXX not sure what to do here about using _find_views or analogue;
     # for now let's just keep it as-is
@@ -280,61 +293,49 @@ class ACLAllowed(ACLPermitsResult, Allowed):
     """
 
 
-class AuthenticationAPIMixin(object):
+class SecurityAPIMixin(object):
+    @property
+    def authenticated_identity(self):
+        """
+        Return an opaque object identifying the current user or ``None`` if no
+        user is authenticated or there is no :term:`security policy` in effect.
+
+        """
+        policy = _get_security_policy(self)
+        if policy is None:
+            return None
+        return policy.identify(self)
+
     @property
     def authenticated_userid(self):
-        """ Return the userid of the currently authenticated user or
-        ``None`` if there is no :term:`authentication policy` in effect or
-        there is no currently authenticated user.
-
-        .. versionadded:: 1.5
         """
-        policy = _get_authentication_policy(self)
-        if policy is None:
+        Return the :term:`userid` of the currently authenticated user or
+        ``None`` if there is no :term:`security policy` in effect or there is
+        no currently authenticated user.
+
+        .. versionchanged:: 2.0
+
+            When using the new security system, this property outputs the
+            string representation of the :term:`identity`.
+
+        """
+        authn = _get_authentication_policy(self)
+        security = _get_security_policy(self)
+        if authn is not None:
+            return authn.authenticated_userid(self)
+        elif security is not None:
+            return str(security.identify(self))
+        else:
             return None
-        return policy.authenticated_userid(self)
 
-    @property
-    def unauthenticated_userid(self):
-        """ Return an object which represents the *claimed* (not verified) user
-        id of the credentials present in the request. ``None`` if there is no
-        :term:`authentication policy` in effect or there is no user data
-        associated with the current request.  This differs from
-        :attr:`~pyramid.request.Request.authenticated_userid`, because the
-        effective authentication policy will not ensure that a record
-        associated with the userid exists in persistent storage.
-
-        .. versionadded:: 1.5
-        """
-        policy = _get_authentication_policy(self)
-        if policy is None:
-            return None
-        return policy.unauthenticated_userid(self)
-
-    @property
-    def effective_principals(self):
-        """ Return the list of 'effective' :term:`principal` identifiers
-        for the ``request``. If no :term:`authentication policy` is in effect,
-        this will return a one-element list containing the
-        :data:`pyramid.security.Everyone` principal.
-
-        .. versionadded:: 1.5
-        """
-        policy = _get_authentication_policy(self)
-        if policy is None:
-            return [Everyone]
-        return policy.effective_principals(self)
-
-
-class AuthorizationAPIMixin(object):
     def has_permission(self, permission, context=None):
         """ Given a permission and an optional context, returns an instance of
         :data:`pyramid.security.Allowed` if the permission is granted to this
         request with the provided context, or the context already associated
         with the request.  Otherwise, returns an instance of
         :data:`pyramid.security.Denied`.  This method delegates to the current
-        authentication and authorization policies.  Returns
-        :data:`pyramid.security.Allowed` unconditionally if no authentication
+        security policy.  Returns
+        :data:`pyramid.security.Allowed` unconditionally if no security
         policy has been registered for this request.  If ``context`` is not
         supplied or is supplied as ``None``, the context used is the
         ``request.context`` attribute.
@@ -346,20 +347,101 @@ class AuthorizationAPIMixin(object):
         :returns: Either :class:`pyramid.security.Allowed` or
                   :class:`pyramid.security.Denied`.
 
-        .. versionadded:: 1.5
-
         """
         if context is None:
             context = self.context
-        reg = _get_registry(self)
-        authn_policy = reg.queryUtility(IAuthenticationPolicy)
-        if authn_policy is None:
-            return Allowed('No authentication policy in use.')
-        authz_policy = reg.queryUtility(IAuthorizationPolicy)
-        if authz_policy is None:
-            raise ValueError(
-                'Authentication policy registered without '
-                'authorization policy'
-            )  # should never happen
-        principals = authn_policy.effective_principals(self)
-        return authz_policy.permits(context, principals, permission)
+        policy = _get_security_policy(self)
+        if policy is None:
+            return Allowed('No security policy in use.')
+        identity = policy.identify(self)
+        return policy.permits(self, context, identity, permission)
+
+
+class AuthenticationAPIMixin(object):
+    @property
+    def unauthenticated_userid(self):
+        """
+        .. deprecated:: 2.0
+
+            ``unauthenticated_userid`` does not have an equivalent in the new
+            security system.  Use :attr:`.authenticated_userid` or
+            :attr:`.identity` instead.  See :ref:`upgrading_auth` for more
+            information.
+
+        Return an object which represents the *claimed* (not verified) user
+        id of the credentials present in the request. ``None`` if there is no
+        :term:`authentication policy` in effect or there is no user data
+        associated with the current request.  This differs from
+        :attr:`~pyramid.request.Request.authenticated_userid`, because the
+        effective authentication policy will not ensure that a record
+        associated with the userid exists in persistent storage.
+
+        """
+        authn = _get_authentication_policy(self)
+        security = _get_security_policy(self)
+        if authn is not None:
+            return authn.unauthenticated_userid(self)
+        elif security is not None:
+            return str(security.identify(self))
+        else:
+            return None
+
+    @property
+    def effective_principals(self):
+        """
+        .. deprecated:: 2.0
+
+            The new security policy has removed the concept of principals.  See
+            :ref:`upgrading_auth` for more information.
+
+        Return the list of 'effective' :term:`principal` identifiers
+        for the ``request``. If no :term:`authentication policy` is in effect,
+        this will return a one-element list containing the
+        :data:`pyramid.security.Everyone` principal.
+
+        """
+        policy = _get_authentication_policy(self)
+        if policy is None:
+            return [Everyone]
+        return policy.effective_principals(self)
+
+    effective_principals = deprecated(
+        effective_principals,
+        'The new security policy has removed the concept of principals.  See '
+        'https://docs.pylonsproject.org/projects/pyramid/en/latest'
+        '/whatsnew-2.0.html#upgrading-authentication-authorization '
+        'for more information.',
+    )
+
+
+@implementer(ISecurityPolicy)
+class LegacySecurityPolicy:
+    """
+    A :term:`security policy` which provides a backwards compatibility shim for
+    the :term:`authentication policy` and the :term:`authorization policy`.
+
+    """
+
+    def _get_authn_policy(self, request):
+        return request.registry.getUtility(IAuthenticationPolicy)
+
+    def _get_authz_policy(self, request):
+        return request.registry.getUtility(IAuthorizationPolicy)
+
+    def identify(self, request):
+        authn = self._get_authn_policy(request)
+        return authn.authenticated_userid(request)
+
+    def remember(self, request, userid, **kw):
+        authn = self._get_authn_policy(request)
+        return authn.remember(request, userid, **kw)
+
+    def forget(self, request):
+        authn = self._get_authn_policy(request)
+        return authn.forget(request)
+
+    def permits(self, request, context, identity, permission):
+        authn = self._get_authn_policy(request)
+        authz = self._get_authz_policy(request)
+        principals = authn.effective_principals(request)
+        return authz.permits(context, principals, permission)

@@ -1,4 +1,5 @@
 from zope.interface import implementer
+from zope.deprecation import deprecate
 
 from pyramid.interfaces import (
     IAuthorizationPolicy,
@@ -6,6 +7,7 @@ from pyramid.interfaces import (
     ICSRFStoragePolicy,
     IDefaultCSRFOptions,
     IDefaultPermission,
+    ISecurityPolicy,
     PHASE1_CONFIG,
     PHASE2_CONFIG,
 )
@@ -13,6 +15,7 @@ from pyramid.interfaces import (
 from pyramid.csrf import LegacySessionCSRFStoragePolicy
 from pyramid.exceptions import ConfigurationError
 from pyramid.util import as_sorted_tuple
+from pyramid.security import LegacySecurityPolicy
 
 from pyramid.config.actions import action_method
 
@@ -22,8 +25,54 @@ class SecurityConfiguratorMixin(object):
         self.set_csrf_storage_policy(LegacySessionCSRFStoragePolicy())
 
     @action_method
+    def set_security_policy(self, policy):
+        """ Override the :app:`Pyramid` :term:`security policy` in the current
+        configuration.  The ``policy`` argument must be an instance
+        of a security policy or a :term:`dotted Python name`
+        that points at an instance of a security policy.
+
+        .. note::
+
+           Using the ``security_policy`` argument to the
+           :class:`pyramid.config.Configurator` constructor can be used to
+           achieve the same purpose.
+
+        """
+
+        def register():
+            self.registry.registerUtility(policy, ISecurityPolicy)
+
+        policy = self.maybe_dotted(policy)
+        intr = self.introspectable(
+            'security policy',
+            None,
+            self.object_description(policy),
+            'security policy',
+        )
+        intr['policy'] = policy
+        self.action(
+            ISecurityPolicy,
+            register,
+            order=PHASE2_CONFIG,
+            introspectables=(intr,),
+        )
+
+    @deprecate(
+        'Authentication and authorization policies have been deprecated in '
+        'favor of security policies.  See '
+        'https://docs.pylonsproject.org/projects/pyramid/en/latest'
+        '/whatsnew-2.0.html#upgrading-authentication-authorization '
+        'for more information.'
+    )
+    @action_method
     def set_authentication_policy(self, policy):
-        """ Override the :app:`Pyramid` :term:`authentication policy` in the
+        """
+        .. deprecated:: 2.0
+
+            Authentication policies have been replaced by
+            security policies.  See :ref:`upgrading_auth` for more information.
+
+        Override the :app:`Pyramid` :term:`authentication policy` in the
         current configuration.  The ``policy`` argument must be an instance
         of an authentication policy or a :term:`dotted Python name`
         that points at an instance of an authentication policy.
@@ -37,14 +86,22 @@ class SecurityConfiguratorMixin(object):
         """
 
         def register():
-            self._set_authentication_policy(policy)
+            self.registry.registerUtility(policy, IAuthenticationPolicy)
             if self.registry.queryUtility(IAuthorizationPolicy) is None:
                 raise ConfigurationError(
                     'Cannot configure an authentication policy without '
                     'also configuring an authorization policy '
                     '(use the set_authorization_policy method)'
                 )
+            if self.registry.queryUtility(ISecurityPolicy) is not None:
+                raise ConfigurationError(
+                    'Cannot configure an authentication and authorization'
+                    'policy with a configured security policy.'
+                )
+            security_policy = LegacySecurityPolicy()
+            self.registry.registerUtility(security_policy, ISecurityPolicy)
 
+        policy = self.maybe_dotted(policy)
         intr = self.introspectable(
             'authentication policy',
             None,
@@ -60,13 +117,15 @@ class SecurityConfiguratorMixin(object):
             introspectables=(intr,),
         )
 
-    def _set_authentication_policy(self, policy):
-        policy = self.maybe_dotted(policy)
-        self.registry.registerUtility(policy, IAuthenticationPolicy)
-
     @action_method
     def set_authorization_policy(self, policy):
-        """ Override the :app:`Pyramid` :term:`authorization policy` in the
+        """
+        .. deprecated:: 2.0
+
+            Authentication policies have been replaced by
+            security policies.  See :ref:`upgrading_auth` for more information.
+
+        Override the :app:`Pyramid` :term:`authorization policy` in the
         current configuration.  The ``policy`` argument must be an instance
         of an authorization policy or a :term:`dotted Python name` that points
         at an instance of an authorization policy.
@@ -76,10 +135,11 @@ class SecurityConfiguratorMixin(object):
            Using the ``authorization_policy`` argument to the
            :class:`pyramid.config.Configurator` constructor can be used to
            achieve the same purpose.
+
         """
 
         def register():
-            self._set_authorization_policy(policy)
+            self.registry.registerUtility(policy, IAuthorizationPolicy)
 
         def ensure():
             if self.autocommit:
@@ -91,6 +151,7 @@ class SecurityConfiguratorMixin(object):
                     '(use the set_authorization_policy method)'
                 )
 
+        policy = self.maybe_dotted(policy)
         intr = self.introspectable(
             'authorization policy',
             None,
@@ -107,10 +168,6 @@ class SecurityConfiguratorMixin(object):
             introspectables=(intr,),
         )
         self.action(None, ensure)
-
-    def _set_authorization_policy(self, policy):
-        policy = self.maybe_dotted(policy)
-        self.registry.registerUtility(policy, IAuthorizationPolicy)
 
     @action_method
     def set_default_permission(self, permission):

@@ -35,6 +35,7 @@
 
   :methodcategory:`Using Security`
 
+     .. automethod:: set_security_policy
      .. automethod:: set_authentication_policy
      .. automethod:: set_authorization_policy
      .. automethod:: set_default_csrf_options

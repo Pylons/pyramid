@@ -14,12 +14,7 @@ from pyramid.path import caller_package
 from pyramid.response import _get_response_factory
 from pyramid.registry import Registry
 
-from pyramid.security import (
-    Authenticated,
-    Everyone,
-    AuthenticationAPIMixin,
-    AuthorizationAPIMixin,
-)
+from pyramid.security import SecurityAPIMixin, AuthenticationAPIMixin
 
 from pyramid.threadlocal import get_current_registry, manager
 
@@ -43,18 +38,16 @@ class DummyRootFactory(object):
 
 
 class DummySecurityPolicy(object):
-    """ A standin for both an IAuthentication and IAuthorization policy """
+    """ A standin for a security policy"""
 
     def __init__(
         self,
-        userid=None,
-        groupids=(),
+        identity=None,
         permissive=True,
         remember_result=None,
         forget_result=None,
     ):
-        self.userid = userid
-        self.groupids = groupids
+        self.identity = identity
         self.permissive = permissive
         if remember_result is None:
             remember_result = []
@@ -63,19 +56,11 @@ class DummySecurityPolicy(object):
         self.remember_result = remember_result
         self.forget_result = forget_result
 
-    def authenticated_userid(self, request):
-        return self.userid
+    def identify(self, request):
+        return self.identity
 
-    def unauthenticated_userid(self, request):
-        return self.userid
-
-    def effective_principals(self, request):
-        effective_principals = [Everyone]
-        if self.userid:
-            effective_principals.append(Authenticated)
-            effective_principals.append(self.userid)
-            effective_principals.extend(self.groupids)
-        return effective_principals
+    def permits(self, request, context, identity, permission):
+        return self.permissive
 
     def remember(self, request, userid, **kw):
         self.remembered = userid
@@ -84,15 +69,6 @@ class DummySecurityPolicy(object):
     def forget(self, request):
         self.forgotten = True
         return self.forget_result
-
-    def permits(self, context, principals, permission):
-        return self.permissive
-
-    def principals_allowed_by_permission(self, context, permission):
-        if self.permissive:
-            return self.effective_principals(None)
-        else:
-            return []
 
 
 class DummyTemplateRenderer(object):
@@ -303,8 +279,8 @@ class DummyRequest(
     CallbackMethodsMixin,
     InstancePropertyMixin,
     LocalizerRequestMixin,
+    SecurityAPIMixin,
     AuthenticationAPIMixin,
-    AuthorizationAPIMixin,
     ViewMethodsMixin,
 ):
     """ A DummyRequest object (incompletely) imitates a :term:`request` object.

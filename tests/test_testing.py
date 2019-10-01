@@ -23,52 +23,17 @@ class TestDummySecurityPolicy(unittest.TestCase):
 
         return DummySecurityPolicy
 
-    def _makeOne(self, userid=None, groupids=(), permissive=True):
+    def _makeOne(self, identity=None, permissive=True):
         klass = self._getTargetClass()
-        return klass(userid, groupids, permissive)
+        return klass(identity, permissive)
 
-    def test_authenticated_userid(self):
+    def test_identify(self):
         policy = self._makeOne('user')
-        self.assertEqual(policy.authenticated_userid(None), 'user')
-
-    def test_unauthenticated_userid(self):
-        policy = self._makeOne('user')
-        self.assertEqual(policy.unauthenticated_userid(None), 'user')
-
-    def test_effective_principals_userid(self):
-        policy = self._makeOne('user', ('group1',))
-        from pyramid.security import Everyone
-        from pyramid.security import Authenticated
-
-        self.assertEqual(
-            policy.effective_principals(None),
-            [Everyone, Authenticated, 'user', 'group1'],
-        )
-
-    def test_effective_principals_nouserid(self):
-        policy = self._makeOne()
-        from pyramid.security import Everyone
-
-        self.assertEqual(policy.effective_principals(None), [Everyone])
+        self.assertEqual(policy.identify(None), 'user')
 
     def test_permits(self):
         policy = self._makeOne()
-        self.assertEqual(policy.permits(None, None, None), True)
-
-    def test_principals_allowed_by_permission(self):
-        policy = self._makeOne('user', ('group1',))
-        from pyramid.security import Everyone
-        from pyramid.security import Authenticated
-
-        result = policy.principals_allowed_by_permission(None, None)
-        self.assertEqual(result, [Everyone, Authenticated, 'user', 'group1'])
-
-    def test_principals_allowed_by_permission_not_permissive(self):
-        policy = self._makeOne('user', ('group1',))
-        policy.permissive = False
-
-        result = policy.principals_allowed_by_permission(None, None)
-        self.assertEqual(result, [])
+        self.assertEqual(policy.permits(None, None, None, None), True)
 
     def test_forget(self):
         policy = self._makeOne()

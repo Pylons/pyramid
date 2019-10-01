@@ -7,12 +7,11 @@ from pyramid.csrf import check_csrf_origin, check_csrf_token
 from pyramid.response import Response
 
 from pyramid.interfaces import (
-    IAuthenticationPolicy,
-    IAuthorizationPolicy,
     IDefaultCSRFOptions,
     IDefaultPermission,
     IDebugLogger,
     IResponse,
+    ISecurityPolicy,
     IViewMapper,
     IViewMapperFactory,
 )
@@ -308,19 +307,17 @@ def _secured_view(view, info):
         # permission, replacing it with no permission at all
         permission = None
 
-    wrapped_view = view
-    authn_policy = info.registry.queryUtility(IAuthenticationPolicy)
-    authz_policy = info.registry.queryUtility(IAuthorizationPolicy)
+    policy = info.registry.queryUtility(ISecurityPolicy)
 
     # no-op on exception-only views without an explicit permission
     if explicit_val is None and info.exception_only:
         return view
 
-    if authn_policy and authz_policy and (permission is not None):
+    if policy and (permission is not None):
 
         def permitted(context, request):
-            principals = authn_policy.effective_principals(request)
-            return authz_policy.permits(context, principals, permission)
+            identity = policy.identify(request)
+            return policy.permits(request, context, identity, permission)
 
         def secured_view(context, request):
             result = permitted(context, request)
@@ -334,12 +331,12 @@ def _secured_view(view, info):
             )
             raise HTTPForbidden(msg, result=result)
 
-        wrapped_view = secured_view
-        wrapped_view.__call_permissive__ = view
-        wrapped_view.__permitted__ = permitted
-        wrapped_view.__permission__ = permission
-
-    return wrapped_view
+        secured_view.__call_permissive__ = view
+        secured_view.__permitted__ = permitted
+        secured_view.__permission__ = permission
+        return secured_view
+    else:
+        return view
 
 
 def _authdebug_view(view, info):
@@ -348,8 +345,7 @@ def _authdebug_view(view, info):
     permission = explicit_val = info.options.get('permission')
     if permission is None:
         permission = info.registry.queryUtility(IDefaultPermission)
-    authn_policy = info.registry.queryUtility(IAuthenticationPolicy)
-    authz_policy = info.registry.queryUtility(IAuthorizationPolicy)
+    policy = info.registry.queryUtility(ISecurityPolicy)
     logger = info.registry.queryUtility(IDebugLogger)
 
     # no-op on exception-only views without an explicit permission
@@ -361,18 +357,18 @@ def _authdebug_view(view, info):
         def authdebug_view(context, request):
             view_name = getattr(request, 'view_name', None)
 
-            if authn_policy and authz_policy:
+            if policy:
                 if permission is NO_PERMISSION_REQUIRED:
                     msg = 'Allowed (NO_PERMISSION_REQUIRED)'
                 elif permission is None:
                     msg = 'Allowed (no permission registered)'
                 else:
-                    principals = authn_policy.effective_principals(request)
+                    identity = policy.identify(request)
                     msg = str(
-                        authz_policy.permits(context, principals, permission)
+                        policy.permits(request, context, identity, permission)
                     )
             else:
-                msg = 'Allowed (no authorization policy in use)'
+                msg = 'Allowed (no security policy in use)'
 
             view_name = getattr(request, 'view_name', None)
             url = getattr(request, 'url', None)

@@ -5,5 +5,8 @@
 
 .. automodule:: pyramid.authorization
 
+  .. autoclass:: ACLHelper
+      :members:
+
   .. autoclass:: ACLAuthorizationPolicy
 

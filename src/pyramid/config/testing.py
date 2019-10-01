@@ -1,11 +1,6 @@
 from zope.interface import Interface
 
-from pyramid.interfaces import (
-    ITraverser,
-    IAuthorizationPolicy,
-    IAuthenticationPolicy,
-    IRendererFactory,
-)
+from pyramid.interfaces import ITraverser, ISecurityPolicy, IRendererFactory
 
 from pyramid.renderers import RendererHelper
 
@@ -18,8 +13,7 @@ class TestingConfiguratorMixin(object):
     # testing API
     def testing_securitypolicy(
         self,
-        userid=None,
-        groupids=(),
+        identity=None,
         permissive=True,
         remember_result=None,
         forget_result=None,
@@ -69,10 +63,9 @@ class TestingConfiguratorMixin(object):
         from pyramid.testing import DummySecurityPolicy
 
         policy = DummySecurityPolicy(
-            userid, groupids, permissive, remember_result, forget_result
+            identity, permissive, remember_result, forget_result
         )
-        self.registry.registerUtility(policy, IAuthorizationPolicy)
-        self.registry.registerUtility(policy, IAuthenticationPolicy)
+        self.registry.registerUtility(policy, ISecurityPolicy)
         return policy
 
     def testing_resources(self, resources):

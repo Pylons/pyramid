@@ -298,13 +298,20 @@ Glossary
      foo` and `group bar`.
 
    userid
-     A *userid* is a string used to identify and authenticate
-     a real-world user or client. A userid is supplied to an
-     :term:`authentication policy` in order to discover the user's
-     :term:`principals <principal>`. In the authentication policies which
-     :app:`Pyramid` provides, the default behavior returns the user's userid as
-     a principal, but this is not strictly necessary in custom policies that
-     define their principals differently.
+     A *userid* is the string representation of an :term:`identity`.  Just like
+     the identity, it should identify the user associated with the current
+     request.  Oftentimes this is the ID of the user object in a database.
+
+   identity
+     An identity is an object identifying the user associated with the
+     current request.  The identity can be any object, but should implement a
+     ``__str__`` method that outputs a corresponding :term:`userid`.
+
+   security policy
+     A security policy in :app:`Pyramid` terms is a bit of code which has an
+     API which identifies the user associated with the current request (perhaps
+     via a cookie or ``Authorization`` header) and determines whether or not
+     that user is permitted to access the requested resource.
 
    authorization policy
      An authorization policy in :app:`Pyramid` terms is a bit of
@@ -313,10 +320,18 @@ Glossary
      associated with a permission, based on the information found on the
      :term:`context` resource.
 
+     .. deprecated:: 2.0
+       Authorization policies have been deprecated in favor of a
+       :term:`security policy`.
+
    authentication policy
      An authentication policy in :app:`Pyramid` terms is a bit of
      code which has an API which determines the current
      :term:`principal` (or principals) associated with a request.
+
+     .. deprecated:: 2.0
+       Authentication policies have been deprecated in favor of a
+       :term:`security policy`.
 
    WSGI
      `Web Server Gateway Interface <https://wsgi.readthedocs.io/en/latest/>`_.

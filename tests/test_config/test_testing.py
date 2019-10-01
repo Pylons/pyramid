@@ -1,7 +1,7 @@
 import unittest
 from zope.interface import implementer
 
-from pyramid.security import AuthenticationAPIMixin, AuthorizationAPIMixin
+from pyramid.security import SecurityAPIMixin, AuthenticationAPIMixin
 from pyramid.util import text_
 from . import IDummy
 
@@ -17,28 +17,20 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
         from pyramid.testing import DummySecurityPolicy
 
         config = self._makeOne(autocommit=True)
-        config.testing_securitypolicy(
-            'user', ('group1', 'group2'), permissive=False
-        )
-        from pyramid.interfaces import IAuthenticationPolicy
-        from pyramid.interfaces import IAuthorizationPolicy
+        config.testing_securitypolicy('user', permissive=False)
+        from pyramid.interfaces import ISecurityPolicy
 
-        ut = config.registry.getUtility(IAuthenticationPolicy)
-        self.assertTrue(isinstance(ut, DummySecurityPolicy))
-        ut = config.registry.getUtility(IAuthorizationPolicy)
-        self.assertEqual(ut.userid, 'user')
-        self.assertEqual(ut.groupids, ('group1', 'group2'))
-        self.assertEqual(ut.permissive, False)
+        policy = config.registry.getUtility(ISecurityPolicy)
+        self.assertTrue(isinstance(policy, DummySecurityPolicy))
+        self.assertEqual(policy.identity, 'user')
+        self.assertEqual(policy.permissive, False)
 
     def test_testing_securitypolicy_remember_result(self):
         from pyramid.security import remember
 
         config = self._makeOne(autocommit=True)
         pol = config.testing_securitypolicy(
-            'user',
-            ('group1', 'group2'),
-            permissive=False,
-            remember_result=True,
+            'user', permissive=False, remember_result=True
         )
         request = DummyRequest()
         request.registry = config.registry
@@ -51,7 +43,7 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
 
         config = self._makeOne(autocommit=True)
         pol = config.testing_securitypolicy(
-            'user', ('group1', 'group2'), permissive=False, forget_result=True
+            'user', permissive=False, forget_result=True
         )
         request = DummyRequest()
         request.registry = config.registry
@@ -232,7 +224,7 @@ class DummyEvent:
     pass
 
 
-class DummyRequest(AuthenticationAPIMixin, AuthorizationAPIMixin):
+class DummyRequest(SecurityAPIMixin, AuthenticationAPIMixin):
     def __init__(self, environ=None):
         if environ is None:
             environ = {}

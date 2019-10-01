@@ -1,7 +1,7 @@
 import unittest
 from pyramid import testing
 
-from pyramid.security import AuthenticationAPIMixin, AuthorizationAPIMixin
+from pyramid.security import SecurityAPIMixin, AuthenticationAPIMixin
 from pyramid.util import text_, bytes_
 
 
@@ -54,7 +54,7 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(cls.ResponseClass, Response)
 
     def test_implements_security_apis(self):
-        apis = (AuthenticationAPIMixin, AuthorizationAPIMixin)
+        apis = (SecurityAPIMixin, AuthenticationAPIMixin)
         r = self._makeOne()
         self.assertTrue(isinstance(r, apis))
 

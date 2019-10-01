@@ -502,6 +502,22 @@ class Test_EffectivePrincipalsPredicate(unittest.TestCase):
 
         return EffectivePrincipalsPredicate(val, config)
 
+    def _testing_authn_policy(self, userid, groupids=tuple()):
+        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.security import Everyone, Authenticated
+
+        class DummyPolicy:
+            def effective_principals(self, request):
+                p = [Everyone]
+                if userid:
+                    p.append(Authenticated)
+                    p.append(userid)
+                    p.extend(groupids)
+                return p
+
+        registry = self.config.registry
+        registry.registerUtility(DummyPolicy(), IAuthenticationPolicy)
+
     def test_text(self):
         inst = self._makeOne(('verna', 'fred'), None)
         self.assertEqual(
@@ -526,7 +542,7 @@ class Test_EffectivePrincipalsPredicate(unittest.TestCase):
 
     def test_it_call_authentication_policy_provides_superset(self):
         request = testing.DummyRequest()
-        self.config.testing_securitypolicy('fred', groupids=('verna', 'bambi'))
+        self._testing_authn_policy('fred', groupids=('verna', 'bambi'))
         inst = self._makeOne(('verna', 'fred'), None)
         context = Dummy()
         self.assertTrue(inst(context, request))
@@ -535,14 +551,14 @@ class Test_EffectivePrincipalsPredicate(unittest.TestCase):
         from pyramid.security import Authenticated
 
         request = testing.DummyRequest()
-        self.config.testing_securitypolicy('fred', groupids=('verna', 'bambi'))
+        self._testing_authn_policy('fred', groupids=('verna', 'bambi'))
         inst = self._makeOne(Authenticated, None)
         context = Dummy()
         self.assertTrue(inst(context, request))
 
     def test_it_call_authentication_policy_doesnt_provide_superset(self):
         request = testing.DummyRequest()
-        self.config.testing_securitypolicy('fred')
+        self._testing_authn_policy('fred')
         inst = self._makeOne(('verna', 'fred'), None)
         context = Dummy()
         self.assertFalse(inst(context, request))

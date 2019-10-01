@@ -1,5 +1,7 @@
 import re
 
+from zope.deprecation import deprecated
+
 from pyramid.exceptions import ConfigurationError
 
 from pyramid.csrf import check_csrf_token
@@ -291,6 +293,14 @@ class PhysicalPathPredicate(object):
 
 
 class EffectivePrincipalsPredicate(object):
+    """
+    .. deprecated:: 2.0
+
+        The new security system has removed the concept of principals.  See
+        :ref:`upgrading_auth` for more information.
+
+    """
+
     def __init__(self, val, config):
         if is_nonstr_iter(val):
             self.val = set(val)
@@ -309,6 +319,15 @@ class EffectivePrincipalsPredicate(object):
             if self.val.issubset(rpset):
                 return True
         return False
+
+
+deprecated(
+    'EffectivePrincipalsPredicate',
+    'The new security policy has removed the concept of principals.  See '
+    'https://docs.pylonsproject.org/projects/pyramid/en/latest'
+    '/whatsnew-2.0.html#upgrading-authentication-authorization '
+    'for more information.',
+)
 
 
 class Notted(object):

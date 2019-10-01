@@ -166,7 +166,11 @@
 
    .. attribute:: authenticated_userid
 
-      .. versionadded:: 1.5
+      .. deprecated:: 2.0
+
+          ``authenticated_userid`` has been replaced by
+          :attr:`authenticated_identity` in the new security system.  See
+          :ref:`upgrading_auth` for more information.
 
       A property which returns the :term:`userid` of the currently
       authenticated user or ``None`` if there is no :term:`authentication
@@ -178,7 +182,11 @@
 
    .. attribute:: unauthenticated_userid
 
-      .. versionadded:: 1.5
+      .. deprecated:: 2.0
+
+          ``unauthenticated_userid`` has been replaced by
+          :attr:`authenticated_identity` in the new security system.  See
+          :ref:`upgrading_auth` for more information.
 
       A property which returns a value which represents the *claimed* (not
       verified) :term:`userid` of the credentials present in the
@@ -193,7 +201,10 @@
 
    .. attribute:: effective_principals
 
-      .. versionadded:: 1.5
+      .. deprecated:: 2.0
+
+          The new security policy has removed the concept of principals.  See
+          :ref:`upgrading_auth` for more information.
 
       A property which returns the list of 'effective' :term:`principal`
       identifiers for this request.  This list typically includes the

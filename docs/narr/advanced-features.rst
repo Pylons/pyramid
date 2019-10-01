@@ -104,13 +104,14 @@ For example, if you want to reuse an existing application that already has a bun
 Authenticate Users Your Way
 ---------------------------
 
-:app:`Pyramid` ships with prebuilt, well-tested authentication and authorization schemes out of the box. Using a scheme is a matter of configuration. So if you need to change approaches later, you need only update your configuration.
-
-In addition, the system that handles authentication and authorization is flexible and pluggable. If you want to use another security add-on, or define your own, you can. And again, you need only update your application configuration to make the change.
+:app:`Pyramid` has a powerful security system that can be tailored to your
+needs.  Build your own security policy tailored to your needs, or use one of
+the many helpers provided to easily implement common authentication and
+authorization patterns.
 
 .. seealso::
 
-   See also :ref:`enabling_authorization_policy`.
+   See also :ref:`writing_security_policy`.
 
 Build Trees of Resources
 ------------------------
