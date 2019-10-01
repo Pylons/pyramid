@@ -46,6 +46,10 @@ Features
   ``Referer`` header for privacy reasons.
   See https://github.com/Pylons/pyramid/pull/3512
 
+- Added ``pyramid.interfaces.IPredicateInfo`` which defines the object passed
+  to predicate factories as their second argument.
+  See https://github.com/Pylons/pyramid/pull/3514
+
 Deprecations
 ------------
 
@@ -108,6 +112,13 @@ Backward Incompatibilities
   ``'pyramid'``. To find any decorator regardless of category, specify
   ``config.scan(..., categories=None)``.
   See https://github.com/Pylons/pyramid/pull/3510
+
+- The second argument to predicate factories has been changed from ``config``
+  to ``info``, an instance of ``pyramid.interfaces.IPredicateInfo``. This
+  limits the data available to predicates but still provides the package,
+  registry, settings and dotted-name resolver which should cover most use
+  cases and is largely backward compatible.
+  See https://github.com/Pylons/pyramid/pull/3514
 
 Documentation Changes
 ---------------------
