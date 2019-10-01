@@ -44,7 +44,7 @@ The new security policy adds the concept of an :term:`identity`, which is an
 object representing the user associated with the current request.  The identity
 can be accessed via :attr:`pyramid.request.Request.authenticated_identity`.
 The object can be of any shape, such as a simple ID string or an ORM object,
-but should implement a ``__str__`` method that outputs a string identifying the
+but should implement a ``__str__`` method that returns a string identifying the
 current user, e.g. the ID of the user object in a database.  The string
 representation is return as
 :attr:`pyramid.request.Request.authenticated_userid`.
