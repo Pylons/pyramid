@@ -1414,6 +1414,28 @@ class TestDeriveView(unittest.TestCase):
         result = view(None, request)
         self.assertTrue(result is response)
 
+    def test_csrf_view_disables_origin_check(self):
+        response = DummyResponse()
+
+        def inner_view(request):
+            return response
+
+        self.config.set_default_csrf_options(
+            require_csrf=True, check_origin=False
+        )
+        request = self._makeRequest()
+        request.scheme = "https"
+        request.domain = "example.com"
+        request.host_port = "443"
+        request.referrer = None
+        request.method = 'POST'
+        request.headers = {"Origin": "https://evil-example.com"}
+        request.session = DummySession({'csrf_token': 'foo'})
+        request.POST = {'csrf_token': 'foo'}
+        view = self.config._derive_view(inner_view, require_csrf=True)
+        result = view(None, request)
+        self.assertTrue(result is response)
+
     def test_csrf_view_allow_no_origin(self):
         response = DummyResponse()
 
