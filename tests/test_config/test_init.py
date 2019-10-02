@@ -1113,7 +1113,7 @@ test_config.dummy_include2"""
 
     def test_scan_integration_with_extra_kw(self):
         config = self._makeOne(autocommit=True)
-        config.scan('tests.test_config.pkgs.scanextrakw', a=1)
+        config.scan('tests.test_config.pkgs.scanextrakw', a=1, categories=None)
         self.assertEqual(config.a, 1)
 
     def test_scan_integration_with_onerror(self):

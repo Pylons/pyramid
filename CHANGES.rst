@@ -103,6 +103,12 @@ Backward Incompatibilities
   by the default execution policy.
   See https://github.com/Pylons/pyramid/pull/3496
 
+- ``pyramid.config.Configurator.scan`` will no longer, by default, execute
+  Venusian decorator callbacks registered for categories other than
+  ``'pyramid'``. To find any decorator regardless of category, specify
+  ``config.scan(..., categories=None)``.
+  See https://github.com/Pylons/pyramid/pull/3510
+
 Documentation Changes
 ---------------------
 

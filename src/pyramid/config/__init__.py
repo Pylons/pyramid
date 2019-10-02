@@ -814,7 +814,12 @@ class Configurator(
 
     # this is *not* an action method (uses caller_package)
     def scan(
-        self, package=None, categories=None, onerror=None, ignore=None, **kw
+        self,
+        package=None,
+        categories=('pyramid',),
+        onerror=None,
+        ignore=None,
+        **kw
     ):
         """Scan a Python package and any of its subpackages for objects
         marked with :term:`configuration decoration` such as
@@ -829,12 +834,12 @@ class Configurator(
         The ``categories`` argument, if provided, should be the
         :term:`Venusian` 'scan categories' to use during scanning.  Providing
         this argument is not often necessary; specifying scan categories is
-        an extremely advanced usage.  By default, ``categories`` is ``None``
-        which will execute *all* Venusian decorator callbacks including
-        :app:`Pyramid`-related decorators such as
-        :class:`pyramid.view.view_config`.  See the :term:`Venusian`
-        documentation for more information about limiting a scan by using an
-        explicit set of categories.
+        an extremely advanced usage.  By default, ``categories`` is
+        ``['pyramid']`` which will execute only :app:`Pyramid`-related Venusian
+        decorator callbacks such as from :class:`pyramid.view.view_config`.
+        See the :term:`Venusian` documentation for more information about
+        limiting a scan by using an explicit set of categories. Pass ``None``
+        to pick up *all* Venusian decorators.
 
         The ``onerror`` argument, if provided, should be a Venusian
         ``onerror`` callback function.  The onerror function is passed to
@@ -871,6 +876,10 @@ class Configurator(
 
         .. versionadded:: 1.3
            The ``ignore`` argument.
+
+        .. versionchanged:: 2.0
+           The ``categories`` argument now defaults to ``['pyramid']`` instead
+           of ``None`` to control which decorator callbacks are executed.
 
         """
         package = self.maybe_dotted(package)
