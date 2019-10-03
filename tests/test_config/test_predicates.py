@@ -476,5 +476,11 @@ class DummyRequest:
 
 
 class DummyConfigurator(object):
+    package = 'dummy package'
+    registry = 'dummy registry'
+
+    def get_settings(self):
+        return {}
+
     def maybe_dotted(self, thing):
         return thing

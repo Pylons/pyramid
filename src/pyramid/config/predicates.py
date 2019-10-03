@@ -98,6 +98,14 @@ class not_(object):
 # over = before
 
 
+class PredicateInfo(object):
+    def __init__(self, package, registry, settings, maybe_dotted):
+        self.package = package
+        self.registry = registry
+        self.settings = settings
+        self.maybe_dotted = maybe_dotted
+
+
 class PredicateList(object):
     def __init__(self):
         self.sorter = TopologicalSorter()
@@ -134,6 +142,12 @@ class PredicateList(object):
         phash = md5()
         weights = []
         preds = []
+        info = PredicateInfo(
+            package=config.package,
+            registry=config.registry,
+            settings=config.get_settings(),
+            maybe_dotted=config.maybe_dotted,
+        )
         for n, (name, predicate_factory) in enumerate(ordered):
             vals = kw.pop(name, None)
             if vals is None:  # XXX should this be a sentinel other than None?
@@ -146,7 +160,7 @@ class PredicateList(object):
                 if isinstance(val, not_):
                     realval = val.value
                     notted = True
-                pred = predicate_factory(realval, config)
+                pred = predicate_factory(realval, info)
                 if notted:
                     pred = Notted(pred)
                 hashes = pred.phash()
