@@ -479,28 +479,6 @@ configured view.
   consideration when deciding whether or not to invoke the associated view
   callable.
 
-``check_csrf``
-  If specified, this value should be one of ``None``, ``True``, ``False``, or a
-  string representing the "check name".  If the value is ``True`` or a string,
-  CSRF checking will be performed.  If the value is ``False`` or ``None``, CSRF
-  checking will not be performed.
-
-  If the value provided is a string, that string will be used as the "check
-  name".  If the value provided is ``True``, ``csrf_token`` will be used as the
-  check name.
-
-  If CSRF checking is performed, the checked value will be the value of
-  ``request.POST[check_name]``.  This value will be compared against the
-  value of ``request.session.get_csrf_token()``, and the check will pass if
-  these two values are the same.  If the check passes, the associated view will
-  be permitted to execute.  If the check fails, the associated view will not be
-  permitted to execute.
-
-  Note that using this feature requires a :term:`session factory` to have been
-  configured.
-
-  .. versionadded:: 1.4a2
-
 ``physical_path``
   If specified, this value should be a string or a tuple representing the
   :term:`physical path` of the context found via traversal for this predicate

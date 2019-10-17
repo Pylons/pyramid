@@ -1886,24 +1886,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request.upath_info = text_('/')
         self._assertNotFound(wrapper, None, request)
 
-    def test_add_view_with_check_csrf_predicates_match(self):
-        import warnings
-        from pyramid.renderers import null_renderer
-
-        view = lambda *arg: 'OK'
-        config = self._makeOne(autocommit=True)
-        with warnings.catch_warnings(record=True) as w:
-            warnings.filterwarnings('always')
-            config.add_view(view=view, check_csrf=True, renderer=null_renderer)
-            self.assertEqual(len(w), 1)
-        wrapper = self._getViewCallable(config)
-        request = self._makeRequest(config)
-        request.method = "POST"
-        request.session = DummySession({'csrf_token': 'foo'})
-        request.POST = {'csrf_token': 'foo'}
-        request.headers = {}
-        self.assertEqual(wrapper(None, request), 'OK')
-
     def test_add_view_with_custom_predicates_match(self):
         import warnings
         from pyramid.renderers import null_renderer

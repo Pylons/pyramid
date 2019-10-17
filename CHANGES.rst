@@ -120,6 +120,11 @@ Backward Incompatibilities
   cases and is largely backward compatible.
   See https://github.com/Pylons/pyramid/pull/3514
 
+- Removed the ``check_csrf`` predicate. Instead, use
+  ``pyramid.config.Configurator.set_default_csrf_options`` and the
+  ``require_csrf`` view option to enable automatic CSRF checking.
+  See https://github.com/Pylons/pyramid/pull/3521
+
 Documentation Changes
 ---------------------
 
