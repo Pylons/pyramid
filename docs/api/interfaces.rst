@@ -29,6 +29,9 @@ Event-Related Interfaces
 Other Interfaces
 ++++++++++++++++
 
+  .. autointerface:: ISecurityPolicy
+     :members:
+
   .. autointerface:: IAuthenticationPolicy
      :members:
 

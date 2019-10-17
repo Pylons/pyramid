@@ -308,10 +308,11 @@ Glossary
      ``__str__`` method that outputs a corresponding :term:`userid`.
 
    security policy
-     A security policy in :app:`Pyramid` terms is a bit of code which has an
-     API which identifies the user associated with the current request (perhaps
-     via a cookie or ``Authorization`` header) and determines whether or not
-     that user is permitted to access the requested resource.
+     A security policy in :app:`Pyramid` terms is an object implementing the
+     :class:`pyramid.interfaces.ISecurityPolicy` API which identifies the user
+     associated with the current request
+     (perhaps via a cookie or ``Authorization`` header) and determines whether
+     or not that user is permitted to access the requested resource.
 
    authorization policy
      An authorization policy in :app:`Pyramid` terms is a bit of
