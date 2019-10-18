@@ -63,11 +63,7 @@ accessible by completely anonymous users.  In order to begin protecting views
 from execution based on security settings, you need to write a security policy.
 
 Security policies are simple classes implementing a
-:class:`pyramid.interfaces.ISecurityPolicy`, defined as follows:
-
-.. autointerface:: pyramid.interfaces.ISecurityPolicy
-  :members:
-
+:class:`pyramid.interfaces.ISecurityPolicy`.
 A simple security policy might look like the following:
 
 .. code-block:: python
@@ -88,7 +84,7 @@ A simple security policy might look like the following:
                 return Denied('User is not signed in.')
 
         def remember(request, userid, **kw):
-            request.session.get('userid')
+            request.session['userid'] = userid
             return []
 
         def forget(request):
