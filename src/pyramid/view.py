@@ -174,7 +174,7 @@ class view_config(object):
     ``request_type``, ``route_name``, ``request_method``, ``request_param``,
     ``containment``, ``xhr``, ``accept``, ``header``, ``path_info``,
     ``custom_predicates``, ``decorator``, ``mapper``, ``http_cache``,
-    ``require_csrf``, ``match_param``, ``check_csrf``, ``physical_path``, and
+    ``require_csrf``, ``match_param``, ``physical_path``, and
     ``view_options``.
 
     The meanings of these arguments are the same as the arguments passed to

@@ -315,55 +315,6 @@ class TestTraversePredicate(unittest.TestCase):
         self.assertEqual(inst.phash(), '')
 
 
-class Test_CheckCSRFTokenPredicate(unittest.TestCase):
-    def _makeOne(self, val, config):
-        from pyramid.predicates import CheckCSRFTokenPredicate
-
-        return CheckCSRFTokenPredicate(val, config)
-
-    def test_text(self):
-        inst = self._makeOne(True, None)
-        self.assertEqual(inst.text(), 'check_csrf = True')
-
-    def test_phash(self):
-        inst = self._makeOne(True, None)
-        self.assertEqual(inst.phash(), 'check_csrf = True')
-
-    def test_it_call_val_True(self):
-        inst = self._makeOne(True, None)
-        request = Dummy()
-
-        def check_csrf_token(req, val, raises=True):
-            self.assertEqual(req, request)
-            self.assertEqual(val, 'csrf_token')
-            self.assertEqual(raises, False)
-            return True
-
-        inst.check_csrf_token = check_csrf_token
-        result = inst(None, request)
-        self.assertEqual(result, True)
-
-    def test_it_call_val_str(self):
-        inst = self._makeOne('abc', None)
-        request = Dummy()
-
-        def check_csrf_token(req, val, raises=True):
-            self.assertEqual(req, request)
-            self.assertEqual(val, 'abc')
-            self.assertEqual(raises, False)
-            return True
-
-        inst.check_csrf_token = check_csrf_token
-        result = inst(None, request)
-        self.assertEqual(result, True)
-
-    def test_it_call_val_False(self):
-        inst = self._makeOne(False, None)
-        request = Dummy()
-        result = inst(None, request)
-        self.assertEqual(result, True)
-
-
 class TestHeaderPredicate(unittest.TestCase):
     def _makeOne(self, val):
         from pyramid.predicates import HeaderPredicate

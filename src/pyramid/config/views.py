@@ -276,7 +276,6 @@ class ViewsConfiguratorMixin(object):
         mapper=None,
         http_cache=None,
         match_param=None,
-        check_csrf=None,
         require_csrf=None,
         exception_only=False,
         **view_options
@@ -709,38 +708,6 @@ class ViewsConfiguratorMixin(object):
           variable.  If the regex matches, this predicate will be
           ``True``.
 
-        check_csrf
-
-          .. deprecated:: 1.7
-             Use the ``require_csrf`` option or see :ref:`auto_csrf_checking`
-             instead to have :class:`pyramid.exceptions.BadCSRFToken`
-             exceptions raised.
-
-          If specified, this value should be one of ``None``, ``True``,
-          ``False``, or a string representing the 'check name'.  If the value
-          is ``True`` or a string, CSRF checking will be performed.  If the
-          value is ``False`` or ``None``, CSRF checking will not be performed.
-
-          If the value provided is a string, that string will be used as the
-          'check name'.  If the value provided is ``True``, ``csrf_token`` will
-          be used as the check name.
-
-          If CSRF checking is performed, the checked value will be the value of
-          ``request.params[check_name]``. This value will be compared against
-          the value of ``policy.get_csrf_token()`` (where ``policy`` is an
-          implementation of :meth:`pyramid.interfaces.ICSRFStoragePolicy`), and
-          the check will pass if these two values are the same. If the check
-          passes, the associated view will be permitted to execute. If the
-          check fails, the associated view will not be permitted to execute.
-
-          .. versionadded:: 1.4a2
-
-          .. versionchanged:: 1.9
-            This feature requires either a :term:`session factory` to have been
-            configured, or a :term:`CSRF storage policy` other than the default
-            to be in use.
-
-
         physical_path
 
           If specified, this value should be a string or a tuple representing
@@ -804,6 +771,10 @@ class ViewsConfiguratorMixin(object):
              Support setting view deriver options. Previously, only custom
              view predicate values could be supplied.
 
+          .. versionchanged:: 2.0
+
+             Removed support for the ``check_csrf`` predicate.
+
         """
         if custom_predicates:
             warnings.warn(
@@ -814,19 +785,6 @@ class ViewsConfiguratorMixin(object):
                     'view predicate as a predicate argument to add_view '
                     'instead. See "Adding A Third Party View, Route, or '
                     'Subscriber Predicate" in the "Hooks" chapter of the '
-                    'documentation for more information.'
-                ),
-                DeprecationWarning,
-                stacklevel=4,
-            )
-
-        if check_csrf is not None:
-            warnings.warn(
-                (
-                    'The "check_csrf" argument to Configurator.add_view is '
-                    'deprecated as of Pyramid 1.7. Use the "require_csrf" '
-                    'option instead or see "Checking CSRF Tokens '
-                    'Automatically" in the "Sessions" chapter of the '
                     'documentation for more information.'
                 ),
                 DeprecationWarning,
@@ -903,7 +861,6 @@ class ViewsConfiguratorMixin(object):
                 containment=containment,
                 request_type=request_type,
                 match_param=match_param,
-                check_csrf=check_csrf,
                 custom=predvalseq(custom_predicates),
             )
         )
@@ -963,7 +920,6 @@ class ViewsConfiguratorMixin(object):
                 header=header,
                 path_info=path_info,
                 match_param=match_param,
-                check_csrf=check_csrf,
                 http_cache=http_cache,
                 require_csrf=require_csrf,
                 callable=view,
@@ -1249,7 +1205,6 @@ class ViewsConfiguratorMixin(object):
             ('containment', p.ContainmentPredicate),
             ('request_type', p.RequestTypePredicate),
             ('match_param', p.MatchParamPredicate),
-            ('check_csrf', p.CheckCSRFTokenPredicate),
             ('physical_path', p.PhysicalPathPredicate),
             ('effective_principals', p.EffectivePrincipalsPredicate),
             ('custom', p.CustomPredicate),

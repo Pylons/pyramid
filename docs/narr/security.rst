@@ -892,26 +892,3 @@ If CSRF checks fail then a :class:`pyramid.exceptions.BadCSRFToken` or
 exception may be caught and handled by an :term:`exception view` but, by
 default, will result in a ``400 Bad Request`` response being sent to the
 client.
-
-Checking CSRF Tokens with a View Predicate
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. deprecated:: 1.7
-   Use the ``require_csrf`` option or read :ref:`auto_csrf_checking` instead
-   to have :class:`pyramid.exceptions.BadCSRFToken` exceptions raised.
-
-A convenient way to require a valid CSRF token for a particular view is to
-include ``check_csrf=True`` as a view predicate. See
-:meth:`pyramid.config.Configurator.add_view`.
-
-.. code-block:: python
-
-     @view_config(request_method='POST', check_csrf=True, ...)
-     def myview(request):
-         # ...
-
-.. note::
-   A mismatch of a CSRF token is treated like any other predicate miss, and the
-   predicate system, when it doesn't find a view, raises ``HTTPNotFound``
-   instead of ``HTTPBadRequest``, so ``check_csrf=True`` behavior is different
-   from calling :func:`pyramid.csrf.check_csrf_token`.
