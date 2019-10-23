@@ -43,8 +43,17 @@ Features
   ``pyramid.csrf.check_csrf_origin``. This option controls whether a
   request is rejected if it has no ``Origin`` or ``Referer`` header -
   often the result of a user configuring their browser not to send a
-  ``Referer`` header for privacy reasons.
+  ``Referer`` header for privacy reasons even on same-domain requests.
+  The default is to reject requests without a known origin. It is also
+  possible to allow the special ``Origin: null`` header by adding it to the
+  ``pyramid.csrf_trusted_origins`` list in the settings.
   See https://github.com/Pylons/pyramid/pull/3512
+  and https://github.com/Pylons/pyramid/pull/3518
+
+- A new parameter, ``check_origin``, was added to
+  ``pyramid.config.Configurator.set_default_csrf_options`` which disables
+  origin checking entirely.
+  See https://github.com/Pylons/pyramid/pull/3518
 
 - Added ``pyramid.interfaces.IPredicateInfo`` which defines the object passed
   to predicate factories as their second argument.

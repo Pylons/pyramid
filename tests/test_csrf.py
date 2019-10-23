@@ -387,8 +387,48 @@ class Test_check_csrf_origin(unittest.TestCase):
         request = testing.DummyRequest()
         request.scheme = "https"
         request.referrer = None
-        self.assertRaises(BadCSRFOrigin, self._callFUT, request)
+        self.assertRaises(
+            BadCSRFOrigin, self._callFUT, request, allow_no_origin=False
+        )
+        self.assertFalse(
+            self._callFUT(request, raises=False, allow_no_origin=False)
+        )
+
+    def test_fail_with_null_origin(self):
+        from pyramid.exceptions import BadCSRFOrigin
+
+        request = testing.DummyRequest()
+        request.scheme = "https"
+        request.host = "example.com"
+        request.host_port = "443"
+        request.referrer = None
+        request.headers = {'Origin': 'null'}
+        request.registry.settings = {}
         self.assertFalse(self._callFUT(request, raises=False))
+        self.assertRaises(BadCSRFOrigin, self._callFUT, request)
+
+    def test_success_with_null_origin_and_setting(self):
+        request = testing.DummyRequest()
+        request.scheme = "https"
+        request.host = "example.com"
+        request.host_port = "443"
+        request.referrer = None
+        request.headers = {'Origin': 'null'}
+        request.registry.settings = {"pyramid.csrf_trusted_origins": ["null"]}
+        self.assertTrue(self._callFUT(request, raises=False))
+
+    def test_success_with_multiple_origins(self):
+        request = testing.DummyRequest()
+        request.scheme = "https"
+        request.host = "example.com"
+        request.host_port = "443"
+        request.headers = {
+            'Origin': 'https://google.com https://not-example.com'
+        }
+        request.registry.settings = {
+            "pyramid.csrf_trusted_origins": ["not-example.com"]
+        }
+        self.assertTrue(self._callFUT(request, raises=False))
 
     def test_fails_when_http_to_https(self):
         from pyramid.exceptions import BadCSRFOrigin

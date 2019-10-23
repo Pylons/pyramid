@@ -254,6 +254,7 @@ class SecurityConfiguratorMixin(object):
         token='csrf_token',
         header='X-CSRF-Token',
         safe_methods=('GET', 'HEAD', 'OPTIONS', 'TRACE'),
+        check_origin=True,
         allow_no_origin=False,
         callback=None,
     ):
@@ -279,8 +280,13 @@ class SecurityConfiguratorMixin(object):
         never be automatically checked for CSRF tokens.
         Default: ``('GET', 'HEAD', 'OPTIONS', TRACE')``.
 
-        ``allow_no_origin`` is a boolean.  If false, a request lacking both an
-        ``Origin`` and ``Referer`` header will fail the CSRF check.
+        ``check_origin`` is a boolean. If ``False``, the ``Origin`` and
+        ``Referer`` headers will not be validated as part of automated
+        CSRF checks.
+
+        ``allow_no_origin`` is a boolean.  If ``True``, a request lacking both
+        an ``Origin`` and ``Referer`` header will pass the CSRF check. This
+        option has no effect if ``check_origin`` is ``False``.
 
         If ``callback`` is set, it must be a callable accepting ``(request)``
         and returning ``True`` if the request should be checked for a valid
@@ -298,7 +304,7 @@ class SecurityConfiguratorMixin(object):
            Added the ``callback`` option.
 
         .. versionchanged:: 2.0
-           Added the ``allow_no_origin`` option.
+           Added the ``allow_no_origin`` and ``check_origin`` options.
 
         """
         options = DefaultCSRFOptions(
@@ -306,6 +312,7 @@ class SecurityConfiguratorMixin(object):
             token=token,
             header=header,
             safe_methods=safe_methods,
+            check_origin=check_origin,
             allow_no_origin=allow_no_origin,
             callback=callback,
         )
@@ -323,6 +330,8 @@ class SecurityConfiguratorMixin(object):
         intr['token'] = token
         intr['header'] = header
         intr['safe_methods'] = as_sorted_tuple(safe_methods)
+        intr['check_origin'] = allow_no_origin
+        intr['allow_no_origin'] = check_origin
         intr['callback'] = callback
 
         self.action(
@@ -362,6 +371,7 @@ class DefaultCSRFOptions(object):
         token,
         header,
         safe_methods,
+        check_origin,
         allow_no_origin,
         callback,
     ):
@@ -369,5 +379,6 @@ class DefaultCSRFOptions(object):
         self.token = token
         self.header = header
         self.safe_methods = frozenset(safe_methods)
+        self.check_origin = check_origin
         self.allow_no_origin = allow_no_origin
         self.callback = callback

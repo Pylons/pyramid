@@ -248,7 +248,7 @@ def check_csrf_token(
 
 
 def check_csrf_origin(
-    request, trusted_origins=None, allow_no_origin=False, raises=True
+    request, *, trusted_origins=None, allow_no_origin=False, raises=True
 ):
     """
     Check the ``Origin`` of the request to see if it is a cross site request or
@@ -266,6 +266,10 @@ def check_csrf_origin(
     (the default) this list of additional domains will be pulled from the
     ``pyramid.csrf_trusted_origins`` setting.
 
+    ``allow_no_origin`` determines whether to return ``True`` when the
+    origin cannot be determined via either the ``Referer`` or ``Origin``
+    header. The default is ``False`` which will reject the check.
+
     Note that this function will do nothing if ``request.scheme`` is not
     ``https``.
 
@@ -274,78 +278,90 @@ def check_csrf_origin(
     .. versionchanged:: 1.9
        Moved from :mod:`pyramid.session` to :mod:`pyramid.csrf`
 
+    .. versionchanged:: 2.0
+       Added the ``allow_no_origin`` option.
+
     """
 
     def _fail(reason):
         if raises:
-            raise BadCSRFOrigin(reason)
+            raise BadCSRFOrigin("Origin checking failed - " + reason)
         else:
             return False
 
-    if request.scheme == "https":
-        # Suppose user visits http://example.com/
-        # An active network attacker (man-in-the-middle, MITM) sends a
-        # POST form that targets https://example.com/detonate-bomb/ and
-        # submits it via JavaScript.
-        #
-        # The attacker will need to provide a CSRF cookie and token, but
-        # that's no problem for a MITM when we cannot make any assumptions
-        # about what kind of session storage is being used. So the MITM can
-        # circumvent the CSRF protection. This is true for any HTTP connection,
-        # but anyone using HTTPS expects better! For this reason, for
-        # https://example.com/ we need additional protection that treats
-        # http://example.com/ as completely untrusted. Under HTTPS,
-        # Barth et al. found that the Referer header is missing for
-        # same-domain requests in only about 0.2% of cases or less, so
-        # we can use strict Referer checking.
+    # Origin checks are only trustworthy / useful on HTTPS requests.
+    if request.scheme != "https":
+        return True
 
-        # Determine the origin of this request
-        origin = request.headers.get("Origin")
-        if origin is None:
-            origin = request.referrer
+    # Suppose user visits http://example.com/
+    # An active network attacker (man-in-the-middle, MITM) sends a
+    # POST form that targets https://example.com/detonate-bomb/ and
+    # submits it via JavaScript.
+    #
+    # The attacker will need to provide a CSRF cookie and token, but
+    # that's no problem for a MITM when we cannot make any assumptions
+    # about what kind of session storage is being used. So the MITM can
+    # circumvent the CSRF protection. This is true for any HTTP connection,
+    # but anyone using HTTPS expects better! For this reason, for
+    # https://example.com/ we need additional protection that treats
+    # http://example.com/ as completely untrusted. Under HTTPS,
+    # Barth et al. found that the Referer header is missing for
+    # same-domain requests in only about 0.2% of cases or less, so
+    # we can use strict Referer checking.
 
-        # If we can't find an origin, fail or pass immediately depending on
-        # ``allow_no_origin``
-        if not origin:
-            if allow_no_origin:
-                return True
-            else:
-                return _fail("Origin checking failed - no Origin or Referer.")
+    # Determine the origin of this request
+    origin = request.headers.get("Origin")
+    origin_is_referrer = False
+    if origin is None:
+        origin = request.referrer
+        origin_is_referrer = True
 
-        # Parse our origin so we we can extract the required information from
-        # it.
-        originp = urlparse(origin)
+    else:
+        # use the last origin in the list under the assumption that the
+        # server generally appends values and we want the origin closest
+        # to us
+        origin = origin.split(' ')[-1]
 
-        # Ensure that our Referer is also secure.
-        if originp.scheme != "https":
-            return _fail(
-                "Referer checking failed - Referer is insecure while host is "
-                "secure."
-            )
-
-        # Determine which origins we trust, which by default will include the
-        # current origin.
-        if trusted_origins is None:
-            trusted_origins = aslist(
-                request.registry.settings.get(
-                    "pyramid.csrf_trusted_origins", []
-                )
-            )
-
-        if request.host_port not in set(["80", "443"]):
-            trusted_origins.append("{0.domain}:{0.host_port}".format(request))
+    # If we can't find an origin, fail or pass immediately depending on
+    # ``allow_no_origin``
+    if not origin:
+        if allow_no_origin:
+            return True
         else:
-            trusted_origins.append(request.domain)
+            return _fail("missing Origin or Referer.")
 
-        # Actually check to see if the request's origin matches any of our
-        # trusted origins.
-        if not any(
-            is_same_domain(originp.netloc, host) for host in trusted_origins
-        ):
-            reason = (
-                "Referer checking failed - {0} does not match any trusted "
-                "origins."
-            )
-            return _fail(reason.format(origin))
+    # Determine which origins we trust, which by default will include the
+    # current origin.
+    if trusted_origins is None:
+        trusted_origins = aslist(
+            request.registry.settings.get("pyramid.csrf_trusted_origins", [])
+        )
+
+    if request.host_port not in set(["80", "443"]):
+        trusted_origins.append("{0.domain}:{0.host_port}".format(request))
+    else:
+        trusted_origins.append(request.domain)
+
+    # Check "Origin: null" against trusted_origins
+    if not origin_is_referrer and origin == 'null':
+        if origin in trusted_origins:
+            return True
+        else:
+            return _fail("null does not match any trusted origins.")
+
+    # Parse our origin so we we can extract the required information from
+    # it.
+    originp = urlparse(origin)
+
+    # Ensure that our Referer is also secure.
+    if originp.scheme != "https":
+        return _fail("Origin is insecure while host is secure.")
+
+    # Actually check to see if the request's origin matches any of our
+    # trusted origins.
+    if not any(
+        is_same_domain(originp.netloc, host) for host in trusted_origins
+    ):
+        return _fail("{0} does not match any trusted origins.".format(origin))
 
     return True
