@@ -57,17 +57,6 @@ class PickleSerializer(object):
 
         Please see :ref:`pickle_session_deprecation`.
 
-        Also, please see these tickets: 
-
-        * 2.0 feature request: Require that sessions are JSON serializable #2709
-          https://github.com/pylons/pyramid/issues/2709
-
-        * deprecate pickleable sessions, recommend json #3353
-          https://github.com/Pylons/pyramid/pull/3353
-
-        * change to use JSONSerializer for SignedCookieSessionFactory #3413
-          https://github.com/Pylons/pyramid/pull/3413
-
     A serializer that uses the pickle protocol to dump Python data to bytes.
 
     This was the default serializer used by Pyramid, but has been deprecated.

@@ -85,6 +85,12 @@ This is a stricter contract than the previous requirement that all objects be pi
 This is a backward-incompatible change.
 Previously, if a client-side session implementation was compromised, it left the application vulnerable to remote code execution attacks using specially-crafted sessions that execute code when deserialized.
 
+Please reference the following tickets if detailed information on these changes is needed:
+
+* `2.0 feature request: Require that sessions are JSON serializable #2709 <https://github.com/pylons/pyramid/issues/2709>`_.
+* `deprecate pickleable sessions, recommend json #3353 <https://github.com/pylons/pyramid/pull/3353>`_.
+* `change to use JSONSerializer for SignedCookieSessionFactory #3413 <https://github.com/pylons/pyramid/pull/3413>`_.
+
 For users with compatibility concerns, it's possible to craft a serializer that can handle both formats until you are satisfied that clients have had time to reasonably upgrade.
 Remember that sessions should be short-lived and thus the number of clients affected should be small (no longer than an auth token, at a maximum). An example serializer:
 
