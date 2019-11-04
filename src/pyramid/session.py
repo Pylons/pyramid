@@ -50,7 +50,7 @@ class PickleSerializer(object):
     .. warning::
 
         In :app:`Pyramid` 2.0 the default ``serializer`` option changed to
-        use :class:`pyramid.session.JSONSerializer`, and ``PickleSerializer`
+        use :class:`pyramid.session.JSONSerializer`, and ``PickleSerializer``
         has been been removed from active Pyramid code.
 
         Pyramid will require JSON-serializable objects in :app:`Pyramid` 2.0.
@@ -74,7 +74,6 @@ class PickleSerializer(object):
 
     ``protocol`` may be specified to control the version of pickle used.
     Defaults to :attr:`pickle.HIGHEST_PROTOCOL`.
-
     """
 
     def __init__(self, protocol=pickle.HIGHEST_PROTOCOL):
