@@ -4,6 +4,8 @@ unreleased
 Features
 --------
 
+- Deprecated ``pyramid.session.PickleSerializer``.
+
 - Changed the default ``serializer`` on
   ``pyramid.session.SignedCookieSessionFactory`` to use
   ``pyramid.session.JSONSerializer`` instead of

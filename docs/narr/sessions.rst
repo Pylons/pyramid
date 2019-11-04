@@ -91,26 +91,32 @@ Remember that sessions should be short-lived and thus the number of clients affe
 .. code-block:: python
     :linenos:
 
+    import pickle
     from pyramid.session import JSONSerializer
-    from pyramid.session import PickleSerializer
     from pyramid.session import SignedCookieSessionFactory
+
 
     class JSONSerializerWithPickleFallback(object):
         def __init__(self):
             self.json = JSONSerializer()
-            self.pickle = PickleSerializer()
 
-        def dumps(self, value):
+        def dumps(self, appstruct):
+            """Accept a Python object and return bytes."""
             # maybe catch serialization errors here and keep using pickle
             # while finding spots in your app that are not storing
             # JSON-serializable objects, falling back to pickle
-            return self.json.dumps(value)
+            return self.json.dumps(appstruct)
 
-        def loads(self, value):
+        def loads(self, bstruct):
+            """Accept bytes and return a Python object."""
             try:
-                return self.json.loads(value)
+                return self.json.loads(bstruct)
             except ValueError:
-                return self.pickle.loads(value)
+                try:
+                    return pickle.loads(bstruct)
+                # at least ValueError, AttributeError, ImportError but more to be safe
+                except Exception:
+                    raise ValueError
 
     # somewhere in your configuration code
     serializer = JSONSerializerWithPickleFallback()

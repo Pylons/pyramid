@@ -44,10 +44,24 @@ def manage_changed(wrapped):
 
 
 class PickleSerializer(object):
-    """ A serializer that uses the pickle protocol to dump Python
-    data to bytes.
+    """
+    .. deprecated:: 2.0
 
-    This is the default serializer used by Pyramid.
+    .. warning::
+
+    In :app:`Pyramid` 2.0 the default ``serializer`` option changed to
+    use :class:`pyramid.session.JSONSerializer`, and ``PickleSerializer`
+    has been been removed from active Pyramid code.
+
+    Pyramid will require JSON-serializable objects in :app:`Pyramid` 2.0.
+
+    Please see :ref:`pickle_session_deprecation`.
+
+    Also, please see: #2709, #3353, #3413
+
+    A serializer that uses the pickle protocol to dump Python data to bytes.
+
+    This was the default serializer used by Pyramid, but has been deprecated.
 
     ``protocol`` may be specified to control the version of pickle used.
     Defaults to :attr:`pickle.HIGHEST_PROTOCOL`.
