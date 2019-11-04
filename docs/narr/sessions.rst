@@ -101,10 +101,14 @@ Remember that sessions should be short-lived and thus the number of clients affe
             self.json = JSONSerializer()
 
         def dumps(self, appstruct):
-            """Accept a Python object and return bytes."""
-            # maybe catch serialization errors here and keep using pickle
-            # while finding spots in your app that are not storing
-            # JSON-serializable objects, falling back to pickle
+            """
+            Accept a Python object and return bytes.
+
+            During a migration, you may want to catch serialization errors here,
+            and keep using pickle while finding spots in your app that are not
+            storing JSON-serializable objects. You may also want to integrate
+            a fall-back to picke serialization here as well.
+            """
             return self.json.dumps(appstruct)
 
         def loads(self, bstruct):
@@ -114,8 +118,9 @@ Remember that sessions should be short-lived and thus the number of clients affe
             except ValueError:
                 try:
                     return pickle.loads(bstruct)
-                # at least ValueError, AttributeError, ImportError but more to be safe
                 except Exception:
+					# this block should catch at least:
+					# ValueError, AttributeError, ImportError; but more to be safe
                     raise ValueError
 
     # somewhere in your configuration code
