@@ -940,7 +940,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(result, 'http://example.com:8080')
 
     def test_partial_application_url_with_http_host_nondefault_port_https(
-        self
+        self,
     ):
         environ = {'wsgi.url_scheme': 'https', 'HTTP_HOST': 'example.com:4443'}
         request = self._makeOne(environ)

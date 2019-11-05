@@ -398,7 +398,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals_repoze_who_userid_is_unclean_Authenticated(
-        self
+        self,
     ):
         from pyramid.security import Everyone
 
