@@ -82,6 +82,14 @@ class PickleSerializer(object):
         return pickle.dumps(appstruct, self.protocol)
 
 
+deprecated(
+    'PickleSerializer',
+    'pyramid.session.PickleSerializer is deprecated as of Pyramid 2.0 for '
+    'security concerns. Use pyramid.session.JSONSerializer or reference the '
+    'narrative documentation for information on building a migration tool.',
+)
+
+
 JSONSerializer = JSONSerializer  # api
 
 
