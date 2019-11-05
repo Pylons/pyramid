@@ -55,7 +55,7 @@ class TestDummyResource(unittest.TestCase):
         return klass(name, parent, **kw)
 
     def test__setitem__and__getitem__and__delitem__and__contains__and_get(
-        self
+        self,
     ):
         class Dummy:
             pass
