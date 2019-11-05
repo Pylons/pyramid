@@ -113,7 +113,7 @@ Remember that sessions should be short-lived and thus the number of clients affe
             During a migration, you may want to catch serialization errors here,
             and keep using pickle while finding spots in your app that are not
             storing JSON-serializable objects. You may also want to integrate
-            a fall-back to picke serialization here as well.
+            a fall-back to pickle serialization here as well.
             """
             return self.json.dumps(appstruct)
 
@@ -125,8 +125,8 @@ Remember that sessions should be short-lived and thus the number of clients affe
                 try:
                     return pickle.loads(bstruct)
                 except Exception:
-					# this block should catch at least:
-					# ValueError, AttributeError, ImportError; but more to be safe
+                    # this block should catch at least:
+                    # ValueError, AttributeError, ImportError; but more to be safe
                     raise ValueError
 
     # somewhere in your configuration code
