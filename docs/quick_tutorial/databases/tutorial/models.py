@@ -15,7 +15,7 @@ from sqlalchemy.orm import (
 
 from zope.sqlalchemy import register
 
-DBSession = scoped_session(sessionmaker(autoflush=False))
+DBSession = scoped_session(sessionmaker())
 register(DBSession)
 Base = declarative_base()
 
