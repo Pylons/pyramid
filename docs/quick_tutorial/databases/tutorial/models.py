@@ -13,10 +13,10 @@ from sqlalchemy.orm import (
     sessionmaker,
     )
 
-from zope.sqlalchemy import ZopeTransactionExtension
+from zope.sqlalchemy import register
 
-DBSession = scoped_session(
-    sessionmaker(extension=ZopeTransactionExtension()))
+DBSession = scoped_session(sessionmaker(autoflush=False))
+register(DBSession)
 Base = declarative_base()
 
 
