@@ -11,7 +11,7 @@ matrix:
         - python: 3.5
           env: TOXENV=py35
         # aws s3 ls s3://travis-python-archives/binaries/ubuntu/14.04/x86_64/ | grep 'pypy.*bz2$'
-        - python: pypy-7.1.1
+        - python: pypy
           env: TOXENV=pypy
         - python: 3.5
           env: TOXENV=py2-cover,py3-cover,coverage
