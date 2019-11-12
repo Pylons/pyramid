@@ -533,6 +533,9 @@ class TestDummySession(unittest.TestCase):
         from pyramid.testing import DummySession
         return DummySession()
 
+    @testing.skip_on(
+        'pypy'
+    )  # see https://github.com/Pylons/pyramid/issues/3237
     def test_instance_conforms(self):
         from zope.interface.verify import verifyObject
         from pyramid.interfaces import ISession
