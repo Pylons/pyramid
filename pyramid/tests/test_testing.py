@@ -1,6 +1,9 @@
 import unittest
 from zope.component import getSiteManager
 
+from pyramid import testing
+
+
 class TestDummyRootFactory(unittest.TestCase):
     def _makeOne(self, environ):
         from pyramid.testing import DummyRootFactory
