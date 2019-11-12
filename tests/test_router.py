@@ -434,7 +434,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.root, context)
 
     def test_call_view_registered_nonspecific_nondefault_path_and_subpath(
-        self
+        self,
     ):
         from pyramid.interfaces import IViewClassifier
 

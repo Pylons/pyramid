@@ -755,8 +755,8 @@ class ResourceTreeTraverser(object):
 
 
 ModelGraphTraverser = (
-    ResourceTreeTraverser
-)  # b/w compat, not API, used in wild
+    ResourceTreeTraverser  # b/w compat, not API, used in wild
+)
 
 
 @implementer(IResourceURL)
@@ -791,8 +791,8 @@ class ResourceURL(object):
         self.physical_path = physical_path  # IResourceURL attr
         self.virtual_path_tuple = virtual_path_tuple  # IResourceURL attr (1.5)
         self.physical_path_tuple = (
-            physical_path_tuple
-        )  # IResourceURL attr (1.5)
+            physical_path_tuple  # IResourceURL attr (1.5)
+        )
 
 
 @lru_cache(1000)

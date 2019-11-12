@@ -17,7 +17,7 @@ cache:
 version: '{branch}.{build}'
 
 install:
-  - "%PYTHON%\\python.exe -m pip install tox"
+  - "%PYTHON%\\python.exe -m pip install -U tox virtualenv"
 
 build: off
 

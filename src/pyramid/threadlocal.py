@@ -55,7 +55,7 @@ def get_current_request():
 
 
 def get_current_registry(
-    context=None
+    context=None,
 ):  # context required by getSiteManager API
     """
     Return the currently active :term:`application registry` or the

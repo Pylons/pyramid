@@ -1282,8 +1282,8 @@ class DummyContext(object):
 class DummyRequest:
 
     application_url = (
-        'http://example.com:5432'
-    )  # app_url never ends with slash
+        'http://example.com:5432'  # app_url never ends with slash
+    )
     matchdict = None
     matched_route = None
 
