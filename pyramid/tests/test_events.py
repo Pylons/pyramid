@@ -235,6 +235,9 @@ class TestBeforeRender(unittest.TestCase):
         from pyramid.events import BeforeRender
         return BeforeRender(system, val)
 
+    @testing.skip_on(
+        'pypy'
+    )  # see https://github.com/Pylons/pyramid/issues/3237
     def test_instance_conforms(self):
         from zope.interface.verify import verifyObject
         from pyramid.interfaces import IBeforeRender
