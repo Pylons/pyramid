@@ -85,32 +85,49 @@ This is a stricter contract than the previous requirement that all objects be pi
 This is a backward-incompatible change.
 Previously, if a client-side session implementation was compromised, it left the application vulnerable to remote code execution attacks using specially-crafted sessions that execute code when deserialized.
 
+Please reference the following tickets if detailed information on these changes is needed:
+
+* `2.0 feature request: Require that sessions are JSON serializable #2709 <https://github.com/pylons/pyramid/issues/2709>`_.
+* `deprecate pickleable sessions, recommend json #3353 <https://github.com/pylons/pyramid/pull/3353>`_.
+* `change to use JSONSerializer for SignedCookieSessionFactory #3413 <https://github.com/pylons/pyramid/pull/3413>`_.
+
 For users with compatibility concerns, it's possible to craft a serializer that can handle both formats until you are satisfied that clients have had time to reasonably upgrade.
 Remember that sessions should be short-lived and thus the number of clients affected should be small (no longer than an auth token, at a maximum). An example serializer:
 
 .. code-block:: python
     :linenos:
 
+    import pickle
     from pyramid.session import JSONSerializer
-    from pyramid.session import PickleSerializer
     from pyramid.session import SignedCookieSessionFactory
+
 
     class JSONSerializerWithPickleFallback(object):
         def __init__(self):
             self.json = JSONSerializer()
-            self.pickle = PickleSerializer()
 
-        def dumps(self, value):
-            # maybe catch serialization errors here and keep using pickle
-            # while finding spots in your app that are not storing
-            # JSON-serializable objects, falling back to pickle
-            return self.json.dumps(value)
+        def dumps(self, appstruct):
+            """
+            Accept a Python object and return bytes.
 
-        def loads(self, value):
+            During a migration, you may want to catch serialization errors here,
+            and keep using pickle while finding spots in your app that are not
+            storing JSON-serializable objects. You may also want to integrate
+            a fall-back to pickle serialization here as well.
+            """
+            return self.json.dumps(appstruct)
+
+        def loads(self, bstruct):
+            """Accept bytes and return a Python object."""
             try:
-                return self.json.loads(value)
+                return self.json.loads(bstruct)
             except ValueError:
-                return self.pickle.loads(value)
+                try:
+                    return pickle.loads(bstruct)
+                except Exception:
+                    # this block should catch at least:
+                    # ValueError, AttributeError, ImportError; but more to be safe
+                    raise ValueError
 
     # somewhere in your configuration code
     serializer = JSONSerializerWithPickleFallback()

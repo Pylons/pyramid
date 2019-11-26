@@ -4,6 +4,11 @@ unreleased
 Features
 --------
 
+- Deprecated ``pyramid.session.PickleSerializer``.
+  See https://github.com/pylons/pyramid/issues/2709
+  and https://github.com/pylons/pyramid/pull/3353
+  and https://github.com/pylons/pyramid/pull/3413
+
 - Changed the default ``serializer`` on
   ``pyramid.session.SignedCookieSessionFactory`` to use
   ``pyramid.session.JSONSerializer`` instead of

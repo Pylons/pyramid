@@ -564,6 +564,10 @@ class Test_manage_changed(unittest.TestCase):
 
 
 class TestPickleSerializer(unittest.TestCase):
+    """
+    .. deprecated:: 2.0
+    """
+
     def _makeOne(self):
         from pyramid.session import PickleSerializer
 
