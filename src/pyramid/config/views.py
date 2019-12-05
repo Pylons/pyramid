@@ -2045,6 +2045,8 @@ class ViewsConfiguratorMixin(object):
         :class:`~pyramid.interfaces.ICacheBuster` interface.
         Default: ``False``.
 
+        .. versionadded:: 1.6
+
         """
         spec = self._make_spec(path)
         info = self._get_static_info()
