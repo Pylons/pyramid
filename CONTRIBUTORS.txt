@@ -336,3 +336,5 @@ Contributors
 - Alexandre Yukio Harano, 2018/10/05
 
 - Eric Atkin, 2019/02/15
+
+- Behzod Saidov, 2019/12/05
