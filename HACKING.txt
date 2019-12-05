@@ -80,10 +80,10 @@ Running Tests
   to your virtual environment:
 
     # run a single test
-    $ $VENV/bin/nosetests pyramid.tests.test_module:ClassName.test_mytestname
+    $ $VENV/bin/nosetests tests.test_module:ClassName.test_mytestname
 
     # run all tests in a class
-    $ $VENV/bin/nosetests pyramid.tests.test_module:ClassName
+    $ $VENV/bin/nosetests tests.test_module:ClassName
 
   Optionally you can install a nose plugin `nose-selecttests` to run specific
   tests.
@@ -99,7 +99,7 @@ Running Tests
   tests like so:
 
     $ $VENV/bin/pip install pytest
-    $ $VENV/bin/pytest --strict pyramid/
+    $ $VENV/bin/pytest --strict pyramid/ tests/
 
   To run individual tests (i.e., during development), see "pytest usage -
   Specifying tests / selecting tests":
