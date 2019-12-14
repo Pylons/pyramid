@@ -484,18 +484,21 @@ class IViewMapperFactory(Interface):
 
 class ISecurityPolicy(Interface):
     def identify(request):
-        """ Return an object identifying a trusted and verified user.  This
-        object may be anything, but should implement a ``__str__`` method that
-        outputs a corresponding :term:`userid`.
+        """ Return an object identifying a trusted and verified user.
 
+        The object may be anything.
         """
 
-    def permits(request, context, identity, permission):
+    def authenticated_userid(request, identity):
+        """ Return a :term:`userid` string identifying the trusted and
+        verified user, or ``None`` if unauthenticated.
+        """
+
+    def permits(request, context, permission):
         """ Return an instance of :class:`pyramid.security.Allowed` if a user
         of the given identity is allowed the ``permission`` in the current
         ``context``, else return an instance of
         :class:`pyramid.security.Denied`.
-
         """
 
     def remember(request, userid, **kw):
@@ -503,13 +506,11 @@ class ISecurityPolicy(Interface):
         :term:`userid` named ``userid`` when set in a response.  An
         individual authentication policy and its consumers can
         decide on the composition and meaning of ``**kw``.
-
         """
 
-    def forget(request):
+    def forget(request, **kw):
         """ Return a set of headers suitable for 'forgetting' the
         current user on subsequent requests.
-
         """
 
 

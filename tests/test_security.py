@@ -350,7 +350,7 @@ class TestAuthenticatedUserId(unittest.TestCase):
         request = _makeRequest()
         _registerAuthenticationPolicy(request.registry, 'yo')
         _registerSecurityPolicy(request.registry, 'wat')
-        self.assertEqual(request.authenticated_userid, 'yo')
+        self.assertEqual(request.authenticated_userid, 'wat')
 
     def test_with_security_policy(self):
         request = _makeRequest()
@@ -511,10 +511,7 @@ class TestLegacySecurityPolicy(unittest.TestCase):
         _registerAuthenticationPolicy(request.registry, ['p1', 'p2'])
         _registerAuthorizationPolicy(request.registry, True)
 
-        self.assertIs(
-            policy.permits(request, request.context, 'userid', 'permission'),
-            True,
-        )
+        self.assertTrue(policy.permits(request, request.context, 'permission'))
 
 
 _TEST_HEADER = 'X-Pyramid-Test'
@@ -532,7 +529,10 @@ class DummySecurityPolicy:
     def identify(self, request):
         return self.result
 
-    def permits(self, request, context, identity, permission):
+    def authenticated_userid(self, request):
+        return self.result
+
+    def permits(self, request, context, permission):
         return self.result
 
     def remember(self, request, userid, **kw):
@@ -540,7 +540,7 @@ class DummySecurityPolicy:
         self._header_remembered = headers[0]
         return headers
 
-    def forget(self, request):
+    def forget(self, request, **kw):
         headers = [(_TEST_HEADER, 'logout')]
         self._header_forgotten = headers[0]
         return headers

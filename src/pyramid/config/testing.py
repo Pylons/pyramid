@@ -13,6 +13,7 @@ class TestingConfiguratorMixin(object):
     # testing API
     def testing_securitypolicy(
         self,
+        userid=None,
         identity=None,
         permissive=True,
         remember_result=None,
@@ -39,6 +40,7 @@ class TestingConfiguratorMixin(object):
         not provided (or it is provided, and is ``None``), the default value
         ``[]`` (the empty list) will be returned by ``forget``.
 
+        XXX rewrite
         The behavior of the registered :term:`authentication policy`
         depends on the values provided for the ``userid`` and
         ``groupids`` argument.  The authentication policy will return
@@ -51,7 +53,6 @@ class TestingConfiguratorMixin(object):
         This function is most useful when testing code that uses
         the APIs named :meth:`pyramid.request.Request.has_permission`,
         :attr:`pyramid.request.Request.authenticated_userid`,
-        :attr:`pyramid.request.Request.effective_principals`, and
         :func:`pyramid.security.principals_allowed_by_permission`.
 
         .. versionadded:: 1.4
@@ -59,11 +60,14 @@ class TestingConfiguratorMixin(object):
 
         .. versionadded:: 1.4
            The ``forget_result`` argument.
+
+        .. versionchanged:: 2.0
+           Removed ``groupids`` argument and doc about effective principals.
         """
         from pyramid.testing import DummySecurityPolicy
 
         policy = DummySecurityPolicy(
-            identity, permissive, remember_result, forget_result
+            userid, identity, permissive, remember_result, forget_result
         )
         self.registry.registerUtility(policy, ISecurityPolicy)
         return policy

@@ -304,8 +304,8 @@ Glossary
 
    identity
      An identity is an object identifying the user associated with the
-     current request.  The identity can be any object, but should implement a
-     ``__str__`` method that outputs a corresponding :term:`userid`.
+     current request.  The identity can be any object, but security policies
+     should ensure that it represents a valid user (not deleted or deactivated).
 
    security policy
      A security policy in :app:`Pyramid` terms is an object implementing the

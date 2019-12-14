@@ -116,10 +116,6 @@ Probably Bad Ideas
 
 - Add functionality that mocks the behavior of ``repoze.browserid``.
 
-- Consider implementing the API outlined in
-  http://plope.com/pyramid_auth_design_api_postmortem, phasing out the
-  current auth-n-auth abstractions in a backwards compatible way.
-
 - Maybe add ``add_renderer_globals`` method to Configurator.
 
 - Supply ``X-Vhm-Host`` support (probably better to do what paste#prefix

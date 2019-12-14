@@ -9,7 +9,6 @@ ignore =
     # W504: line break after binary operator (flake8 is not PEP8 compliant)
     W504
 exclude =
-    src/pyramid/compat.py
     tests/fixtures
     tests/pkgs
     tests/test_config/pkgs

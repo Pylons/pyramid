@@ -2086,7 +2086,10 @@ class DummySecurityPolicy:
     def identify(self, request):
         return 123
 
-    def permits(self, request, context, identity, permission):
+    def authenticated_userid(self, request):
+        return 123
+
+    def permits(self, request, context, permission):
         return self.permitted
 
 
