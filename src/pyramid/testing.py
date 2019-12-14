@@ -38,7 +38,7 @@ class DummyRootFactory(object):
 
 
 class DummySecurityPolicy(object):
-    """ A standin for a security policy"""
+    """ A standin for a :term:`security policy`."""
 
     def __init__(
         self,
