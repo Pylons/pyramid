@@ -44,14 +44,25 @@ def manage_changed(wrapped):
 
 
 class PickleSerializer(object):
-    """ A serializer that uses the pickle protocol to dump Python
-    data to bytes.
+    """
+    .. deprecated:: 2.0
 
-    This is the default serializer used by Pyramid.
+    .. warning::
+
+        In :app:`Pyramid` 2.0 the default ``serializer`` option changed to
+        use :class:`pyramid.session.JSONSerializer`, and ``PickleSerializer``
+        has been been removed from active Pyramid code.
+
+        Pyramid will require JSON-serializable objects in :app:`Pyramid` 2.0.
+
+        Please see :ref:`pickle_session_deprecation`.
+
+    A serializer that uses the pickle protocol to dump Python data to bytes.
+
+    This was the default serializer used by Pyramid, but has been deprecated.
 
     ``protocol`` may be specified to control the version of pickle used.
     Defaults to :attr:`pickle.HIGHEST_PROTOCOL`.
-
     """
 
     def __init__(self, protocol=pickle.HIGHEST_PROTOCOL):
@@ -61,13 +72,22 @@ class PickleSerializer(object):
         """Accept bytes and return a Python object."""
         try:
             return pickle.loads(bstruct)
-        # at least ValueError, AttributeError, ImportError but more to be safe
         except Exception:
+            # this block should catch at least:
+            # ValueError, AttributeError, ImportError; but more to be safe
             raise ValueError
 
     def dumps(self, appstruct):
         """Accept a Python object and return bytes."""
         return pickle.dumps(appstruct, self.protocol)
+
+
+deprecated(
+    'PickleSerializer',
+    'pyramid.session.PickleSerializer is deprecated as of Pyramid 2.0 for '
+    'security concerns. Use pyramid.session.JSONSerializer or reference the '
+    'narrative documentation for information on building a migration tool.',
+)
 
 
 JSONSerializer = JSONSerializer  # api
@@ -438,10 +458,10 @@ def SignedCookieSessionFactory(
 
     .. warning::
 
-       In :app:`Pyramid` 2.0 the default ``serializer`` option changed to
-       use :class:`pyramid.session.JSONSerializer`. See
-       :ref:`pickle_session_deprecation` for more information about why this
-       change was made.
+        In :app:`Pyramid` 2.0 the default ``serializer`` option changed to
+        use :class:`pyramid.session.JSONSerializer`. See
+        :ref:`pickle_session_deprecation` for more information about why this
+        change was made.
 
     .. versionadded: 1.5a3
 

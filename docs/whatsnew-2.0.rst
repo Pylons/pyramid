@@ -58,7 +58,7 @@ flexibility in authorization implementations, especially those that do not
 match the ACL pattern.  If you were previously using
 :class:`pyramid.authorization.ACLAuthorizationPolicy`, you can achieve the same
 results by writing your own ``permits`` method using
-:class:`pyraid.authorization.ACLHelper`.  For more details on implementing an
+:class:`pyramid.authorization.ACLHelper`.  For more details on implementing an
 ACL, see :ref:`assigning_acls`.
 
 Pyramid does not provide any built-in security policies.  Similiar

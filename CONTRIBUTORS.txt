@@ -344,3 +344,9 @@ Contributors
 - Theron Luhn, 2019/03/30
 
 - Mandar Vaze, 2019/07/20
+
+- Jonathan Vanasco, 2019/11/05
+
+- Jan Likar, 2019/11/07
+
+- Andrea Borghi, 2019/11/11

@@ -62,6 +62,11 @@ Features
 Deprecations
 ------------
 
+- Deprecated ``pyramid.session.PickleSerializer``.
+  See https://github.com/pylons/pyramid/issues/2709
+  and https://github.com/pylons/pyramid/pull/3353
+  and https://github.com/pylons/pyramid/pull/3413
+
 Backward Incompatibilities
 --------------------------
 
