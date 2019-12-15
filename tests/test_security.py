@@ -466,6 +466,12 @@ class TestLegacySecurityPolicy(unittest.TestCase):
             policy.forget(request), [('X-Pyramid-Test', 'logout')]
         )
 
+    def test_forget_with_kwargs(self):
+        from pyramid.security import LegacySecurityPolicy
+
+        policy = LegacySecurityPolicy()
+        self.assertRaises(ValueError, lambda: policy.forget(None, foo='bar'))
+
     def test_permits(self):
         from pyramid.security import LegacySecurityPolicy
 

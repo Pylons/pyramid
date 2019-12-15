@@ -439,8 +439,12 @@ class LegacySecurityPolicy:
         return authn.remember(request, userid, **kw)
 
     def forget(self, request, **kw):
+        if kw:
+            raise ValueError(
+                'Legacy authentication policies do not support keyword '
+                'arguments for `forget`'
+            )
         authn = self._get_authn_policy(request)
-        # XXX log warning if varkwargs were passed?
         return authn.forget(request)
 
     def permits(self, request, context, permission):
