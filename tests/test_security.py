@@ -165,15 +165,6 @@ class TestPrincipalsAllowedByPermission(unittest.TestCase):
         result = self._callFUT(context, 'view')
         self.assertEqual(result, [Everyone])
 
-    def test_with_authorization_policy(self):
-        from pyramid.threadlocal import get_current_registry
-
-        registry = get_current_registry()
-        _registerAuthorizationPolicy(registry, 'yo')
-        context = DummyContext()
-        result = self._callFUT(context, 'view')
-        self.assertEqual(result, 'yo')
-
 
 class TestRemember(unittest.TestCase):
     def setUp(self):
@@ -358,15 +349,6 @@ class TestAuthenticatedUserId(unittest.TestCase):
         _registerSecurityPolicy(request.registry, 123)
         self.assertEqual(request.authenticated_userid, '123')
 
-    def test_with_authentication_policy_no_reg_on_request(self):
-        from pyramid.threadlocal import get_current_registry
-
-        registry = get_current_registry()
-        request = _makeRequest()
-        del request.registry
-        _registerAuthenticationPolicy(registry, 'yo')
-        self.assertEqual(request.authenticated_userid, 'yo')
-
 
 class TestUnAuthenticatedUserId(unittest.TestCase):
     def setUp(self):
@@ -390,15 +372,6 @@ class TestUnAuthenticatedUserId(unittest.TestCase):
         _registerSecurityPolicy(request.registry, 'yo')
         self.assertEqual(request.unauthenticated_userid, 'yo')
 
-    def test_with_authentication_policy_no_reg_on_request(self):
-        from pyramid.threadlocal import get_current_registry
-
-        registry = get_current_registry()
-        request = _makeRequest()
-        del request.registry
-        _registerAuthenticationPolicy(registry, 'yo')
-        self.assertEqual(request.unauthenticated_userid, 'yo')
-
 
 class TestEffectivePrincipals(unittest.TestCase):
     def setUp(self):
@@ -416,15 +389,6 @@ class TestEffectivePrincipals(unittest.TestCase):
     def test_with_authentication_policy(self):
         request = _makeRequest()
         _registerAuthenticationPolicy(request.registry, 'yo')
-        self.assertEqual(request.effective_principals, 'yo')
-
-    def test_with_authentication_policy_no_reg_on_request(self):
-        from pyramid.threadlocal import get_current_registry
-
-        registry = get_current_registry()
-        request = _makeRequest()
-        del request.registry
-        _registerAuthenticationPolicy(registry, 'yo')
         self.assertEqual(request.effective_principals, 'yo')
 
 
