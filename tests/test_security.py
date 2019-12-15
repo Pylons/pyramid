@@ -345,8 +345,7 @@ class TestAuthenticatedUserId(unittest.TestCase):
 
     def test_with_security_policy(self):
         request = _makeRequest()
-        # Ensure the identity is stringified.
-        _registerSecurityPolicy(request.registry, 123)
+        _registerSecurityPolicy(request.registry, '123')
         self.assertEqual(request.authenticated_userid, '123')
 
 
