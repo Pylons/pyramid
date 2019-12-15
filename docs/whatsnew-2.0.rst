@@ -40,17 +40,15 @@ The new security policy should implement
 ``security_policy`` argument of :class:`pyramid.config.Configurator` or
 :meth:`pyramid.config.Configurator.set_security_policy`.
 
+The policy contains ``authenticated_userid`` and ``remember``,
+with the same method signatures as in the legacy authentication policy.  It
+also contains ``forget``, but now with keyword arguments in the method
+signature.
+
 The new security policy adds the concept of an :term:`identity`, which is an
 object representing the user associated with the current request.  The identity
 can be accessed via :attr:`pyramid.request.Request.authenticated_identity`.
-The object can be of any shape, such as a simple ID string or an ORM object,
-and should represent an active user.
-
-As in previous version, the property :attr:`pyramid.request.Request.authenticated_userid`
-can be used to get a string identifying the current user, for example
-the ID of the user object in a database.  The value is obtained from the
-security policy.
-(:attr:`pyramid.request.Request.unauthenticated_userid` has been deprecated.)
+The object can be of any shape, such as a simple ID string or an ORM object.
 
 The concept of :term:`principals <principal>` has been removed; the
 ``permits`` method is passed an identity object.  This change gives much more
@@ -97,9 +95,8 @@ The new :attr:`pyramid.request.Request.authenticated_identity` property will
 output the same result as :attr:`pyramid.request.Request.authenticated_userid`.
 
 If using a security policy,
-:attr:`pyramid.request.Request.unauthenticated_userid` and
-:attr:`pyramid.request.Request.authenticated_userid` will both return the
-string representation of the :term:`identity`.
+:attr:`pyramid.request.Request.authenticated_userid` will return the same value
+as :attr:`pyramid.request.Request.authenticated_userid`.
 :attr:`pyramid.request.Request.effective_principals` will always return a
 one-element list containing the :data:`pyramid.security.Everyone` principal, as
 there is no equivalent in the new security policy.

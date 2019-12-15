@@ -32,14 +32,11 @@ how it works at a high level:
 - A :term:`view callable` is located by :term:`view lookup` using the context
   as well as other attributes of the request.
 
-- If a :term:`security policy` is in effect, it is passed the request and
-  returns the :term:`identity` of the current user.
-
 - If a :term:`security policy` is in effect and the :term:`view
   configuration` associated with the view callable that was found has a
-  :term:`permission` associated with it, the policy is passed the
-  :term:`context`, the current :term:`identity`, and the :term:`permission`
-  associated with the view; it will allow or deny access.
+  :term:`permission` associated with it, the policy is passed :term:`request`,
+  the :term:`context`,  and the :term:`permission` associated with the view; it
+  will allow or deny access.
 
 - If the security policy allows access, the view callable is invoked.
 
@@ -62,7 +59,7 @@ Writing a Security Policy
 accessible by completely anonymous users.  In order to begin protecting views
 from execution based on security settings, you need to write a security policy.
 
-Security policies are simple classes implementing a
+Security policies are simple classes implementing
 :class:`pyramid.interfaces.ISecurityPolicy`.
 A simple security policy might look like the following:
 
@@ -72,15 +69,16 @@ A simple security policy might look like the following:
     from pyramid.security import Allowed, Denied
 
     class SessionSecurityPolicy:
-        def authenticated_userid(self, request):
-            """ Return the user ID stored in the session. """
-            return request.session.get('userid')
-
         def identify(self, request):
             """ Return app-specific user object. """
-            userid = self.authenticated_userid(request)
-            if userid is not None:
-                return models.Users.get(id=userid)
+            userid = request.session.get('userid')
+            if userid is None:
+                return None
+            return load_identity_from_db(request, userid)
+
+        def authenticated_userid(self, request):
+            """ Return a string ID for the user. """
+            return self.identify(request).id
 
         def permits(self, request, context, permission):
             """ Allow access to everything if signed in. """
@@ -143,12 +141,12 @@ For example, our above security policy can leverage these helpers like so:
         def __init__(self):
             self.helper = SessionAuthenticationHelper()
 
-        def authenticated_userid(self, request):
-            # XXX add code
-            ...
-
         def identify(self, request):
-            return self.helper.identify(request)
+            userid = self.helper.authenticated_userid(request)
+            return load_identity_from_db(request, userid)
+
+        def authenticated_userid(self, request):
+            return self.identify(request).id
 
         def permits(self, request, context, permission):
             """ Allow access to everything if signed in. """
@@ -164,19 +162,11 @@ For example, our above security policy can leverage these helpers like so:
         def forget(request, **kw):
             return self.helper.forget(request, **kw)
 
-Helpers are intended to be used with application-specific code, so perhaps your
-authentication also queries the database to ensure the identity is valid.
-
-.. code-block:: python
-    :linenos:
-
-    def identify(self, request):
-        # XXX review: use authenticated_userid below or identify?
-        user_id = self.helper.identify(request)
-        if validate_user_id(user_id):
-            return user_id
-        else:
-            return None
+Helpers are intended to be used with application-specific code.  Notice how the
+above code takes the userid from the helper and uses it to load the
+:term:`identity` from the database.  ``authenticated_userid`` pulls the
+:term:`userid` from the :term:`identity` in order to guarantee that the user ID
+stored in the session exists in the database ("authenticated").
 
 .. index::
    single: permissions

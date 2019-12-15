@@ -484,9 +484,9 @@ class IViewMapperFactory(Interface):
 
 class ISecurityPolicy(Interface):
     def identify(request):
-        """ Return an object identifying a trusted and verified user.
-
-        The object may be anything.
+        """ Return an object identifying a trusted and verified user for the
+        current request.  The object can be of any shape, such as a simple ID
+        string or an ORM object.
         """
 
     def authenticated_userid(request, identity):
