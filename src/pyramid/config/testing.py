@@ -53,13 +53,14 @@ class TestingConfiguratorMixin(object):
         :type forget_result:  list
 
         .. versionadded:: 1.4
-           The ``remember_result`` argument.
+            The ``remember_result`` argument.
 
         .. versionadded:: 1.4
-           The ``forget_result`` argument.
+            The ``forget_result`` argument.
 
         .. versionchanged:: 2.0
-           Removed ``groupids`` argument and add `identity` argument.
+            Removed ``groupids`` argument and add `identity` argument.
+
         """
         from pyramid.testing import DummySecurityPolicy
 

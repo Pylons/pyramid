@@ -174,9 +174,9 @@
 
       .. deprecated:: 2.0
 
-         ``unauthenticated_userid`` has been deprecated in version 2.0.  Use
-         :attr:`authenticated_userid` or :attr:`authenticated_identity`
-         instead.  See :ref:`upgrading_auth` for more information.
+          ``unauthenticated_userid`` has been deprecated in version 2.0.  Use
+          :attr:`authenticated_userid` or :attr:`authenticated_identity`
+          instead.  See :ref:`upgrading_auth` for more information.
 
       A property which returns a value which represents the *claimed* (not
       verified) :term:`userid` of the credentials present in the
@@ -193,8 +193,8 @@
 
       .. deprecated:: 2.0
 
-         The new security policy has removed the concept of principals.  See
-         :ref:`upgrading_auth` for more information.
+          The new security policy has removed the concept of principals.  See
+          :ref:`upgrading_auth` for more information.
 
       A property which returns the list of 'effective' :term:`principal`
       identifiers for this request.  This list typically includes the
