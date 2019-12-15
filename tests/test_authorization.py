@@ -3,9 +3,6 @@ import unittest
 from pyramid.testing import cleanUp
 
 
-# XXX fix all tests to add request, remove principals
-
-
 class TestACLAuthorizationPolicy(unittest.TestCase):
     def setUp(self):
         cleanUp()
