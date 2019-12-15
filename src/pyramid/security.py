@@ -376,18 +376,14 @@ class AuthenticationAPIMixin(object):
         associated with the userid exists in persistent storage.
 
         """
-        policy = _get_security_policy(self)
-        if policy is None:
+        authn = _get_authentication_policy(self)
+        security = _get_security_policy(self)
+        if authn is not None:
+            return authn.unauthenticated_userid(self)
+        elif security is not None:
+            return security.authenticated_userid(self)
+        else:
             return None
-        return policy.authenticated_userid(self)
-
-    unauthenticated_userid = deprecated(
-        unauthenticated_userid,
-        'The new security policy has removed the concept of unauthenticated '
-        'userid.  See https://docs.pylonsproject.org/projects/pyramid/en/latest'
-        '/whatsnew-2.0.html#upgrading-authentication-authorization '
-        'for more information.',
-    )
 
     @property
     def effective_principals(self):
