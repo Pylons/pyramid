@@ -165,6 +165,15 @@ class TestPrincipalsAllowedByPermission(unittest.TestCase):
         result = self._callFUT(context, 'view')
         self.assertEqual(result, [Everyone])
 
+    def test_with_authorization_policy(self):
+        from pyramid.threadlocal import get_current_registry
+
+        registry = get_current_registry()
+        _registerAuthorizationPolicy(registry, 'yo')
+        context = DummyContext()
+        result = self._callFUT(context, 'view')
+        self.assertEqual(result, 'yo')
+
 
 class TestRemember(unittest.TestCase):
     def setUp(self):
