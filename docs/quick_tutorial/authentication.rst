@@ -104,8 +104,6 @@ Steps
 Analysis
 ========
 
-# TODO update
-
 Unlike many web frameworks, Pyramid includes a built-in but optional security
 model for authentication and authorization. This security system is intended to
 be flexible and support many needs. In this security model, authentication (who
