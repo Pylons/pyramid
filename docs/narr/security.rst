@@ -35,7 +35,7 @@ how it works at a high level:
 - If a :term:`security policy` is in effect and the :term:`view
   configuration` associated with the view callable that was found has a
   :term:`permission` associated with it, the policy is passed :term:`request`,
-  the :term:`context`,  and the :term:`permission` associated with the view; it
+  the :term:`context`, and the :term:`permission` associated with the view; it
   will allow or deny access.
 
 - If the security policy allows access, the view callable is invoked.
