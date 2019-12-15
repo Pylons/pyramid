@@ -25,7 +25,7 @@ class TestDummySecurityPolicy(unittest.TestCase):
 
     def _makeOne(self, identity=None, permissive=True):
         klass = self._getTargetClass()
-        return klass(identity, permissive)
+        return klass(identity, identity, permissive)
 
     def test_identify(self):
         policy = self._makeOne('user')

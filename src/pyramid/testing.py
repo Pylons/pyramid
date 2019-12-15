@@ -48,7 +48,7 @@ class DummySecurityPolicy(object):
         remember_result=None,
         forget_result=None,
     ):
-        self.userid = None
+        self.userid = userid
         self.identity = identity
         self.permissive = permissive
         if remember_result is None:
