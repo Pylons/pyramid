@@ -2045,9 +2045,10 @@ class TestViewsConfigurationMixin(unittest.TestCase):
                 outerself.assertEqual(r, request)
                 return 123
 
-            def permits(self, r, context, permission):
+            def permits(self, r, context, identity, permission):
                 outerself.assertEqual(r, request)
                 outerself.assertEqual(context, None)
+                outerself.assertEqual(identity, 123)
                 outerself.assertEqual(permission, 'view')
                 return True
 
@@ -2069,9 +2070,10 @@ class TestViewsConfigurationMixin(unittest.TestCase):
                 outerself.assertEqual(r, request)
                 return 123
 
-            def permits(self, r, context, permission):
+            def permits(self, r, context, identity, permission):
                 outerself.assertEqual(r, request)
                 outerself.assertEqual(context, None)
+                outerself.assertEqual(identity, 123)
                 outerself.assertEqual(permission, 'view')
                 return True
 

@@ -33,7 +33,7 @@ class TestDummySecurityPolicy(unittest.TestCase):
 
     def test_permits(self):
         policy = self._makeOne()
-        self.assertTrue(policy.permits(None, None, None))
+        self.assertEqual(policy.permits(None, None, None, None), True)
 
     def test_forget(self):
         policy = self._makeOne()
