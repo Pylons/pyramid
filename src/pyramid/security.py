@@ -427,6 +427,9 @@ class LegacySecurityPolicy:
     def _get_authz_policy(self, request):
         return request.registry.getUtility(IAuthorizationPolicy)
 
+    def identify(self, request):
+        return self.authenticated_userid(request)
+
     def authenticated_userid(self, request):
         authn = self._get_authn_policy(request)
         return authn.authenticated_userid(request)
