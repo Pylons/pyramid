@@ -285,6 +285,14 @@ class EffectivePrincipalsPredicate(object):
         else:
             self.val = set((val,))
 
+    __init__ = deprecated(
+        __init__,
+        'The new security policy has removed the concept of principals.  See '
+        'https://docs.pylonsproject.org/projects/pyramid/en/latest'
+        '/whatsnew-2.0.html#upgrading-authentication-authorization '
+        'for more information.',
+    )
+
     def text(self):
         return 'effective_principals = %s' % sorted(list(self.val))
 
@@ -297,15 +305,6 @@ class EffectivePrincipalsPredicate(object):
             if self.val.issubset(rpset):
                 return True
         return False
-
-
-deprecated(
-    'EffectivePrincipalsPredicate',
-    'The new security policy has removed the concept of principals.  See '
-    'https://docs.pylonsproject.org/projects/pyramid/en/latest'
-    '/whatsnew-2.0.html#upgrading-authentication-authorization '
-    'for more information.',
-)
 
 
 class Notted(object):
