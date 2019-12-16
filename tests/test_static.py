@@ -494,16 +494,15 @@ class Test_static_view_content_encodings(unittest.TestCase):
     def test_call_for_unencoded_variant_with_only_encoded_variant_no_accept(
         self,
     ):
+        from pyramid.httpexceptions import HTTPNotFound
+
         inst = self._makeOne(
             'tests:fixtures/static', content_encodings=['gzip']
         )
         request = self._makeRequest({'PATH_INFO': '/only_encoded.html'})
         context = DummyContext()
 
-        res = inst(context, request)
-        self.assertNotIn('Vary', res.headers)
-        self.assertNotIn('Content-Encoding', res.headers)
-        self.assertEqual(len(res.body), 187)
+        self.assertRaises(HTTPNotFound, lambda: inst(context, request))
 
     def test_call_for_unencoded_variant_with_only_encoded_variant_with_accept(
         self,
