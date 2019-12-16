@@ -533,7 +533,7 @@ class Test_static_view_content_encodings(unittest.TestCase):
             'tests:fixtures/static', content_encodings=['gzip']
         )
         request = self._makeRequest(
-            {'PATH_INFO': '/only_encoded.html', 'HTTP_ACCEPT_ENCODING': 'br',}
+            {'PATH_INFO': '/only_encoded.html', 'HTTP_ACCEPT_ENCODING': 'br'}
         )
         context = DummyContext()
 
