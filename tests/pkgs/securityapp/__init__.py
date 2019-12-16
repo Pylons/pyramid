@@ -4,12 +4,12 @@ from pyramid.security import Allowed, Denied
 
 class SecurityPolicy:
     def identify(self, request):
-        return self.authenticated_userid(request)
+        raise NotImplementedError()  # pragma: no cover
 
     def authenticated_userid(self, request):
         return request.environ.get('REMOTE_USER')
 
-    def permits(self, request, context, identity, permission):
+    def permits(self, request, context, permission):
         userid = self.authenticated_userid(request)
         if userid and permission == 'foo':
             return Allowed('')

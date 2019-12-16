@@ -489,10 +489,7 @@ class TestLegacySecurityPolicy(unittest.TestCase):
         _registerAuthenticationPolicy(request.registry, ['p1', 'p2'])
         _registerAuthorizationPolicy(request.registry, True)
 
-        self.assertIs(
-            policy.permits(request, request.context, 'userid', 'permission'),
-            True,
-        )
+        self.assertTrue(policy.permits(request, request.context, 'permission'))
 
 
 _TEST_HEADER = 'X-Pyramid-Test'
@@ -513,7 +510,7 @@ class DummySecurityPolicy:
     def authenticated_userid(self, request):
         return self.result
 
-    def permits(self, request, context, identity, permission):
+    def permits(self, request, context, permission):
         return self.result
 
     def remember(self, request, userid, **kw):

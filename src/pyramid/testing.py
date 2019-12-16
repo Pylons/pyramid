@@ -64,7 +64,7 @@ class DummySecurityPolicy(object):
     def authenticated_userid(self, request):
         return self.userid
 
-    def permits(self, request, context, identity, permission):
+    def permits(self, request, context, permission):
         return self.permissive
 
     def remember(self, request, userid, **kw):

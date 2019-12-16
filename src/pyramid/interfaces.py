@@ -494,7 +494,7 @@ class ISecurityPolicy(Interface):
         verified user, or ``None`` if unauthenticated.
         """
 
-    def permits(request, context, identity, permission):
+    def permits(request, context, permission):
         """ Return an instance of :class:`pyramid.security.Allowed` if a user
         of the given identity is allowed the ``permission`` in the current
         ``context``, else return an instance of

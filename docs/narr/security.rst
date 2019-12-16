@@ -80,8 +80,9 @@ A simple security policy might look like the following:
             """ Return a string ID for the user. """
             return self.identify(request).id
 
-        def permits(self, request, context, identity, permission):
+        def permits(self, request, context, permission):
             """ Allow access to everything if signed in. """
+            identity = self.identify(request)
             if identity is not None:
                 return Allowed('User is signed in.')
             else:
@@ -147,8 +148,9 @@ For example, our above security policy can leverage these helpers like so:
         def authenticated_userid(self, request):
             return self.identify(request).id
 
-        def permits(self, request, context, identity, permission):
+        def permits(self, request, context, permission):
             """ Allow access to everything if signed in. """
+            identity = self.identify(request)
             if identity is not None:
                 return Allowed('User is signed in.')
             else:
@@ -236,7 +238,9 @@ might look like so:
     from pyramid.security import Allowed, Denied
 
     class SecurityPolicy:
-        def permits(self, request, context, identity, permission):
+        def permits(self, request, context, permission):
+            identity = self.identify(request)
+
             if identity is None:
                 return Denied('User is not signed in.')
             if identity.role == 'admin':
@@ -326,7 +330,7 @@ object.  An implementation might look like this:
     from pyramid.authorization import ACLHelper
 
     class SecurityPolicy:
-        def permits(self, request, context, identity, permission):
+        def permits(self, request, context, permission):
             principals = [Everyone]
             if identity is not None:
                 principals.append(Authenticated)

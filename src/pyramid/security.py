@@ -351,9 +351,7 @@ class SecurityAPIMixin:
         policy = _get_security_policy(self)
         if policy is None:
             return Allowed('No security policy in use.')
-        return policy.permits(
-            self, context, self.authenticated_identity, permission
-        )
+        return policy.permits(self, context, permission)
 
 
 class AuthenticationAPIMixin(object):
@@ -449,7 +447,7 @@ class LegacySecurityPolicy:
         authn = self._get_authn_policy(request)
         return authn.forget(request)
 
-    def permits(self, request, context, identity, permission):
+    def permits(self, request, context, permission):
         authn = self._get_authn_policy(request)
         authz = self._get_authz_policy(request)
         principals = authn.effective_principals(request)

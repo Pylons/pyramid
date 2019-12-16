@@ -316,8 +316,7 @@ def _secured_view(view, info):
     if policy and (permission is not None):
 
         def permitted(context, request):
-            identity = policy.identify(request)
-            return policy.permits(request, context, identity, permission)
+            return policy.permits(request, context, permission)
 
         def secured_view(context, request):
             result = permitted(context, request)
@@ -363,10 +362,8 @@ def _authdebug_view(view, info):
                 elif permission is None:
                     msg = 'Allowed (no permission registered)'
                 else:
-                    identity = policy.identify(request)
-                    msg = str(
-                        policy.permits(request, context, identity, permission)
-                    )
+                    result = policy.permits(request, context, permission)
+                    msg = str(result)
             else:
                 msg = 'Allowed (no security policy in use)'
 
