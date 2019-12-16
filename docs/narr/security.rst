@@ -69,16 +69,20 @@ A simple security policy might look like the following:
     from pyramid.security import Allowed, Denied
 
     class SessionSecurityPolicy:
+        def authenticated_userid(self, request):
+            """ Return a string ID for the user. """
+            userid = self.identify(request).id
+            if validate_userid(request, userid):
+                return userid
+            else:
+                return None
+
         def identify(self, request):
             """ Return app-specific user object. """
-            userid = request.session.get('userid')
+            userid = self.authenticated_userid
             if userid is None:
                 return None
             return load_identity_from_db(request, userid)
-
-        def authenticated_userid(self, request):
-            """ Return a string ID for the user. """
-            return self.identify(request).id
 
         def permits(self, request, context, permission):
             """ Allow access to everything if signed in. """
@@ -141,12 +145,18 @@ For example, our above security policy can leverage these helpers like so:
         def __init__(self):
             self.helper = SessionAuthenticationHelper()
 
-        def identify(self, request):
-            userid = self.helper.authenticated_userid(request)
-            return load_identity_from_db(request, userid)
-
         def authenticated_userid(self, request):
-            return self.identify(request).id
+            userid = self.helper.authenticated_userid(request)
+            if validate_userid(request, userid):
+                return userid
+            else:
+                return None
+
+        def identify(self, request):
+            userid = self.authenticated_userid
+            if userid is None:
+                return None
+            return load_identity_from_db(request, userid)
 
         def permits(self, request, context, permission):
             """ Allow access to everything if signed in. """

@@ -483,15 +483,14 @@ class IViewMapperFactory(Interface):
 
 
 class ISecurityPolicy(Interface):
-    def identify(request):
-        """ Return an object identifying a trusted and verified user for the
-        current request.  The object can be of any shape, such as a simple ID
-        string or an ORM object.
-        """
-
     def authenticated_userid(request, identity):
         """ Return a :term:`userid` string identifying the trusted and
         verified user, or ``None`` if unauthenticated.
+        """
+
+    def identify(request):
+        """ Return the :term:`identity` of the current user.  The object can be
+        of any shape, such as a simple ID string or an ORM object.
         """
 
     def permits(request, context, permission):
