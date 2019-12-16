@@ -86,10 +86,10 @@ At the time of a Pyramid version release, each supports all versions of Python
 through the end of their lifespans. The end-of-life for a given version of
 Python is when security updates are no longer released.
 
-- `Python 3.4 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2019-03-16	.
-- `Python 3.5 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2020-09-13	.
+- `Python 3.5 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2020-09-13.
 - `Python 3.6 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2021-12-23.
-- `Python 3.7 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2023-06-27	.
+- `Python 3.7 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2023-06-27.
+- `Python 3.8 Lifespan <https://devguide.python.org/#status-of-python-branches>`_ 2024-10-??.
 
 To determine the Python support for a specific release of Pyramid, view its
 ``tox.ini`` file at the root of the repository's version.

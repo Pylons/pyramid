@@ -32,7 +32,7 @@ you to send messages to :mod:`Python standard library logging package
 :term:`PasteDeploy` ``development.ini`` and ``production.ini`` files created
 when you use our cookiecutter include a basic configuration for the Python
 :mod:`logging` package.
-These ``.ini`` file sections are passed to the `logging module's config file configuration engine <https://docs.python.org/3.7/howto/logging.html#configuring-logging>`_.
+These ``.ini`` file sections are passed to the `logging module's config file configuration engine <https://docs.python.org/3/howto/logging.html#configuring-logging>`_.
 
 PasteDeploy ``.ini`` files use the Python standard library :mod:`ConfigParser
 format <ConfigParser>`. This is the same format used as the Python
