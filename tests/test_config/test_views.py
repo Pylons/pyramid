@@ -2041,10 +2041,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         outerself = self
 
         class DummyPolicy(object):
-            def identify(self, r):
-                outerself.assertEqual(r, request)
-                return 123
-
             def permits(self, r, context, permission):
                 outerself.assertEqual(r, request)
                 outerself.assertEqual(context, None)
@@ -2065,10 +2061,6 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         outerself = self
 
         class DummyPolicy(object):
-            def identify(self, r):
-                outerself.assertEqual(r, request)
-                return 123
-
             def permits(self, r, context, permission):
                 outerself.assertEqual(r, request)
                 outerself.assertEqual(context, None)
