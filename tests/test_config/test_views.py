@@ -4174,7 +4174,9 @@ class DummyRegistry:
     utility = None
 
     def __init__(self):
-        self.settings = {}
+        self.settings = {
+            'pyramid.reload_assets': False,
+        }
 
     def queryUtility(self, type_or_iface, name=None, default=None):
         return self.utility or default

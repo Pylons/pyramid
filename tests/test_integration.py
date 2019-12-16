@@ -73,8 +73,8 @@ class IntegrationBase(object):
             root_factory=self.root_factory, package=self.package
         )
         config.include(self.package)
-        app = config.make_wsgi_app()
-        self.testapp = TestApp(app)
+        self.app = config.make_wsgi_app()
+        self.testapp = TestApp(self.app)
         self.config = config
 
     def tearDown(self):
@@ -225,6 +225,57 @@ class TestStaticAppUsingAbsPath(StaticAppBase, unittest.TestCase):
 
 class TestStaticAppUsingAssetSpec(StaticAppBase, unittest.TestCase):
     package = 'tests.pkgs.static_assetspec'
+
+
+class TestStaticAppWithEncodings(IntegrationBase, unittest.TestCase):
+    package = 'tests.pkgs.static_encodings'
+
+    # XXX webtest actually runs response.decode_content() and so we can't
+    # use it to test gzip- or deflate-encoded responses to see if they
+    # were transferred correctly
+    def _getResponse(self, *args, **kwargs):
+        from pyramid.request import Request
+
+        req = Request.blank(*args, **kwargs)
+        return req.get_response(self.app)
+
+    def test_no_accept(self):
+        res = self._getResponse('/static/encoded.html')
+        self.assertEqual(res.headers['Vary'], 'Accept-Encoding')
+        self.assertNotIn('Content-Encoding', res.headers)
+        _assertBody(
+            res.body, os.path.join(here, 'fixtures/static/encoded.html')
+        )
+
+    def test_unsupported_accept(self):
+        res = self._getResponse(
+            '/static/encoded.html',
+            headers={'Accept-Encoding': 'br, foo, bar'},
+        )
+        self.assertEqual(res.headers['Vary'], 'Accept-Encoding')
+        self.assertNotIn('Content-Encoding', res.headers)
+        _assertBody(
+            res.body, os.path.join(here, 'fixtures/static/encoded.html')
+        )
+
+    def test_accept_gzip(self):
+        res = self._getResponse(
+            '/static/encoded.html',
+            headers={'Accept-Encoding': 'br, foo, gzip'},
+        )
+        self.assertEqual(res.headers['Vary'], 'Accept-Encoding')
+        self.assertEqual(res.headers['Content-Encoding'], 'gzip')
+        _assertBody(
+            res.body, os.path.join(here, 'fixtures/static/encoded.html.gz')
+        )
+
+    def test_accept_gzip_returns_identity(self):
+        res = self._getResponse(
+            '/static/index.html', headers={'Accept-Encoding': 'gzip'}
+        )
+        self.assertNotIn('Vary', res.headers)
+        self.assertNotIn('Content-Encoding', res.headers)
+        _assertBody(res.body, os.path.join(here, 'fixtures/static/index.html'))
 
 
 class TestStaticAppNoSubpath(unittest.TestCase):

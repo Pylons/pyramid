@@ -59,6 +59,12 @@ Features
   to predicate factories as their second argument.
   See https://github.com/Pylons/pyramid/pull/3514
 
+- Added support for serving pre-compressed static assets by using the
+  ``content_encodings`` argument of
+  ``pyramid.config.Configurator.add_static_view`` and
+  ``pyramid.static.static_view``.
+  See https://github.com/Pylons/pyramid/pull/3537
+
 Deprecations
 ------------
 

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from functools import lru_cache
 import json
+import mimetypes
 import os
 
-from os.path import getmtime, normcase, normpath, join, isdir, exists
+from os.path import getmtime, getsize, normcase, normpath, join, isdir, exists
 
 from pkg_resources import resource_exists, resource_filename, resource_isdir
 
@@ -53,6 +54,19 @@ class static_view(object):
     the static application will consider request.environ[``PATH_INFO``] as
     ``PATH_INFO`` input. By default, this is ``False``.
 
+    ``reload`` controls whether a cache of files is maintained or the asset
+    subsystem is queried per-request to determine what files are available.
+    By default, this is ``False`` and new files added while the process is
+    running are not recognized.
+
+    ``content_encodings`` is a list of alternative file encodings supported
+    in the ``Accept-Encoding`` HTTP Header. Alternative files are found using
+    file extensions defined in :attr:`mimetypes.encodings_map`. An encoded
+    asset will be returned with the ``Content-Encoding`` header set to the
+    selected encoding. If the asset contains alternative encodings then the
+    ``Accept-Encoding`` value will be added to the response's ``Vary`` header.
+    By default, the list is empty and no alternatives will be supported.
+
     .. note::
 
        If the ``root_dir`` is relative to a :term:`package`, or is a
@@ -61,6 +75,11 @@ class static_view(object):
        assets within the named ``root_dir`` package-relative directory.
        However, if the ``root_dir`` is absolute, configuration will not be able
        to override the assets it contains.
+
+    .. versionchanged:: 2.0
+
+       Added ``reload`` and ``content_encodings`` options.
+
     """
 
     def __init__(
@@ -70,6 +89,8 @@ class static_view(object):
         package_name=None,
         use_subpath=False,
         index='index.html',
+        reload=False,
+        content_encodings=(),
     ):
         # package_name is for bw compat; it is preferred to pass in a
         # package-relative path as root_dir
@@ -83,8 +104,36 @@ class static_view(object):
         self.docroot = docroot
         self.norm_docroot = normcase(normpath(docroot))
         self.index = index
+        self.reload = reload
+        self.content_encodings = _compile_content_encodings(content_encodings)
+        self.filemap = {}
 
     def __call__(self, context, request):
+        resource_name = self.get_resource_name(request)
+        files = self.get_possible_files(resource_name)
+        filepath, content_encoding = self.find_best_match(request, files)
+        if filepath is None:
+            raise HTTPNotFound(request.url)
+
+        content_type, _ = _guess_type(resource_name)
+        response = FileResponse(
+            filepath,
+            request,
+            self.cache_max_age,
+            content_type,
+            content_encoding,
+        )
+        if len(files) > 1:
+            _add_vary(response, 'Accept-Encoding')
+        return response
+
+    def get_resource_name(self, request):
+        """
+        Return the computed name of the requested resource.
+
+        The returned file is not guaranteed to exist.
+
+        """
         if self.use_subpath:
             path_tuple = request.subpath
         else:
@@ -94,46 +143,126 @@ class static_view(object):
         if path is None:
             raise HTTPNotFound('Out of bounds: %s' % request.url)
 
+        # normalize asset spec or fs path into resource_path
         if self.package_name:  # package resource
             resource_path = '%s/%s' % (self.docroot.rstrip('/'), path)
             if resource_isdir(self.package_name, resource_path):
                 if not request.path_url.endswith('/'):
-                    self.add_slash_redirect(request)
+                    raise self.add_slash_redirect(request)
                 resource_path = '%s/%s' % (
                     resource_path.rstrip('/'),
                     self.index,
                 )
 
-            if not resource_exists(self.package_name, resource_path):
-                raise HTTPNotFound(request.url)
-            filepath = resource_filename(self.package_name, resource_path)
-
         else:  # filesystem file
-
             # os.path.normpath converts / to \ on windows
-            filepath = normcase(normpath(join(self.norm_docroot, path)))
-            if isdir(filepath):
+            resource_path = normcase(normpath(join(self.norm_docroot, path)))
+            if isdir(resource_path):
                 if not request.path_url.endswith('/'):
-                    self.add_slash_redirect(request)
-                filepath = join(filepath, self.index)
-            if not exists(filepath):
-                raise HTTPNotFound(request.url)
+                    raise self.add_slash_redirect(request)
+                resource_path = join(resource_path, self.index)
 
-        content_type, content_encoding = _guess_type(filepath)
-        return FileResponse(
-            filepath,
-            request,
-            self.cache_max_age,
-            content_type,
-            content_encoding=None,
-        )
+        return resource_path
+
+    def find_resource_path(self, name):
+        """
+        Return the absolute path to the resource or ``None`` if it doesn't
+        exist.
+
+        """
+        if self.package_name:
+            if resource_exists(self.package_name, name):
+                return resource_filename(self.package_name, name)
+
+        elif exists(name):
+            return name
+
+    def get_possible_files(self, resource_name):
+        """ Return a sorted list of ``(size, encoding, path)`` entries."""
+        result = self.filemap.get(resource_name)
+        if result is not None:
+            return result
+
+        # XXX we could put a lock around this work but worst case scenario a
+        # couple requests scan the disk for files at the same time and then
+        # the cache is set going forward so do not bother
+        result = []
+
+        # add the identity
+        path = self.find_resource_path(resource_name)
+        if path:
+            result.append((path, None))
+
+        # add each file we find for the supported encodings
+        # we don't mind adding multiple files for the same encoding if there
+        # are copies with different extensions because we sort by size so the
+        # smallest is always found first and the rest ignored
+        for encoding, extensions in self.content_encodings.items():
+            for ext in extensions:
+                encoded_name = resource_name + ext
+                path = self.find_resource_path(encoded_name)
+                if path:
+                    result.append((path, encoding))
+
+        # sort the files by size, smallest first
+        result.sort(key=lambda x: getsize(x[0]))
+
+        # only cache the results if reload is disabled
+        if not self.reload:
+            self.filemap[resource_name] = result
+        return result
+
+    def find_best_match(self, request, files):
+        """ Return ``(path | None, encoding)``."""
+        # if the client did not specify encodings then assume only the
+        # identity is acceptable
+        if not request.accept_encoding:
+            identity_path = next(
+                (path for path, encoding in files if encoding is None), None,
+            )
+            return identity_path, None
+
+        # find encodings the client will accept
+        acceptable_encodings = {
+            x[0]
+            for x in request.accept_encoding.acceptable_offers(
+                [encoding for path, encoding in files if encoding is not None]
+            )
+        }
+        acceptable_encodings.add(None)
+
+        # return the smallest file from the acceptable encodings
+        # we know that files is sorted by size, smallest first
+        for path, encoding in files:
+            if encoding in acceptable_encodings:
+                return path, encoding
 
     def add_slash_redirect(self, request):
         url = request.path_url + '/'
         qs = request.query_string
         if qs:
             url = url + '?' + qs
-        raise HTTPMovedPermanently(url)
+        return HTTPMovedPermanently(url)
+
+
+def _compile_content_encodings(encodings):
+    """
+    Convert mimetypes.encodings_map into a dict of
+    ``(encoding) -> [file extensions]``.
+
+    """
+    result = {}
+    for ext, encoding in mimetypes.encodings_map.items():
+        if encoding in encodings:
+            result.setdefault(encoding, []).append(ext)
+    return result
+
+
+def _add_vary(response, option):
+    vary = response.vary or []
+    if not any(x.lower() == option.lower() for x in vary):
+        vary.append(option)
+    response.vary = vary
 
 
 _seps = set(['/', os.sep])
