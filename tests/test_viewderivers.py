@@ -2083,9 +2083,6 @@ class DummySecurityPolicy:
     def __init__(self, permitted=True):
         self.permitted = permitted
 
-    def identify(self, request):
-        return 123
-
     def permits(self, request, context, permission):
         return self.permitted
 
