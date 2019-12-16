@@ -236,6 +236,7 @@ class static_view(object):
         for path, encoding in files:
             if encoding in acceptable_encodings:
                 return path, encoding
+        return None, None
 
     def add_slash_redirect(self, request):
         url = request.path_url + '/'
