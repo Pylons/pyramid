@@ -483,7 +483,7 @@ class IViewMapperFactory(Interface):
 
 
 class ISecurityPolicy(Interface):
-    def authenticated_userid(request, identity):
+    def authenticated_userid(request):
         """ Return a :term:`userid` string identifying the trusted and
         verified user, or ``None`` if unauthenticated.
         """
