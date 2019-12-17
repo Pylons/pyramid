@@ -502,14 +502,15 @@ class ISecurityPolicy(Interface):
 
     def remember(request, userid, **kw):
         """ Return a set of headers suitable for 'remembering' the
-        :term:`userid` named ``userid`` when set in a response.  An
-        individual authentication policy and its consumers can
-        decide on the composition and meaning of ``**kw``.
+        :term:`userid` named ``userid`` when set in a response.  An individual
+        security policy and its consumers can decide on the composition and
+        meaning of ``**kw``.
         """
 
     def forget(request, **kw):
         """ Return a set of headers suitable for 'forgetting' the
-        current user on subsequent requests.
+        current user on subsequent requests.  An individual security policy and
+        its consumers can decide on the composition and meaning of ``**kw``.
         """
 
 
