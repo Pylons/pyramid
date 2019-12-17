@@ -69,20 +69,19 @@ A simple security policy might look like the following:
     from pyramid.security import Allowed, Denied
 
     class SessionSecurityPolicy:
-        def authenticated_userid(self, request):
-            """ Return a string ID for the user. """
-            userid = self.identify(request).id
-            if validate_userid(request, userid):
-                return userid
-            else:
-                return None
-
         def identify(self, request):
             """ Return app-specific user object. """
-            userid = self.authenticated_userid
+            userid = request.session.get('userid')
             if userid is None:
                 return None
             return load_identity_from_db(request, userid)
+
+        def authenticated_userid(self, request):
+            """ Return a string ID for the user. """
+            identity = request.authenticated_identity
+            if identity is None:
+                return None
+            return string(identity.id)
 
         def permits(self, request, context, permission):
             """ Allow access to everything if signed in. """
@@ -145,18 +144,19 @@ For example, our above security policy can leverage these helpers like so:
         def __init__(self):
             self.helper = SessionAuthenticationHelper()
 
-        def authenticated_userid(self, request):
-            userid = self.helper.authenticated_userid(request)
-            if validate_userid(request, userid):
-                return userid
-            else:
-                return None
-
         def identify(self, request):
-            userid = self.authenticated_userid
+            """ Return app-specific user object. """
+            userid = self.helper.authenticated_userid(request)
             if userid is None:
                 return None
             return load_identity_from_db(request, userid)
+
+        def authenticated_userid(self, request):
+            """ Return a string ID for the user. """
+            identity = request.authenticated_identity
+            if identity is None:
+                return None
+            return str(identity.id)
 
         def permits(self, request, context, permission):
             """ Allow access to everything if signed in. """
