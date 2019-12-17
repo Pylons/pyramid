@@ -78,7 +78,7 @@ A simple security policy might look like the following:
 
         def authenticated_userid(self, request):
             """ Return a string ID for the user. """
-            identity = request.authenticated_identity
+            identity = self.identify(request)
             if identity is None:
                 return None
             return string(identity.id)
@@ -153,7 +153,7 @@ For example, our above security policy can leverage these helpers like so:
 
         def authenticated_userid(self, request):
             """ Return a string ID for the user. """
-            identity = request.authenticated_identity
+            identity = self.identify(request)
             if identity is None:
                 return None
             return str(identity.id)
