@@ -458,6 +458,86 @@ class Test_static_view_content_encodings(unittest.TestCase):
         self.assertEqual(res.headers['Content-Encoding'], 'gzip')
         self.assertEqual(len(res.body), 187)
 
+    def test_call_for_encoded_variant_without_unencoded_variant_no_accept(
+        self,
+    ):
+        inst = self._makeOne(
+            'tests:fixtures/static', content_encodings=['gzip']
+        )
+        request = self._makeRequest({'PATH_INFO': '/only_encoded.html.gz'})
+        context = DummyContext()
+
+        res = inst(context, request)
+        self.assertNotIn('Vary', res.headers)
+        self.assertNotIn('Content-Encoding', res.headers)
+        self.assertEqual(len(res.body), 187)
+
+    def test_call_for_encoded_variant_without_unencoded_variant_with_accept(
+        self,
+    ):
+        inst = self._makeOne(
+            'tests:fixtures/static', content_encodings=['gzip']
+        )
+        request = self._makeRequest(
+            {
+                'PATH_INFO': '/only_encoded.html.gz',
+                'HTTP_ACCEPT_ENCODING': 'gzip',
+            }
+        )
+        context = DummyContext()
+
+        res = inst(context, request)
+        self.assertNotIn('Vary', res.headers)
+        self.assertNotIn('Content-Encoding', res.headers)
+        self.assertEqual(len(res.body), 187)
+
+    def test_call_for_unencoded_variant_with_only_encoded_variant_no_accept(
+        self,
+    ):
+        from pyramid.httpexceptions import HTTPNotFound
+
+        inst = self._makeOne(
+            'tests:fixtures/static', content_encodings=['gzip']
+        )
+        request = self._makeRequest({'PATH_INFO': '/only_encoded.html'})
+        context = DummyContext()
+
+        self.assertRaises(HTTPNotFound, lambda: inst(context, request))
+
+    def test_call_for_unencoded_variant_with_only_encoded_variant_with_accept(
+        self,
+    ):
+        inst = self._makeOne(
+            'tests:fixtures/static', content_encodings=['gzip']
+        )
+        request = self._makeRequest(
+            {
+                'PATH_INFO': '/only_encoded.html',
+                'HTTP_ACCEPT_ENCODING': 'gzip',
+            }
+        )
+        context = DummyContext()
+
+        res = inst(context, request)
+        self.assertNotIn('Vary', res.headers)
+        self.assertEqual(res.headers['Content-Encoding'], 'gzip')
+        self.assertEqual(len(res.body), 187)
+
+    def test_call_for_unencoded_variant_with_only_encoded_variant_bad_accept(
+        self,
+    ):
+        from pyramid.httpexceptions import HTTPNotFound
+
+        inst = self._makeOne(
+            'tests:fixtures/static', content_encodings=['gzip']
+        )
+        request = self._makeRequest(
+            {'PATH_INFO': '/only_encoded.html', 'HTTP_ACCEPT_ENCODING': 'br'}
+        )
+        context = DummyContext()
+
+        self.assertRaises(HTTPNotFound, lambda: inst(context, request))
+
     def test_call_get_possible_files_is_cached(self):
         inst = self._makeOne('tests:fixtures/static')
         result1 = inst.get_possible_files('tests:fixtures/static/encoded.html')
