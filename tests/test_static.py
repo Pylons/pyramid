@@ -39,6 +39,8 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         self.assertEqual(inst.docroot, 'resource_name')
         self.assertEqual(inst.cache_max_age, 3600)
         self.assertEqual(inst.index, 'index.html')
+        self.assertEqual(inst.reload, False)
+        self.assertEqual(inst.content_encodings, {})
 
     def test_call_adds_slash_path_info_empty(self):
         inst = self._makeOne('tests:fixtures/static')
@@ -252,6 +254,8 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         self.assertEqual(inst.docroot, 'resource_name')
         self.assertEqual(inst.cache_max_age, 3600)
         self.assertEqual(inst.index, 'index.html')
+        self.assertEqual(inst.reload, False)
+        self.assertEqual(inst.content_encodings, {})
 
     def test_call_adds_slash_path_info_empty(self):
         inst = self._makeOne('tests:fixtures/static')
@@ -401,6 +405,150 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         from pyramid.httpexceptions import HTTPNotFound
 
         self.assertRaises(HTTPNotFound, inst, context, request)
+
+
+class Test_static_view_content_encodings(unittest.TestCase):
+    def _getTargetClass(self):
+        from pyramid.static import static_view
+
+        return static_view
+
+    def _makeOne(self, *arg, **kw):
+        return self._getTargetClass()(*arg, **kw)
+
+    def _makeRequest(self, kw=None):
+        from pyramid.request import Request
+
+        environ = {
+            'wsgi.url_scheme': 'http',
+            'wsgi.version': (1, 0),
+            'SERVER_NAME': 'example.com',
+            'SERVER_PORT': '6543',
+            'PATH_INFO': '/',
+            'SCRIPT_NAME': '',
+            'REQUEST_METHOD': 'GET',
+        }
+        if kw is not None:
+            environ.update(kw)
+        return Request(environ=environ)
+
+    def test_call_without_accept(self):
+        inst = self._makeOne(
+            'tests:fixtures/static', content_encodings=['gzip']
+        )
+        request = self._makeRequest({'PATH_INFO': '/encoded.html'})
+        context = DummyContext()
+
+        res = inst(context, request)
+        self.assertEqual(res.headers['Vary'], 'Accept-Encoding')
+        self.assertNotIn('Content-Encoding', res.headers)
+        self.assertEqual(len(res.body), 221)
+
+    def test_call_with_accept_gzip(self):
+        inst = self._makeOne(
+            'tests:fixtures/static', content_encodings=['gzip']
+        )
+        request = self._makeRequest(
+            {'PATH_INFO': '/encoded.html', 'HTTP_ACCEPT_ENCODING': 'gzip'}
+        )
+        context = DummyContext()
+
+        res = inst(context, request)
+        self.assertEqual(res.headers['Vary'], 'Accept-Encoding')
+        self.assertEqual(res.headers['Content-Encoding'], 'gzip')
+        self.assertEqual(len(res.body), 187)
+
+    def test_call_for_encoded_variant_without_unencoded_variant_no_accept(
+        self,
+    ):
+        inst = self._makeOne(
+            'tests:fixtures/static', content_encodings=['gzip']
+        )
+        request = self._makeRequest({'PATH_INFO': '/only_encoded.html.gz'})
+        context = DummyContext()
+
+        res = inst(context, request)
+        self.assertNotIn('Vary', res.headers)
+        self.assertNotIn('Content-Encoding', res.headers)
+        self.assertEqual(len(res.body), 187)
+
+    def test_call_for_encoded_variant_without_unencoded_variant_with_accept(
+        self,
+    ):
+        inst = self._makeOne(
+            'tests:fixtures/static', content_encodings=['gzip']
+        )
+        request = self._makeRequest(
+            {
+                'PATH_INFO': '/only_encoded.html.gz',
+                'HTTP_ACCEPT_ENCODING': 'gzip',
+            }
+        )
+        context = DummyContext()
+
+        res = inst(context, request)
+        self.assertNotIn('Vary', res.headers)
+        self.assertNotIn('Content-Encoding', res.headers)
+        self.assertEqual(len(res.body), 187)
+
+    def test_call_for_unencoded_variant_with_only_encoded_variant_no_accept(
+        self,
+    ):
+        from pyramid.httpexceptions import HTTPNotFound
+
+        inst = self._makeOne(
+            'tests:fixtures/static', content_encodings=['gzip']
+        )
+        request = self._makeRequest({'PATH_INFO': '/only_encoded.html'})
+        context = DummyContext()
+
+        self.assertRaises(HTTPNotFound, lambda: inst(context, request))
+
+    def test_call_for_unencoded_variant_with_only_encoded_variant_with_accept(
+        self,
+    ):
+        inst = self._makeOne(
+            'tests:fixtures/static', content_encodings=['gzip']
+        )
+        request = self._makeRequest(
+            {
+                'PATH_INFO': '/only_encoded.html',
+                'HTTP_ACCEPT_ENCODING': 'gzip',
+            }
+        )
+        context = DummyContext()
+
+        res = inst(context, request)
+        self.assertNotIn('Vary', res.headers)
+        self.assertEqual(res.headers['Content-Encoding'], 'gzip')
+        self.assertEqual(len(res.body), 187)
+
+    def test_call_for_unencoded_variant_with_only_encoded_variant_bad_accept(
+        self,
+    ):
+        from pyramid.httpexceptions import HTTPNotFound
+
+        inst = self._makeOne(
+            'tests:fixtures/static', content_encodings=['gzip']
+        )
+        request = self._makeRequest(
+            {'PATH_INFO': '/only_encoded.html', 'HTTP_ACCEPT_ENCODING': 'br'}
+        )
+        context = DummyContext()
+
+        self.assertRaises(HTTPNotFound, lambda: inst(context, request))
+
+    def test_call_get_possible_files_is_cached(self):
+        inst = self._makeOne('tests:fixtures/static')
+        result1 = inst.get_possible_files('tests:fixtures/static/encoded.html')
+        result2 = inst.get_possible_files('tests:fixtures/static/encoded.html')
+        self.assertIs(result1, result2)
+
+    def test_call_get_possible_files_is_not_cached(self):
+        inst = self._makeOne('tests:fixtures/static', reload=True)
+        result1 = inst.get_possible_files('tests:fixtures/static/encoded.html')
+        result2 = inst.get_possible_files('tests:fixtures/static/encoded.html')
+        self.assertIsNot(result1, result2)
 
 
 class TestQueryStringConstantCacheBuster(unittest.TestCase):

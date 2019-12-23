@@ -73,6 +73,3 @@ The expected result should look like the following:
 
     .........................
     25 passed in 6.87 seconds
-
-If you use Python 3.7, you may see deprecation warnings from the docutils 0.14 package.
-You can apply a [patch](https://sourceforge.net/p/docutils/patches/144/) to fix the issue, or ignore it and wait for the next release of docutils.

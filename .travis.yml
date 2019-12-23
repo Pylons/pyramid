@@ -4,8 +4,6 @@ sudo: false
 
 matrix:
     include:
-        - python: 3.4
-          env: TOXENV=py34
         - python: 3.5
           env: TOXENV=py35
         - python: 3.6
@@ -14,7 +12,7 @@ matrix:
           env: TOXENV=pypy3
         - python: 3.6
           env: TOXENV=py36-cover,coverage
-        - python: 3.5
+        - python: 3.6
           env: TOXENV=docs
         - python: 3.6
           env: TOXENV=lint
@@ -22,12 +20,10 @@ matrix:
           env: TOXENV=py37
           dist: xenial
           sudo: true
-        - python: 3.8-dev
+        - python: 3.8
           env: TOXENV=py38
           dist: xenial
           sudo: true
-    allow_failures:
-        - env: TOXENV=py38
 
 install:
   - travis_retry pip install tox

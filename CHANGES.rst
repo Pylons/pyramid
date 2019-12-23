@@ -4,6 +4,9 @@ unreleased
 Features
 --------
 
+- Add support for Python 3.8.
+  See https://github.com/Pylons/pyramid/pull/3547
+
 - Changed the default ``serializer`` on
   ``pyramid.session.SignedCookieSessionFactory`` to use
   ``pyramid.session.JSONSerializer`` instead of
@@ -59,6 +62,12 @@ Features
   to predicate factories as their second argument.
   See https://github.com/Pylons/pyramid/pull/3514
 
+- Added support for serving pre-compressed static assets by using the
+  ``content_encodings`` argument of
+  ``pyramid.config.Configurator.add_static_view`` and
+  ``pyramid.static.static_view``.
+  See https://github.com/Pylons/pyramid/pull/3537
+
 Deprecations
 ------------
 
@@ -69,6 +78,11 @@ Deprecations
 
 Backward Incompatibilities
 --------------------------
+
+- Drop support for Python 2.7.
+
+- Drop support for Python 3.4.
+  See https://github.com/Pylons/pyramid/pull/3547
 
 - ``pcreate`` and the builtin scaffolds have been removed in favor of
   using the ``cookiecutter`` tool and the ``pyramid-cookiecutter-starter``

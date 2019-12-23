@@ -190,6 +190,37 @@ such a request.  The :meth:`~pyramid.request.Request.static_url` API is
 discussed in more detail later in this chapter.
 
 .. index::
+   single: pre-compressed assets
+
+.. _pre_compressed_assets:
+
+Serving Pre-compressed Assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 2.0
+
+It's possible to configure :app:`Pyramid` to serve pre-compressed static assets.
+This can greatly reduce the bandwidth required to serve assets - most modern browsers support ``gzip``, ``deflate``, and ``br`` (brotli) encoded responses.
+A client declares support for encoded responses using the ``Accept-Encoding`` HTTP header. For example, ``Accept-Encoding: gzip, default, br``.
+The response will then contain the pre-compressed content with the ``Content-Encoding`` header set to the matched encoding.
+This feature assumes that the static assets exist unencoded (``identity`` encoding) as well as in zero or more encoded formats.
+If the encoded version of a file is missing, or the client doesn't declare support for the encoded version, the unencoded version is returned instead.
+
+In order to configure this in your application, the first step is to compress your assets.
+For example, update your static asset pipeline to export ``.gz`` versions of every file.
+Second, add ``content_encodings=['gzip']`` when invoking :meth:`pyramid.config.Configurator.add_static_view`.
+
+The encoded file extensions are determined by :attr:`mimetypes.encodings_map`.
+So, if your desired encoding is missing, you'll need to add it there:
+
+.. code-block:: python
+
+    import mimetypes
+    mimetypes.encodings_map['.br'] = 'br'  # add brotli
+
+It is not necessary for every file to support every encoding, but :app:`Pyramid` will not serve an encoding that is not declared.
+
+.. index::
    single: generating static asset urls
    single: static asset urls
    pair:   assets; generating urls

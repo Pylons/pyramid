@@ -1954,6 +1954,16 @@ class ViewsConfiguratorMixin(object):
         prefix*.  By default, this argument is ``None``, meaning that no
         particular Expires or Cache-Control headers are set in the response.
 
+        The ``content_encodings`` keyword argument is a list of alternative
+        file encodings supported in the ``Accept-Encoding`` HTTP Header.
+        Alternative files are found using file extensions defined in
+        :attr:`mimetypes.encodings_map`. An encoded asset will be returned
+        with the ``Content-Encoding`` header set to the selected encoding.
+        If the asset contains alternative encodings then the
+        ``Accept-Encoding`` value will be added to the response's ``Vary``
+        header. By default, the list is empty and no alternatives will be
+        supported.
+
         The ``permission`` keyword argument is used to specify the
         :term:`permission` required by a user to execute the static view.  By
         default, it is the string
@@ -2030,6 +2040,11 @@ class ViewsConfiguratorMixin(object):
            static_url('mypackage:images/logo.png', request)
 
         See :ref:`static_assets_section` for more information.
+
+        .. versionchanged:: 2.0
+
+           Added the ``content_encodings`` argument.
+
         """
         spec = self._make_spec(path)
         info = self._get_static_info()
@@ -2204,10 +2219,15 @@ class StaticURLInfo(object):
             # it's a view name
             url = None
             cache_max_age = extra.pop('cache_max_age', None)
+            content_encodings = extra.pop('content_encodings', [])
 
             # create a view
             view = static_view(
-                spec, cache_max_age=cache_max_age, use_subpath=True
+                spec,
+                cache_max_age=cache_max_age,
+                use_subpath=True,
+                reload=config.registry.settings['pyramid.reload_assets'],
+                content_encodings=content_encodings,
             )
 
             # Mutate extra to allow factory, etc to be passed through here.
