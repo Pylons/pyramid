@@ -64,7 +64,6 @@ extensions = [
 intersphinx_mapping = {
     'colander': ('https://docs.pylonsproject.org/projects/colander/en/latest/', None),
     'cookbook': ('https://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/', None),
-    'cookiecutter': ('https://cookiecutter.readthedocs.io/en/latest/', None),
     'deform': ('https://docs.pylonsproject.org/projects/deform/en/latest/', None),
     'jinja2': ('https://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/', None),
     'pylonswebframework': ('https://docs.pylonsproject.org/projects/pylons-webframework/en/latest/', None),
