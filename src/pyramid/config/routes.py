@@ -332,6 +332,17 @@ class RoutesConfiguratorMixin(object):
                 stacklevel=3,
             )
 
+        if 'effective_principals' in predicates:
+            warnings.warn(
+                (
+                    'The new security policy has removed the concept of '
+                    'principals. See "Upgrading Authentication/Authorization" '
+                    'in "What\'s New in Pyramid 2.0" for more information.'
+                ),
+                DeprecationWarning,
+                stacklevel=3,
+            )
+
         if accept is not None:
             if not is_nonstr_iter(accept):
                 accept = [accept]
