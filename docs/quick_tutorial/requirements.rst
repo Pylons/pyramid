@@ -19,7 +19,7 @@ virtual environment.)
 
 This *Quick Tutorial* is based on:
 
-* **Python 3.8**. Pyramid fully supports Python 3.6+.
+* **Python 3.8**. Pyramid fully supports Python 3.5+.
   This tutorial uses **Python 3.8**.
 
 * **venv**. We believe in virtual environments.
