@@ -32,14 +32,11 @@ how it works at a high level:
 - A :term:`view callable` is located by :term:`view lookup` using the context
   as well as other attributes of the request.
 
-- If a :term:`security policy` is in effect, it is passed the request and
-  returns the :term:`identity` of the current user.
-
 - If a :term:`security policy` is in effect and the :term:`view
   configuration` associated with the view callable that was found has a
-  :term:`permission` associated with it, the policy is passed the
-  :term:`context`, the current :term:`identity`, and the :term:`permission`
-  associated with the view; it will allow or deny access.
+  :term:`permission` associated with it, the policy is passed :term:`request`,
+  the :term:`context`, and the :term:`permission` associated with the view; it
+  will allow or deny access.
 
 - If the security policy allows access, the view callable is invoked.
 
@@ -62,7 +59,7 @@ Writing a Security Policy
 accessible by completely anonymous users.  In order to begin protecting views
 from execution based on security settings, you need to write a security policy.
 
-Security policies are simple classes implementing a
+Security policies are simple classes implementing
 :class:`pyramid.interfaces.ISecurityPolicy`.
 A simple security policy might look like the following:
 
@@ -73,11 +70,22 @@ A simple security policy might look like the following:
 
     class SessionSecurityPolicy:
         def identify(self, request):
-            """ Return the user ID stored in the session. """
-            return request.session.get('userid')
+            """ Return app-specific user object. """
+            userid = request.session.get('userid')
+            if userid is None:
+                return None
+            return load_identity_from_db(request, userid)
 
-        def permits(self, request, context, identity, permission):
+        def authenticated_userid(self, request):
+            """ Return a string ID for the user. """
+            identity = self.identify(request)
+            if identity is None:
+                return None
+            return string(identity.id)
+
+        def permits(self, request, context, permission):
             """ Allow access to everything if signed in. """
+            identity = self.identify(request)
             if identity is not None:
                 return Allowed('User is signed in.')
             else:
@@ -87,7 +95,7 @@ A simple security policy might look like the following:
             request.session['userid'] = userid
             return []
 
-        def forget(request):
+        def forget(request, **kw):
             del request.session['userid']
             return []
 
@@ -137,11 +145,22 @@ For example, our above security policy can leverage these helpers like so:
             self.helper = SessionAuthenticationHelper()
 
         def identify(self, request):
-            """ Return the user ID stored in the session. """
-            return self.helper.identify(request)
+            """ Return app-specific user object. """
+            userid = self.helper.authenticated_userid(request)
+            if userid is None:
+                return None
+            return load_identity_from_db(request, userid)
 
-        def permits(self, request, context, identity, permission):
+        def authenticated_userid(self, request):
+            """ Return a string ID for the user. """
+            identity = self.identify(request)
+            if identity is None:
+                return None
+            return str(identity.id)
+
+        def permits(self, request, context, permission):
             """ Allow access to everything if signed in. """
+            identity = self.identify(request)
             if identity is not None:
                 return Allowed('User is signed in.')
             else:
@@ -150,22 +169,14 @@ For example, our above security policy can leverage these helpers like so:
         def remember(request, userid, **kw):
             return self.helper.remember(request, userid, **kw)
 
-        def forget(request):
-            return self.helper.forget(request)
+        def forget(request, **kw):
+            return self.helper.forget(request, **kw)
 
-Helpers are intended to be used with application-specific code, so perhaps your
-authentication also queries the database to ensure the identity is valid.
-
-.. code-block:: python
-    :linenos:
-
-        def identify(self, request):
-            """ Return the user ID stored in the session. """
-            user_id = self.helper.identify(request)
-            if validate_user_id(user_id):
-                return user_id
-            else:
-                return None
+Helpers are intended to be used with application-specific code.  Notice how the
+above code takes the userid from the helper and uses it to load the
+:term:`identity` from the database.  ``authenticated_userid`` pulls the
+:term:`userid` from the :term:`identity` in order to guarantee that the user ID
+stored in the session exists in the database ("authenticated").
 
 .. index::
    single: permissions
@@ -237,7 +248,9 @@ might look like so:
     from pyramid.security import Allowed, Denied
 
     class SecurityPolicy:
-        def permits(self, request, context, identity, permission):
+        def permits(self, request, context, permission):
+            identity = self.identify(request)
+
             if identity is None:
                 return Denied('User is not signed in.')
             if identity.role == 'admin':
@@ -246,6 +259,7 @@ might look like so:
                 allowed = ['read', 'write']
             else:
                 allowed = ['read']
+
             if permission in allowed:
                 return Allowed(
                     'Access granted for user %s with role %s.',
@@ -326,7 +340,7 @@ object.  An implementation might look like this:
     from pyramid.authorization import ACLHelper
 
     class SecurityPolicy:
-        def permits(self, request, context, identity, permission):
+        def permits(self, request, context, permission):
             principals = [Everyone]
             if identity is not None:
                 principals.append(Authenticated)
@@ -352,7 +366,7 @@ For example, an ACL might be attached to the resource for a blog via its class:
             (Allow, Everyone, 'view'),
             (Allow, 'group:editors', 'add'),
             (Allow, 'group:editors', 'edit'),
-            ]
+        ]
 
 Or, if your resources are persistent, an ACL might be specified via the
 ``__acl__`` attribute of an *instance* of a resource:
@@ -369,10 +383,10 @@ Or, if your resources are persistent, an ACL might be specified via the
     blog = Blog()
 
     blog.__acl__ = [
-            (Allow, Everyone, 'view'),
-            (Allow, 'group:editors', 'add'),
-            (Allow, 'group:editors', 'edit'),
-            ]
+        (Allow, Everyone, 'view'),
+        (Allow, 'group:editors', 'add'),
+        (Allow, 'group:editors', 'edit'),
+    ]
 
 Whether an ACL is attached to a resource's class or an instance of the resource
 itself, the effect is the same.  It is useful to decorate individual resource
@@ -425,10 +439,10 @@ Here's an example ACL:
     from pyramid.security import Everyone
 
     __acl__ = [
-            (Allow, Everyone, 'view'),
-            (Allow, 'group:editors', 'add'),
-            (Allow, 'group:editors', 'edit'),
-            ]
+        (Allow, Everyone, 'view'),
+        (Allow, 'group:editors', 'add'),
+        (Allow, 'group:editors', 'edit'),
+    ]
 
 The example ACL indicates that the :data:`pyramid.security.Everyone`
 principal—a special system-defined principal indicating, literally, everyone—is
@@ -460,7 +474,7 @@ dictated by the ACL*.  So if you have an ACL like this:
     __acl__ = [
         (Allow, Everyone, 'view'),
         (Deny, Everyone, 'view'),
-        ]
+    ]
 
 The ACL helper will *allow* everyone the view permission, even though later in
 the ACL you have an ACE that denies everyone the view permission.  On the other
@@ -476,7 +490,7 @@ hand, if you have an ACL like this:
     __acl__ = [
         (Deny, Everyone, 'view'),
         (Allow, Everyone, 'view'),
-        ]
+    ]
 
 The ACL helper will deny everyone the view permission, even though
 later in the ACL, there is an ACE that allows everyone.
@@ -495,7 +509,7 @@ can collapse this into a single ACE, as below.
     __acl__ = [
         (Allow, Everyone, 'view'),
         (Allow, 'group:editors', ('add', 'edit')),
-        ]
+    ]
 
 .. _special_principals:
 

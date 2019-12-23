@@ -1,5 +1,6 @@
 import os
 import unittest
+import warnings
 from zope.interface import implementer
 
 from pyramid import testing
@@ -2041,14 +2042,9 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         outerself = self
 
         class DummyPolicy(object):
-            def identify(self, r):
-                outerself.assertEqual(r, request)
-                return 123
-
-            def permits(self, r, context, identity, permission):
+            def permits(self, r, context, permission):
                 outerself.assertEqual(r, request)
                 outerself.assertEqual(context, None)
-                outerself.assertEqual(identity, 123)
                 outerself.assertEqual(permission, 'view')
                 return True
 
@@ -2066,14 +2062,9 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         outerself = self
 
         class DummyPolicy(object):
-            def identify(self, r):
-                outerself.assertEqual(r, request)
-                return 123
-
-            def permits(self, r, context, identity, permission):
+            def permits(self, r, context, permission):
                 outerself.assertEqual(r, request)
                 outerself.assertEqual(context, None)
-                outerself.assertEqual(identity, 123)
                 outerself.assertEqual(permission, 'view')
                 return True
 
@@ -2934,6 +2925,16 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             'text/html;charset=utf8',
             weighs_more_than='text/plain;charset=utf8',
         )
+
+    def test_effective_principals_deprecated(self):
+        config = self._makeOne(autocommit=True)
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always', DeprecationWarning)
+            config.add_view(lambda: None, effective_principals=['any'])
+            self.assertIn(
+                'removed the concept of principals', str(w[-1].message)
+            )
 
 
 class Test_runtime_exc_view(unittest.TestCase):

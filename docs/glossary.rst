@@ -303,9 +303,8 @@ Glossary
      request.  Oftentimes this is the ID of the user object in a database.
 
    identity
-     An identity is an object identifying the user associated with the
-     current request.  The identity can be any object, but should implement a
-     ``__str__`` method that outputs a corresponding :term:`userid`.
+      An identity is an object identifying the user associated with the current request.
+      The object can be of any shape, such as a simple ID string or an ORM object.
 
    security policy
      A security policy in :app:`Pyramid` terms is an object implementing the

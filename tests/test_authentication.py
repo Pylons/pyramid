@@ -1706,20 +1706,20 @@ class TestSessionAuthenticationHelper(unittest.TestCase):
 
         return SessionAuthenticationHelper(prefix=prefix)
 
-    def test_identify(self):
+    def test_authenticated_userid(self):
         request = self._makeRequest({'userid': 'fred'})
         helper = self._makeOne()
-        self.assertEqual(helper.identify(request), 'fred')
+        self.assertEqual(helper.authenticated_userid(request), 'fred')
 
-    def test_identify_with_prefix(self):
+    def test_authenticated_userid_with_prefix(self):
         request = self._makeRequest({'foo.userid': 'fred'})
         helper = self._makeOne(prefix='foo.')
-        self.assertEqual(helper.identify(request), 'fred')
+        self.assertEqual(helper.authenticated_userid(request), 'fred')
 
-    def test_identify_none(self):
+    def test_authenticated_userid_none(self):
         request = self._makeRequest()
         helper = self._makeOne()
-        self.assertEqual(helper.identify(request), None)
+        self.assertEqual(helper.authenticated_userid(request), None)
 
     def test_remember(self):
         request = self._makeRequest()

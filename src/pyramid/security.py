@@ -82,7 +82,7 @@ def remember(request, userid, **kw):
     return policy.remember(request, userid, **kw)
 
 
-def forget(request):
+def forget(request, **kw):
     """
     Return a sequence of header tuples (e.g. ``[('Set-Cookie',
     'foo=abc')]``) suitable for 'forgetting' the set of credentials
@@ -104,7 +104,7 @@ def forget(request):
     policy = _get_security_policy(request)
     if policy is None:
         return []
-    return policy.forget(request)
+    return policy.forget(request, **kw)
 
 
 def principals_allowed_by_permission(context, permission):
@@ -293,7 +293,9 @@ class ACLAllowed(ACLPermitsResult, Allowed):
     """
 
 
-class SecurityAPIMixin(object):
+class SecurityAPIMixin:
+    """ Mixin for Request class providing auth-related properties. """
+
     @property
     def authenticated_identity(self):
         """
@@ -315,18 +317,14 @@ class SecurityAPIMixin(object):
 
         .. versionchanged:: 2.0
 
-            When using the new security system, this property outputs the
-            string representation of the :term:`identity`.
+           This property delegates to the effective :term:`security policy`,
+           ignoring old-style :term:`authentication policy`.
 
         """
-        authn = _get_authentication_policy(self)
-        security = _get_security_policy(self)
-        if authn is not None:
-            return authn.authenticated_userid(self)
-        elif security is not None:
-            return str(security.identify(self))
-        else:
+        policy = _get_security_policy(self)
+        if policy is None:
             return None
+        return policy.authenticated_userid(self)
 
     def has_permission(self, permission, context=None):
         """ Given a permission and an optional context, returns an instance of
@@ -353,11 +351,12 @@ class SecurityAPIMixin(object):
         policy = _get_security_policy(self)
         if policy is None:
             return Allowed('No security policy in use.')
-        identity = policy.identify(self)
-        return policy.permits(self, context, identity, permission)
+        return policy.permits(self, context, permission)
 
 
 class AuthenticationAPIMixin(object):
+    """ Mixin for Request class providing compatibility properties. """
+
     @property
     def unauthenticated_userid(self):
         """
@@ -365,8 +364,8 @@ class AuthenticationAPIMixin(object):
 
             ``unauthenticated_userid`` does not have an equivalent in the new
             security system.  Use :attr:`.authenticated_userid` or
-            :attr:`.identity` instead.  See :ref:`upgrading_auth` for more
-            information.
+            :attr:`.authenticated_identity` instead.
+            See :ref:`upgrading_auth` for more information.
 
         Return an object which represents the *claimed* (not verified) user
         id of the credentials present in the request. ``None`` if there is no
@@ -382,7 +381,7 @@ class AuthenticationAPIMixin(object):
         if authn is not None:
             return authn.unauthenticated_userid(self)
         elif security is not None:
-            return str(security.identify(self))
+            return security.authenticated_userid(self)
         else:
             return None
 
@@ -429,6 +428,9 @@ class LegacySecurityPolicy:
         return request.registry.getUtility(IAuthorizationPolicy)
 
     def identify(self, request):
+        return self.authenticated_userid(request)
+
+    def authenticated_userid(self, request):
         authn = self._get_authn_policy(request)
         return authn.authenticated_userid(request)
 
@@ -436,11 +438,16 @@ class LegacySecurityPolicy:
         authn = self._get_authn_policy(request)
         return authn.remember(request, userid, **kw)
 
-    def forget(self, request):
+    def forget(self, request, **kw):
+        if kw:
+            raise ValueError(
+                'Legacy authentication policies do not support keyword '
+                'arguments for `forget`'
+            )
         authn = self._get_authn_policy(request)
         return authn.forget(request)
 
-    def permits(self, request, context, identity, permission):
+    def permits(self, request, context, permission):
         authn = self._get_authn_policy(request)
         authz = self._get_authz_policy(request)
         principals = authn.effective_principals(request)

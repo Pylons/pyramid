@@ -17,12 +17,13 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
         from pyramid.testing import DummySecurityPolicy
 
         config = self._makeOne(autocommit=True)
-        config.testing_securitypolicy('user', permissive=False)
+        config.testing_securitypolicy('userid', 'identity', permissive=False)
         from pyramid.interfaces import ISecurityPolicy
 
         policy = config.registry.getUtility(ISecurityPolicy)
         self.assertTrue(isinstance(policy, DummySecurityPolicy))
-        self.assertEqual(policy.identity, 'user')
+        self.assertEqual(policy.userid, 'userid')
+        self.assertEqual(policy.identity, 'identity')
         self.assertEqual(policy.permissive, False)
 
     def test_testing_securitypolicy_remember_result(self):

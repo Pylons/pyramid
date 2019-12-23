@@ -350,22 +350,12 @@ class TestAuthenticatedUserId(unittest.TestCase):
         request = _makeRequest()
         _registerAuthenticationPolicy(request.registry, 'yo')
         _registerSecurityPolicy(request.registry, 'wat')
-        self.assertEqual(request.authenticated_userid, 'yo')
+        self.assertEqual(request.authenticated_userid, 'wat')
 
     def test_with_security_policy(self):
         request = _makeRequest()
-        # Ensure the identity is stringified.
-        _registerSecurityPolicy(request.registry, 123)
+        _registerSecurityPolicy(request.registry, '123')
         self.assertEqual(request.authenticated_userid, '123')
-
-    def test_with_authentication_policy_no_reg_on_request(self):
-        from pyramid.threadlocal import get_current_registry
-
-        registry = get_current_registry()
-        request = _makeRequest()
-        del request.registry
-        _registerAuthenticationPolicy(registry, 'yo')
-        self.assertEqual(request.authenticated_userid, 'yo')
 
 
 class TestUnAuthenticatedUserId(unittest.TestCase):
@@ -390,15 +380,6 @@ class TestUnAuthenticatedUserId(unittest.TestCase):
         _registerSecurityPolicy(request.registry, 'yo')
         self.assertEqual(request.unauthenticated_userid, 'yo')
 
-    def test_with_authentication_policy_no_reg_on_request(self):
-        from pyramid.threadlocal import get_current_registry
-
-        registry = get_current_registry()
-        request = _makeRequest()
-        del request.registry
-        _registerAuthenticationPolicy(registry, 'yo')
-        self.assertEqual(request.unauthenticated_userid, 'yo')
-
 
 class TestEffectivePrincipals(unittest.TestCase):
     def setUp(self):
@@ -416,15 +397,6 @@ class TestEffectivePrincipals(unittest.TestCase):
     def test_with_authentication_policy(self):
         request = _makeRequest()
         _registerAuthenticationPolicy(request.registry, 'yo')
-        self.assertEqual(request.effective_principals, 'yo')
-
-    def test_with_authentication_policy_no_reg_on_request(self):
-        from pyramid.threadlocal import get_current_registry
-
-        registry = get_current_registry()
-        request = _makeRequest()
-        del request.registry
-        _registerAuthenticationPolicy(registry, 'yo')
         self.assertEqual(request.effective_principals, 'yo')
 
 
@@ -503,6 +475,12 @@ class TestLegacySecurityPolicy(unittest.TestCase):
             policy.forget(request), [('X-Pyramid-Test', 'logout')]
         )
 
+    def test_forget_with_kwargs(self):
+        from pyramid.security import LegacySecurityPolicy
+
+        policy = LegacySecurityPolicy()
+        self.assertRaises(ValueError, lambda: policy.forget(None, foo='bar'))
+
     def test_permits(self):
         from pyramid.security import LegacySecurityPolicy
 
@@ -511,10 +489,7 @@ class TestLegacySecurityPolicy(unittest.TestCase):
         _registerAuthenticationPolicy(request.registry, ['p1', 'p2'])
         _registerAuthorizationPolicy(request.registry, True)
 
-        self.assertIs(
-            policy.permits(request, request.context, 'userid', 'permission'),
-            True,
-        )
+        self.assertTrue(policy.permits(request, request.context, 'permission'))
 
 
 _TEST_HEADER = 'X-Pyramid-Test'
@@ -532,7 +507,10 @@ class DummySecurityPolicy:
     def identify(self, request):
         return self.result
 
-    def permits(self, request, context, identity, permission):
+    def authenticated_userid(self, request):
+        return self.result
+
+    def permits(self, request, context, permission):
         return self.result
 
     def remember(self, request, userid, **kw):
@@ -540,7 +518,7 @@ class DummySecurityPolicy:
         self._header_remembered = headers[0]
         return headers
 
-    def forget(self, request):
+    def forget(self, request, **kw):
         headers = [(_TEST_HEADER, 'logout')]
         self._header_forgotten = headers[0]
         return headers

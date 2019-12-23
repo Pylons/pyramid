@@ -4,10 +4,14 @@ from pyramid.security import Allowed, Denied
 
 class SecurityPolicy:
     def identify(self, request):
+        raise NotImplementedError()  # pragma: no cover
+
+    def authenticated_userid(self, request):
         return request.environ.get('REMOTE_USER')
 
-    def permits(self, request, context, identity, permission):
-        if identity and permission == 'foo':
+    def permits(self, request, context, permission):
+        userid = self.authenticated_userid(request)
+        if userid and permission == 'foo':
             return Allowed('')
         else:
             return Denied('')
@@ -15,7 +19,7 @@ class SecurityPolicy:
     def remember(self, request, userid, **kw):
         raise NotImplementedError()  # pragma: no cover
 
-    def forget(self, request):
+    def forget(self, request, **kw):
         raise NotImplementedError()  # pragma: no cover
 
 

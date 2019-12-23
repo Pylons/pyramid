@@ -166,27 +166,17 @@
 
    .. attribute:: authenticated_userid
 
-      .. deprecated:: 2.0
-
-          ``authenticated_userid`` has been replaced by
-          :attr:`authenticated_identity` in the new security system.  See
-          :ref:`upgrading_auth` for more information.
-
       A property which returns the :term:`userid` of the currently
-      authenticated user or ``None`` if there is no :term:`authentication
-      policy` in effect or there is no currently authenticated user.  This
-      differs from :attr:`~pyramid.request.Request.unauthenticated_userid`,
-      because the effective authentication policy will have ensured that a
-      record associated with the :term:`userid` exists in persistent storage;
-      if it has not, this value will be ``None``.
+      authenticated user or ``None`` if there is no :term:`security policy` in
+      effect or there is no currently authenticated user.
 
    .. attribute:: unauthenticated_userid
 
       .. deprecated:: 2.0
 
-          ``unauthenticated_userid`` has been replaced by
-          :attr:`authenticated_identity` in the new security system.  See
-          :ref:`upgrading_auth` for more information.
+          ``unauthenticated_userid`` has been deprecated in version 2.0.  Use
+          :attr:`authenticated_userid` or :attr:`authenticated_identity`
+          instead.  See :ref:`upgrading_auth` for more information.
 
       A property which returns a value which represents the *claimed* (not
       verified) :term:`userid` of the credentials present in the

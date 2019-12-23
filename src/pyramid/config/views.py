@@ -791,6 +791,17 @@ class ViewsConfiguratorMixin(object):
                 stacklevel=4,
             )
 
+        if 'effective_principals' in view_options:
+            warnings.warn(
+                (
+                    'The new security policy has removed the concept of '
+                    'principals. See "Upgrading Authentication/Authorization" '
+                    'in "What\'s New in Pyramid 2.0" for more information.'
+                ),
+                DeprecationWarning,
+                stacklevel=4,
+            )
+
         if accept is not None:
             if is_nonstr_iter(accept):
                 raise ConfigurationError(

@@ -13,57 +13,59 @@ class TestingConfiguratorMixin(object):
     # testing API
     def testing_securitypolicy(
         self,
+        userid=None,
         identity=None,
         permissive=True,
         remember_result=None,
         forget_result=None,
     ):
-        """Unit/integration testing helper: Registers a pair of faux
-        :app:`Pyramid` security policies: a :term:`authentication
-        policy` and a :term:`authorization policy`.
+        """Unit/integration testing helper.  Registers a faux :term:`security
+        policy`.
 
-        The behavior of the registered :term:`authorization policy`
-        depends on the ``permissive`` argument.  If ``permissive`` is
-        true, a permissive :term:`authorization policy` is registered;
-        this policy allows all access.  If ``permissive`` is false, a
-        nonpermissive :term:`authorization policy` is registered; this
-        policy denies all access.
+        This function is most useful when testing code that uses the security
+        APIs, such as :meth:`pyramid.request.Request.identity`,
+        :attr:`pyramid.request.Request.authenticated_userid`, or
+        :meth:`pyramid.request.Request.has_permission`,
 
-        ``remember_result``, if provided, should be the result returned by
-        the ``remember`` method of the faux authentication policy.  If it is
-        not provided (or it is provided, and is ``None``), the default value
-        ``[]`` (the empty list) will be returned by ``remember``.
+        The behavior of the registered :term:`security policy` depends on the
+        arguments passed to this method.
 
-        ``forget_result``, if provided, should be the result returned by
-        the ``forget`` method of the faux authentication policy.  If it is
-        not provided (or it is provided, and is ``None``), the default value
-        ``[]`` (the empty list) will be returned by ``forget``.
-
-        The behavior of the registered :term:`authentication policy`
-        depends on the values provided for the ``userid`` and
-        ``groupids`` argument.  The authentication policy will return
-        the userid identifier implied by the ``userid`` argument and
-        the group ids implied by the ``groupids`` argument when the
-        :attr:`pyramid.request.Request.authenticated_userid` or
-        :attr:`pyramid.request.Request.effective_principals` APIs are
-        used.
-
-        This function is most useful when testing code that uses
-        the APIs named :meth:`pyramid.request.Request.has_permission`,
-        :attr:`pyramid.request.Request.authenticated_userid`,
-        :attr:`pyramid.request.Request.effective_principals`, and
-        :func:`pyramid.security.principals_allowed_by_permission`.
+        :param userid:  If provided, the policy's ``authenticated_userid``
+            method will return this value.  As a result,
+            :attr:`pyramid.request.Request.authenticated_userid` will have this
+            value as well.
+        :type userid:  str
+        :param identity:  If provided, the policy's ``identify`` method will
+            return this value.  As a result,
+            :attr:`pyramid.request.Request.authenticated_identity`` will have
+            this value.
+        :type identity:  object
+        :param permissive:  If true, the policy will allow access to any user
+            for any permission.  If false, the policy will deny all access.
+        :type permissive:  bool
+        :param remember_result:  If provided, the policy's ``remember`` method
+            will return this value.  Otherwise, ``remember`` will return an
+            empty list.
+        :type remember_result:  list
+        :param forget_result:  If provided, the policy's ``forget`` method will
+            return this value.  Otherwise, ``forget`` will return an empty
+            list.
+        :type forget_result:  list
 
         .. versionadded:: 1.4
-           The ``remember_result`` argument.
+            The ``remember_result`` argument.
 
         .. versionadded:: 1.4
-           The ``forget_result`` argument.
+            The ``forget_result`` argument.
+
+        .. versionchanged:: 2.0
+            Removed ``groupids`` argument and add `identity` argument.
+
         """
         from pyramid.testing import DummySecurityPolicy
 
         policy = DummySecurityPolicy(
-            identity, permissive, remember_result, forget_result
+            userid, identity, permissive, remember_result, forget_result
         )
         self.registry.registerUtility(policy, ISecurityPolicy)
         return policy

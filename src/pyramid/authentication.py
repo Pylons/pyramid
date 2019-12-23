@@ -1110,7 +1110,7 @@ class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
         return self.helper.forget(request)
 
     def unauthenticated_userid(self, request):
-        return self.helper.identify(request)
+        return self.helper.authenticated_userid(request)
 
 
 class SessionAuthenticationHelper:
@@ -1134,13 +1134,13 @@ class SessionAuthenticationHelper:
         request.session[self.userid_key] = userid
         return []
 
-    def forget(self, request):
+    def forget(self, request, **kw):
         """ Remove the stored userid from the session."""
         if self.userid_key in request.session:
             del request.session[self.userid_key]
         return []
 
-    def identify(self, request):
+    def authenticated_userid(self, request):
         """ Return the stored userid."""
         return request.session.get(self.userid_key)
 

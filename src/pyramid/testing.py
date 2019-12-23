@@ -38,15 +38,17 @@ class DummyRootFactory(object):
 
 
 class DummySecurityPolicy(object):
-    """ A standin for a security policy"""
+    """ A standin for a :term:`security policy`."""
 
     def __init__(
         self,
+        userid=None,
         identity=None,
         permissive=True,
         remember_result=None,
         forget_result=None,
     ):
+        self.userid = userid
         self.identity = identity
         self.permissive = permissive
         if remember_result is None:
@@ -59,14 +61,17 @@ class DummySecurityPolicy(object):
     def identify(self, request):
         return self.identity
 
-    def permits(self, request, context, identity, permission):
+    def authenticated_userid(self, request):
+        return self.userid
+
+    def permits(self, request, context, permission):
         return self.permissive
 
     def remember(self, request, userid, **kw):
         self.remembered = userid
         return self.remember_result
 
-    def forget(self, request):
+    def forget(self, request, **kw):
         self.forgotten = True
         return self.forget_result
 
