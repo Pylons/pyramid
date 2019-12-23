@@ -1,4 +1,5 @@
 import unittest
+import warnings
 
 from . import dummyfactory
 from . import DummyContext
@@ -307,6 +308,16 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
             pass
         else:  # pragma: no cover
             raise AssertionError
+
+    def test_add_route_effective_principals_deprecated(self):
+        config = self._makeOne(autocommit=True)
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always', DeprecationWarning)
+            config.add_route('foo', '/bar', effective_principals=['any'])
+            self.assertIn(
+                'removed the concept of principals', str(w[-1].message)
+            )
 
 
 class DummyRequest:
