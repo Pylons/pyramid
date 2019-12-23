@@ -117,7 +117,7 @@ specific path information for commands and files.
         WSGIApplicationGroup %{GLOBAL}
         WSGIPassAuthorization On
         WSGIDaemonProcess pyramid user=chrism group=staff threads=4 \
-          python-path=/Users/chrism/myproject/env/lib/python3.5/site-packages
+          python-path=/Users/chrism/myproject/env/lib/python3.8/site-packages
         WSGIScriptAlias /myapp /Users/chrism/myproject/pyramid.wsgi
 
         <Directory /Users/chrism/myproject>

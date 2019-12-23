@@ -127,8 +127,6 @@ On Unix
 On Windows
 ^^^^^^^^^^
 
-Python 3.7:
-
 .. code-block:: doscon
 
     python -m venv %VENV%
