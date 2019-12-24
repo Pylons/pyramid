@@ -138,7 +138,7 @@ deprecated(
     'principals_allowed_by_permission',
     'The new security policy has removed the concept of principals.  See '
     '"Upgrading Authentication/Authorization" in "What\'s New in Pyramid 2.0" '
-    'for more information.',
+    'of the documentation for more information.',
 )
 
 
@@ -384,7 +384,7 @@ class AuthenticationAPIMixin(object):
         (
             'The new security policy has deprecated unauthenticated_userid. '
             'See "Upgrading Authentication/Authorization" in "What\'s New in '
-            'Pyramid 2.0" for more information.'
+            'Pyramid 2.0" of the documentation for more information.'
         ),
     )
 
@@ -413,7 +413,7 @@ class AuthenticationAPIMixin(object):
         (
             'The new security policy has deprecated effective_principals. '
             'See "Upgrading Authentication/Authorization" in "What\'s New in '
-            'Pyramid 2.0" for more information.'
+            'Pyramid 2.0" of the documentation for more information.'
         ),
     )
 

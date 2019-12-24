@@ -81,7 +81,7 @@ class SecurityConfiguratorMixin(object):
             'Authentication and authorization policies have been deprecated '
             'in favor of security policies.  See "Upgrading '
             'Authentication/Authorization" in "What\'s New in Pyramid 2.0" '
-            'for more information.',
+            'of the documentation for more information.',
             DeprecationWarning,
             stacklevel=3,
         )
@@ -142,7 +142,7 @@ class SecurityConfiguratorMixin(object):
             'Authentication and authorization policies have been deprecated '
             'in favor of security policies.  See "Upgrading '
             'Authentication/Authorization" in "What\'s New in Pyramid 2.0" '
-            'for more information.',
+            'of the documentation for more information.',
             DeprecationWarning,
             stacklevel=3,
         )

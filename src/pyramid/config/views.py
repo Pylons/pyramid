@@ -797,7 +797,7 @@ class ViewsConfiguratorMixin(object):
                     'The new security policy has deprecated '
                     'effective_principals. See "Upgrading '
                     'Authentication/Authorization" in "What\'s New in '
-                    'Pyramid 2.0" for more information.'
+                    'Pyramid 2.0" of the documentation for more information.'
                 ),
                 DeprecationWarning,
                 stacklevel=4,
