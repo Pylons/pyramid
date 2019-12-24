@@ -302,6 +302,16 @@ introspectables in categories not described here.
      The :class:`pyramid.interfaces.IRoute` object that is used to perform
      matching and generation for this route.
 
+``security policy``
+
+  There will be one and only one introspectable in the ``security policy`` category.
+  It represents a call to the :meth:`pyramid.config.Configurator.set_security_policy` method (or its Configurator constructor equivalent).
+  It will have the following data:
+
+  ``policy``
+
+    The policy object (the resolved ``policy`` argument to ``set_security_policy``).
+
 ``authentication policy``
 
   There will be one and only one introspectable in the ``authentication

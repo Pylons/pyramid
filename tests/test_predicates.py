@@ -454,8 +454,9 @@ class Test_EffectivePrincipalsPredicate(unittest.TestCase):
         return EffectivePrincipalsPredicate(val, config)
 
     def _testing_authn_policy(self, userid, groupids=tuple()):
-        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import IAuthenticationPolicy, ISecurityPolicy
         from pyramid.security import Everyone, Authenticated
+        from pyramid.security import LegacySecurityPolicy
 
         class DummyPolicy:
             def effective_principals(self, request):
@@ -468,6 +469,7 @@ class Test_EffectivePrincipalsPredicate(unittest.TestCase):
 
         registry = self.config.registry
         registry.registerUtility(DummyPolicy(), IAuthenticationPolicy)
+        registry.registerUtility(LegacySecurityPolicy(), ISecurityPolicy)
 
     def test_text(self):
         inst = self._makeOne(('verna', 'fred'), None)

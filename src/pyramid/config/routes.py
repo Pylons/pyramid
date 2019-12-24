@@ -335,9 +335,10 @@ class RoutesConfiguratorMixin(object):
         if 'effective_principals' in predicates:
             warnings.warn(
                 (
-                    'The new security policy has removed the concept of '
-                    'principals. See "Upgrading Authentication/Authorization" '
-                    'in "What\'s New in Pyramid 2.0" for more information.'
+                    'The new security policy has deprecated '
+                    'effective_principals. See "Upgrading '
+                    'Authentication/Authorization" in "What\'s New in '
+                    'Pyramid 2.0" for more information.'
                 ),
                 DeprecationWarning,
                 stacklevel=3,

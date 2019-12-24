@@ -102,7 +102,7 @@ def render_view_to_iterable(context, request, name='', secure=True):
     If ``secure`` is ``True``, and the view is protected by a permission, the
     permission will be checked before the view function is invoked.  If the
     permission check disallows view execution (based on the current
-    :term:`authentication policy`), a
+    :term:`security policy`), a
     :exc:`pyramid.httpexceptions.HTTPForbidden` exception will be raised; its
     ``args`` attribute explains why the view access was disallowed.
 

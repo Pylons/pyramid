@@ -346,16 +346,22 @@ class TestAuthenticatedUserId(unittest.TestCase):
         request = _makeRequest()
         self.assertEqual(request.authenticated_userid, None)
 
-    def test_with_authentication_policy(self):
-        request = _makeRequest()
-        _registerAuthenticationPolicy(request.registry, 'yo')
-        _registerSecurityPolicy(request.registry, 'wat')
-        self.assertEqual(request.authenticated_userid, 'wat')
-
     def test_with_security_policy(self):
         request = _makeRequest()
         _registerSecurityPolicy(request.registry, '123')
         self.assertEqual(request.authenticated_userid, '123')
+
+    def test_with_authentication_policy(self):
+        request = _makeRequest()
+        _registerAuthenticationPolicy(request.registry, 'yo')
+        _registerLegacySecurityPolicy(request.registry)
+        self.assertEqual(request.authenticated_userid, 'yo')
+
+    def test_security_policy_trumps_authentication_policy(self):
+        request = _makeRequest()
+        _registerAuthenticationPolicy(request.registry, 'yo')
+        _registerSecurityPolicy(request.registry, 'wat')
+        self.assertEqual(request.authenticated_userid, 'wat')
 
 
 class TestUnAuthenticatedUserId(unittest.TestCase):
@@ -369,16 +375,22 @@ class TestUnAuthenticatedUserId(unittest.TestCase):
         request = _makeRequest()
         self.assertEqual(request.unauthenticated_userid, None)
 
-    def test_with_authentication_policy(self):
-        request = _makeRequest()
-        _registerAuthenticationPolicy(request.registry, 'yo')
-        _registerSecurityPolicy(request.registry, 'wat')
-        self.assertEqual(request.unauthenticated_userid, 'yo')
-
     def test_with_security_policy(self):
         request = _makeRequest()
         _registerSecurityPolicy(request.registry, 'yo')
         self.assertEqual(request.unauthenticated_userid, 'yo')
+
+    def test_legacy_authentication_policy(self):
+        request = _makeRequest()
+        _registerAuthenticationPolicy(request.registry, 'yo')
+        _registerLegacySecurityPolicy(request.registry)
+        self.assertEqual(request.unauthenticated_userid, 'yo')
+
+    def test_security_policy_trumps_authentication_policy(self):
+        request = _makeRequest()
+        _registerAuthenticationPolicy(request.registry, 'yo')
+        _registerSecurityPolicy(request.registry, 'wat')
+        self.assertEqual(request.unauthenticated_userid, 'wat')
 
 
 class TestEffectivePrincipals(unittest.TestCase):
@@ -394,10 +406,26 @@ class TestEffectivePrincipals(unittest.TestCase):
         request = _makeRequest()
         self.assertEqual(request.effective_principals, [Everyone])
 
-    def test_with_authentication_policy(self):
+    def test_with_security_policy(self):
+        from pyramid.security import Everyone
+
+        request = _makeRequest()
+        _registerSecurityPolicy(request.registry, 'yo')
+        self.assertEqual(request.effective_principals, [Everyone])
+
+    def test_legacy_authentication_policy(self):
         request = _makeRequest()
         _registerAuthenticationPolicy(request.registry, 'yo')
+        _registerLegacySecurityPolicy(request.registry)
         self.assertEqual(request.effective_principals, 'yo')
+
+    def test_security_policy_trumps_authentication_policy(self):
+        from pyramid.security import Everyone
+
+        request = _makeRequest()
+        _registerAuthenticationPolicy(request.registry, 'wat')
+        _registerSecurityPolicy(request.registry, 'yo')
+        self.assertEqual(request.effective_principals, [Everyone])
 
 
 class TestHasPermission(unittest.TestCase):
@@ -563,6 +591,15 @@ def _registerSecurityPolicy(reg, result):
     from pyramid.interfaces import ISecurityPolicy
 
     policy = DummySecurityPolicy(result)
+    reg.registerUtility(policy, ISecurityPolicy)
+    return policy
+
+
+def _registerLegacySecurityPolicy(reg):
+    from pyramid.interfaces import ISecurityPolicy
+    from pyramid.security import LegacySecurityPolicy
+
+    policy = LegacySecurityPolicy()
     reg.registerUtility(policy, ISecurityPolicy)
     return policy
 

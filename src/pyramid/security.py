@@ -41,10 +41,6 @@ def _get_security_policy(request):
     return request.registry.queryUtility(ISecurityPolicy)
 
 
-def _get_authentication_policy(request):
-    return request.registry.queryUtility(IAuthenticationPolicy)
-
-
 def remember(request, userid, **kw):
     """
     Returns a sequence of header tuples (e.g. ``[('Set-Cookie', 'foo=abc')]``)
@@ -71,7 +67,7 @@ def remember(request, userid, **kw):
 
     .. versionchanged:: 1.6
         Deprecated the ``principal`` argument in favor of ``userid`` to clarify
-        its relationship to the authentication policy.
+        its relationship to the security policy.
 
     .. versionchanged:: 1.10
         Removed the deprecated ``principal`` argument.
@@ -141,8 +137,7 @@ def principals_allowed_by_permission(context, permission):
 deprecated(
     'principals_allowed_by_permission',
     'The new security policy has removed the concept of principals.  See '
-    'https://docs.pylonsproject.org/projects/pyramid/en/latest'
-    '/whatsnew-2.0.html#upgrading-authentication-authorization '
+    '"Upgrading Authentication/Authorization" in "What\'s New in Pyramid 2.0" '
     'for more information.',
 )
 
@@ -152,7 +147,7 @@ def view_execution_permitted(context, request, name=''):
     by a :term:`permission`, check the permission associated with the
     view using the effective authentication/authorization policies and
     the ``request``.  Return a boolean result.  If no
-    :term:`authorization policy` is in effect, or if the view is not
+    :term:`security policy` is in effect, or if the view is not
     protected by a permission, return ``True``. If no view can view found,
     an exception will be raised.
 
@@ -376,14 +371,22 @@ class AuthenticationAPIMixin(object):
         associated with the userid exists in persistent storage.
 
         """
-        authn = _get_authentication_policy(self)
         security = _get_security_policy(self)
-        if authn is not None:
-            return authn.unauthenticated_userid(self)
-        elif security is not None:
-            return security.authenticated_userid(self)
-        else:
+        if security is None:
             return None
+        if isinstance(security, LegacySecurityPolicy):
+            authn = security._get_authn_policy(self)
+            return authn.unauthenticated_userid(self)
+        return security.authenticated_userid(self)
+
+    unauthenticated_userid = deprecated(
+        unauthenticated_userid,
+        (
+            'The new security policy has deprecated unauthenticated_userid. '
+            'See "Upgrading Authentication/Authorization" in "What\'s New in '
+            'Pyramid 2.0" for more information.'
+        ),
+    )
 
     @property
     def effective_principals(self):
@@ -399,17 +402,19 @@ class AuthenticationAPIMixin(object):
         :data:`pyramid.security.Everyone` principal.
 
         """
-        policy = _get_authentication_policy(self)
-        if policy is None:
-            return [Everyone]
-        return policy.effective_principals(self)
+        security = _get_security_policy(self)
+        if security is not None and isinstance(security, LegacySecurityPolicy):
+            authn = security._get_authn_policy(self)
+            return authn.effective_principals(self)
+        return [Everyone]
 
     effective_principals = deprecated(
         effective_principals,
-        'The new security policy has removed the concept of principals.  See '
-        'https://docs.pylonsproject.org/projects/pyramid/en/latest'
-        '/whatsnew-2.0.html#upgrading-authentication-authorization '
-        'for more information.',
+        (
+            'The new security policy has deprecated effective_principals. '
+            'See "Upgrading Authentication/Authorization" in "What\'s New in '
+            'Pyramid 2.0" for more information.'
+        ),
     )
 
 

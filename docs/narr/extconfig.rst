@@ -271,6 +271,7 @@ Pre-defined Phases
 
 - :meth:`pyramid.config.Configurator.add_route`
 - :meth:`pyramid.config.Configurator.set_authentication_policy`
+- :meth:`pyramid.config.Configurator.set_security_policy`
 
 :const:`pyramid.config.PHASE3_CONFIG`
 

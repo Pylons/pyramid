@@ -278,7 +278,7 @@ In the above example, we create a ``MyTest`` test case that inherits from
 be found when ``pytest`` is run.  It has two test methods.
 
 The first test method, ``test_view_fn_forbidden`` tests the ``view_fn`` when
-the authentication policy forbids the current user the ``edit`` permission. Its
+the security policy forbids the current user the ``edit`` permission. Its
 third line registers a "dummy" "non-permissive" authorization policy using the
 :meth:`~pyramid.config.Configurator.testing_securitypolicy` method, which is a
 special helper method for unit testing.
@@ -288,13 +288,13 @@ WebOb request object API.  A :class:`pyramid.testing.DummyRequest` is a request
 object that requires less setup than a "real" :app:`Pyramid` request.  We call
 the function being tested with the manufactured request.  When the function is
 called, :meth:`pyramid.request.Request.has_permission` will call the "dummy"
-authentication policy we've registered through
+security policy we've registered through
 :meth:`~pyramid.config.Configurator.testing_securitypolicy`, which denies
 access.  We check that the view function raises a
 :exc:`~pyramid.httpexceptions.HTTPForbidden` error.
 
 The second test method, named ``test_view_fn_allowed``, tests the alternate
-case, where the authentication policy allows access.  Notice that we pass
+case, where the security policy allows access.  Notice that we pass
 different values to :meth:`~pyramid.config.Configurator.testing_securitypolicy`
 to obtain this result.  We assert at the end of this that the view function
 returns a value.
