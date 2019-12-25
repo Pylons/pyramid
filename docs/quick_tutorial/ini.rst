@@ -133,7 +133,7 @@ Extra credit
 
 .. seealso::
    :ref:`project_narr`,
-   :ref:`cookiecutters`,
+   :ref:`pyramid-cookiecutters`,
    :ref:`what_is_this_pserve_thing`,
    :ref:`environment_chapter`,
    :ref:`paste_chapter`
