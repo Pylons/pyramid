@@ -73,7 +73,7 @@ In :ref:`installing_chapter`, you created a virtual Python environment via the
 ``venv`` command. We called the virtual environment directory
 ``env`` and set an environment variable ``VENV`` to its path.
 
-We assume that you :ref:`previously installed cookiecutter <cookiecutters>`, following its installation instructions.
+We assume that you :ref:`previously installed cookiecutter <pyramid-cookiecutters>`, following its installation instructions.
 
 When we invoke ``cookiecutter``, it will create a directory that represents our project.
 
