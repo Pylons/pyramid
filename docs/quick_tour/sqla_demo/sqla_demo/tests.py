@@ -1,7 +1,8 @@
 import unittest
-import transaction
 
 from pyramid import testing
+
+import transaction
 
 
 def dummy_request(dbsession):

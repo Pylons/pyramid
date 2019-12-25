@@ -9,17 +9,17 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
     CHANGES = f.read()
 
 requires = [
-    'alembic',
     'plaster_pastedeploy',
-    'pyramid >= 1.9',
-    'pyramid_debugtoolbar',
+    'pyramid',
     'pyramid_jinja2',
+    'pyramid_debugtoolbar',
+    'waitress',
+    'alembic',
     'pyramid_retry',
     'pyramid_tm',
     'SQLAlchemy',
     'transaction',
     'zope.sqlalchemy',
-    'waitress',
 ]
 
 tests_require = [
@@ -55,7 +55,7 @@ setup(
             'main = sqla_demo:main',
         ],
         'console_scripts': [
-            'initialize_sqla_demo_db = sqla_demo.scripts.initialize_db:main',
+            'initialize_sqla_demo_db=sqla_demo.scripts.initialize_db:main',
         ],
     },
 )

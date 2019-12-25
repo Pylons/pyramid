@@ -493,7 +493,8 @@ So far we have done all of our *Quick Tour* as a single Python file. No Python
 packages, no structure. Most Pyramid projects, though, aren't developed this
 way.
 
-To ease the process of getting started, the Pylons Project provides a :term:`cookiecutter` that generates sample Pyramid projects from project templates. This cookiecutter will install Pyramid and its dependencies as well.
+To ease the process of getting started, the Pylons Project provides a :term:`cookiecutter` that generates a sample Pyramid project from project templates.
+This cookiecutter will install Pyramid and its dependencies as well.
 
 First you'll need to install cookiecutter.
 
@@ -894,9 +895,22 @@ We then run through the following commands as before.
     # Reset our environment variable for a new virtual environment.
     export VENV=~/sqla_demo/env
 
-We now have a working sample SQLAlchemy application with all dependencies
-installed. The sample project provides a console script to initialize a SQLite
-database with tables. Let's run it, then start the application:
+We now have a working sample SQLAlchemy application with all dependencies installed.
+The sample project provides a method to generate a database migration from existing models and upgrade the database schema using Alembic.
+Let's generate the first revision.
+
+.. code-block:: bash
+
+    $VENV/bin/alembic -c development.ini revision --autogenerate -m "init"
+
+Now let's upgrade the database schema.
+
+.. code-block:: bash
+
+    $VENV/bin/alembic -c development.ini upgrade head
+
+The sample project also provides a console script to load data into the SQLite database.
+Let's run it, then start the application:
 
 .. code-block:: bash
 
