@@ -1,5 +1,6 @@
-from zope.interface import Interface
 from webob import Response
+from zope.interface import Interface
+
 from pyramid.httpexceptions import HTTPForbidden
 
 

@@ -3,8 +3,7 @@ import sys
 import textwrap
 
 from pyramid.interfaces import IMultiView
-from pyramid.paster import bootstrap
-from pyramid.paster import setup_logging
+from pyramid.paster import bootstrap, setup_logging
 from pyramid.request import Request
 from pyramid.scripts.common import parse_vars
 from pyramid.view import _find_views

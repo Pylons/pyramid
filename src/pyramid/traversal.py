@@ -1,18 +1,16 @@
 from functools import lru_cache
 from urllib.parse import unquote_to_bytes
-
 from zope.interface import implementer
 from zope.interface.interfaces import IInterface
 
-from pyramid.interfaces import (
-    IResourceURL,
-    IRequestFactory,
-    ITraverser,
-    VH_ROOT_KEY,
-)
-
 from pyramid.encode import url_quote
 from pyramid.exceptions import URLDecodeError
+from pyramid.interfaces import (
+    VH_ROOT_KEY,
+    IRequestFactory,
+    IResourceURL,
+    ITraverser,
+)
 from pyramid.location import lineage
 from pyramid.threadlocal import get_current_registry
 from pyramid.util import ascii_, is_nonstr_iter, text_

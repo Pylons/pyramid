@@ -1,16 +1,19 @@
 import os
 import unittest
 
-from . import dummy_tween_factory
-from . import dummy_include
-from . import dummy_extend
-from . import dummy_extend2
-from . import DummyContext
-
-from pyramid.exceptions import ConfigurationExecutionError
-from pyramid.exceptions import ConfigurationConflictError
-
+from pyramid.exceptions import (
+    ConfigurationConflictError,
+    ConfigurationExecutionError,
+)
 from pyramid.interfaces import IRequest
+
+from . import (
+    DummyContext,
+    dummy_extend,
+    dummy_extend2,
+    dummy_include,
+    dummy_tween_factory,
+)
 
 
 class ConfiguratorTests(unittest.TestCase):

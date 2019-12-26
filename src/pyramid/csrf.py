@@ -1,18 +1,16 @@
 from urllib.parse import urlparse
 import uuid
-
 from webob.cookies import CookieProfile
 from zope.interface import implementer
-
 
 from pyramid.exceptions import BadCSRFOrigin, BadCSRFToken
 from pyramid.interfaces import ICSRFStoragePolicy
 from pyramid.settings import aslist
 from pyramid.util import (
     SimpleSerializer,
+    bytes_,
     is_same_domain,
     strings_differ,
-    bytes_,
     text_,
 )
 

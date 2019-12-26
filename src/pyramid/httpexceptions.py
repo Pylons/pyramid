@@ -129,13 +129,10 @@ subclasses have one additional keyword argument: ``location``,
 which indicates the location to which to redirect.
 """
 import json
-
 from string import Template
-
-from zope.interface import implementer
-
 from webob import html_escape as _html_escape
 from webob.acceptparse import create_accept_header
+from zope.interface import implementer
 
 from pyramid.interfaces import IExceptionResponse
 from pyramid.response import Response

@@ -2,22 +2,19 @@ import contextlib
 from urllib.parse import urlparse
 import warnings
 
+from pyramid.config.actions import action_method
+from pyramid.config.predicates import normalize_accept_offer, predvalseq
+from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import (
+    PHASE2_CONFIG,
     IRequest,
     IRouteRequest,
     IRoutesMapper,
-    PHASE2_CONFIG,
 )
-
-from pyramid.exceptions import ConfigurationError
 import pyramid.predicates
 from pyramid.request import route_request_iface
 from pyramid.urldispatch import RoutesMapper
-
 from pyramid.util import as_sorted_tuple, is_nonstr_iter
-
-from pyramid.config.actions import action_method
-from pyramid.config.predicates import normalize_accept_offer, predvalseq
 
 
 class RoutesConfiguratorMixin(object):

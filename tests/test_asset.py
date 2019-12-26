@@ -1,5 +1,5 @@
-import unittest
 import os
+import unittest
 
 here = os.path.abspath(os.path.dirname(__file__))
 

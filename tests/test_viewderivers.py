@@ -3,7 +3,7 @@ from zope.interface import implementer
 
 from pyramid import testing
 from pyramid.exceptions import ConfigurationError
-from pyramid.interfaces import IResponse, IRequest
+from pyramid.interfaces import IRequest, IResponse
 
 
 class TestDeriveView(unittest.TestCase):

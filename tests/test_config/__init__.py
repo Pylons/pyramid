@@ -1,7 +1,6 @@
 # package
 from functools import partial
-from zope.interface import implementer
-from zope.interface import Interface
+from zope.interface import Interface, implementer
 
 
 class IFactory(Interface):

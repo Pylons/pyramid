@@ -1,5 +1,5 @@
-from pyramid.view import notfound_view_config, view_config
 from pyramid.response import Response
+from pyramid.view import notfound_view_config, view_config
 
 
 @notfound_view_config(route_name='foo', append_slash=True)

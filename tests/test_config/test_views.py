@@ -4,14 +4,15 @@ import warnings
 from zope.interface import implementer
 
 from pyramid import testing
-from pyramid.exceptions import ConfigurationError
-from pyramid.exceptions import ConfigurationExecutionError
-from pyramid.exceptions import ConfigurationConflictError
-from pyramid.interfaces import IResponse, IRequest, IMultiView
+from pyramid.exceptions import (
+    ConfigurationConflictError,
+    ConfigurationError,
+    ConfigurationExecutionError,
+)
+from pyramid.interfaces import IMultiView, IRequest, IResponse
 from pyramid.util import text_
 
-from . import IDummy
-from . import dummy_view
+from . import IDummy, dummy_view
 
 
 class TestViewsConfigurationMixin(unittest.TestCase):

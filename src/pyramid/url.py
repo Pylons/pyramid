@@ -3,19 +3,17 @@
 from functools import lru_cache
 import os
 
-from pyramid.interfaces import IResourceURL, IRoutesMapper, IStaticURLInfo
-
 from pyramid.encode import url_quote, urlencode
+from pyramid.interfaces import IResourceURL, IRoutesMapper, IStaticURLInfo
 from pyramid.path import caller_package
 from pyramid.threadlocal import get_current_registry
-from pyramid.util import bytes_
-
 from pyramid.traversal import (
-    ResourceURL,
-    quote_path_segment,
     PATH_SAFE,
     PATH_SEGMENT_SAFE,
+    ResourceURL,
+    quote_path_segment,
 )
+from pyramid.util import bytes_
 
 QUERY_SAFE = "/?:@!$&'()*+,;="  # RFC 3986
 ANCHOR_SAFE = QUERY_SAFE

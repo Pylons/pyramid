@@ -1,6 +1,8 @@
 from webob import Response
-from .models import AnException
+
 from pyramid.httpexceptions import HTTPBadRequest
+
+from .models import AnException
 
 
 def no(request):

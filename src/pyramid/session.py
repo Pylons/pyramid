@@ -2,17 +2,13 @@ import binascii
 import os
 import pickle
 import time
-
+from webob.cookies import JSONSerializer, SignedSerializer
 from zope.deprecation import deprecated
 from zope.interface import implementer
 
-from webob.cookies import JSONSerializer, SignedSerializer
-
 from pyramid.csrf import check_csrf_origin, check_csrf_token
-
 from pyramid.interfaces import ISession
-
-from pyramid.util import text_, bytes_
+from pyramid.util import bytes_, text_
 
 
 def manage_accessed(wrapped):

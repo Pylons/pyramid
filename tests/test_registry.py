@@ -1,6 +1,5 @@
 import unittest
-from zope.interface import Interface
-from zope.interface import implementer
+from zope.interface import Interface, implementer
 
 
 class TestRegistry(unittest.TestCase):

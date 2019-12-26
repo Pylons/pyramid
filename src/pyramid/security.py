@@ -1,15 +1,14 @@
-from zope.interface import implementer, providedBy
 from zope.deprecation import deprecated
+from zope.interface import implementer, providedBy
 
 from pyramid.interfaces import (
-    ISecurityPolicy,
     IAuthenticationPolicy,
     IAuthorizationPolicy,
     ISecuredView,
+    ISecurityPolicy,
     IView,
     IViewClassifier,
 )
-
 from pyramid.threadlocal import get_current_registry
 
 Everyone = 'system.Everyone'

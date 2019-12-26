@@ -1,7 +1,7 @@
-from pyramid.view import forbidden_view_config, view_config
-from pyramid.response import Response
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
+from pyramid.response import Response
+from pyramid.view import forbidden_view_config, view_config
 
 
 @forbidden_view_config(route_name='foo')

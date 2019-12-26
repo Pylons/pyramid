@@ -1,5 +1,6 @@
-from pyramid import testing
 import unittest
+
+from pyramid import testing
 
 
 class TestThreadLocalManager(unittest.TestCase):

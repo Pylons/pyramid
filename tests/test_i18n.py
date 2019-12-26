@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import unittest
+
 from pyramid import testing
 
 here = os.path.dirname(__file__)

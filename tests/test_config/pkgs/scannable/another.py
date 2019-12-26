@@ -1,5 +1,5 @@
-from pyramid.view import view_config
 from pyramid.renderers import null_renderer
+from pyramid.view import view_config
 
 
 @view_config(name='another', renderer=null_renderer)

@@ -1,15 +1,12 @@
 import os
 import pkg_resources
 import sys
-
 from zope.interface import implementer
 
-from pyramid.interfaces import IPackageOverrides, PHASE1_CONFIG
-
-from pyramid.exceptions import ConfigurationError
-from pyramid.threadlocal import get_current_registry
-
 from pyramid.config.actions import action_method
+from pyramid.exceptions import ConfigurationError
+from pyramid.interfaces import PHASE1_CONFIG, IPackageOverrides
+from pyramid.threadlocal import get_current_registry
 
 
 class OverrideProvider(pkg_resources.DefaultProvider):

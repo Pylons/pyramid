@@ -1,21 +1,15 @@
 import gettext
 import os
-
-from translationstring import (
-    Translator,
-    Pluralizer,
-    TranslationString,  # API
-    TranslationStringFactory,  # API
-)
+from translationstring import Pluralizer, Translator
+from translationstring import TranslationString  # API
+from translationstring import TranslationStringFactory  # API
 
 from pyramid.decorator import reify
-
 from pyramid.interfaces import (
+    ILocaleNegotiator,
     ILocalizer,
     ITranslationDirectories,
-    ILocaleNegotiator,
 )
-
 from pyramid.threadlocal import get_current_registry
 
 TranslationString = TranslationString  # PyFlakes

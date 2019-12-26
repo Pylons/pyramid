@@ -1,5 +1,5 @@
-from pyramid.response import Response
 from pyramid.authentication import RemoteUserAuthenticationPolicy
+from pyramid.response import Response
 from pyramid.security import Allowed, Denied
 
 

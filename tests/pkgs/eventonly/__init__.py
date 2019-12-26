@@ -1,5 +1,5 @@
-from pyramid.view import view_config
 from pyramid.events import subscriber
+from pyramid.view import view_config
 
 
 class Yup(object):
