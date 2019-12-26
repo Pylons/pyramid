@@ -68,6 +68,9 @@ Features
   ``pyramid.static.static_view``.
   See https://github.com/Pylons/pyramid/pull/3537
 
+- Fix ``DeprecationWarning`` emitted by using the ``imp`` module.
+  See https://github.com/Pylons/pyramid/pull/3553
+
 Deprecations
 ------------
 
