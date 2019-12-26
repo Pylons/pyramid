@@ -1,7 +1,6 @@
 import os
 import pkg_resources
 import sys
-import imp
 
 from zope.interface import implementer
 
@@ -9,12 +8,21 @@ from pyramid.interfaces import IAssetDescriptor
 
 from pyramid._compat import string_types
 
-ignore_types = [imp.C_EXTENSION, imp.C_BUILTIN]
-init_names = [
-    '__init__%s' % x[0]
-    for x in imp.get_suffixes()
-    if x[0] and x[2] not in ignore_types
-]
+try:
+    from importlib.machinery import SOURCE_SUFFIXES
+except ImportError:
+    # `importlib.machinery` is missing on Python < 3.3
+    # `imp` is deprecated on Python > 3.4
+    import imp
+
+    ignore_types = [imp.C_EXTENSION, imp.C_BUILTIN]
+    SOURCE_SUFFIXES = [
+        _suffix
+        for _suffix, _, _type in imp.get_suffixes()
+        if _suffix and _type not in ignore_types
+    ]
+
+init_names = ['__init__%s' % x for x in SOURCE_SUFFIXES]
 
 
 def caller_path(path, level=2):
