@@ -1699,10 +1699,6 @@ class DummyResponse(object):
         return self.app_iter
 
 
-class DummyAuthenticationPolicy:
-    pass
-
-
 class DummyLogger:
     def __init__(self):
         self.messages = []

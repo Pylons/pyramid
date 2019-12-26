@@ -297,21 +297,22 @@ Methods Which Provide Conflict Detection
 
 These are the methods of the configurator which provide conflict detection:
 
-:meth:`~pyramid.config.Configurator.add_view`,
-:meth:`~pyramid.config.Configurator.add_route`,
-:meth:`~pyramid.config.Configurator.add_renderer`,
-:meth:`~pyramid.config.Configurator.add_request_method`,
-:meth:`~pyramid.config.Configurator.set_request_factory`,
-:meth:`~pyramid.config.Configurator.set_session_factory`,
-:meth:`~pyramid.config.Configurator.set_root_factory`,
-:meth:`~pyramid.config.Configurator.set_view_mapper`,
-:meth:`~pyramid.config.Configurator.set_authentication_policy`,
-:meth:`~pyramid.config.Configurator.set_authorization_policy`,
-:meth:`~pyramid.config.Configurator.set_locale_negotiator`,
-:meth:`~pyramid.config.Configurator.set_default_permission`,
-:meth:`~pyramid.config.Configurator.add_traverser`,
-:meth:`~pyramid.config.Configurator.add_resource_url_adapter`,
-and :meth:`~pyramid.config.Configurator.add_response_adapter`.
+- :meth:`~pyramid.config.Configurator.add_renderer`
+- :meth:`~pyramid.config.Configurator.add_request_method`
+- :meth:`~pyramid.config.Configurator.add_resource_url_adapter`
+- :meth:`~pyramid.config.Configurator.add_response_adapter`
+- :meth:`~pyramid.config.Configurator.add_route`
+- :meth:`~pyramid.config.Configurator.add_traverser`
+- :meth:`~pyramid.config.Configurator.add_view`
+- :meth:`~pyramid.config.Configurator.set_authentication_policy`
+- :meth:`~pyramid.config.Configurator.set_authorization_policy`
+- :meth:`~pyramid.config.Configurator.set_default_permission`
+- :meth:`~pyramid.config.Configurator.set_locale_negotiator`
+- :meth:`~pyramid.config.Configurator.set_request_factory`
+- :meth:`~pyramid.config.Configurator.set_root_factory`
+- :meth:`~pyramid.config.Configurator.set_security_policy`
+- :meth:`~pyramid.config.Configurator.set_session_factory`
+- :meth:`~pyramid.config.Configurator.set_view_mapper`
 
 :meth:`~pyramid.config.Configurator.add_static_view` also indirectly provides
 conflict detection, because it's implemented in terms of the conflict-aware

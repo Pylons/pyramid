@@ -199,11 +199,11 @@ Under its hood however, the implementation of ``authenticated_userid`` is this:
 
     def authenticated_userid(request):
         """ Return the userid of the currently authenticated user or
-        ``None`` if there is no authentication policy in effect or there
+        ``None`` if there is no security policy in effect or there
         is no currently authenticated user. """
 
         registry = request.registry # the ZCA component registry
-        policy = registry.queryUtility(IAuthenticationPolicy)
+        policy = registry.queryUtility(ISecurityPolicy)
         if policy is None:
             return None
         return policy.authenticated_userid(request)
@@ -264,19 +264,19 @@ instead of the rule.  So instead of:
 .. code-block:: python
     :linenos:
 
-    from pyramid.interfaces import IAuthenticationPolicy
+    from pyramid.interfaces import ISecurityPolicy
     from zope.component import getUtility
-    policy = getUtility(IAuthenticationPolicy)
+    policy = getUtility(ISecurityPolicy)
 
 :app:`Pyramid` code will usually do:
 
 .. code-block:: python
     :linenos:
 
-    from pyramid.interfaces import IAuthenticationPolicy
+    from pyramid.interfaces import ISecurityPolicy
     from pyramid.threadlocal import get_current_registry
     registry = get_current_registry()
-    policy = registry.getUtility(IAuthenticationPolicy)
+    policy = registry.getUtility(ISecurityPolicy)
 
 While the latter is more verbose, it also arguably makes it more obvious what's
 going on.  All of the :app:`Pyramid` core code uses this pattern rather than

@@ -316,7 +316,7 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
             warnings.simplefilter('always', DeprecationWarning)
             config.add_route('foo', '/bar', effective_principals=['any'])
             self.assertIn(
-                'removed the concept of principals', str(w[-1].message)
+                'deprecated effective_principals', str(w[-1].message)
             )
 
 

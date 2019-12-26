@@ -1,5 +1,5 @@
+import warnings
 from zope.interface import implementer
-from zope.deprecation import deprecate
 
 from pyramid.interfaces import (
     IAuthorizationPolicy,
@@ -57,13 +57,6 @@ class SecurityConfiguratorMixin(object):
             introspectables=(intr,),
         )
 
-    @deprecate(
-        'Authentication and authorization policies have been deprecated in '
-        'favor of security policies.  See '
-        'https://docs.pylonsproject.org/projects/pyramid/en/latest'
-        '/whatsnew-2.0.html#upgrading-authentication-authorization '
-        'for more information.'
-    )
     @action_method
     def set_authentication_policy(self, policy):
         """
@@ -84,6 +77,14 @@ class SecurityConfiguratorMixin(object):
            achieve the same purpose.
 
         """
+        warnings.warn(
+            'Authentication and authorization policies have been deprecated '
+            'in favor of security policies.  See "Upgrading '
+            'Authentication/Authorization" in "What\'s New in Pyramid 2.0" '
+            'of the documentation for more information.',
+            DeprecationWarning,
+            stacklevel=3,
+        )
 
         def register():
             self.registry.registerUtility(policy, IAuthenticationPolicy)
@@ -137,6 +138,14 @@ class SecurityConfiguratorMixin(object):
            achieve the same purpose.
 
         """
+        warnings.warn(
+            'Authentication and authorization policies have been deprecated '
+            'in favor of security policies.  See "Upgrading '
+            'Authentication/Authorization" in "What\'s New in Pyramid 2.0" '
+            'of the documentation for more information.',
+            DeprecationWarning,
+            stacklevel=3,
+        )
 
         def register():
             self.registry.registerUtility(policy, IAuthorizationPolicy)

@@ -32,11 +32,11 @@ various :app:`Pyramid` API functions.  For example, the implementation of the
 :mod:`pyramid.security` function named
 :func:`~pyramid.security.authenticated_userid` (deprecated as of 1.5) retrieves
 the thread local :term:`application registry` as a matter of course to find an
-:term:`authentication policy`.  It uses the
+:term:`security policy`.  It uses the
 :func:`pyramid.threadlocal.get_current_registry` function to retrieve the
-application registry, from which it looks up the authentication policy; it then
-uses the authentication policy to retrieve the authenticated user id.  This is
-how :app:`Pyramid` allows arbitrary authentication policies to be "plugged in".
+application registry, from which it looks up the security policy; it then
+uses the security policy to retrieve the authenticated user id.  This is
+how :app:`Pyramid` allows arbitrary security policies to be "plugged in".
 
 When they need to do so, :app:`Pyramid` internals use two API functions to
 retrieve the :term:`request` and :term:`application registry`:
