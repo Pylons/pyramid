@@ -1,18 +1,13 @@
+from importlib.machinery import SOURCE_SUFFIXES
 import os
 import pkg_resources
 import sys
-import imp
 
 from zope.interface import implementer
 
 from pyramid.interfaces import IAssetDescriptor
 
-ignore_types = [imp.C_EXTENSION, imp.C_BUILTIN]
-init_names = [
-    '__init__%s' % x[0]
-    for x in imp.get_suffixes()
-    if x[0] and x[2] not in ignore_types
-]
+init_names = ['__init__%s' % x for x in SOURCE_SUFFIXES]
 
 
 def caller_path(path, level=2):
