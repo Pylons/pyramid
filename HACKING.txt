@@ -48,7 +48,7 @@ In order to add a feature to Pyramid:
 Coding Style
 ------------
 
-- Pyramid uses Black (https://pypi.org/project/black/) and isort (https://pypi.org/project/black/) for code formatting style.
+- Pyramid uses Black (https://pypi.org/project/black/) and isort (https://pypi.org/project/isort/) for code formatting style.
   To run formatters:
 
     $ tox -e format
