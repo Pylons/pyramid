@@ -1,12 +1,12 @@
 .. index::
     single: cookiecutter
 
-.. _pyramid-cookiecutters:
+.. _cookiecutters:
 
 Pyramid cookiecutters
 =====================
 
-A :term:`cookiecutter` is a command-line utility that creates projects from `cookiecutters <https://cookiecutter.readthedocs.io/en/latest/>`_ (project templates).
+A :term:`cookiecutter` is a command-line utility that creates projects from `cookiecutters <https://cookiecutter.readthedocs.io/en/latest/>`__ (project templates).
 
 The Pylons Project supports one official Pyramid cookiecutter `pyramid-cookiecutter-starter <https://github.com/Pylons/pyramid-cookiecutter-starter>`_.
 
