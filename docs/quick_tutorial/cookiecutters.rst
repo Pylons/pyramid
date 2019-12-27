@@ -73,8 +73,8 @@ Steps
 
     .. code-block:: text
 
-        Starting subprocess with file monitor
-        Starting server in PID 73732.
+        Starting monitor for PID 60461.
+        Starting server in PID 60461.
         Serving on http://localhost:6543
         Serving on http://localhost:6543
 
