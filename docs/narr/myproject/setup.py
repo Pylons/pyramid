@@ -25,7 +25,7 @@ tests_require = [
 setup(
     name='myproject',
     version='0.0',
-    description='MyProject',
+    description='myproject',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[
         'Programming Language :: Python',

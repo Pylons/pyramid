@@ -14,7 +14,13 @@ class ViewTests(unittest.TestCase):
         from .views.default import my_view
         request = testing.DummyRequest()
         info = my_view(request)
-        self.assertEqual(info['project'], 'MyProject')
+        self.assertEqual(info['project'], 'myproject')
+
+    def test_notfound_view(self):
+        from .views.notfound import notfound_view
+        request = testing.DummyRequest()
+        info = notfound_view(request)
+        self.assertEqual(info, {})
 
 
 class FunctionalTests(unittest.TestCase):
@@ -27,3 +33,7 @@ class FunctionalTests(unittest.TestCase):
     def test_root(self):
         res = self.testapp.get('/', status=200)
         self.assertTrue(b'Pyramid' in res.body)
+
+    def test_notfound(self):
+        res = self.testapp.get('/badurl', status=404)
+        self.assertTrue(res.status_code == 404)
