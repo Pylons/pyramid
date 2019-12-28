@@ -73,7 +73,7 @@ Success executing this command will end with a line to the console similar to th
 
 .. code-block:: text
 
-    Successfully installed docutils-0.14 tutorial
+    Successfully installed docutils-0.15.2 tutorial
 
 
 Adding view functions in the ``views`` package
@@ -356,7 +356,7 @@ Our templates name static assets, including CSS and images.
 We don't need to create these files within our package's ``static`` directory because they were provided by the cookiecutter at the time we created the project.
 
 As an example, the CSS file will be accessed via ``http://localhost:6543/static/theme.css`` by virtue of the call to the ``add_static_view`` directive in the ``routes.py`` file.
-Any number and type of static assets can be placed in this directory (or subdirectories)
+Any number and type of static assets can be placed in this directory (or subdirectories).
 They are referred to by either URL or using the convenience method ``static_url``, for example ``request.static_url('<package>:static/foo.css')``, within templates.
 
 
