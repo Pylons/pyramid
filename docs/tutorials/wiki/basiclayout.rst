@@ -107,6 +107,12 @@ Next include routes from the ``.routes`` module.
     :lineno-match:
     :language: py
 
+The included module contains the following function.
+
+.. literalinclude:: src/basiclayout/tutorial/routes.py
+    :linenos:
+    :language: py
+
 This registers a "static view" using the :meth:`pyramid.config.Configurator.add_static_view` method.
 This view answers requests whose URL path starts with ``/static``.
 This statement registers a view that will serve up static assets, such as CSS and image files.
@@ -121,7 +127,7 @@ Alternatively the cookiecutter could have used an *absolute* asset specification
 
 The third argument is an optional ``cache_max_age`` which specifies the number of seconds the static asset will be HTTP-cached.
 
-Next perform a :term:`scan`.
+Back into our ``__init__.py``, next perform a :term:`scan`.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 21
@@ -208,12 +214,12 @@ Let's try to understand the components in this module:
     The ``context`` argument signifies that the decorated view callable ``my_view`` should only be run when :term:`traversal` finds the ``tutorial.models.MyModel`` :term:`resource` as the :term:`context` of a request.
     In English this means that when the URL ``/`` is visited, and because ``MyModel`` is the root model, this view callable will be invoked.
 
-    The ``renderer`` argument names an :term:`asset specification` of ``templates/mytemplate.pt``.
+    The ``renderer`` argument names an :term:`asset specification` of ``tutorial:templates/mytemplate.pt``.
     This asset specification points at a :term:`Chameleon` template which lives in the ``mytemplate.pt`` file within the ``templates`` directory of the ``tutorial`` package.
     And indeed if you look in the ``templates`` directory of this package, you will see a ``mytemplate.pt`` template file
     This template renders the default home page of the generated project.
-    This asset specification is *relative* to the ``views`` package.
-    Alternatively we could have used the absolute asset specification ``tutorial:templates/mytemplate.pt``.
+    This asset specification is *absolute* to the ``views`` package.
+    Alternatively we could have used the relative asset specification ``../templates/mytemplate.pt``.
 
     Since this call to ``@view_config`` doesn't pass a ``name`` argument, the ``my_view`` function which it decorates represents the "default" view callable used when the context is of the type ``MyModel``.
 
@@ -225,7 +231,7 @@ Let's try to understand the components in this module:
     The function returns the dictionary ``{'project': 'myproj'}``.
     This dictionary is used by the template named by the ``mytemplate.pt`` asset specification to fill in certain values on the page.
 
-Let us open ``tutorial/views/default.py`` in the ``views`` package to look at the second view.
+Let us open ``tutorial/views/notfound.py`` in the ``views`` package to look at the second view.
 
 .. literalinclude:: src/basiclayout/tutorial/views/notfound.py
     :linenos:
@@ -237,7 +243,7 @@ Without repeating ourselves, we will point out the differences between this view
     The ``notfound_view`` function is decorated with ``@notfound_view_config``.
     This decorator registers a :term:`Not Found View` using :meth:`pyramid.config.Configurator.add_notfound_view`.
 
-    The ``renderer`` argument names an :term:`asset specification` of ``templates/404.pt``.
+    The ``renderer`` argument names an :term:`asset specification` of ``tutorial:templates/404.pt``.
 
 #.  *Lines 5-7*.
     A :term:`view callable` named ``notfound_view`` is defined, which is decorated in the step above.
