@@ -12,7 +12,7 @@ requires = [
     'alembic',
     'bcrypt',
     'plaster_pastedeploy',
-    'pyramid >= 1.9',
+    'pyramid',
     'pyramid_debugtoolbar',
     'pyramid_jinja2',
     'pyramid_retry',
@@ -56,7 +56,7 @@ setup(
             'main = tutorial:main',
         ],
         'console_scripts': [
-            'initialize_tutorial_db = tutorial.scripts.initialize_db:main',
+            'initialize_tutorial_db=tutorial.scripts.initialize_db:main',
         ],
     },
 )
