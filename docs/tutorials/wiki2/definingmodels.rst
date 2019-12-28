@@ -256,14 +256,14 @@ Populating the database
 Because our model has changed, and to repopulate the database, we need to rerun the ``initialize_tutorial_db`` command to pick up the changes we've made to the ``initialize_db.py`` file.
 
 On Unix
-^^^^^^^
+-------
 
 .. code-block:: bash
 
    $VENV/bin/initialize_tutorial_db development.ini
 
 On Windows
-^^^^^^^^^^
+----------
 
 .. code-block:: doscon
 
