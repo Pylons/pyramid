@@ -16,3 +16,9 @@ class ViewTests(unittest.TestCase):
         info = my_view(request)
         self.assertEqual(info['project'], 'myproj')
 
+    def test_notfound_view(self):
+        from .views.notfound import notfound_view
+        request = testing.DummyRequest()
+        info = notfound_view(request)
+        self.assertEqual(info, {})
+

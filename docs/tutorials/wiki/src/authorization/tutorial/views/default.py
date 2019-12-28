@@ -24,7 +24,7 @@ def view_wiki(context, request):
     return HTTPFound(location=request.resource_url(context, 'FrontPage'))
 
 
-@view_config(context='..models.Page', renderer='../templates/view.pt',
+@view_config(context='..models.Page', renderer='tutorial:templates/view.pt',
              permission='view')
 def view_page(context, request):
     wiki = context.__parent__
@@ -47,7 +47,7 @@ def view_page(context, request):
 
 
 @view_config(name='add_page', context='..models.Wiki',
-             renderer='../templates/edit.pt',
+             renderer='tutorial:templates/edit.pt',
              permission='edit')
 def add_page(context, request):
     pagename = request.subpath[0]
@@ -67,7 +67,7 @@ def add_page(context, request):
 
 
 @view_config(name='edit_page', context='..models.Page',
-             renderer='../templates/edit.pt',
+             renderer='tutorial:templates/edit.pt',
              permission='edit')
 def edit_page(context, request):
     if 'form.submitted' in request.params:
@@ -80,8 +80,8 @@ def edit_page(context, request):
 
 
 @view_config(context='..models.Wiki', name='login',
-             renderer='../templates/login.pt')
-@forbidden_view_config(renderer='../templates/login.pt')
+             renderer='tutorial:templates/login.pt')
+@forbidden_view_config(renderer='tutorial:templates/login.pt')
 def login(request):
     login_url = request.resource_url(request.context, 'login')
     referrer = request.url
