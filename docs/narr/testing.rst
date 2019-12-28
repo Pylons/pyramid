@@ -411,9 +411,8 @@ The following example functional test demonstrates invoking the above
       :pyobject: FunctionalTests
       :language: python
 
-When this test is run, each test method creates a "real" :term:`WSGI`
-application using the ``main`` function in your ``myproject.__init__`` module,
-using :term:`WebTest` to wrap that WSGI application.  It assigns the result to
+When these tests are run, each test method creates a "real" :term:`WSGI` application using the ``main`` function in your ``myproject.__init__`` module, using :term:`WebTest` to wrap that WSGI application.
+It assigns the result to
 ``self.testapp``.  In the test named ``test_root``, the ``TestApp``'s ``GET``
 method is used to invoke the root URL.  Finally, an assertion is made that the
 returned HTML contains the text ``Pyramid``.
