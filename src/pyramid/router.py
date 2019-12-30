@@ -1,33 +1,29 @@
 from zope.interface import implementer, providedBy
 
+from pyramid.events import (
+    BeforeTraversal,
+    ContextFound,
+    NewRequest,
+    NewResponse,
+)
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.interfaces import (
     IDebugLogger,
     IExecutionPolicy,
     IRequest,
     IRequestExtensions,
-    IRootFactory,
-    IRouteRequest,
-    IRouter,
     IRequestFactory,
+    IRootFactory,
+    IRouter,
+    IRouteRequest,
     IRoutesMapper,
     ITraverser,
     ITweens,
 )
-
-from pyramid.events import (
-    ContextFound,
-    NewRequest,
-    NewResponse,
-    BeforeTraversal,
-)
-
-from pyramid.httpexceptions import HTTPNotFound
-from pyramid.request import Request
-from pyramid.view import _call_view
-from pyramid.request import apply_request_extensions
+from pyramid.request import Request, apply_request_extensions
 from pyramid.threadlocal import RequestContext
-
 from pyramid.traversal import DefaultRootFactory, ResourceTreeTraverser
+from pyramid.view import _call_view
 
 
 @implementer(IRouter)

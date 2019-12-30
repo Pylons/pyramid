@@ -2,21 +2,15 @@ from functools import partial
 import json
 import os
 import re
-
 from zope.interface import implementer, providedBy
 from zope.interface.registry import Components
 
-from pyramid.interfaces import IJSONAdapter, IRendererFactory, IRendererInfo
-
 from pyramid.csrf import get_csrf_token
 from pyramid.decorator import reify
-
 from pyramid.events import BeforeRender
-
 from pyramid.httpexceptions import HTTPBadRequest
-
+from pyramid.interfaces import IJSONAdapter, IRendererFactory, IRendererInfo
 from pyramid.path import caller_package
-
 from pyramid.response import _get_response_factory
 from pyramid.threadlocal import get_current_registry
 from pyramid.util import hide_attrs

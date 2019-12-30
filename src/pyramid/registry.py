@@ -1,13 +1,10 @@
 import operator
 import threading
-
 from zope.interface import implementer
 from zope.interface.registry import Components
 
 from pyramid.decorator import reify
-
-from pyramid.interfaces import IIntrospector, IIntrospectable, ISettings
-
+from pyramid.interfaces import IIntrospectable, IIntrospector, ISettings
 from pyramid.path import CALLER_PACKAGE, caller_package
 
 

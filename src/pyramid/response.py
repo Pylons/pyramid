@@ -1,10 +1,9 @@
 import mimetypes
 from os.path import getmtime, getsize
-
 import venusian
-
 from webob import Response as _Response
 from zope.interface import implementer
+
 from pyramid.interfaces import IResponse, IResponseFactory
 
 _BLOCK_SIZE = 4096 * 64  # 256K

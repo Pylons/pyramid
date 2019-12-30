@@ -9,6 +9,7 @@
 # lib/site.py
 
 import argparse
+import hupper
 import os
 import re
 import sys
@@ -17,11 +18,8 @@ import threading
 import time
 import webbrowser
 
-import hupper
-
-from pyramid.scripts.common import get_config_loader
-from pyramid.scripts.common import parse_vars
 from pyramid.path import AssetResolver
+from pyramid.scripts.common import get_config_loader, parse_vars
 from pyramid.settings import aslist
 
 

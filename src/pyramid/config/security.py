@@ -1,23 +1,21 @@
 import warnings
 from zope.interface import implementer
 
+from pyramid.config.actions import action_method
+from pyramid.csrf import LegacySessionCSRFStoragePolicy
+from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import (
-    IAuthorizationPolicy,
+    PHASE1_CONFIG,
+    PHASE2_CONFIG,
     IAuthenticationPolicy,
+    IAuthorizationPolicy,
     ICSRFStoragePolicy,
     IDefaultCSRFOptions,
     IDefaultPermission,
     ISecurityPolicy,
-    PHASE1_CONFIG,
-    PHASE2_CONFIG,
 )
-
-from pyramid.csrf import LegacySessionCSRFStoragePolicy
-from pyramid.exceptions import ConfigurationError
-from pyramid.util import as_sorted_tuple
 from pyramid.security import LegacySecurityPolicy
-
-from pyramid.config.actions import action_method
+from pyramid.util import as_sorted_tuple
 
 
 class SecurityConfiguratorMixin(object):

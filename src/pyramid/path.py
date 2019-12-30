@@ -2,7 +2,6 @@ from importlib.machinery import SOURCE_SUFFIXES
 import os
 import pkg_resources
 import sys
-
 from zope.interface import implementer
 
 from pyramid.interfaces import IAssetDescriptor

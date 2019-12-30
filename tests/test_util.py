@@ -1,6 +1,7 @@
 import sys
 import unittest
-from pyramid.util import text_, bytes_
+
+from pyramid.util import bytes_, text_
 
 
 class Test_InstancePropertyHelper(unittest.TestCase):

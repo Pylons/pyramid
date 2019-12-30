@@ -1,18 +1,14 @@
 from zope.interface import implementer
 
-from pyramid.interfaces import ITweens
-
+from pyramid.config.actions import action_method
 from pyramid.exceptions import ConfigurationError
-
-from pyramid.tweens import MAIN, INGRESS, EXCVIEW
-
+from pyramid.interfaces import ITweens
+from pyramid.tweens import EXCVIEW, INGRESS, MAIN
 from pyramid.util import (
+    TopologicalSorter,
     is_nonstr_iter,
     is_string_or_iterable,
-    TopologicalSorter,
 )
-
-from pyramid.config.actions import action_method
 
 
 class TweensConfiguratorMixin(object):

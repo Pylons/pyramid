@@ -1,21 +1,18 @@
 from zope.interface import implementer
 
+from pyramid.config.actions import action_method
 from pyramid.interfaces import (
     IDefaultRootFactory,
     IExecutionPolicy,
+    IRequestExtensions,
     IRequestFactory,
     IResponseFactory,
-    IRequestExtensions,
     IRootFactory,
     ISessionFactory,
 )
-
 from pyramid.router import default_execution_policy
 from pyramid.traversal import DefaultRootFactory
-
-from pyramid.util import get_callable_name, InstancePropertyHelper
-
-from pyramid.config.actions import action_method
+from pyramid.util import InstancePropertyHelper, get_callable_name
 
 
 class FactoriesConfiguratorMixin(object):

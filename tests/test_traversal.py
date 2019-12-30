@@ -3,7 +3,6 @@ import unittest
 from urllib.parse import quote
 
 from pyramid.testing import cleanUp
-
 from pyramid.util import text_
 
 

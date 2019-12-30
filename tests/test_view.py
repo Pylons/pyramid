@@ -1,11 +1,9 @@
-import unittest
-from zope.interface import Interface
-from zope.interface import implementer
 import sys
+import unittest
+from zope.interface import Interface, implementer
 
 from pyramid import testing
-from pyramid.interfaces import IRequest
-from pyramid.interfaces import IResponse
+from pyramid.interfaces import IRequest, IResponse
 
 
 class BaseTest(object):

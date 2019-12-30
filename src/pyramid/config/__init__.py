@@ -3,49 +3,20 @@ import logging
 import os
 import threading
 import venusian
-
 from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
 
-from pyramid.interfaces import (
-    IDebugLogger,
-    IExceptionResponse,
-    PHASE0_CONFIG,
-    PHASE1_CONFIG,
-    PHASE2_CONFIG,
-    PHASE3_CONFIG,
-)
-
 from pyramid.asset import resolve_asset_spec
-
 from pyramid.authorization import ACLAuthorizationPolicy
-
-from pyramid.events import ApplicationCreated
-
-from pyramid.exceptions import ConfigurationError
-
-from pyramid.httpexceptions import default_exceptionresponse_view
-
-from pyramid.path import caller_package, package_of
-
-from pyramid.registry import Introspectable, Introspector, Registry
-
-from pyramid.router import Router
-
-from pyramid.settings import aslist
-
-from pyramid.threadlocal import manager
-
-from pyramid.util import WeakOrderedSet, get_callable_name, object_description
-
-from pyramid.config.actions import action_method, ActionState
-from pyramid.config.predicates import not_
-
-from pyramid.config.actions import ActionConfiguratorMixin
+from pyramid.config.actions import (
+    ActionConfiguratorMixin,
+    ActionState,
+    action_method,
+)
 from pyramid.config.adapters import AdaptersConfiguratorMixin
 from pyramid.config.assets import AssetsConfiguratorMixin
 from pyramid.config.factories import FactoriesConfiguratorMixin
 from pyramid.config.i18n import I18NConfiguratorMixin
-from pyramid.config.predicates import PredicateConfiguratorMixin
+from pyramid.config.predicates import PredicateConfiguratorMixin, not_
 from pyramid.config.rendering import RenderingConfiguratorMixin
 from pyramid.config.routes import RoutesConfiguratorMixin
 from pyramid.config.security import SecurityConfiguratorMixin
@@ -54,8 +25,23 @@ from pyramid.config.testing import TestingConfiguratorMixin
 from pyramid.config.tweens import TweensConfiguratorMixin
 from pyramid.config.views import ViewsConfiguratorMixin
 from pyramid.config.zca import ZCAConfiguratorMixin
-
-from pyramid.path import DottedNameResolver
+from pyramid.events import ApplicationCreated
+from pyramid.exceptions import ConfigurationError
+from pyramid.httpexceptions import default_exceptionresponse_view
+from pyramid.interfaces import (
+    PHASE0_CONFIG,
+    PHASE1_CONFIG,
+    PHASE2_CONFIG,
+    PHASE3_CONFIG,
+    IDebugLogger,
+    IExceptionResponse,
+)
+from pyramid.path import DottedNameResolver, caller_package, package_of
+from pyramid.registry import Introspectable, Introspector, Registry
+from pyramid.router import Router
+from pyramid.settings import aslist
+from pyramid.threadlocal import manager
+from pyramid.util import WeakOrderedSet, get_callable_name, object_description
 
 _marker = object()
 

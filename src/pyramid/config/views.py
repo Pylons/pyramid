@@ -1,19 +1,36 @@
 import functools
 import inspect
-import posixpath
 import operator
 import os
-import warnings
-
+import posixpath
 from urllib.parse import quote, urljoin, urlparse, urlunparse
+import warnings
 from webob.acceptparse import Accept
 from zope.interface import Interface, implementedBy, implementer
 from zope.interface.interfaces import IInterface
 
+from pyramid import renderers
+from pyramid.asset import resolve_asset_spec
+from pyramid.config.actions import action_method
+from pyramid.config.predicates import (
+    DEFAULT_PHASH,
+    MAX_ORDER,
+    normalize_accept_offer,
+    predvalseq,
+    sort_accept_offers,
+)
+from pyramid.decorator import reify
+from pyramid.exceptions import ConfigurationError, PredicateMismatch
+from pyramid.httpexceptions import (
+    HTTPForbidden,
+    HTTPNotFound,
+    default_exceptionresponse_view,
+)
 from pyramid.interfaces import (
+    PHASE1_CONFIG,
     IAcceptOrder,
-    IExceptionViewClassifier,
     IException,
+    IExceptionViewClassifier,
     IMultiView,
     IPackageOverrides,
     IRendererFactory,
@@ -24,62 +41,31 @@ from pyramid.interfaces import (
     IStaticURLInfo,
     IView,
     IViewClassifier,
-    IViewDerivers,
     IViewDeriverInfo,
+    IViewDerivers,
     IViewMapperFactory,
-    PHASE1_CONFIG,
 )
-
-from pyramid import renderers
-
-from pyramid.asset import resolve_asset_spec
-
-from pyramid.decorator import reify
-
-from pyramid.exceptions import ConfigurationError, PredicateMismatch
-
-from pyramid.httpexceptions import (
-    HTTPForbidden,
-    HTTPNotFound,
-    default_exceptionresponse_view,
-)
-
+import pyramid.predicates
 from pyramid.registry import Deferred
-
 from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.static import static_view
-
 from pyramid.url import parse_url_overrides
-
-from pyramid.view import AppendSlashNotFoundViewFactory
-
 from pyramid.util import (
+    WIN,
+    TopologicalSorter,
     as_sorted_tuple,
     is_nonstr_iter,
-    TopologicalSorter,
-    WIN,
 )
-
-import pyramid.predicates
+from pyramid.view import AppendSlashNotFoundViewFactory
 import pyramid.viewderivers
-
 from pyramid.viewderivers import (
     INGRESS,
     VIEW,
-    preserve_view_attrs,
-    view_description,
-    requestonly,
     DefaultViewMapper,
+    preserve_view_attrs,
+    requestonly,
+    view_description,
     wraps_view,
-)
-
-from pyramid.config.actions import action_method
-from pyramid.config.predicates import (
-    DEFAULT_PHASH,
-    MAX_ORDER,
-    normalize_accept_offer,
-    predvalseq,
-    sort_accept_offers,
 )
 
 DefaultViewMapper = DefaultViewMapper  # bw-compat

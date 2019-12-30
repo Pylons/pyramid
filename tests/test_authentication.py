@@ -1,8 +1,9 @@
 from http.cookies import SimpleCookie
 import unittest
 import warnings
+
 from pyramid import testing
-from pyramid.util import text_, bytes_
+from pyramid.util import bytes_, text_
 
 
 class TestCallbackAuthenticationPolicyDebugging(unittest.TestCase):

@@ -1,7 +1,6 @@
 import unittest
 
-from pyramid.exceptions import ConfigurationExecutionError
-from pyramid.exceptions import ConfigurationError
+from pyramid.exceptions import ConfigurationError, ConfigurationExecutionError
 
 
 class ConfiguratorSecurityMethodsTests(unittest.TestCase):

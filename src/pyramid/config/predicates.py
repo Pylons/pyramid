@@ -2,12 +2,10 @@ from hashlib import md5
 from webob.acceptparse import Accept
 
 from pyramid.exceptions import ConfigurationError
-from pyramid.interfaces import IPredicateList, PHASE1_CONFIG
+from pyramid.interfaces import PHASE1_CONFIG, IPredicateList
 from pyramid.predicates import Notted
 from pyramid.registry import predvalseq
-from pyramid.util import TopologicalSorter
-from pyramid.util import is_nonstr_iter, bytes_
-
+from pyramid.util import TopologicalSorter, bytes_, is_nonstr_iter
 
 MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()

@@ -1,8 +1,8 @@
 import unittest
-from pyramid import testing
 
-from pyramid.security import SecurityAPIMixin, AuthenticationAPIMixin
-from pyramid.util import text_, bytes_
+from pyramid import testing
+from pyramid.security import AuthenticationAPIMixin, SecurityAPIMixin
+from pyramid.util import bytes_, text_
 
 
 class TestRequest(unittest.TestCase):
