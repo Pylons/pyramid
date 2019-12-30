@@ -55,6 +55,11 @@ Steps
    .. literalinclude:: authorization/tutorial/resources.py
        :linenos:
 
+#. Define a ``GROUPS`` data store and the ``permits`` method of our ``SecurityPolicy``:
+
+   .. literalinclude:: authorization/tutorial/security.py
+       :linenos:
+
 #. Change ``authorization/tutorial/views.py`` to require the ``edit``
    permission on the ``hello`` view and implement the forbidden view:
 
@@ -87,8 +92,10 @@ This simple tutorial step can be boiled down to the following:
 - This ACL says that the ``edit`` permission is available on ``Root``  to the
   ``group:editors`` *principal*.
 
-- The registered ``groupfinder`` answers whether a particular user (``editor``)
-  has a particular group (``group:editors``).
+- The ``SecurityPolicy.effective_principals`` method answers whether a particular user (``editor``) has a particular group (``group:editors``).
+
+- The ``SecurityPolicy.permits`` method is invoked when Pyramid wants to know whether the user is allowed to do something.
+  To do this, it uses the :class:`pyramid.authorization.ACLHelper` to inspect the ACL on the ``context`` and determine if the request is allowed or denied the specific permission.
 
 In summary, ``hello`` wants ``edit`` permission, ``Root`` says
 ``group:editors`` has ``edit`` permission.
@@ -104,6 +111,10 @@ Pyramid that the ``login`` view should be used by decorating the view with
 
 Extra credit
 ============
+
+#. What is the difference between a user and a principal?
+
+#. Can I use a database instead of the ``GROUPS`` data store to look up principals?
 
 #. Do I have to put a ``renderer`` in my ``@forbidden_view_config`` decorator?
 
