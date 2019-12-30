@@ -58,7 +58,7 @@ class DummySecurityPolicy(object):
         self.remember_result = remember_result
         self.forget_result = forget_result
 
-    def identify(self, request):
+    def authenticated_identity(self, request):
         return self.identity
 
     def authenticated_userid(self, request):

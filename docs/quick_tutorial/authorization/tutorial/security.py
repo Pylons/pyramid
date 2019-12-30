@@ -26,13 +26,13 @@ class SecurityPolicy:
         )
         self.acl = ACLHelper()
 
-    def identify(self, request):
+    def authenticated_identity(self, request):
         identity = self.authtkt.identify(request)
         if identity is not None and identity['userid'] in USERS:
             return identity
 
     def authenticated_userid(self, request):
-        identity = self.identify(request)
+        identity = self.authenticated_identity(request)
         if identity is not None:
             return identity['userid']
 

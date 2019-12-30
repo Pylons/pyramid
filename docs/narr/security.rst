@@ -69,7 +69,7 @@ A simple security policy might look like the following:
     from pyramid.security import Allowed, Denied
 
     class SessionSecurityPolicy:
-        def identify(self, request):
+        def authenticated_identity(self, request):
             """ Return app-specific user object. """
             userid = request.session.get('userid')
             if userid is None:
@@ -78,14 +78,14 @@ A simple security policy might look like the following:
 
         def authenticated_userid(self, request):
             """ Return a string ID for the user. """
-            identity = self.identify(request)
+            identity = self.authenticated_identity(request)
             if identity is None:
                 return None
             return string(identity.id)
 
         def permits(self, request, context, permission):
             """ Allow access to everything if signed in. """
-            identity = self.identify(request)
+            identity = self.authenticated_identity(request)
             if identity is not None:
                 return Allowed('User is signed in.')
             else:
@@ -144,7 +144,7 @@ For example, our above security policy can leverage these helpers like so:
         def __init__(self):
             self.helper = SessionAuthenticationHelper()
 
-        def identify(self, request):
+        def authenticated_identity(self, request):
             """ Return app-specific user object. """
             userid = self.helper.authenticated_userid(request)
             if userid is None:
@@ -153,14 +153,14 @@ For example, our above security policy can leverage these helpers like so:
 
         def authenticated_userid(self, request):
             """ Return a string ID for the user. """
-            identity = self.identify(request)
+            identity = self.authenticated_identity(request)
             if identity is None:
                 return None
             return str(identity.id)
 
         def permits(self, request, context, permission):
             """ Allow access to everything if signed in. """
-            identity = self.identify(request)
+            identity = self.authenticated_identity(request)
             if identity is not None:
                 return Allowed('User is signed in.')
             else:
@@ -249,7 +249,7 @@ might look like so:
 
     class SecurityPolicy:
         def permits(self, request, context, permission):
-            identity = self.identify(request)
+            identity = self.authenticated_identity(request)
 
             if identity is None:
                 return Denied('User is not signed in.')
