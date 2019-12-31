@@ -92,7 +92,7 @@ This simple tutorial step can be boiled down to the following:
 - This ACL says that the ``edit`` permission is available on ``Root``  to the
   ``group:editors`` *principal*.
 
-- The ``SecurityPolicy.effective_principals`` method answers whether a particular user (``editor``) has a particular group (``group:editors``).
+- The ``SecurityPolicy.effective_principals`` method answers whether a particular user (``editor``) is a member of a particular group (``group:editors``).
 
 - The ``SecurityPolicy.permits`` method is invoked when Pyramid wants to know whether the user is allowed to do something.
   To do this, it uses the :class:`pyramid.authorization.ACLHelper` to inspect the ACL on the ``context`` and determine if the request is allowed or denied the specific permission.
