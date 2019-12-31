@@ -20,10 +20,7 @@ GROUPS = {'editor': ['group:editors']}
 
 class SecurityPolicy:
     def __init__(self, secret):
-        self.authtkt = AuthTktCookieHelper(
-            secret=secret,
-            hashalg='sha512',
-        )
+        self.authtkt = AuthTktCookieHelper(secret=secret)
         self.acl = ACLHelper()
 
     def authenticated_identity(self, request):

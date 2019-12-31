@@ -156,6 +156,10 @@ Backward Incompatibilities
   ``require_csrf`` view option to enable automatic CSRF checking.
   See https://github.com/Pylons/pyramid/pull/3521
 
+- Changed the ``hashalg`` on ``pyramid.authentication.AuthTktCookieHelper`` to
+  ``sha512``.
+  See https://github.com/Pylons/pyramid/pull/3557
+
 Documentation Changes
 ---------------------
 

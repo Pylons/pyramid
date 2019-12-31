@@ -17,10 +17,7 @@ USERS = {'editor': hash_password('editor'),
 
 class SecurityPolicy:
     def __init__(self, secret):
-        self.authtkt = AuthTktCookieHelper(
-            secret=secret,
-            hashalg='sha512',
-        )
+        self.authtkt = AuthTktCookieHelper(secret=secret)
 
     def authenticated_identity(self, request):
         identity = self.authtkt.identify(request)

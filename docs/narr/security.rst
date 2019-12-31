@@ -698,7 +698,7 @@ A "secret" is required by various components of Pyramid.  For example, the
 helper below might be used for a security policy and uses a secret value
 ``seekrit``::
 
-  helper = AuthTktCookieHelper('seekrit', hashalg='sha512')
+  helper = AuthTktCookieHelper('seekrit')
 
 A :term:`session factory` also requires a secret::
 
