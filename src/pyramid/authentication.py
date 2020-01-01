@@ -841,6 +841,12 @@ class AuthTktCookieHelper(object):
     implementations.  See
     :class:`pyramid.authentication.AuthTktAuthenticationPolicy` for the
     meanings of the constructor arguments.
+
+    .. deprecated:: 1.10
+
+        The default ``hashalg`` of ``md5`` will be changed to ``sha512`` in
+        Pyramid 2.0. Pass ``hashalg='md5'`` to preserve compatibility.
+
     """
 
     parse_ticket = staticmethod(parse_ticket)  # for tests
@@ -874,11 +880,20 @@ class AuthTktCookieHelper(object):
         http_only=False,
         path="/",
         wild_domain=True,
-        hashalg='md5',
+        hashalg=None,
         parent_domain=False,
         domain=None,
         samesite='Lax',
     ):
+        if hashalg is None:
+            hashalg = 'md5'
+            warnings.warn(
+                'The default "hashalg" is "md5" and will change to "sha512" '
+                'in Pyramid 2.0. To preserve the current behavior, '
+                'explicitly pass hashalg="md5".',
+                DeprecationWarning,
+                stacklevel=1,
+            )
 
         serializer = SimpleSerializer()
 

@@ -2,7 +2,7 @@
 
 Pyramid cookiecutters
 =====================
-A :term:`cookiecutter` is a command-line utility that creates projects from :ref:`cookiecutters <cookiecutter:readme>` (project templates).
+A :term:`cookiecutter` is a command-line utility that creates projects from `cookiecutters <https://cookiecutter.readthedocs.io/en/latest/>`__ (project templates).
 
 The Pyramid cookiecutter replaced the deprecated Pyramid scaffolds, and should be used going forward.
 

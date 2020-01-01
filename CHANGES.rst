@@ -1,3 +1,11 @@
+unreleased
+==========
+
+- Deprecate the default ``hashalg='md5'`` on
+  ``pyramid.authentication.AuthTktCookieHelper`` to encourage users to be
+  explicit if they want their code to work without changes when upgrading to
+  Pyramid 2.0.
+
 .. _changes_1.10.4:
 
 1.10.4 (2019-04-15)
