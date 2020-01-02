@@ -5,7 +5,7 @@ from pyramid import testing
 class PageModelTests(unittest.TestCase):
 
     def _getTargetClass(self):
-        from .models import Page
+        from tutorial.models import Page
         return Page
 
     def _makeOne(self, data='some data'):
@@ -18,7 +18,7 @@ class PageModelTests(unittest.TestCase):
 class WikiModelTests(unittest.TestCase):
 
     def _getTargetClass(self):
-        from .models import Wiki
+        from tutorial.models import Wiki
         return Wiki
 
     def _makeOne(self):
@@ -32,7 +32,7 @@ class WikiModelTests(unittest.TestCase):
 class AppmakerTests(unittest.TestCase):
 
     def _callFUT(self, zodb_root):
-        from .models import appmaker
+        from tutorial.models import appmaker
         return appmaker(zodb_root)
 
     def test_it(self):
@@ -43,7 +43,7 @@ class AppmakerTests(unittest.TestCase):
 
 class ViewWikiTests(unittest.TestCase):
     def test_it(self):
-        from .views.default import view_wiki
+        from tutorial.views.default import view_wiki
         context = testing.DummyResource()
         request = testing.DummyRequest()
         response = view_wiki(context, request)
@@ -51,7 +51,7 @@ class ViewWikiTests(unittest.TestCase):
 
 class ViewPageTests(unittest.TestCase):
     def _callFUT(self, context, request):
-        from .views.default import view_page
+        from tutorial.views.default import view_page
         return view_page(context, request)
 
     def test_it(self):
@@ -77,7 +77,7 @@ class ViewPageTests(unittest.TestCase):
 
 class AddPageTests(unittest.TestCase):
     def _callFUT(self, context, request):
-        from .views.default import add_page
+        from tutorial.views.default import add_page
         return add_page(context, request)
 
     def test_it_notsubmitted(self):
@@ -103,7 +103,7 @@ class AddPageTests(unittest.TestCase):
 
 class EditPageTests(unittest.TestCase):
     def _callFUT(self, context, request):
-        from .views.default import edit_page
+        from tutorial.views.default import edit_page
         return edit_page(context, request)
 
     def test_it_notsubmitted(self):
@@ -124,7 +124,7 @@ class EditPageTests(unittest.TestCase):
 
 class SecurityTests(unittest.TestCase):
     def test_hashing(self):
-        from .security import hash_password, check_password
+        from tutorial.security import hash_password, check_password
         password = 'secretpassword'
         hashed_password = hash_password(password)
         self.assertTrue(check_password(hashed_password, password))
@@ -145,7 +145,7 @@ class FunctionalTests(unittest.TestCase):
     def setUp(self):
         import tempfile
         import os.path
-        from . import main
+        from tutorial import main
         self.tmpdir = tempfile.mkdtemp()
 
         dbpath = os.path.join( self.tmpdir, 'test.db')

@@ -317,14 +317,14 @@ On Unix
 
 .. code-block:: bash
 
-    $VENV/bin/pytest --cov=tutorial tutorial/tests.py -q
+    $VENV/bin/pytest --cov=tutorial tests.py -q
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    %VENV%\Scripts\pytest --cov=tutorial tutorial\tests.py -q
+    %VENV%\Scripts\pytest --cov=tutorial tests -q
 
 
 ``pytest`` follows :ref:`conventions for Python test discovery <pytest:test discovery>`.
