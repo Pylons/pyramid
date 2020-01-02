@@ -61,8 +61,7 @@ Glossary
      
      .. seealso::
          
-         See also `PkgResources
-         <http://peak.telecommunity.com/DevCenter/PkgResources>`_.
+         See also `Package Discovery and Resource Access using pkg_resources <https://setuptools.readthedocs.io/en/latest/pkg_resources.html>`_.
 
    asset
      Any file contained within a Python :term:`package` which is *not*
@@ -443,7 +442,7 @@ Glossary
      dispatching and other application configuration tasks.
 
    reStructuredText
-     A `plain text markup format <http://docutils.sourceforge.net/rst.html>`_
+     A `plain text markup format <https://docutils.sourceforge.io/rst.html>`_
      that is the defacto standard for documenting Python projects.
      The Pyramid documentation is written in reStructuredText.
 
