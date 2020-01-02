@@ -11,13 +11,13 @@ class ViewTests(unittest.TestCase):
         testing.tearDown()
 
     def test_my_view(self):
-        from .views.default import my_view
+        from myproject.views.default import my_view
         request = testing.DummyRequest()
         info = my_view(request)
         self.assertEqual(info['project'], 'myproject')
 
     def test_notfound_view(self):
-        from .views.notfound import notfound_view
+        from myproject.views.notfound import notfound_view
         request = testing.DummyRequest()
         info = notfound_view(request)
         self.assertEqual(info, {})
