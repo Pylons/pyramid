@@ -406,7 +406,7 @@ function ``my_view`` that returns an HTML body when the root URL is invoked:
 The following example functional test demonstrates invoking the above
 :term:`view`:
 
-   .. literalinclude:: myproject/myproject/tests.py
+   .. literalinclude:: myproject/tests/test_it.py
       :linenos:
       :pyobject: FunctionalTests
       :language: python

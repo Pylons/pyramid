@@ -731,7 +731,7 @@ This yields the following output.
 
 Our tests passed, and its coverage is complete. What did our test look like?
 
-.. literalinclude:: quick_tour/package/hello_world/tests/test_it.py
+.. literalinclude:: quick_tour/package/tests/test_it.py
     :language: python
     :linenos:
 
