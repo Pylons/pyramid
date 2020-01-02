@@ -403,8 +403,7 @@ function ``my_view`` that returns an HTML body when the root URL is invoked:
       :linenos:
       :language: python
 
-The following example functional test demonstrates invoking the above
-:term:`view`:
+The following example functional tests demonstrate invoking the above :term:`view`:
 
    .. literalinclude:: myproject/tests/test_it.py
       :linenos:
@@ -412,10 +411,13 @@ The following example functional test demonstrates invoking the above
       :language: python
 
 When these tests are run, each test method creates a "real" :term:`WSGI` application using the ``main`` function in your ``myproject.__init__`` module, using :term:`WebTest` to wrap that WSGI application.
-It assigns the result to
-``self.testapp``.  In the test named ``test_root``, the ``TestApp``'s ``GET``
-method is used to invoke the root URL.  Finally, an assertion is made that the
-returned HTML contains the text ``Pyramid``.
+It assigns the result to ``self.testapp``.
+
+In the test named ``test_root``, the ``TestApp``'s ``GET`` method is used to invoke the root URL.
+An assertion is made that the returned HTML contains the text ``Pyramid``.
+
+In the test named ``test_notfound``, the ``TestApp``'s ``GET`` method is used to invoke a bad URL ``/badurl``.
+An assertion is made that the returned status code in the response is ``404``.
 
 See the :term:`WebTest` documentation for further information about the methods
 available to a :class:`webtest.app.TestApp` instance.
