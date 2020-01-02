@@ -393,7 +393,7 @@ On Unix
 
 .. code-block:: bash
 
-    $VENV/bin/pytest --cov=tutorial tutorial/tests.py -q
+    $VENV/bin/pytest --cov=tutorial tests -q
 
 On Windows
 ^^^^^^^^^^

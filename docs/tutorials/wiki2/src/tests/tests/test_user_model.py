@@ -7,12 +7,12 @@ from pyramid import testing
 class BaseTest(unittest.TestCase):
 
     def setUp(self):
-        from ..models import get_tm_session
+        from tutorial.models import get_tm_session
         self.config = testing.setUp(settings={
             'sqlalchemy.url': 'sqlite:///:memory:'
         })
-        self.config.include('..models')
-        self.config.include('..routes')
+        self.config.include('tutorial.models')
+        self.config.include('tutorial.routes')
 
         session_factory = self.config.registry['dbsession_factory']
         self.session = get_tm_session(session_factory, transaction.manager)
@@ -20,7 +20,7 @@ class BaseTest(unittest.TestCase):
         self.init_database()
 
     def init_database(self):
-        from ..models.meta import Base
+        from tutorial.models.meta import Base
         session_factory = self.config.registry['dbsession_factory']
         engine = session_factory.kw['bind']
         Base.metadata.create_all(engine)
@@ -30,7 +30,7 @@ class BaseTest(unittest.TestCase):
         transaction.abort()
 
     def makeUser(self, name, role):
-        from ..models import User
+        from tutorial.models import User
         return User(name=name, role=role)
 
 

@@ -10,12 +10,12 @@ def dummy_request(dbsession):
 
 class BaseTest(unittest.TestCase):
     def setUp(self):
-        from ..models import get_tm_session
+        from tutorial.models import get_tm_session
         self.config = testing.setUp(settings={
             'sqlalchemy.url': 'sqlite:///:memory:'
         })
-        self.config.include('..models')
-        self.config.include('..routes')
+        self.config.include('tutorial.models')
+        self.config.include('tutorial.routes')
 
         session_factory = self.config.registry['dbsession_factory']
         self.session = get_tm_session(session_factory, transaction.manager)
@@ -23,7 +23,7 @@ class BaseTest(unittest.TestCase):
         self.init_database()
 
     def init_database(self):
-        from ..models.meta import Base
+        from tutorial.models.meta import Base
         session_factory = self.config.registry['dbsession_factory']
         engine = session_factory.kw['bind']
         Base.metadata.create_all(engine)
@@ -33,20 +33,20 @@ class BaseTest(unittest.TestCase):
         transaction.abort()
 
     def makeUser(self, name, role, password='dummy'):
-        from ..models import User
+        from tutorial.models import User
         user = User(name=name, role=role)
         user.set_password(password)
         return user
 
     def makePage(self, name, data, creator):
-        from ..models import Page
+        from tutorial.models import Page
         return Page(name=name, data=data, creator=creator)
 
 
 class ViewWikiTests(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
-        self.config.include('..routes')
+        self.config.include('tutorial.routes')
 
     def tearDown(self):
         testing.tearDown()
@@ -67,7 +67,7 @@ class ViewPageTests(BaseTest):
         return view_page(request)
 
     def test_it(self):
-        from ..routes import PageResource
+        from tutorial.routes import PageResource
 
         # add a page to the db
         user = self.makeUser('foo', 'editor')
@@ -99,8 +99,8 @@ class AddPageTests(BaseTest):
         return add_page(request)
 
     def test_it_pageexists(self):
-        from ..models import Page
-        from ..routes import NewPage
+        from tutorial.models import Page
+        from tutorial.routes import NewPage
         request = testing.DummyRequest({'form.submitted': True,
                                         'body': 'Hello yo!'},
                                        dbsession=self.session)
@@ -111,7 +111,7 @@ class AddPageTests(BaseTest):
         self.assertGreater(pagecount, 0)
 
     def test_it_notsubmitted(self):
-        from ..routes import NewPage
+        from tutorial.routes import NewPage
         request = dummy_request(self.session)
         request.user = self.makeUser('foo', 'editor')
         request.context = NewPage('AnotherPage')
@@ -121,8 +121,8 @@ class AddPageTests(BaseTest):
                          'http://example.com/add_page/AnotherPage')
 
     def test_it_submitted(self):
-        from ..models import Page
-        from ..routes import NewPage
+        from tutorial.models import Page
+        from tutorial.routes import NewPage
         request = testing.DummyRequest({'form.submitted': True,
                                         'body': 'Hello yo!'},
                                        dbsession=self.session)
@@ -139,7 +139,7 @@ class EditPageTests(BaseTest):
         return edit_page(request)
 
     def makeContext(self, page):
-        from ..routes import PageResource
+        from tutorial.routes import PageResource
         return PageResource(page)
 
     def test_it_notsubmitted(self):

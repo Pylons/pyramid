@@ -8,16 +8,16 @@ class TestMyAuthenticationPolicy(unittest.TestCase):
         request = DummyRequest()
         request.user = None
 
-        from ..security import MyAuthenticationPolicy
+        from tutorial.security import MyAuthenticationPolicy
         policy = MyAuthenticationPolicy(None)
         self.assertEqual(policy.authenticated_userid(request), None)
 
     def test_authenticated_user(self):
-        from ..models import User
+        from tutorial.models import User
         request = DummyRequest()
         request.user = User()
         request.user.id = 'foo'
 
-        from ..security import MyAuthenticationPolicy
+        from tutorial.security import MyAuthenticationPolicy
         policy = MyAuthenticationPolicy(None)
         self.assertEqual(policy.authenticated_userid(request), 'foo')
