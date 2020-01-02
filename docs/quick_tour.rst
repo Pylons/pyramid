@@ -676,15 +676,15 @@ the relevant ``.ini`` configuration file.
     :ref:`Quick Tutorial pyramid_debugtoolbar <qtut_debugtoolbar>` and
     :ref:`pyramid_debugtoolbar <toolbar:overview>`
 
-Unit tests and ``pytest``
-=========================
+Unit and functional tests and ``pytest``
+========================================
 
 Yikes! We got this far and we haven't yet discussed tests. This is particularly
 egregious, as Pyramid has had a deep commitment to full test coverage since
 before its release.
 
-Our ``pyramid-cookiecutter-starter`` cookiecutter generated a ``tests.py`` module with
-one unit test and one functional test in it. It also configured ``setup.py`` with test requirements:
+Our ``pyramid-cookiecutter-starter`` cookiecutter generated a ``test_it.py`` module inside the ``tests`` package with two unit tests and two functional tests in it.
+It also configured ``setup.py`` with test requirements:
 ``pytest`` as the test runner, ``WebTest`` for running view tests, and the
 ``pytest-cov`` tool which yells at us for code that isn't tested:
 
@@ -709,33 +709,35 @@ This yields the following output.
 .. code-block:: text
 
     =========================== test session starts ===========================
-    platform darwin -- Python 3.6.0, pytest-3.0.5, py-1.4.32, pluggy-0.4.0
-    rootdir: /Users/stevepiercy/hello_world, inifile: pytest.ini
-    plugins: cov-2.4.0
-    collected 2 items
+    platform darwin -- Python 3.7.3, pytest-5.3.2, py-1.8.1, pluggy-0.13.1
+    rootdir: /<somepath>/hello_world, inifile: pytest.ini, testpaths: hello_world, tests
+    plugins: cov-2.8.1
+    collected 4 items
 
-    hello_world/tests.py ..
+    tests/test_it.py ....                                                [100%]
 
-    ------------- coverage: platform darwin, python 3.6.0-final-0 -------------
-    Name                                      Stmts   Miss  Cover   Missing
-    -----------------------------------------------------------------------
-    hello_world/__init__.py                       8      0   100%
-    hello_world/views.py                          3      0   100%
-    -----------------------------------------------------------------------
-    TOTAL                                        11      0   100%
+    ---------- coverage: platform darwin, python 3.7.3-final-0 -----------
+    Name                            Stmts   Miss  Cover   Missing
+    -------------------------------------------------------------
+    hello_world/__init__.py             7      0   100%
+    hello_world/routes.py               3      0   100%
+    hello_world/views/__init__.py       0      0   100%
+    hello_world/views/default.py        3      0   100%
+    hello_world/views/notfound.py       4      0   100%
+    -------------------------------------------------------------
+    TOTAL                              17      0   100%
 
-
-    ========================= 2 passed in 1.37 seconds =========================
+    ======================== 4 passed in 0.65 seconds =========================
 
 Our tests passed, and its coverage is complete. What did our test look like?
 
-.. literalinclude:: quick_tour/package/hello_world/tests.py
+.. literalinclude:: quick_tour/package/hello_world/tests/test_it.py
     :language: python
     :linenos:
 
-Pyramid supplies helpers for test writing, which we use in the test setup and
-teardown. Our first test imports the view, makes a dummy request, and sees if the
-view returns what we expected. Our second test verifies that the response body from a request to the web root contains what we expected.
+Pyramid supplies helpers for test writing, which we use in the test setup and teardown.
+Our view tests import the view, make a dummy request, and sees if the view returns what we expected.
+Our functional tests verify that the response body from a request to the web root contains what we expected and that the expected response code for making a request to ``/badurl`` results in ``404``.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Unit Testing <qtut_unit_testing>`, :ref:`Quick
