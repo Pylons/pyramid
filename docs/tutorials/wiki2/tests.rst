@@ -109,7 +109,7 @@ The expected result should look like the following:
 
 .. code-block:: text
 
-    ................................
-    32 passed in 9.90 seconds
+    ...............................
+    31 passed in 8.85 seconds
 
 .. _webtest: https://docs.pylonsproject.org/projects/webtest/en/latest/
