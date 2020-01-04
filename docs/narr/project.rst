@@ -1168,7 +1168,7 @@ inotify support
 By default ``hupper`` will poll the filesystem for changes to all Python
 code. This can be pretty inefficient in larger projects.
 To be nicer to your hard drive, you should install either the `watchman <https://facebook.github.io/watchman/>`_ or `watchdog <https://pythonhosted.org/watchdog/>`_ package in development.
-``hupper`` will use, in order of preference for efficiency, if available, ``watchman``, ``watchdog``, then finally ``inotify`` to poll the filesystem.
+``hupper`` will use, in order of preference for efficiency, if available, ``watchman``, ``watchdog``, or finally polling to detect changes to the filesystem.
 
 Monitoring Custom Files
 ~~~~~~~~~~~~~~~~~~~~~~~
