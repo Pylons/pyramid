@@ -13,7 +13,7 @@ requires = [
     'bcrypt',
     'docutils',
     'plaster_pastedeploy',
-    'pyramid >= 1.9',
+    'pyramid',
     'pyramid_debugtoolbar',
     'pyramid_jinja2',
     'pyramid_retry',
@@ -45,7 +45,7 @@ setup(
     author_email='',
     url='',
     keywords='web pyramid pylons',
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests']),
     include_package_data=True,
     zip_safe=False,
     extras_require={
@@ -57,7 +57,7 @@ setup(
             'main = tutorial:main',
         ],
         'console_scripts': [
-            'initialize_tutorial_db = tutorial.scripts.initialize_db:main',
+            'initialize_tutorial_db=tutorial.scripts.initialize_db:main',
         ],
     },
 )

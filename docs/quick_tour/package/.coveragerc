@@ -1,3 +1,2 @@
 [run]
 source = hello_world
-omit = hello_world/test*

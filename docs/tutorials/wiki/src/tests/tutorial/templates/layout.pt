@@ -1,5 +1,5 @@
 <!DOCTYPE html metal:define-macro="layout">
-<html lang="{{request.locale_name}}">
+<html lang="${request.locale_name}">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">

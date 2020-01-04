@@ -11,7 +11,7 @@ from pyramid.view import (
 from ..models import User
 
 
-@view_config(route_name='login', renderer='../templates/login.jinja2')
+@view_config(route_name='login', renderer='tutorial:templates/login.jinja2')
 def login(request):
     next_url = request.params.get('next', request.referrer)
     if not next_url:

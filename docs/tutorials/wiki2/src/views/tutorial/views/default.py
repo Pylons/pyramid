@@ -19,7 +19,7 @@ def view_wiki(request):
     next_url = request.route_url('view_page', pagename='FrontPage')
     return HTTPFound(location=next_url)
 
-@view_config(route_name='view_page', renderer='../templates/view.jinja2')
+@view_config(route_name='view_page', renderer='tutorial:templates/view.jinja2')
 def view_page(request):
     pagename = request.matchdict['pagename']
     page = request.dbsession.query(models.Page).filter_by(name=pagename).first()
@@ -41,7 +41,7 @@ def view_page(request):
     edit_url = request.route_url('edit_page', pagename=page.name)
     return dict(page=page, content=content, edit_url=edit_url)
 
-@view_config(route_name='edit_page', renderer='../templates/edit.jinja2')
+@view_config(route_name='edit_page', renderer='tutorial:templates/edit.jinja2')
 def edit_page(request):
     pagename = request.matchdict['pagename']
     page = request.dbsession.query(models.Page).filter_by(name=pagename).one()
@@ -55,7 +55,7 @@ def edit_page(request):
         save_url=request.route_url('edit_page', pagename=page.name),
         )
 
-@view_config(route_name='add_page', renderer='../templates/edit.jinja2')
+@view_config(route_name='add_page', renderer='tutorial:templates/edit.jinja2')
 def add_page(request):
     pagename = request.matchdict['pagename']
     if request.dbsession.query(models.Page).filter_by(name=pagename).count() > 0:

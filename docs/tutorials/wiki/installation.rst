@@ -185,18 +185,20 @@ The console will show ``pip`` checking for packages and installing missing packa
 
 .. code-block:: bash
 
-    Successfully installed BTrees-4.5.1 Chameleon-3.5 Mako-1.0.7 \
-    MarkupSafe-1.1.0 PasteDeploy-1.5.2 Pygments-2.2.0 WebTest-2.0.32 \
-    ZConfig-3.3.0 ZEO-5.2.0 ZODB-5.5.1 ZODB3-3.11.0 atomicwrites-1.2.1 \
-    attrs-18.2.0 beautifulsoup4-4.6.3 coverage-4.5.2 hupper-1.4.1 \
-    more-itertools-4.3.0 persistent-4.4.3 plaster-1.0 plaster-pastedeploy-0.6 \
-    pluggy-0.8.0 py-1.7.0 pyramid-1.10.1 pyramid-chameleon-0.3 \
-    pyramid-debugtoolbar-4.5 pyramid-mako-1.0.2 pyramid-retry-1.0 \
-    pyramid-tm-2.2.1 pyramid-zodbconn-0.8.1 pytest-4.0.0 pytest-cov-2.6.0 \
-    repoze.lru-0.7 six-1.11.0 transaction-2.4.0 translationstring-1.3 \
-    tutorial venusian-1.1.0 waitress-1.1.0 webob-1.8.4 zc.lockfile-1.4 \
-    zdaemon-4.3 zodbpickle-1.0.2 zodburi-2.3.0 zope.deprecation-4.3.0 \
-    zope.interface-4.6.0
+    Successfully installed BTrees-4.6.1 Chameleon-3.6.2 Mako-1.1.0 \
+    MarkupSafe-1.1.1 PasteDeploy-2.0.1 Pygments-2.5.2 WebTest-2.0.33 \
+    ZConfig-3.5.0 ZEO-5.2.1 ZODB-5.5.1 ZODB3-3.11.0 attrs-19.3.0 \
+    beautifulsoup4-4.8.2 cffi-1.13.2 coverage-5.0.1 hupper-1.9.1 \
+    importlib-metadata-1.3.0 more-itertools-8.0.2 packaging-19.2 \
+    persistent-4.5.1 plaster-1.0 plaster-pastedeploy-0.7 pluggy-0.13.1 \
+    py-1.8.1 pycparser-2.19 pyparsing-2.4.6 pyramid-1.10.4 \
+    pyramid-chameleon-0.3 pyramid-debugtoolbar-4.5.1 pyramid-mako-1.1.0 \
+    pyramid-retry-2.1 pyramid-tm-2.3 pyramid-zodbconn-0.8.1 pytest-5.3.2 \
+    pytest-cov-2.8.1 repoze.lru-0.7 six-1.13.0 soupsieve-1.9.5 \
+    transaction-3.0.0 translationstring-1.3 tutorial venusian-3.0.0 \
+    waitress-1.4.1 wcwidth-0.1.7 webob-1.8.5 zc.lockfile-2.0 zdaemon-4.3 \
+    zipp-0.6.0 zodbpickle-2.0.0 zodburi-2.4.0 zope.deprecation-4.4.0 \
+    zope.interface-4.7.1
 
 Testing requirements are defined in our project's ``setup.py`` file, in the ``tests_require`` and ``extras_require`` stanzas.
 
@@ -241,8 +243,8 @@ For a successful test run, you should see output that ends like this:
 
 .. code-block:: bash
 
-    .
-    1 passed in 0.24 seconds
+    ..
+    2 passed in 0.49 seconds
 
 
 Expose test coverage information
@@ -274,29 +276,28 @@ If successful, you will see output something like this:
 .. code-block:: bash
 
     ======================== test session starts =========================
-    platform darwin -- Python 3.7.0, pytest-4.0.0, py-1.7.0, pluggy-0.8.0
-    rootdir: /Users/stevepiercy/projects/hack-on-pyramid/tutorial, inifile: pytest.ini
-    plugins: cov-2.6.0
-    collected 1 item
+    platform darwin -- Python 3.7.3, pytest-5.3.2, py-1.8.1, pluggy-0.13.1
+    rootdir: /filepath/tutorial, inifile: pytest.ini, testpaths: tutorial
+    plugins: cov-2.8.1
+    collected 2 items
 
-    tutorial/tests.py .
-                                                                    [100%]
+    tutorial/tests.py ..                                            [100%]
+
 
     ---------- coverage: platform darwin, python 3.7.0-final-0 -----------
     Name                          Stmts   Miss  Cover   Missing
     -----------------------------------------------------------
-    tutorial/__init__.py             17     12    29%   7-8, 14-23
+    tutorial/__init__.py             16     11    31%   7-8, 14-22
     tutorial/models/__init__.py       8      4    50%   9-12
     tutorial/pshell.py                6      6     0%   1-12
     tutorial/routes.py                2      2     0%   1-2
     tutorial/views/__init__.py        0      0   100%
     tutorial/views/default.py         4      0   100%
-    tutorial/views/notfound.py        4      4     0%   1-7
+    tutorial/views/notfound.py        4      0   100%
     -----------------------------------------------------------
-    TOTAL                            41     28    32%
+    TOTAL                            40     23    42%
 
-
-    ===================== 1 passed in 0.31 seconds =======================
+    ===================== 2 passed in 0.55 seconds =======================
 
 Our package doesn't quite have 100% test coverage.
 
@@ -316,14 +317,14 @@ On Unix
 
 .. code-block:: bash
 
-    $VENV/bin/pytest --cov=tutorial tutorial/tests.py -q
+    $VENV/bin/pytest --cov=tutorial tests.py -q
 
 On Windows
 ^^^^^^^^^^
 
 .. code-block:: doscon
 
-    %VENV%\Scripts\pytest --cov=tutorial tutorial\tests.py -q
+    %VENV%\Scripts\pytest --cov=tutorial tests -q
 
 
 ``pytest`` follows :ref:`conventions for Python test discovery <pytest:test discovery>`.
@@ -365,8 +366,8 @@ If successful, you will see something like this on your console:
 
 .. code-block:: text
 
-    Starting subprocess with file monitor
-    Starting server in PID 44078.
+    Starting monitor for PID 65233.
+    Starting server in PID 65233.
     Serving on http://localhost:6543
     Serving on http://localhost:6543
 

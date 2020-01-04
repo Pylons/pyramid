@@ -95,4 +95,6 @@ application's ``main`` function as ``global_config`` (see the reference to the
 Alternative Configuration File Formats
 --------------------------------------
 
-It is possible to use different file formats with :app:`Pyramid` if you do not like :term:`PasteDeploy`. Under the hood all command-line scripts such as ``pserve`` and ``pshell`` pass the ``config_uri`` (e.g. ``development.ini`` or ``production.ini``) to the :term:`plaster` library which performs a lookup for an appropriate parser. For ``.ini`` files it uses PasteDeploy but you can register your own configuration formats that plaster will find instead.
+It is possible to use different file formats with :app:`Pyramid` if you do not like :term:`PasteDeploy`.
+Under the hood all command-line scripts such as ``pserve`` and ``pshell`` pass the ``config_uri`` (e.g., ``development.ini`` or ``production.ini``) to the :term:`plaster` library which performs a lookup for an appropriate parser.
+For ``.ini`` files it uses PasteDeploy but you can register your own configuration formats that plaster will find instead.

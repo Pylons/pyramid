@@ -3,7 +3,7 @@ from pyramid.view import notfound_view_config
 from ..models import Page
 
 
-@notfound_view_config(renderer='../templates/404.pt')
+@notfound_view_config(renderer='tutorial:templates/404.pt')
 def notfound_view(request):
     request.response.status = 404
     pagename = request.path
