@@ -1,7 +1,7 @@
 import os
 import pkg_resources
 
-from pyramid.path import package_path, package_name
+from pyramid.path import package_name, package_path
 
 
 def resolve_asset_spec(spec, pname='__main__'):

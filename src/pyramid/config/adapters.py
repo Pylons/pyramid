@@ -1,14 +1,10 @@
-from webob import Response as WebobResponse
-
 from functools import update_wrapper
-
+from webob import Response as WebobResponse
 from zope.interface import Interface
 
-from pyramid.interfaces import IResponse, ITraverser, IResourceURL
-
-from pyramid.util import takes_one_arg
-
 from pyramid.config.actions import action_method
+from pyramid.interfaces import IResourceURL, IResponse, ITraverser
+from pyramid.util import takes_one_arg
 
 
 class AdaptersConfiguratorMixin(object):

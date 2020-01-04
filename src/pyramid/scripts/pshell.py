@@ -1,19 +1,15 @@
+import argparse
 from code import interact
 from contextlib import contextmanager
-import argparse
 import os
+import pkg_resources
 import sys
 import textwrap
-import pkg_resources
 
-from pyramid.util import DottedNameResolver
-from pyramid.util import make_contextmanager
 from pyramid.paster import bootstrap
-
+from pyramid.scripts.common import get_config_loader, parse_vars
 from pyramid.settings import aslist
-
-from pyramid.scripts.common import get_config_loader
-from pyramid.scripts.common import parse_vars
+from pyramid.util import DottedNameResolver, make_contextmanager
 
 
 def main(argv=sys.argv, quiet=False):

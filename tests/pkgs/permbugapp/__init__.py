@@ -1,6 +1,7 @@
 from html import escape
-from pyramid.security import view_execution_permitted
+
 from pyramid.response import Response
+from pyramid.security import view_execution_permitted
 
 
 def x_view(request):  # pragma: no cover

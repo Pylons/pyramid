@@ -1,27 +1,24 @@
 from collections import deque
-
+from webob import BaseRequest
 from zope.interface import implementer
 from zope.interface.interface import InterfaceClass
 
-from webob import BaseRequest
-
+from pyramid.decorator import reify
+from pyramid.i18n import LocalizerRequestMixin
 from pyramid.interfaces import (
     IRequest,
     IRequestExtensions,
     IResponse,
     ISessionFactory,
 )
-
-from pyramid.decorator import reify
-from pyramid.i18n import LocalizerRequestMixin
 from pyramid.response import Response, _get_response_factory
-from pyramid.security import SecurityAPIMixin, AuthenticationAPIMixin
+from pyramid.security import AuthenticationAPIMixin, SecurityAPIMixin
 from pyramid.url import URLMethodsMixin
 from pyramid.util import (
     InstancePropertyHelper,
     InstancePropertyMixin,
-    text_,
     bytes_,
+    text_,
 )
 from pyramid.view import ViewMethodsMixin
 

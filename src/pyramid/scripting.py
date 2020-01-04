@@ -1,10 +1,7 @@
 from pyramid.config import global_registries
 from pyramid.exceptions import ConfigurationError
-
 from pyramid.interfaces import IRequestFactory, IRootFactory
-from pyramid.request import Request
-from pyramid.request import apply_request_extensions
-
+from pyramid.request import Request, apply_request_extensions
 from pyramid.threadlocal import RequestContext
 from pyramid.traversal import DefaultRootFactory
 

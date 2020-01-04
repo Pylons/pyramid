@@ -177,26 +177,30 @@ The console will show ``pip`` checking for packages and installing missing packa
 
 .. code-block:: bash
 
-    Successfully installed Jinja2-2.8 Mako-1.0.6 MarkupSafe-0.23 \
-    PasteDeploy-1.5.2 Pygments-2.1.3 SQLAlchemy-1.1.4 WebOb-1.6.3 \
-    WebTest-2.0.24 beautifulsoup4-4.5.1 coverage-4.2 py-1.4.32 pyramid-1.7.3 \
-    pyramid-debugtoolbar-3.0.5 pyramid-jinja2-2.7 pyramid-mako-1.0.2 \
-    pyramid-tm-1.1.1 pytest-3.0.5 pytest-cov-2.4.0 repoze.lru-0.6 six-1.10.0 \
-    transaction-2.0.3 translationstring-1.3 tutorial venusian-1.0 \
-    waitress-1.0.1 zope.deprecation-4.2.0 zope.interface-4.3.3 \
-    zope.sqlalchemy-0.7.7
+    Successfully installed Jinja2-2.10.3 Mako-1.1.0 MarkupSafe-1.1.1 \
+    PasteDeploy-2.0.1 Pygments-2.5.2 SQLAlchemy-1.3.12 WebTest-2.0.33 \
+    alembic-1.3.2 attrs-19.3.0 beautifulsoup4-4.8.2 coverage-5.0.1 \
+    hupper-1.9.1 importlib-metadata-1.3.0 more-itertools-8.0.2 packaging-19.2 \
+    plaster-1.0 plaster-pastedeploy-0.7 pluggy-0.13.1 py-1.8.1 \
+    pyparsing-2.4.6 pyramid-1.10.4 pyramid-debugtoolbar-4.5.1 \
+    pyramid-jinja2-2.8 pyramid-mako-1.1.0 pyramid-retry-2.1 pyramid-tm-2.3 \
+    pytest-5.3.2 pytest-cov-2.8.1 python-dateutil-2.8.1 python-editor-1.0.4 \
+    repoze.lru-0.7 six-1.13.0 soupsieve-1.9.5 transaction-3.0.0 \
+    translationstring-1.3 tutorial venusian-3.0.0 waitress-1.4.1 \
+    wcwidth-0.1.7 webob-1.8.5 zipp-0.6.0 zope.deprecation-4.4.0 \
+    zope.interface-4.7.1 zope.sqlalchemy-1.2
 
 Testing requirements are defined in our project's ``setup.py`` file, in the ``tests_require`` and ``extras_require`` stanzas.
 
 .. literalinclude:: src/installation/setup.py
     :language: python
     :lineno-match:
-    :lines: 24-28
+    :lines: 25-29
 
 .. literalinclude:: src/installation/setup.py
     :language: python
     :lineno-match:
-    :lines: 48-50
+    :lines: 49-51
 
 
 .. _initialize_db_wiki2:
@@ -226,26 +230,11 @@ The output to your console should be something like this:
 
 .. code-block:: text
 
-    2018-06-22 17:57:31,587 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-    2018-06-22 17:57:31,587 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-22 17:57:31,588 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-    2018-06-22 17:57:31,588 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-22 17:57:31,589 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
-    2018-06-22 17:57:31,589 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-22 17:57:31,590 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
-    2018-06-22 17:57:31,590 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-22 17:57:31,590 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
-    CREATE TABLE alembic_version (
-           version_num VARCHAR(32) NOT NULL,
-           CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
-    )
-
-
-    2018-06-22 17:57:31,591 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-22 17:57:31,591 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
-    2018-06-22 17:57:31,594 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT name FROM sqlite_master WHERE type='table' ORDER BY name
-    2018-06-22 17:57:31,594 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-     Generating /<somepath>/tutorial/alembic/versions/20180622_bab5a278ce04.py ... done
+    2019-12-28 00:46:03,850 INFO  [alembic.runtime.migration:154][MainThread] Context impl SQLiteImpl.
+    2019-12-28 00:46:03,850 INFO  [alembic.runtime.migration:161][MainThread] Will assume non-transactional DDL.
+    2019-12-28 00:46:03,853 INFO  [alembic.autogenerate.compare:134][MainThread] Detected added table 'models'
+    2019-12-28 00:46:03,853 INFO  [alembic.autogenerate.compare:586][MainThread] Detected added index 'my_index' on '['name']'
+      Generating <somepath>/tutorial/tutorial/alembic/versions/20191228_a8e203c3ce9c.py ...  done
 
 Upgrade to that revision.
 
@@ -267,34 +256,9 @@ The output to your console should be something like this:
 
 .. code-block:: text
 
-    2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-    2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-    2018-06-22 17:57:37,814 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-22 17:57:37,816 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
-    2018-06-22 17:57:37,816 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT alembic_version.version_num
-    FROM alembic_version
-    2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
-    2018-06-22 17:57:37,817 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-22 17:57:37,819 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
-    CREATE TABLE models (
-           id INTEGER NOT NULL,
-           name TEXT,
-           value INTEGER,
-           CONSTRAINT pk_models PRIMARY KEY (id)
-    )
-
-
-    2018-06-22 17:57:37,820 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-22 17:57:37,822 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
-    2018-06-22 17:57:37,824 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] CREATE UNIQUE INDEX my_index ON models (name)
-    2018-06-22 17:57:37,824 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
-    2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO alembic_version (version_num) VALUES ('bab5a278ce04')
-    2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-22 17:57:37,825 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2019-12-28 00:52:12,158 INFO  [alembic.runtime.migration:154][MainThread] Context impl SQLiteImpl.
+    2019-12-28 00:52:12,158 INFO  [alembic.runtime.migration:161][MainThread] Will assume non-transactional DDL.
+    2019-12-28 00:52:12,160 INFO  [alembic.runtime.migration:513][MainThread] Running upgrade  -> a8e203c3ce9c, init
 
 
 .. _load_data_wiki2:
@@ -318,22 +282,9 @@ On Windows
 
    %VENV%\Scripts\initialize_tutorial_db development.ini
 
-The output to your console should be something like this:
-
-.. code-block:: bash
-
-    2018-06-22 17:57:46,241 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-    2018-06-22 17:57:46,241 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-22 17:57:46,242 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-    2018-06-22 17:57:46,242 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-22 17:57:46,243 INFO  [sqlalchemy.engine.base.Engine:682][MainThread] BEGIN (implicit)
-    2018-06-22 17:57:46,244 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO models (name, value) VALUES (?, ?)
-    2018-06-22 17:57:46,245 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ('one', 1)
-    2018-06-22 17:57:46,246 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
-
-Success!  You should now have a ``tutorial.sqlite`` file in your current
-working directory. This is an SQLite database with a single table defined in it
-(``models``) and single record inside of that.
+There should be no output to your console.
+You should now have a ``tutorial.sqlite`` file in your current working directory.
+This is an SQLite database with three tables defined in it, ``alembic_version``, ``models``, and ``master``, where the first two tables each have single record inside of them.
 
 
 .. _sql_running_tests:
@@ -398,29 +349,31 @@ If successful, you will see output something like this:
 .. code-block:: bash
 
     ======================== test session starts ========================
-    platform Python 3.6.5, pytest-3.6.2, py-1.5.3, pluggy-0.6.0
-    rootdir: /<somepath>/tutorial, inifile: pytest.ini
-    plugins: cov-2.5.1
+    platform -- Python 3.7.3, pytest-5.3.2, py-1.8.1, pluggy-0.13.1
+    rootdir: <somepath>/tutorial, inifile: pytest.ini, testpaths: tutorial
+    plugins: cov-2.8.1
     collected 2 items
 
     tutorial/tests.py ..
-    ------------------ coverage: platform Python 3.6.5 ------------------
+
+    ------------------ coverage: platform Python 3.7.3 ------------------
     Name                                Stmts   Miss  Cover   Missing
     -----------------------------------------------------------------
     tutorial/__init__.py                    8      6    25%   7-12
     tutorial/models/__init__.py            24      0   100%
     tutorial/models/meta.py                 5      0   100%
     tutorial/models/mymodel.py              8      0   100%
+    tutorial/pshell.py                      7      7     0%   1-13
     tutorial/routes.py                      3      3     0%   1-3
     tutorial/scripts/__init__.py            0      0   100%
-    tutorial/scripts/initialize_db.py      24     24     0%   1-34
+    tutorial/scripts/initialize_db.py      22     22     0%   1-38
     tutorial/views/__init__.py              0      0   100%
     tutorial/views/default.py              12      0   100%
     tutorial/views/notfound.py              4      4     0%   1-7
     -----------------------------------------------------------------
-    TOTAL                                  88     37    58%
+    TOTAL                                  93     42    55%
 
-    ===================== 2 passed in 0.57 seconds ======================
+    ===================== 2 passed in 0.64 seconds ======================
 
 Our package doesn't quite have 100% test coverage.
 
@@ -440,7 +393,7 @@ On Unix
 
 .. code-block:: bash
 
-    $VENV/bin/pytest --cov=tutorial tutorial/tests.py -q
+    $VENV/bin/pytest --cov=tutorial tests -q
 
 On Windows
 ^^^^^^^^^^
@@ -489,8 +442,8 @@ If successful, you will see something like this on your console:
 
 .. code-block:: text
 
-    Starting subprocess with file monitor
-    Starting server in PID 44078.
+    Starting monitor for PID 68932.
+    Starting server in PID 68932.
     Serving on http://localhost:6543
     Serving on http://localhost:6543
 

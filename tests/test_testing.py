@@ -1,7 +1,7 @@
 import unittest
 from zope.component import getSiteManager
-from zope.interface import Interface
-from zope.interface import implementer
+from zope.interface import Interface, implementer
+
 from pyramid import testing
 
 

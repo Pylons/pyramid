@@ -15,7 +15,7 @@ def view_wiki(context, request):
     return HTTPFound(location=request.resource_url(context, 'FrontPage'))
 
 
-@view_config(context='..models.Page', renderer='../templates/view.pt')
+@view_config(context='..models.Page', renderer='tutorial:templates/view.pt')
 def view_page(context, request):
     wiki = context.__parent__
 
@@ -36,7 +36,7 @@ def view_page(context, request):
 
 
 @view_config(name='add_page', context='..models.Wiki',
-             renderer='../templates/edit.pt')
+             renderer='tutorial:templates/edit.pt')
 def add_page(context, request):
     pagename = request.subpath[0]
     if 'form.submitted' in request.params:
@@ -54,7 +54,7 @@ def add_page(context, request):
 
 
 @view_config(name='edit_page', context='..models.Page',
-             renderer='../templates/edit.pt')
+             renderer='tutorial:templates/edit.pt')
 def edit_page(context, request):
     if 'form.submitted' in request.params:
         context.data = request.params['body']

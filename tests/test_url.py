@@ -2,7 +2,6 @@ import os
 import unittest
 
 from pyramid import testing
-
 from pyramid.util import WIN, text_
 
 

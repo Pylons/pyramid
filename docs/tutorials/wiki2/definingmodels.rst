@@ -33,10 +33,12 @@ Open ``tutorial/setup.py`` and edit it to look like the following:
 
 .. literalinclude:: src/models/setup.py
     :linenos:
-    :emphasize-lines: 13
+    :emphasize-lines: 11-24
     :language: python
 
-Only the highlighted line needs to be added.
+It is a good practice to sort packages alphabetically to make them easier to find.
+Our cookiecutter does not have its packages sorted because it merely tacks on additional packages depending on our selections.
+After adding ``bcrypt`` and sorting packages, we should have the above ``requires`` list.
 
 .. note::
 
@@ -70,7 +72,7 @@ like the following.
 
 .. code-block:: text
 
-    Successfully installed bcrypt-3.1.4 cffi-1.11.5 pycparser-2.18 tutorial
+    Successfully installed bcrypt-3.1.7 cffi-1.13.2 pycparser-2.19 tutorial
 
 
 Remove ``mymodel.py``
@@ -185,86 +187,19 @@ Success executing these commands will generate output similar to the following.
 
 .. code-block:: text
 
-    2018-06-29 01:28:42,407 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-    2018-06-29 01:28:42,407 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-29 01:28:42,408 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-    2018-06-29 01:28:42,408 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-29 01:28:42,409 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
-    2018-06-29 01:28:42,409 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:28:42,410 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT alembic_version.version_num
-    FROM alembic_version
-    2018-06-29 01:28:42,410 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:28:42,411 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT name FROM sqlite_master WHERE type='table' ORDER BY name
-    2018-06-29 01:28:42,412 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:28:42,413 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("models")
-    2018-06-29 01:28:42,413 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:28:42,414 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = 'models' AND type = 'table'
-    2018-06-29 01:28:42,414 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:28:42,414 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA foreign_key_list("models")
-    2018-06-29 01:28:42,414 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:28:42,414 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = 'models' AND type = 'table'
-    2018-06-29 01:28:42,415 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:28:42,416 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_list("models")
-    2018-06-29 01:28:42,416 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:28:42,416 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_info("my_index")
-    2018-06-29 01:28:42,416 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_list("models")
-    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA index_info("my_index")
-    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = 'models' AND type = 'table'
-    2018-06-29 01:28:42,417 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-      Generating /<somepath>/tutorial/tutorial/alembic/versions/20180629_23e9f8eb6c28.py ... done
+    2019-12-28 02:02:31,841 INFO  [alembic.runtime.migration:154][MainThread] Context impl SQLiteImpl.
+    2019-12-28 02:02:31,841 INFO  [alembic.runtime.migration:161][MainThread] Will assume non-transactional DDL.
+    2019-12-28 02:02:31,844 INFO  [alembic.autogenerate.compare:134][MainThread] Detected added table 'users'
+    2019-12-28 02:02:31,845 INFO  [alembic.autogenerate.compare:134][MainThread] Detected added table 'pages'
+    2019-12-28 02:02:31,853 INFO  [alembic.autogenerate.compare:621][MainThread] Detected removed index 'my_index' on 'models'
+    2019-12-28 02:02:31,853 INFO  [alembic.autogenerate.compare:176][MainThread] Detected removed table 'models'
+      Generating <somepath>/tutorial/tutorial/alembic/versions/20191228_226a73ffaeef.py ...  done
 
 .. code-block:: text
 
-    2018-06-29 01:29:37,957 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-    2018-06-29 01:29:37,958 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-29 01:29:37,958 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-    2018-06-29 01:29:37,958 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-29 01:29:37,960 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] PRAGMA table_info("alembic_version")
-    2018-06-29 01:29:37,960 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:29:37,960 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] SELECT alembic_version.version_num
-    FROM alembic_version
-    2018-06-29 01:29:37,960 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:29:37,963 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
-    CREATE TABLE users (
-            id INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            role TEXT NOT NULL,
-            password_hash TEXT,
-            CONSTRAINT pk_users PRIMARY KEY (id),
-            CONSTRAINT uq_users_name UNIQUE (name)
-    )
-
-
-    2018-06-29 01:29:37,963 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:29:37,966 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
-    2018-06-29 01:29:37,968 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
-    CREATE TABLE pages (
-            id INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            data TEXT NOT NULL,
-            creator_id INTEGER NOT NULL,
-            CONSTRAINT pk_pages PRIMARY KEY (id),
-            CONSTRAINT fk_pages_creator_id_users FOREIGN KEY(creator_id) REFERENCES users (id),
-            CONSTRAINT uq_pages_name UNIQUE (name)
-    )
-
-
-    2018-06-29 01:29:37,968 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:29:37,969 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
-    2018-06-29 01:29:37,969 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
-    DROP INDEX my_index
-    2018-06-29 01:29:37,969 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:29:37,970 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
-    2018-06-29 01:29:37,970 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread]
-    DROP TABLE models
-    2018-06-29 01:29:37,970 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:29:37,971 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
-    2018-06-29 01:29:37,972 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] UPDATE alembic_version SET version_num='23e9f8eb6c28' WHERE alembic_version.version_num = 'b6b22ae3e628'
-    2018-06-29 01:29:37,972 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ()
-    2018-06-29 01:29:37,972 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+    2019-12-28 02:03:15,390 INFO  [alembic.runtime.migration:154][MainThread] Context impl SQLiteImpl.
+    2019-12-28 02:03:15,391 INFO  [alembic.runtime.migration:161][MainThread] Will assume non-transactional DDL.
+    2019-12-28 02:03:15,393 INFO  [alembic.runtime.migration:513][MainThread] Running upgrade a8e203c3ce9c -> 226a73ffaeef, use new models Page and User
 
 
 .. _wiki2_alembic_overview:
@@ -318,26 +253,23 @@ Only the highlighted lines need to be changed.
 Populating the database
 =======================
 
-Because our model has changed, and to repopulate the database, we
-need to rerun the ``initialize_tutorial_db`` command to pick up the changes
-we've made to the initialize_db.py file. See :ref:`initialize_db_wiki2` for instructions.
+Because our model has changed, and to repopulate the database, we need to rerun the ``initialize_tutorial_db`` command to pick up the changes we've made to the ``initialize_db.py`` file.
 
-Success will look something like this:
+On Unix
+-------
 
-.. code-block:: text
+.. code-block:: bash
 
-    2018-06-29 01:30:39,326 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-    2018-06-29 01:30:39,326 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-29 01:30:39,327 INFO  [sqlalchemy.engine.base.Engine:1254][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-    2018-06-29 01:30:39,327 INFO  [sqlalchemy.engine.base.Engine:1255][MainThread] ()
-    2018-06-29 01:30:39,328 INFO  [sqlalchemy.engine.base.Engine:682][MainThread] BEGIN (implicit)
-    2018-06-29 01:30:39,329 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
-    2018-06-29 01:30:39,329 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ('editor', 'editor', '$2b$12$PlaJSN7goVbyx8OFs8yAju9n5gHGdI6PZ2QRJGM2jDCiEU4ItUNxy')
-    2018-06-29 01:30:39,330 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO users (name, role, password_hash) VALUES (?, ?, ?)
-    2018-06-29 01:30:39,330 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ('basic', 'basic', '$2b$12$MvXdM8jlkbjEyPZ6uXzRg.yatZZK8jCwfPaM7kFkmVJiJjRoCCvmW')
-    2018-06-29 01:30:39,331 INFO  [sqlalchemy.engine.base.Engine:1151][MainThread] INSERT INTO pages (name, data, creator_id) VALUES (?, ?, ?)
-    2018-06-29 01:30:39,331 INFO  [sqlalchemy.engine.base.Engine:1154][MainThread] ('FrontPage', 'This is the front page', 1)
-    2018-06-29 01:30:39,332 INFO  [sqlalchemy.engine.base.Engine:722][MainThread] COMMIT
+   $VENV/bin/initialize_tutorial_db development.ini
+
+On Windows
+----------
+
+.. code-block:: doscon
+
+   %VENV%\Scripts\initialize_tutorial_db development.ini
+
+There should be no output to your console to indicate success.
 
 
 View the application in a browser

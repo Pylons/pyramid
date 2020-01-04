@@ -1,12 +1,9 @@
 import re
 from zope.interface import implementer
 
-from pyramid.interfaces import IRoutesMapper, IRoute
-
 from pyramid.exceptions import URLDecodeError
-
-from pyramid.traversal import quote_path_segment, split_path_info, PATH_SAFE
-
+from pyramid.interfaces import IRoute, IRoutesMapper
+from pyramid.traversal import PATH_SAFE, quote_path_segment, split_path_info
 from pyramid.util import is_nonstr_iter, text_
 
 _marker = object()

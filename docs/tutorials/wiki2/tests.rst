@@ -5,18 +5,15 @@ Adding Tests
 ============
 
 We will now add tests for the models and views as well as a few functional
-tests in a new ``tests`` subpackage.  Tests ensure that an application works,
+tests in a new ``tests`` package.  Tests ensure that an application works,
 and that it continues to work when changes are made in the future.
 
-The file ``tests.py`` was generated from choosing the ``sqlalchemy`` backend
-option, but it is a common practice to put tests into a ``tests``
-subpackage, especially as projects grow in size and complexity.  Each module in
-the test subpackage should contain tests for its corresponding module in our
-application.  Each corresponding pair of modules should have the same names,
-except the test module should have the prefix ``test_``.
+The file ``tests/test_it.py`` at the root of our project directory was generated from choosing the ``sqlalchemy`` backend option.
+It is a common practice to put tests into a ``tests`` package alongside the application package, especially as projects grow in size and complexity.
+Each module in the test package should contain tests for its corresponding module in our application.
+Each corresponding pair of modules should have the same names, except the test module should have the prefix ``test_``.
 
-Start by deleting ``tests.py``, then create a new directory to contain our new
-tests as well as a new empty file ``tests/__init__.py``.
+Start by deleting ``tests/test_it.py``.
 
 .. warning::
 
@@ -47,36 +44,36 @@ user cannot edit pages that it didn't create but the ``editor`` user can, and
 so on.
 
 
-View the results of all our edits to ``tests`` subpackage
-=========================================================
+View the results of all our edits to ``tests`` package
+======================================================
 
-Create ``tutorial/tests/test_views.py`` such that it appears as follows:
+Create ``tests/test_views.py`` such that it appears as follows:
 
-.. literalinclude:: src/tests/tutorial/tests/test_views.py
+.. literalinclude:: src/tests/tests/test_views.py
     :linenos:
     :language: python
 
-Create ``tutorial/tests/test_functional.py`` such that it appears as follows:
+Create ``tests/test_functional.py`` such that it appears as follows:
 
-.. literalinclude:: src/tests/tutorial/tests/test_functional.py
+.. literalinclude:: src/tests/tests/test_functional.py
     :linenos:
     :language: python
 
-Create ``tutorial/tests/test_initdb.py`` such that it appears as follows:
+Create ``tests/test_initdb.py`` such that it appears as follows:
 
-.. literalinclude:: src/tests/tutorial/tests/test_initdb.py
+.. literalinclude:: src/tests/tests/test_initdb.py
     :linenos:
     :language: python
 
-Create ``tutorial/tests/test_security.py`` such that it appears as follows:
+Create ``tests/test_security.py`` such that it appears as follows:
 
-.. literalinclude:: src/tests/tutorial/tests/test_security.py
+.. literalinclude:: src/tests/tests/test_security.py
     :linenos:
     :language: python
 
-Create ``tutorial/tests/test_user_model.py`` such that it appears as follows:
+Create ``tests/test_user_model.py`` such that it appears as follows:
 
-.. literalinclude:: src/tests/tutorial/tests/test_user_model.py
+.. literalinclude:: src/tests/tests/test_user_model.py
     :linenos:
     :language: python
 
@@ -112,7 +109,7 @@ The expected result should look like the following:
 
 .. code-block:: text
 
-    ................................
-    32 passed in 9.90 seconds
+    ...............................
+    31 passed in 8.85 seconds
 
 .. _webtest: https://docs.pylonsproject.org/projects/webtest/en/latest/

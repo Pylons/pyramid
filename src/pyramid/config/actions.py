@@ -12,8 +12,7 @@ from pyramid.exceptions import (
 )
 from pyramid.interfaces import IActionInfo
 from pyramid.registry import undefer
-from pyramid.util import is_nonstr_iter
-from pyramid.util import reraise
+from pyramid.util import is_nonstr_iter, reraise
 
 
 class ActionConfiguratorMixin(object):

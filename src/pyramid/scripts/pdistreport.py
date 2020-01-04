@@ -1,8 +1,8 @@
-import sys
-import platform
-import pkg_resources
 import argparse
 from operator import itemgetter
+import pkg_resources
+import platform
+import sys
 
 
 def out(*args):  # pragma: no cover

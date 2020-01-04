@@ -1,24 +1,24 @@
+import base64
 import binascii
-from codecs import utf_8_decode
-from codecs import utf_8_encode
+from codecs import utf_8_decode, utf_8_encode
 from collections import namedtuple
 import hashlib
-import base64
 import re
 import time as time_mod
 from urllib.parse import quote, unquote
 import warnings
-
+from webob.cookies import CookieProfile
 from zope.interface import implementer
 
-from webob.cookies import CookieProfile
-
 from pyramid.interfaces import IAuthenticationPolicy, IDebugLogger
-
 from pyramid.security import Authenticated, Everyone
-
-from pyramid.util import strings_differ, bytes_, ascii_, text_
-from pyramid.util import SimpleSerializer
+from pyramid.util import (
+    SimpleSerializer,
+    ascii_,
+    bytes_,
+    strings_differ,
+    text_,
+)
 
 VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
 

@@ -1,20 +1,16 @@
-import fnmatch
 import argparse
+import fnmatch
+import re
 import sys
 import textwrap
-import re
-
 from zope.interface import Interface
 
-from pyramid.paster import bootstrap
-from pyramid.interfaces import IRouteRequest
 from pyramid.config import not_
-
-from pyramid.scripts.common import get_config_loader
-from pyramid.scripts.common import parse_vars
+from pyramid.interfaces import IRouteRequest
+from pyramid.paster import bootstrap
+from pyramid.scripts.common import get_config_loader, parse_vars
 from pyramid.static import static_view
 from pyramid.view import _find_views
-
 
 PAD = 3
 ANY_KEY = '*'

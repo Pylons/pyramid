@@ -3,12 +3,9 @@ import sys
 import textwrap
 
 from pyramid.interfaces import ITweens
-
-from pyramid.tweens import MAIN
-from pyramid.tweens import INGRESS
-from pyramid.paster import bootstrap
-from pyramid.paster import setup_logging
+from pyramid.paster import bootstrap, setup_logging
 from pyramid.scripts.common import parse_vars
+from pyramid.tweens import INGRESS, MAIN
 
 
 def main(argv=sys.argv, quiet=False):

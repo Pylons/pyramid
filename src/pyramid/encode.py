@@ -1,5 +1,4 @@
-from urllib.parse import quote as _url_quote
-from urllib.parse import quote_plus as _quote_plus
+from urllib.parse import quote as _url_quote, quote_plus as _quote_plus
 
 from pyramid.util import is_nonstr_iter
 

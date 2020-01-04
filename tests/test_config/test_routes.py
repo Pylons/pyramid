@@ -1,9 +1,9 @@
 import unittest
 import warnings
 
-from . import dummyfactory
-from . import DummyContext
 from pyramid.util import text_
+
+from . import DummyContext, dummyfactory
 
 
 class RoutesConfiguratorMixinTests(unittest.TestCase):

@@ -1,31 +1,28 @@
 import inspect
-
 from zope.interface import implementer, provider
 
-from pyramid.security import NO_PERMISSION_REQUIRED
+from pyramid import renderers
 from pyramid.csrf import check_csrf_origin, check_csrf_token
-from pyramid.response import Response
-
+from pyramid.exceptions import ConfigurationError
+from pyramid.httpexceptions import HTTPForbidden
 from pyramid.interfaces import (
+    IDebugLogger,
     IDefaultCSRFOptions,
     IDefaultPermission,
-    IDebugLogger,
     IResponse,
     ISecurityPolicy,
     IViewMapper,
     IViewMapperFactory,
 )
-
-from pyramid.exceptions import ConfigurationError
-from pyramid.httpexceptions import HTTPForbidden
+from pyramid.response import Response
+from pyramid.security import NO_PERMISSION_REQUIRED
 from pyramid.util import (
-    object_description,
-    takes_one_arg,
     is_bound_method,
     is_unbound_method,
+    object_description,
+    takes_one_arg,
 )
 from pyramid.view import render_view_to_response
-from pyramid import renderers
 
 
 def view_description(view):

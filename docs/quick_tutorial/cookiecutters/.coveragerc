@@ -1,3 +1,2 @@
 [run]
 source = cc_starter
-omit = cc_starter/test*

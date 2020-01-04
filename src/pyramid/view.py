@@ -1,33 +1,26 @@
+import inspect
 import itertools
 import sys
-import inspect
-
 import venusian
-
 from zope.interface import providedBy
 
-from pyramid.interfaces import (
-    IRoutesMapper,
-    IMultiView,
-    ISecuredView,
-    IView,
-    IViewClassifier,
-    IRequest,
-    IExceptionViewClassifier,
-)
-
 from pyramid.exceptions import ConfigurationError, PredicateMismatch
-
 from pyramid.httpexceptions import (
     HTTPNotFound,
     HTTPTemporaryRedirect,
     default_exceptionresponse_view,
 )
-
+from pyramid.interfaces import (
+    IExceptionViewClassifier,
+    IMultiView,
+    IRequest,
+    IRoutesMapper,
+    ISecuredView,
+    IView,
+    IViewClassifier,
+)
 from pyramid.threadlocal import get_current_registry, manager
-
-from pyramid.util import hide_attrs
-from pyramid.util import reraise as reraise_
+from pyramid.util import hide_attrs, reraise as reraise_
 
 _marker = object()
 

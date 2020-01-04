@@ -1,13 +1,11 @@
 import re
 
 from pyramid.exceptions import ConfigurationError
-
 from pyramid.traversal import (
     find_interface,
-    traversal_path,
     resource_path_tuple,
+    traversal_path,
 )
-
 from pyramid.urldispatch import _compile_route
 from pyramid.util import as_sorted_tuple, is_nonstr_iter, object_description
 

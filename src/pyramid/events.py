@@ -1,14 +1,13 @@
 import venusian
-
-from zope.interface import implementer, Interface
+from zope.interface import Interface, implementer
 
 from pyramid.interfaces import (
-    IContextFound,
-    INewRequest,
-    INewResponse,
     IApplicationCreated,
     IBeforeRender,
     IBeforeTraversal,
+    IContextFound,
+    INewRequest,
+    INewResponse,
 )
 
 

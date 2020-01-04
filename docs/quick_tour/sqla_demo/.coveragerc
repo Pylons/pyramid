@@ -1,3 +1,2 @@
 [run]
 source = sqla_demo
-omit = sqla_demo/test*

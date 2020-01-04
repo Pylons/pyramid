@@ -1,4 +1,4 @@
-MyProject
+myproject
 =========
 
 Getting Started
@@ -6,7 +6,7 @@ Getting Started
 
 - Change directory into your newly created project.
 
-    cd MyProject
+    cd myproject
 
 - Create a Python virtual environment.
 

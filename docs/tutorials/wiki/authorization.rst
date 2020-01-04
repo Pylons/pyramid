@@ -99,7 +99,7 @@ Here we use "dummy" data to represent user and groups sources.
 Add an ACL
 ~~~~~~~~~~
 
-Open ``tutorial/models.py`` and add the following import statement near the top:
+Open ``tutorial/models/__init__.py`` and add the following import statement near the top:
 
 .. literalinclude:: src/authorization/tutorial/models/__init__.py
     :lines: 4-8
@@ -179,7 +179,7 @@ Open ``tutorial/views/default.py`` and add a ``permission='edit'`` parameter to 
     :language: python
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-    :lines: 68-70
+    :lines: 69-71
     :emphasize-lines: 2-3
     :language: python
 
@@ -191,12 +191,12 @@ Add a ``permission='view'`` parameter to the ``@view_config`` decorator for
 ``view_wiki()`` and ``view_page()`` as follows:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-    :lines: 23-24
+    :lines: 21-22
     :emphasize-lines: 1-2
     :language: python
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-    :lines: 28-29
+    :lines: 27-28
     :emphasize-lines: 1-2
     :language: python
 
@@ -318,7 +318,7 @@ Our ``tutorial/__init__.py`` will look like this when we are done:
 
 Only the highlighted lines need to be added or edited.
 
-Our ``tutorial/models.py`` will look like this when we are done:
+Our ``tutorial/models/__init__.py`` will look like this when we are done:
 
 .. literalinclude:: src/authorization/tutorial/models/__init__.py
     :linenos:

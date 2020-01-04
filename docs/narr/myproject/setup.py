@@ -25,7 +25,7 @@ tests_require = [
 setup(
     name='myproject',
     version='0.0',
-    description='MyProject',
+    description='myproject',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[
         'Programming Language :: Python',
@@ -37,7 +37,7 @@ setup(
     author_email='',
     url='',
     keywords='web pyramid pylons',
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests']),
     include_package_data=True,
     zip_safe=False,
     extras_require={

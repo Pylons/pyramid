@@ -1,7 +1,6 @@
-from pyramid.interfaces import IRendererFactory, PHASE1_CONFIG
-
 from pyramid import renderers
 from pyramid.config.actions import action_method
+from pyramid.interfaces import PHASE1_CONFIG, IRendererFactory
 
 DEFAULT_RENDERERS = (
     ('json', renderers.json_renderer_factory),

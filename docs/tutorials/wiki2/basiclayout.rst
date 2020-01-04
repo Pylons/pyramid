@@ -58,16 +58,16 @@ dictionary of settings parsed from the ``.ini`` file, which contains
 deployment-related values, such as ``pyramid.reload_templates``,
 ``sqlalchemy.url``, and so on.
 
-Next include :term:`Jinja2` templating bindings so that we can use renderers
-with the ``.jinja2`` extension within our project.
+Next include the package ``models`` using a dotted Python path. The exact
+setup of the models will be covered later.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 8
     :lineno-match:
     :language: py
 
-Next include the package ``models`` using a dotted Python path. The exact
-setup of the models will be covered later.
+Next include :term:`Jinja2` templating bindings so that we can use renderers
+with the ``.jinja2`` extension within our project.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 9
@@ -183,6 +183,25 @@ The sample ``my_view()`` created by the cookiecutter uses a ``try:`` and
 database and provide an alternate error response.  That response will include
 the text shown at the end of the file, which will be displayed in the browser
 to inform the user about possible actions to take to solve the problem.
+
+Open ``tutorial/views/notfound.py`` in the ``views`` package to look at the second view.
+
+.. literalinclude:: src/basiclayout/tutorial/views/notfound.py
+    :linenos:
+    :language: python
+
+Without repeating ourselves, we will point out the differences between this view and the previous.
+
+#.  *Line 4*.
+    The ``notfound_view`` function is decorated with ``@notfound_view_config``.
+    This decorator registers a :term:`Not Found View` using :meth:`pyramid.config.Configurator.add_notfound_view`.
+
+    The ``renderer`` argument names an :term:`asset specification` of ``tutorial:templates/404.jinja2``.
+
+#.  *Lines 5-7*.
+    A :term:`view callable` named ``notfound_view`` is defined, which is decorated in the step above.
+    It sets the HTTP response status code to ``404``.
+    The function returns an empty dictionary to the template ``404.jinja2``, which accepts no parameters anyway.
 
 
 Content models with the ``models`` package

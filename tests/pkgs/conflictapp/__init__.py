@@ -1,6 +1,6 @@
-from pyramid.response import Response
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
+from pyramid.response import Response
 
 
 def aview(request):

@@ -1,12 +1,11 @@
-import base64
 import argparse
+import base64
 import sys
 import textwrap
 from urllib.parse import unquote
 
 from pyramid.request import Request
-from pyramid.scripts.common import get_config_loader
-from pyramid.scripts.common import parse_vars
+from pyramid.scripts.common import get_config_loader, parse_vars
 
 
 def main(argv=sys.argv, quiet=False):

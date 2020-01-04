@@ -1,8 +1,9 @@
 import unittest
 
-from pyramid.exceptions import ConfigurationConflictError
-from pyramid.exceptions import ConfigurationExecutionError
-
+from pyramid.exceptions import (
+    ConfigurationConflictError,
+    ConfigurationExecutionError,
+)
 from pyramid.interfaces import IRequest
 
 

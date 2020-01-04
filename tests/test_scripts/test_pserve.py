@@ -1,8 +1,8 @@
 from io import StringIO
 import os
 import unittest
-from . import dummy
 
+from . import dummy
 
 here = os.path.abspath(os.path.dirname(__file__))
 

@@ -1,3 +1,2 @@
 [run]
 source = myproject
-omit = myproject/test*

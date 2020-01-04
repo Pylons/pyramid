@@ -1,9 +1,8 @@
 import unittest
 
-from . import dummy_tween_factory
-from . import dummy_tween_factory2
-
 from pyramid.exceptions import ConfigurationConflictError
+
+from . import dummy_tween_factory, dummy_tween_factory2
 
 
 class TestTweensConfiguratorMixin(unittest.TestCase):
