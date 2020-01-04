@@ -106,8 +106,8 @@ Analysis
 Unlike many web frameworks, Pyramid includes a built-in but optional security
 model for authentication and authorization. This security system is intended to
 be flexible and support many needs. In this security model, authentication (who
-are you) and authorization (what are you allowed to do) are not just pluggable,
-but decoupled. To learn one step at a time, we provide a system that identifies
+are you) and authorization (what are you allowed to do) are pluggable.
+To learn one step at a time, we provide a system that identifies
 users and lets them log out.
 
 In this example we chose to use the bundled :class:`pyramid.authentication.AuthTktCookieHelper` helper to store the user's logged-in state in a cookie.
