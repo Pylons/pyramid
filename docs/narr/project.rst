@@ -803,7 +803,7 @@ application.  ``author`` and ``author_email`` are text fields which probably
 don't need any description. ``url`` is a field that should point at your
 application project's URL (if any).
 ``keywords`` are keywords that describe your project.
-``packages=find_packages()`` causes all
+``packages=find_packages(exclude=['tests'])`` causes all
 packages within the project to be found when packaging the application.
 ``include_package_data`` will include non-Python files when the application is
 packaged if those files are checked into version control. ``zip_safe=False``
