@@ -71,6 +71,13 @@ Features
 - Fix ``DeprecationWarning`` emitted by using the ``imp`` module.
   See https://github.com/Pylons/pyramid/pull/3553
 
+- Properties created via ``config.add_request_method(..., property=True)`` or
+  ``request.set_property`` used to be readonly. They can now be overridden
+  via ``request.foo = ...`` and until the value is deleted it will return
+  the overridden value. This is most useful when mocking request properties
+  in testing.
+  See https://github.com/Pylons/pyramid/pull/3559
+
 Deprecations
 ------------
 

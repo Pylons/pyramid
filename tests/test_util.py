@@ -103,25 +103,26 @@ class Test_InstancePropertyHelper(unittest.TestCase):
         )
 
     def test_override_property(self):
-        def worker(obj):  # pragma: no cover
+        def worker(obj):
             pass
 
         foo = Dummy()
         helper = self._getTargetClass()
         helper.set_property(foo, worker, name='x')
-
-        def doit():
-            foo.x = 1
-
-        self.assertRaises(AttributeError, doit)
+        self.assertIsNone(foo.x)
+        foo.x = 1
+        self.assertEqual(foo.x, 1)
+        del foo.x
+        self.assertIsNone(foo.x)
 
     def test_override_reify(self):
-        def worker(obj):  # pragma: no cover
+        def worker(obj):
             pass
 
         foo = Dummy()
         helper = self._getTargetClass()
         helper.set_property(foo, worker, name='x', reify=True)
+        self.assertIsNone(foo.x)
         foo.x = 1
         self.assertEqual(1, foo.x)
         foo.x = 2
@@ -301,23 +302,24 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         )
 
     def test_override_property(self):
-        def worker(obj):  # pragma: no cover
+        def worker(obj):
             pass
 
         foo = self._makeOne()
         foo.set_property(worker, name='x')
-
-        def doit():
-            foo.x = 1
-
-        self.assertRaises(AttributeError, doit)
+        self.assertIsNone(foo.x)
+        foo.x = 1
+        self.assertEqual(foo.x, 1)
+        del foo.x
+        self.assertIsNone(foo.x)
 
     def test_override_reify(self):
-        def worker(obj):  # pragma: no cover
+        def worker(obj):
             pass
 
         foo = self._makeOne()
         foo.set_property(worker, name='x', reify=True)
+        self.assertIsNone(foo.x)
         foo.x = 1
         self.assertEqual(1, foo.x)
         foo.x = 2
