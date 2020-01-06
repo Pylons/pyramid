@@ -115,26 +115,26 @@ class InstancePropertyHelper(object):
         (name, property) pair.
         """
 
-        is_property = isinstance(callable, property)
-        if is_property:
-            fn = callable
-            if name is None:
-                raise ValueError('must specify "name" for a property')
-            if reify:
-                raise ValueError('cannot reify a property')
-        elif name is not None:
-            fn = lambda this: callable(this)
-            fn.__name__ = get_callable_name(name)
-            fn.__doc__ = callable.__doc__
-        else:
+        if name is None:
+            if not hasattr(callable, '__name__'):
+                raise ValueError(
+                    'missing __name__, must specify "name" for property'
+                )
             name = callable.__name__
-            fn = callable
+        name = get_callable_name(name)
+        is_data_descriptor = hasattr(callable, '__set__')
+        if reify and is_data_descriptor:
+            raise ValueError('cannot reify a data descriptor')
+        fn = callable
         if reify:
             import pyramid.decorator  # avoid circular import
 
+            fn = lambda this: callable(this)
+            fn.__name__ = name
+            fn.__doc__ = callable.__doc__
             fn = pyramid.decorator.reify(fn)
-        elif not is_property:
-            fn = SettableProperty(fn, name)
+        elif not is_data_descriptor:
+            fn = SettableProperty(callable, name)
 
         return name, fn
 
