@@ -73,6 +73,27 @@ def as_sorted_tuple(val):
     return val
 
 
+class SettableProperty(object):
+    def __init__(self, wrapped, name):
+        self.wrapped = wrapped
+        self.name = name
+        functools.update_wrapper(self, wrapped)
+
+    def __get__(self, obj, type=None):
+        if obj is None:  # pragma: no cover
+            return self
+        value = obj.__dict__.get(self.name, _marker)
+        if value is _marker:
+            value = self.wrapped(obj)
+        return value
+
+    def __set__(self, obj, value):
+        obj.__dict__[self.name] = value
+
+    def __delete__(self, obj):
+        del obj.__dict__[self.name]
+
+
 class InstancePropertyHelper(object):
     """A helper object for assigning properties and descriptors to instances.
     It is not normally possible to do this because descriptors must be
@@ -113,7 +134,7 @@ class InstancePropertyHelper(object):
 
             fn = pyramid.decorator.reify(fn)
         elif not is_property:
-            fn = property(fn)
+            fn = SettableProperty(fn, name)
 
         return name, fn
 
