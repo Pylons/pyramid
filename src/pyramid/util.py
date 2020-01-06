@@ -74,24 +74,23 @@ def as_sorted_tuple(val):
 
 
 class SettableProperty(object):
-    def __init__(self, wrapped, name):
+    def __init__(self, wrapped):
         self.wrapped = wrapped
-        self.name = name
         functools.update_wrapper(self, wrapped)
 
     def __get__(self, obj, type=None):
         if obj is None:  # pragma: no cover
             return self
-        value = obj.__dict__.get(self.name, _marker)
+        value = obj.__dict__.get(self.wrapped.__name__, _marker)
         if value is _marker:
             value = self.wrapped(obj)
         return value
 
     def __set__(self, obj, value):
-        obj.__dict__[self.name] = value
+        obj.__dict__[self.wrapped.__name__] = value
 
     def __delete__(self, obj):
-        del obj.__dict__[self.name]
+        del obj.__dict__[self.wrapped.__name__]
 
 
 class InstancePropertyHelper(object):
@@ -125,16 +124,19 @@ class InstancePropertyHelper(object):
         is_data_descriptor = hasattr(callable, '__set__')
         if reify and is_data_descriptor:
             raise ValueError('cannot reify a data descriptor')
-        fn = callable
-        if reify:
-            import pyramid.decorator  # avoid circular import
+        if is_data_descriptor:
+            fn = callable
+        else:
+            wrapped = lambda this: callable(this)
+            wrapped.__name__ = name
+            wrapped.__doc__ = callable.__doc__
 
-            fn = lambda this: callable(this)
-            fn.__name__ = name
-            fn.__doc__ = callable.__doc__
-            fn = pyramid.decorator.reify(fn)
-        elif not is_data_descriptor:
-            fn = SettableProperty(callable, name)
+            if reify:
+                import pyramid.decorator  # avoid circular import
+
+                fn = pyramid.decorator.reify(wrapped)
+            else:
+                fn = SettableProperty(wrapped)
 
         return name, fn
 
