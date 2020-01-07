@@ -266,7 +266,7 @@ class ViewsConfiguratorMixin(object):
         exception_only=False,
         **view_options
     ):
-        """ Add a :term:`view configuration` to the current
+        r""" Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
         arguments.  Predicate arguments narrow the circumstances in
@@ -723,6 +723,8 @@ class ViewsConfiguratorMixin(object):
 
           .. versionadded:: 1.4a4
 
+          .. deprecated:: 2.0
+
         custom_predicates
 
             .. deprecated:: 1.5
@@ -740,14 +742,14 @@ class ViewsConfiguratorMixin(object):
                 obsoletes this argument, but it is kept around for backwards
                 compatibility.
 
-        view_options
+        \*\*view_options
 
-          Pass a key/value pair here to use a third-party predicate or set a
-          value for a view deriver. See
+          Pass extra keyword parameters to use custom or third-party predicates
+          or set a value for a view deriver. See
           :meth:`pyramid.config.Configurator.add_view_predicate` and
           :meth:`pyramid.config.Configurator.add_view_deriver`. See
           :ref:`view_and_route_predicates` for more information about
-          third-party predicates and :ref:`view_derivers` for information
+          custom predicates and :ref:`view_derivers` for information
           about view derivers.
 
           .. versionadded: 1.4a1

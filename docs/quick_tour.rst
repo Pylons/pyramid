@@ -478,7 +478,7 @@ more to offer:
 
 - One route leading to multiple views, based on information in the request or
   data such as ``request_param``, ``request_method``, ``accept``, ``header``,
-  ``xhr``, ``containment``, and ``custom_predicates``
+  ``xhr``, ``containment``, and custom predicates.
 
 .. seealso:: See also:
     :ref:`Quick Tutorial View Classes <qtut_view_classes>`, :ref:`Quick

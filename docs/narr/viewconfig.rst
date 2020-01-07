@@ -317,6 +317,8 @@ Non-Predicate Arguments
 
   .. versionadded:: 1.8
 
+.. _predicate_view_args:
+
 Predicate Arguments
 +++++++++++++++++++
 
@@ -506,20 +508,22 @@ configured view.
 
 ``custom_predicates``
   If ``custom_predicates`` is specified, it must be a sequence of references to
-  custom predicate callables.  Use custom predicates when no set of predefined
-  predicates do what you need.  Custom predicates can be combined with
+  custom predicate callables.   Custom predicates can be combined with
   predefined predicates as necessary.  Each custom predicate callable should
   accept two arguments, ``context`` and ``request``, and should return either
   ``True`` or ``False`` after doing arbitrary evaluation of the context
   resource and/or the request.  If all callables return ``True``, the
   associated view callable will be considered viable for a given request.
+  This parameter is kept around for backward compatibility.
 
-  If ``custom_predicates`` is not specified, no custom predicates are used.
+  .. deprecated:: 1.5
+     See section below for new-style custom predicates.
 
-``predicates``
-  Pass a key/value pair here to use a third-party predicate registered via
-  :meth:`pyramid.config.Configurator.add_view_predicate`.  More than one
-  key/value pair can be used at the same time.  See
+``**predicates``
+  Extra keyword parameters are used to invoke custom predicates, defined
+  in your app or by third-party packages extending Pyramid and registered via
+  :meth:`pyramid.config.Configurator.add_view_predicate`.  Use custom predicates
+  when no set of predefined predicates do what you need.  See
   :ref:`view_and_route_predicates` for more information about third-party
   predicates.
 

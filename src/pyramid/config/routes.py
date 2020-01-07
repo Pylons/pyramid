@@ -40,7 +40,7 @@ class RoutesConfiguratorMixin(object):
         inherit_slash=None,
         **predicates
     ):
-        """ Add a :term:`route configuration` to the current
+        r""" Add a :term:`route configuration` to the current
         configuration state, as well as possibly a :term:`view
         configuration` to be used to specify a :term:`view callable`
         that will be invoked when this route matches.  The arguments
@@ -283,6 +283,8 @@ class RoutesConfiguratorMixin(object):
 
           .. versionadded:: 1.4a4
 
+          .. deprecated:: 2.0
+
         custom_predicates
 
           .. deprecated:: 1.5
@@ -302,14 +304,14 @@ class RoutesConfiguratorMixin(object):
               :ref:`custom_route_predicates` for more information about
               ``info``.
 
-        predicates
+        \*\*predicates
 
-          Pass a key/value pair here to use a third-party predicate
+          Pass extra keyword parameters to use custom or third-party predicates
           registered via
           :meth:`pyramid.config.Configurator.add_route_predicate`.  More than
-          one key/value pair can be used at the same time.  See
+          one custom predicate can be used at the same time.  See
           :ref:`view_and_route_predicates` for more information about
-          third-party predicates.
+          custom predicates.
 
           .. versionadded:: 1.4
 

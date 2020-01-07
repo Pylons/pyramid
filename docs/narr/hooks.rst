@@ -1564,7 +1564,7 @@ event type.
             self.val = val
 
         def text(self):
-            return 'path_startswith = %s' % (self.val,)
+            return 'request_path_startswith = %s' % (self.val,)
 
         phash = text
 
