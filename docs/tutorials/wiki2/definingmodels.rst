@@ -32,8 +32,10 @@ parameter in the ``setup()`` function.
 Open ``tutorial/setup.py`` and edit it to look like the following:
 
 .. literalinclude:: src/models/setup.py
+    :lines: 11-30
     :linenos:
-    :emphasize-lines: 11-24
+    :lineno-match:
+    :emphasize-lines: 3
     :language: python
 
 It is a good practice to sort packages alphabetically to make them easier to find.
@@ -42,7 +44,9 @@ After adding ``bcrypt`` and sorting packages, we should have the above ``require
 
 .. note::
 
-    We are using the ``bcrypt`` package from PyPI to hash our passwords securely. There are other one-way hash algorithms for passwords if ``bcrypt`` is an issue on your system. Just make sure that it's an algorithm approved for storing passwords versus a generic one-way hash.
+    We are using the ``bcrypt`` package from PyPI to hash our passwords securely.
+    There are other one-way hash algorithms for passwords if ``bcrypt`` is an issue on your system.
+    Just make sure that it's an algorithm approved for storing passwords versus a generic one-way hash.
 
 
 Running ``pip install -e .``
@@ -245,7 +249,7 @@ following:
 .. literalinclude:: src/models/tutorial/scripts/initialize_db.py
     :linenos:
     :language: python
-    :emphasize-lines: 11-24
+    :emphasize-lines: 15-28
 
 Only the highlighted lines need to be changed.
 
