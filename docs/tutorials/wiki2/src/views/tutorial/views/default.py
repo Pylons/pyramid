@@ -1,5 +1,5 @@
-from html import escape
 from docutils.core import publish_parts
+from html import escape
 from pyramid.httpexceptions import (
     HTTPNotFound,
     HTTPSeeOther,
