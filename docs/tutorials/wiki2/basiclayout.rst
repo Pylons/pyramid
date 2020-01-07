@@ -348,3 +348,9 @@ code in our stock application.
 
 The ``Index`` import and the ``Index`` object creation in ``mymodel.py`` is
 not required for this tutorial, and will be removed in the next step.
+
+Tests
+-----
+
+The project contains a basic structure for a test suite using ``pytest``.
+The structure is covered later in :ref:`wiki2_adding_tests`.
