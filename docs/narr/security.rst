@@ -720,6 +720,8 @@ has the possibility of providing a chosen plaintext.
    single: preventing cross-site request forgery attacks
    single: cross-site request forgery attacks, prevention
 
+.. _csrf_protection:
+
 Preventing Cross-Site Request Forgery Attacks
 ---------------------------------------------
 

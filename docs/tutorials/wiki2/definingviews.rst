@@ -26,14 +26,15 @@ is not a dependency of the original "tutorial" application.
 
 We need to add a dependency on the ``docutils`` package to our ``tutorial``
 package's ``setup.py`` file by assigning this dependency to the ``requires``
-parameter in the ``setup()`` function.
+list.
 
 Open ``tutorial/setup.py`` and edit it to look like the following:
 
 .. literalinclude:: src/views/setup.py
-   :linenos:
-   :emphasize-lines: 14
-   :language: python
+    :lines: 11-31
+    :lineno-match:
+    :emphasize-lines: 4
+    :language: python
 
 Only the highlighted line needs to be added.
 
@@ -50,7 +51,7 @@ were provided at the time we created the project.
 
 As an example, the CSS file will be accessed via
 ``http://localhost:6543/static/theme.css`` by virtue of the call to the
-``add_static_view`` directive we've made in the ``routes.py`` file. Any number
+``add_static_view`` directive we've made in the ``tutorial/routes.py`` file. Any number
 and type of static assets can be placed in this directory (or subdirectories)
 and are just referred to by URL or by using the convenience method
 ``static_url``, e.g., ``request.static_url('<package>:static/foo.css')`` within
@@ -63,7 +64,7 @@ Adding routes to ``routes.py``
 This is the `URL Dispatch` tutorial, so let's start by adding some URL patterns
 to our app. Later we'll attach views to handle the URLs.
 
-The ``routes.py`` file contains :meth:`pyramid.config.Configurator.add_route`
+The ``tutorial/routes.py`` file contains :meth:`pyramid.config.Configurator.add_route`
 calls which serve to add routes to our application. First we'll get rid of the
 existing route created by the template using the name ``'home'``. It's only an
 example and isn't relevant to our application.
@@ -96,13 +97,13 @@ order they're registered.
    decorator attached to the ``edit_page`` view function, which in turn will be
    indicated by ``route_name='edit_page'``.
 
-As a result of our edits, the ``routes.py`` file should look like the
+As a result of our edits, the ``tutorial/routes.py`` file should look like the
 following:
 
 .. literalinclude:: src/views/tutorial/routes.py
-   :linenos:
-   :emphasize-lines: 3-6
-   :language: python
+    :linenos:
+    :emphasize-lines: 3-6
+    :language: python
 
 The highlighted lines are the ones that need to be added or edited.
 
@@ -117,18 +118,41 @@ The highlighted lines are the ones that need to be added or edited.
    behavior in your own apps.
 
 
+CSRF protection
+===============
+
+When handling HTML forms that mutate data in our database we need to verify that the form submission is legitimate and not from a URL embedded in a third-party website.
+This is done by adding a unique token to each form that a third-party could not easily guess.
+Read more about CSRF at :ref:`csrf_protection`.
+For this tutorial, we'll store the active CSRF token in a cookie.
+
+Let's add a new ``tutorial/security.py`` file:
+
+.. literalinclude:: src/views/tutorial/security.py
+    :linenos:
+    :emphasize-lines: 5-6
+    :language: python
+
+Since we've added a new ``tutorial/security.py`` module, we need to include it.
+Open the file ``tutorial/__init__.py`` and edit the following lines:
+
+.. literalinclude:: src/views/tutorial/__init__.py
+    :linenos:
+    :emphasize-lines: 9
+    :language: python
+
+On forms that mutate data, we'll be sure to add the CSRF token to the form, using :func:`pyramid.csrf.get_csrf_token`.
+
+
 Adding view functions in ``views/default.py``
 =============================================
 
 It's time for a major change.  Open ``tutorial/views/default.py`` and
-edit it to look like the following:
+replace it with the following:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-   :linenos:
-   :language: python
-   :emphasize-lines: 1-9,14-
-
-The highlighted lines need to be added or edited.
+    :linenos:
+    :language: python
 
 We added some imports, and created a regular expression to find "WikiWords".
 
@@ -137,7 +161,7 @@ when originally rendered after we selected the ``sqlalchemy`` backend option in
 the cookiecutter.  It was only an example and isn't relevant to our
 application.  We also deleted the ``db_err_msg`` string.
 
-Then we added four :term:`view callable` functions to our ``views/default.py``
+Then we added four :term:`view callable` functions to our ``tutorial/views/default.py``
 module, as mentioned in the previous step:
 
 * ``view_wiki()`` - Displays the wiki itself. It will answer on the root URL.
@@ -163,10 +187,10 @@ The ``view_wiki`` view function
 Following is the code for the ``view_wiki`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-   :lines: 17-20
-   :lineno-match:
-   :linenos:
-   :language: python
+    :lines: 16-19
+    :lineno-match:
+    :linenos:
+    :language: python
 
 ``view_wiki()`` is the :term:`default view` that gets called when a request is
 made to the root URL of our wiki.  It always redirects to a URL which
@@ -174,12 +198,12 @@ represents the path to our "FrontPage".
 
 The ``view_wiki`` view callable always redirects to the URL of a Page resource
 named "FrontPage".  To do so, it returns an instance of the
-:class:`pyramid.httpexceptions.HTTPFound` class (instances of which implement
+:class:`pyramid.httpexceptions.HTTPSeeOther` class (instances of which implement
 the :class:`pyramid.interfaces.IResponse` interface, like
 :class:`pyramid.response.Response`). It uses the
 :meth:`pyramid.request.Request.route_url` API to construct a URL to the
 ``FrontPage`` page (i.e., ``http://localhost:6543/FrontPage``), and uses it as
-the "location" of the ``HTTPFound`` response, forming an HTTP redirect.
+the "location" of the ``HTTPSeeOther`` response, forming an HTTP redirect.
 
 
 The ``view_page`` view function
@@ -188,10 +212,10 @@ The ``view_page`` view function
 Here is the code for the ``view_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-   :lines: 22-42
-   :lineno-match:
-   :linenos:
-   :language: python
+    :lines: 21-41
+    :lineno-match:
+    :linenos:
+    :language: python
 
 ``view_page()`` is used to display a single page of our wiki.  It renders the
 :term:`reStructuredText` body of a page (stored as the ``data`` attribute of a
@@ -241,10 +265,10 @@ The ``edit_page`` view function
 Here is the code for the ``edit_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-   :lines: 44-56
-   :lineno-match:
-   :linenos:
-   :language: python
+    :lines: 43-55
+    :lineno-match:
+    :linenos:
+    :language: python
 
 ``edit_page()`` is invoked when a user clicks the "Edit this Page" button on
 the view form. It renders an edit form, but it also acts as the handler for the
@@ -252,14 +276,13 @@ form which it renders. The ``matchdict`` attribute of the request passed to the
 ``edit_page`` view will have a ``'pagename'`` key matching the name of the page
 that the user wants to edit.
 
-If the view execution *is* a result of a form submission (i.e., the expression
-``'form.submitted' in request.params`` is ``True``), the view grabs the
+If the view execution *is* a result of a form submission (i.e., ``request.method == 'POST'``), the view grabs the
 ``body`` element of the request parameters and sets it as the ``data``
 attribute of the page object.  It then redirects to the ``view_page`` view
 of the wiki page.
 
 If the view execution is *not* a result of a form submission (i.e., the
-expression ``'form.submitted' in request.params`` is ``False``), the view
+expression ``request.method != 'POST'``), the view
 simply renders the edit form, passing the page object and a ``save_url``
 which will be used as the action of the generated form.
 
@@ -279,10 +302,10 @@ The ``add_page`` view function
 Here is the code for the ``add_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-   :lines: 58-
-   :lineno-match:
-   :linenos:
-   :language: python
+    :lines: 57-
+    :lineno-match:
+    :linenos:
+    :language: python
 
 ``add_page()`` is invoked when a user clicks on a *WikiWord* which isn't yet
 represented as a page in the system. The ``add_link`` function within the
@@ -301,7 +324,7 @@ the database. If it already exists, then the client is redirected to the
 ``edit_page`` view, else we continue to the next check.
 
 If the view execution *is* a result of a form submission (i.e., the expression
-``'form.submitted' in request.params`` is ``True``), we grab the page body from
+``request.method == 'POST'``), we grab the page body from
 the form data, create a Page object with this page body and the name taken from
 ``matchdict['pagename']``, and save it into the database using
 ``request.dbession.add``. Since we have not yet covered authentication, we
@@ -312,7 +335,7 @@ Finally, we redirect the client back to the ``view_page`` view for the newly
 created page.
 
 If the view execution is *not* a result of a form submission (i.e., the
-expression ``'form.submitted' in request.params`` is ``False``), the view
+expression ``request.method != 'POST'`` is ``False``), the view
 callable renders a template.  To do so, it generates a ``save_url`` which the
 template uses as the form post URL during rendering.  We're lazy here, so
 we're going to use the same template (``templates/edit.jinja2``) for the add
@@ -339,9 +362,9 @@ Update ``tutorial/templates/layout.jinja2`` with the following content, as
 indicated by the emphasized lines:
 
 .. literalinclude:: src/views/tutorial/templates/layout.jinja2
-   :linenos:
-   :emphasize-lines: 11,35-37
-   :language: html
+    :linenos:
+    :emphasize-lines: 11,35-37
+    :language: html
 
 Since we're using a templating engine, we can factor common boilerplate out of
 our page templates into reusable components. One method for doing this is
@@ -350,8 +373,7 @@ template inheritance via blocks.
 - We have defined two placeholders in the layout template where a child
   template can override the content. These blocks are named ``subtitle`` (line
   11) and ``content`` (line 36).
-- Please refer to the `Jinja2 documentation <https://palletsprojects.com/p/jinja/>`_ for more information about template
-  inheritance.
+- Please refer to the `Jinja2 documentation <https://palletsprojects.com/p/jinja/>`_ for more information about template inheritance.
 
 
 The ``view.jinja2`` template
@@ -360,8 +382,8 @@ The ``view.jinja2`` template
 Create ``tutorial/templates/view.jinja2`` and add the following content:
 
 .. literalinclude:: src/views/tutorial/templates/view.jinja2
-   :linenos:
-   :language: html
+    :linenos:
+    :language: html
 
 This template is used by ``view_page()`` for displaying a single wiki page.
 
@@ -384,9 +406,9 @@ The ``edit.jinja2`` template
 Create ``tutorial/templates/edit.jinja2`` and add the following content:
 
 .. literalinclude:: src/views/tutorial/templates/edit.jinja2
-   :linenos:
-   :emphasize-lines: 1,3,12,14,17
-   :language: html
+    :linenos:
+    :emphasize-lines: 1,3,12,13,15,18
+    :language: html
 
 This template serves two use cases. It is used by ``add_page()`` and
 ``edit_page()`` for adding and editing a wiki page.  It displays a page
@@ -396,11 +418,13 @@ containing a form and which provides the following:
   of the page (line 1).
 - Override the ``subtitle`` block to affect the ``<title>`` tag in the
   ``head`` of the page (line 3).
+- Add the CSRF token to the form (line 13).
+  Without this line, attempts to edit the page would result in a ``400 Bad Request`` error.
 - A 10-row by 60-column ``textarea`` field named ``body`` that is filled with
-  any existing page data when it is rendered (line 14).
-- A submit button that has the name ``form.submitted`` (line 17).
+  any existing page data when it is rendered (line 15).
+- A submit button (line 18).
 - The form POSTs back to the ``save_url`` argument supplied by the view (line
-  12). The view will use the ``body`` and ``form.submitted`` values.
+  12). The view will use the ``body`` value.
 
 
 The ``404.jinja2`` template
@@ -409,16 +433,16 @@ The ``404.jinja2`` template
 Replace ``tutorial/templates/404.jinja2`` with the following content:
 
 .. literalinclude:: src/views/tutorial/templates/404.jinja2
-   :linenos:
-   :language: html
+    :linenos:
+    :language: html
 
 This template is linked from the ``notfound_view`` defined in
 ``tutorial/views/notfound.py`` as shown here:
 
 .. literalinclude:: src/views/tutorial/views/notfound.py
-   :linenos:
-   :emphasize-lines: 6
-   :language: python
+    :linenos:
+    :emphasize-lines: 6
+    :language: python
 
 There are several important things to note about this configuration:
 
