@@ -18,7 +18,7 @@ We will implement authentication with the following steps:
 * Add "Login" and "Logout" links to every page based on the user's
   authenticated state (``layout.jinja2``).
 * Make the existing views verify user state (``views/default.py``).
-* Redirect to ``/login`` when a user is not logged in and is denied access to any of the views that require permission (``views/auth.py``)..
+* Redirect to ``/login`` when a user is not logged in and is denied access to any of the views that require permission (``views/auth.py``).
 * Show a custom "403 Forbidden" page if a logged in user is denied access to any views that require permission (``views/auth.py``).
 
 
