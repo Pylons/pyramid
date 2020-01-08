@@ -370,7 +370,7 @@ class RequestLocalCache:
     :meth:`.get`, :meth:`.set` and :meth:`.clear`. Using these methods, the
     cache can be used directly as well, without using it as a decorator.
 
-    The cache will clean release resources aggressively by utilizing
+    The cache will release resources aggressively by utilizing
     :meth:`pyramid.request.Request.add_finished_callback`, but it will also
     maintain a weakref to the request and cleanup when it is garbage collected
     if the callbacks are not invoked for some reason.

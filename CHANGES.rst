@@ -80,7 +80,7 @@ Features
 
 - Finished callbacks are now executed as part of the ``closer`` that is
   invoked as part of ``pyramid.scripting.prepare`` and
-  ``pyramid.paster.boostrap``.
+  ``pyramid.paster.bootstrap``.
   See https://github.com/Pylons/pyramid/pull/3561
 
 - Added ``pyramid.request.RequestLocalCache`` which can be used to create
