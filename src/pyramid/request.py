@@ -378,6 +378,7 @@ class RequestLocalCache:
     .. versionadded:: 2.0
 
     """
+
     NO_VALUE = Sentinel('NO_VALUE')
 
     def __init__(self):
@@ -393,10 +394,13 @@ class RequestLocalCache:
                 return decorator(self.inst, self.__wrapped__)(*args, **kwargs)
 
             def __get__(self, instance, owner):
-                return decorator(self.inst, self.__wrapped__.__get__(instance, owner))
+                return decorator(
+                    self.inst, self.__wrapped__.__get__(instance, owner)
+                )
 
         def adapt(inst, fn):
             return FunctionOrMethodAdapter(inst, fn)
+
         return adapt
 
     @auto_adapt
@@ -405,6 +409,7 @@ class RequestLocalCache:
         Decorate a method or function.
 
         """
+
         @functools.wraps(fn)
         def wrapper(request, *args, **kwargs):
             result = self.get(request)
@@ -413,6 +418,7 @@ class RequestLocalCache:
                 self.set(request, result)
                 request.add_finished_callback(self.clear)
             return result
+
         return wrapper
 
     del auto_adapt
