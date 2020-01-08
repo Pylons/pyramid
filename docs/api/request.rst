@@ -362,3 +362,6 @@
    see :class:`pyramid.interfaces.IMultiDict`.
 
 .. autofunction:: apply_request_extensions(request)
+
+.. autoclass:: RequestLocalCache
+    :members:

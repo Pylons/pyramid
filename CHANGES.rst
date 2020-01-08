@@ -81,6 +81,7 @@ Features
 - Finished callbacks are now executed as part of the ``closer`` that is
   invoked as part of ``pyramid.scripting.prepare`` and
   ``pyramid.paster.boostrap``.
+  See https://github.com/Pylons/pyramid/pull/3561
 
 - Added ``pyramid.request.RequestLocalCache`` which can be used to create
   simple objects that are shared across requests and can be used to store
@@ -91,6 +92,7 @@ Features
   generated on-demand when accessing the request property. However, often
   the case is that the data is generated when accessing some other system
   and then we want to cache the data for the duration of the request.
+  See https://github.com/Pylons/pyramid/pull/3561
 
 Deprecations
 ------------
