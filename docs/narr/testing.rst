@@ -395,23 +395,30 @@ As always, whenever you change your dependencies, make sure to run the correct
 
     $VENV/bin/pip install -e ".[testing]"
 
-In your ``MyPackage`` project, your :term:`package` is named ``myproject``
+In your ``myproject`` project, your :term:`package` is named ``myproject``
 which contains a ``views`` package containing a ``default.py`` module, which in turn contains a :term:`view`
 function ``my_view`` that returns an HTML body when the root URL is invoked:
 
-   .. literalinclude:: myproject/myproject/views/default.py
-      :linenos:
-      :language: python
+    .. literalinclude:: myproject/myproject/views/default.py
+        :linenos:
+        :language: python
 
-The following example functional tests demonstrate invoking the above :term:`view`:
+Test configuration and fixtures are defined in ``conftest.py``.
+In the following example, we define a test fixture.
 
-   .. literalinclude:: myproject/tests/test_it.py
+    .. literalinclude:: myproject/tests/conftest.py
+        :pyobject: testapp
+        :linenos:
+        :language: python
+
+This fixture is used in the following example functional tests, to demonstrate invoking the above :term:`view`:
+
+   .. literalinclude:: myproject/tests/test_functional.py
       :linenos:
-      :pyobject: FunctionalTests
       :language: python
 
 When these tests are run, each test method creates a "real" :term:`WSGI` application using the ``main`` function in your ``myproject.__init__`` module, using :term:`WebTest` to wrap that WSGI application.
-It assigns the result to ``self.testapp``.
+It assigns the result to ``res``.
 
 In the test named ``test_root``, the ``TestApp``'s ``GET`` method is used to invoke the root URL.
 An assertion is made that the returned HTML contains the text ``Pyramid``.
