@@ -21,16 +21,18 @@ class Test_view_page:
         from tutorial.views.default import view_page
         return view_page(request)
 
-    def test_it(self, dummy_request, dbsession):
+    def _makeContext(self, page):
         from tutorial.routes import PageResource
+        return PageResource(page)
 
+    def test_it(self, dummy_request, dbsession):
         # add a page to the db
         user = makeUser('foo', 'editor')
         page = makePage('IDoExist', 'Hello CruelWorld IDoExist', user)
         dbsession.add_all([page, user])
 
         # create a request asking for the page we've created
-        dummy_request.context = PageResource(page)
+        dummy_request.context = self._makeContext(page)
 
         # call the view we're testing and check its behavior
         info = self._callFUT(dummy_request)
@@ -50,21 +52,21 @@ class Test_add_page:
         from tutorial.views.default import add_page
         return add_page(request)
 
-    def test_get(self, dummy_request, dbsession):
+    def _makeContext(self, pagename):
         from tutorial.routes import NewPage
+        return NewPage(pagename)
 
+    def test_get(self, dummy_request, dbsession):
         dummy_request.user = makeUser('foo', 'editor')
-        dummy_request.context = NewPage('AnotherPage')
+        dummy_request.context = self._makeContext('AnotherPage')
         info = self._callFUT(dummy_request)
         assert info['pagedata'] == ''
         assert info['save_url'] == 'http://example.com/add_page/AnotherPage'
 
     def test_submit_works(self, dummy_request, dbsession):
-        from tutorial.routes import NewPage
-
         dummy_request.method = 'POST'
         dummy_request.POST['body'] = 'Hello yo!'
-        dummy_request.context = NewPage('AnotherPage')
+        dummy_request.context = self._makeContext('AnotherPage')
         dummy_request.user = makeUser('foo', 'editor')
         self._callFUT(dummy_request)
         page = (
