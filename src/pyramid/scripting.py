@@ -74,6 +74,12 @@ def prepare(request=None, registry=None):
 
        Added the ability to use the return value as a context manager.
 
+    .. versionchanged:: 2.0
+
+       Request finished callbacks added via
+       :meth:`pyramid.request.Request.add_finished_callback` will be invoked
+       by the ``closer``.
+
     """
     if registry is None:
         registry = getattr(request, 'registry', global_registries.last)
