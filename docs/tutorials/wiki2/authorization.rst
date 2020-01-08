@@ -40,7 +40,7 @@ Open the file ``tutorial/security.py`` and edit it as follows:
 
 .. literalinclude:: src/authorization/tutorial/security.py
    :linenos:
-   :emphasize-lines: 2,4-7,15,37-48
+   :emphasize-lines: 2,5-8,17,42-53
    :language: python
 
 Only the highlighted lines need to be added.

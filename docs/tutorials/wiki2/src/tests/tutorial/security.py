@@ -1,6 +1,7 @@
 from pyramid.authentication import AuthTktCookieHelper
 from pyramid.authorization import ACLHelper
 from pyramid.csrf import CookieCSRFStoragePolicy
+from pyramid.request import RequestLocalCache
 from pyramid.security import (
     Authenticated,
     Everyone,
@@ -12,9 +13,10 @@ from . import models
 class MySecurityPolicy:
     def __init__(self, secret):
         self.authtkt = AuthTktCookieHelper(secret)
+        self.identity_cache = RequestLocalCache(self.load_identity)
         self.acl = ACLHelper()
 
-    def authenticated_identity(self, request):
+    def load_identity(self, request):
         identity = self.authtkt.identify(request)
         if identity is None:
             return None
@@ -22,6 +24,9 @@ class MySecurityPolicy:
         userid = identity['userid']
         user = request.dbsession.query(models.User).get(userid)
         return user
+
+    def authenticated_identity(self, request):
+        return self.identity_cache.get_or_create(request)
 
     def authenticated_userid(self, request):
         user = self.authenticated_identity(request)

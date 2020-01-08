@@ -51,14 +51,29 @@ It also handles authorization, which we'll cover in the next chapter (if you're 
 
 Identifying the current user is done in a couple steps:
 
-1. The ``MySecurityPolicy.authenticated_identity`` method asks the cookie helper to pull the identity from the request.
-   This value is ``None`` if the cookie is missing or the content cannot be verified.
-2. We then translate the identity into a ``tutorial.models.User`` object by looking for a record in the database.
+1. :app:`Pyramid` invokes a method on the policy requesting identity, userid, or permission to perform an operation.
 
-This is a good spot to confirm that the user is actually allowed to access our application.
-For example, maybe they were marked deleted or banned and we should return ``None`` instead of the ``user`` object.
+1. The policy starts by calling :meth:`pyramid.request.RequestLocalCache.get_or_create` to load the identity.
+
+1. The ``MySecurityPolicy.load_identity`` method asks the cookie helper to pull the identity from the request.
+   This value is ``None`` if the cookie is missing or the content cannot be verified.
+
+1. The policy then translates the identity into a ``tutorial.models.User`` object by looking for a record in the database.
+   This is a good spot to confirm that the user is actually allowed to access our application.
+   For example, maybe they were marked deleted or banned and we should return ``None`` instead of the ``user`` object.
+
+1. The result is stored in the ``identity_cache`` which ensures that subsequent invocations return the same identity object for the request.
 
 Finally, :attr:`pyramid.request.Request.authenticated_identity` contains either ``None`` or a ``tutorial.models.User`` instance and that value is aliased to ``request.user`` for convenience in our application.
+
+Note the usage of the ``identity_cache`` is optional, but it has several advantages in most scenarios:
+
+- It improves performance as the identity is necessary for many operations during the lifetime of a request.
+
+- It provides consistency across method invocations to ensure the identity does not change while processing the request.
+
+It is up to individual security policies and applications to determine the best approach with respect to caching.
+Applications is long-running requests may want to avoid caching the identity, or tracking some extra metadata to re-verify it periodically against the authentication source.
 
 
 Configure the app
