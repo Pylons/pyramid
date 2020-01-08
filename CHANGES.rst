@@ -78,6 +78,10 @@ Features
   in testing.
   See https://github.com/Pylons/pyramid/pull/3559
 
+- Finished callbacks are now executed as part of the ``closer`` that is
+  invoked as part of ``pyramid.scripting.prepare`` and
+  ``pyramid.paster.boostrap``.
+
 Deprecations
 ------------
 

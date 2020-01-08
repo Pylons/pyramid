@@ -94,6 +94,8 @@ def prepare(request=None, registry=None):
     apply_request_extensions(request)
 
     def closer():
+        if request.finished_callbacks:
+            request._process_finished_callbacks()
         ctx.end()
 
     root_factory = registry.queryUtility(
