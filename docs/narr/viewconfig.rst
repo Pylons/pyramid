@@ -517,7 +517,7 @@ configured view.
   This parameter is kept around for backward compatibility.
 
   .. deprecated:: 1.5
-     See section below for new-style custom predicates.
+      See section below for new-style custom predicates.
 
 ``**predicates``
   Extra keyword parameters are used to invoke custom predicates, defined

@@ -1163,7 +1163,7 @@ instance, a predicate might do some type conversion of values:
 
     config.add_route_predicate('integers', IntegersPredicate)
     config.add_route('ymd', '/{year}/{month}/{day}',
-                     integers=('year', 'month', 'day')
+                     integers=('year', 'month', 'day'))
 
 Note that a conversion predicate is still a predicate, so it must return
 ``True`` or ``False``. A predicate that does *only* conversion, such as the one
@@ -1194,7 +1194,7 @@ expressions specifying requirements for that marker. For instance:
 
     config.add_route_predicate('integers', IntegersPredicate)
     config.add_route('ymd', '/{year:\d+}/{month:\d+}/{day:\d+}',
-                     integers=('year', 'month', 'day')
+                     integers=('year', 'month', 'day'))
 
 Now the try/except is no longer needed because the route will not match at all
 unless these markers match ``\d+`` which requires them to be valid digits for
@@ -1259,7 +1259,7 @@ that is to use the same argument name and value that in the call to
 .. seealso::
 
     See :ref:`registering_thirdparty_predicates` for more information about
-    custom view, route and subscriber predicates.
+    custom view, route, and subscriber predicates.
 
     See also :class:`pyramid.interfaces.IRoute` for more API documentation
     about route objects.
