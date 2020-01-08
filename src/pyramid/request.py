@@ -1,4 +1,6 @@
 from collections import deque
+import functools
+import weakref
 from webob import BaseRequest
 from zope.interface import implementer
 from zope.interface.interface import InterfaceClass
@@ -17,6 +19,7 @@ from pyramid.url import URLMethodsMixin
 from pyramid.util import (
     InstancePropertyHelper,
     InstancePropertyMixin,
+    Sentinel,
     bytes_,
     text_,
 )
@@ -330,3 +333,111 @@ def apply_request_extensions(request, extensions=None):
         InstancePropertyHelper.apply_properties(
             request, extensions.descriptors
         )
+
+
+class RequestLocalCache:
+    """
+    A store that caches values during for the lifecycle of a request.
+
+    Instantiate a cache object and use it to decorate methods or functions
+    that accept a request parameter. Any other arguments are not used as
+    cache keys so make sure they are constant across calls per-request.
+
+    Wrapping methods:
+
+    .. code-block:: python
+
+        class SecurityPolicy:
+            identity_cache = RequestLocalCache()
+
+            @identity_cache
+            def authenticated_identity(self, request):
+                result = ...  # do some expensive computations
+                return result
+
+    Wrapping functions:
+
+    .. code-block:: python
+
+        user_cache = RequestLocalCache()
+
+        @user_cache
+        def get_user(request):
+            result = ...  # do some expensive computations
+            return result
+
+    It's also possible to inspect and influence the cache during runtime using
+    :meth:`.get`, :meth:`.set` and :meth:`.clear`. Using these methods, the
+    cache can be used directly as well, without using it as a decorator.
+
+    The cache will clean release resources aggressively by utilizing
+    :meth:`pyramid.request.Request.add_finished_callback`, but it will also
+    maintain a weakref to the request and cleanup when it is garbage collected
+    if the callbacks are not invoked for some reason.
+
+    .. versionadded:: 2.0
+
+    """
+    NO_VALUE = Sentinel('NO_VALUE')
+
+    def __init__(self):
+        self.store = weakref.WeakKeyDictionary()
+
+    def auto_adapt(decorator):
+        class FunctionOrMethodAdapter:
+            def __init__(self, inst, func):
+                self.inst = inst
+                self.__wrapped__ = func
+
+            def __call__(self, *args, **kwargs):
+                return decorator(self.inst, self.__wrapped__)(*args, **kwargs)
+
+            def __get__(self, instance, owner):
+                return decorator(self.inst, self.__wrapped__.__get__(instance, owner))
+
+        def adapt(inst, fn):
+            return FunctionOrMethodAdapter(inst, fn)
+        return adapt
+
+    @auto_adapt
+    def __call__(self, fn):
+        """
+        Decorate a method or function.
+
+        """
+        @functools.wraps(fn)
+        def wrapper(request, *args, **kwargs):
+            result = self.get(request)
+            if result is self.NO_VALUE:
+                result = fn(request, *args, **kwargs)
+                self.set(request, result)
+                request.add_finished_callback(self.clear)
+            return result
+        return wrapper
+
+    del auto_adapt
+
+    def clear(self, request):
+        """
+        Delete the value from the cache.
+
+        The cached value is returned or :attr:`.NO_VALUE`.
+
+        """
+        return self.store.pop(request, self.NO_VALUE)
+
+    def get(self, request, default=NO_VALUE):
+        """
+        Return the value from the cache.
+
+        The cached value is returned or ``default``.
+
+        """
+        return self.store.get(request, default)
+
+    def set(self, request, value):
+        """
+        Update the cache with a new value.
+
+        """
+        self.store[request] = value

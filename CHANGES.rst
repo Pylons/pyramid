@@ -82,6 +82,16 @@ Features
   invoked as part of ``pyramid.scripting.prepare`` and
   ``pyramid.paster.boostrap``.
 
+- Added ``pyramid.request.RequestLocalCache`` which can be used to create
+  simple objects that are shared across requests and can be used to store
+  per-request data. This is useful when the source of data is external to
+  the request itself. Often a reified property is used on a request via
+  ``pyramid.config.Configurator.add_request_method``, or
+  ``pyramid.decorator.reify``, and these work great when the data is
+  generated on-demand when accessing the request property. However, often
+  the case is that the data is generated when accessing some other system
+  and then we want to cache the data for the duration of the request.
+
 Deprecations
 ------------
 
