@@ -656,7 +656,6 @@ class TestRequestLocalCache(unittest.TestCase):
         self.assertIs(cache.get(req), 2)
 
     def test_creator_in_constructor(self):
-
         def foo(request):
             return 8
 
@@ -666,7 +665,6 @@ class TestRequestLocalCache(unittest.TestCase):
         self.assertEqual(result, 8)
 
     def test_decorator_overrides_creator(self):
-
         def foo(request):  # pragma: no cover
             raise AssertionError
 
