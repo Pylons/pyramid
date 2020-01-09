@@ -595,16 +595,15 @@ class Test_subclassing_Request(unittest.TestCase):
 
 
 class TestRequestLocalCache(unittest.TestCase):
-    def _makeOne(self):
+    def _makeOne(self, *args, **kwargs):
         from pyramid.request import RequestLocalCache
 
-        return RequestLocalCache()
+        return RequestLocalCache(*args, **kwargs)
 
     def test_it_works_with_functions(self):
-        cache = self._makeOne()
         a = [0]
 
-        @cache
+        @self._makeOne()
         def foo(request):
             a[0] += 1
             return a[0]
@@ -615,34 +614,13 @@ class TestRequestLocalCache(unittest.TestCase):
         self.assertEqual(foo(req2), 2)
         self.assertEqual(foo(req1), 1)
         self.assertEqual(foo(req2), 2)
-        self.assertEqual(len(req1.finished_callbacks), 1)
-        self.assertEqual(len(req2.finished_callbacks), 1)
-
-    def test_it_works_with_methods(self):
-        cache = self._makeOne()
-        a = [0]
-
-        class DummyPolicy:
-            @cache
-            def foo(self, request):
-                a[0] += 1
-                return a[0]
-
-        policy = DummyPolicy()
-        req1 = DummyRequest()
-        req2 = DummyRequest()
-        self.assertEqual(policy.foo(req1), 1)
-        self.assertEqual(policy.foo(req2), 2)
-        self.assertEqual(policy.foo(req1), 1)
-        self.assertEqual(policy.foo(req2), 2)
         self.assertEqual(len(req1.finished_callbacks), 1)
         self.assertEqual(len(req2.finished_callbacks), 1)
 
     def test_clear_works(self):
-        cache = self._makeOne()
         a = [0]
 
-        @cache
+        @self._makeOne()
         def foo(request):
             a[0] += 1
             return a[0]
@@ -650,15 +628,14 @@ class TestRequestLocalCache(unittest.TestCase):
         req = DummyRequest()
         self.assertEqual(foo(req), 1)
         self.assertEqual(len(req.finished_callbacks), 1)
-        cache.clear(req)
+        foo.cache.clear(req)
         self.assertEqual(foo(req), 2)
-        self.assertEqual(len(req.finished_callbacks), 2)
+        self.assertEqual(len(req.finished_callbacks), 1)
 
     def test_set_overrides_current_value(self):
-        cache = self._makeOne()
         a = [0]
 
-        @cache
+        @self._makeOne()
         def foo(request):
             a[0] += 1
             return a[0]
@@ -666,10 +643,10 @@ class TestRequestLocalCache(unittest.TestCase):
         req = DummyRequest()
         self.assertEqual(foo(req), 1)
         self.assertEqual(len(req.finished_callbacks), 1)
-        cache.set(req, 8)
+        foo.cache.set(req, 8)
         self.assertEqual(foo(req), 8)
         self.assertEqual(len(req.finished_callbacks), 1)
-        self.assertEqual(cache.get(req), 8)
+        self.assertEqual(foo.cache.get(req), 8)
 
     def test_get_works(self):
         cache = self._makeOne()
@@ -677,6 +654,47 @@ class TestRequestLocalCache(unittest.TestCase):
         self.assertIs(cache.get(req), cache.NO_VALUE)
         cache.set(req, 2)
         self.assertIs(cache.get(req), 2)
+
+    def test_creator_in_constructor(self):
+
+        def foo(request):
+            return 8
+
+        cache = self._makeOne(foo)
+        req = DummyRequest()
+        result = cache.get_or_create(req)
+        self.assertEqual(result, 8)
+
+    def test_decorator_overrides_creator(self):
+
+        def foo(request):  # pragma: no cover
+            raise AssertionError
+
+        cache = self._makeOne(foo)
+
+        @cache
+        def bar(request):
+            return 8
+
+        req = DummyRequest()
+        result = cache.get_or_create(req)
+        self.assertEqual(result, 8)
+
+    def test_get_or_create_overrides_creator(self):
+        cache = self._makeOne()
+
+        @cache
+        def foo(request):  # pragma: no cover
+            raise AssertionError
+
+        req = DummyRequest()
+        result = cache.get_or_create(req, lambda r: 8)
+        self.assertEqual(result, 8)
+
+    def test_get_or_create_with_no_creator(self):
+        cache = self._makeOne()
+        req = DummyRequest()
+        self.assertRaises(ValueError, cache.get_or_create, req)
 
 
 class Dummy(object):

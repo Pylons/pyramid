@@ -365,3 +365,4 @@
 
 .. autoclass:: RequestLocalCache
     :members:
+    :special-members:
