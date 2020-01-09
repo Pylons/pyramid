@@ -352,10 +352,20 @@ class RequestLocalCache:
             result = ...  # do some expensive computations
             return result
 
+        value = get_user(request)
+
+        # manipulate the cache directly
+        get_user.cache.clear(request)
+
+    The cache instance is attached to the resulting function as the ``cache``
+    attribute such that the function may be used to manipulate the cache.
+
     Wrapping Methods
 
-    A method can be wrapped but it needs to be bound to an instance such that
-    it only accepts one argument - the request.
+    A method can be used as the creator function but it needs to be bound to
+    an instance such that it only accepts one argument - the request. An easy
+    way to do this is to bind the creator in the constructor and then use
+    :meth:`.get_or_create`:
 
     .. code-block:: python
 
@@ -386,26 +396,6 @@ class RequestLocalCache:
         self._creator = creator
 
     def __call__(self, fn):
-        """
-        Decorate and return a new function that utilizes the cache.
-
-        The cache is attached as an attribute to the decorated function
-        such that it may be manipulated directly. For example:
-
-        .. code-block:: python
-
-            @RequestLocalCache()
-            def do_something_expensive(request):
-                return ...
-
-            value = do_something_expensive(request)
-            do_something_expensive.cache.clear(request)
-
-        The ``fn`` is also bound as the creator on the cache such that
-        invocations of :meth:`.get_or_create` will use it.
-
-        """
-
         @functools.wraps(fn)
         def wrapper(request):
             return wrapper.cache.get_or_create(request, fn)
@@ -416,13 +406,13 @@ class RequestLocalCache:
 
     def get_or_create(self, request, creator=None):
         """
-        Return the cached value.
+        Return the value from the cache. Compute if necessary.
 
         If no value is cached then execute the creator, cache the result,
         and return it.
 
         The creator may be passed in as an argument or bound to the cache
-        using the ``__call__`` or constructor arguments.
+        by decorating a function or supplied as a constructor argument.
 
         """
         result = self._store.get(request, self.NO_VALUE)
