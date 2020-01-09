@@ -1,4 +1,6 @@
 from collections import deque
+import functools
+import weakref
 from webob import BaseRequest
 from zope.interface import implementer
 from zope.interface.interface import InterfaceClass
@@ -17,6 +19,7 @@ from pyramid.url import URLMethodsMixin
 from pyramid.util import (
     InstancePropertyHelper,
     InstancePropertyMixin,
+    Sentinel,
     bytes_,
     text_,
 )
@@ -330,3 +333,134 @@ def apply_request_extensions(request, extensions=None):
         InstancePropertyHelper.apply_properties(
             request, extensions.descriptors
         )
+
+
+class RequestLocalCache:
+    """
+    A store that caches values during for the lifecycle of a request.
+
+    Wrapping Functions
+
+    Instantiate and use it to decorate functions that accept a request
+    parameter. The result is cached and returned in subsequent invocations
+    of the function.
+
+    .. code-block:: python
+
+        @RequestLocalCache()
+        def get_user(request):
+            result = ...  # do some expensive computations
+            return result
+
+        value = get_user(request)
+
+        # manipulate the cache directly
+        get_user.cache.clear(request)
+
+    The cache instance is attached to the resulting function as the ``cache``
+    attribute such that the function may be used to manipulate the cache.
+
+    Wrapping Methods
+
+    A method can be used as the creator function but it needs to be bound to
+    an instance such that it only accepts one argument - the request. An easy
+    way to do this is to bind the creator in the constructor and then use
+    :meth:`.get_or_create`:
+
+    .. code-block:: python
+
+        class SecurityPolicy:
+            def __init__(self):
+                self.identity_cache = RequestLocalCache(self.load_identity)
+
+            def load_identity(self, request):
+                result = ...  # do some expensive computations
+                return result
+
+            def authenticated_identity(self, request):
+                return self.identity_cache.get_or_create(request)
+
+    The cache maintains a weakref to each request and will release the cached
+    values when the request is garbage-collected. However, in most scenarios,
+    it will release resources earlier via
+    :meth:`pyramid.request.Request.add_finished_callback`.
+
+    .. versionadded:: 2.0
+
+    """
+
+    NO_VALUE = Sentinel('NO_VALUE')
+
+    def __init__(self, creator=None):
+        self._store = weakref.WeakKeyDictionary()
+        self._creator = creator
+
+    def __call__(self, fn):
+        @functools.wraps(fn)
+        def wrapper(request):
+            return wrapper.cache.get_or_create(request, fn)
+
+        wrapper.cache = self
+        self._creator = fn
+        return wrapper
+
+    def get_or_create(self, request, creator=None):
+        """
+        Return the value from the cache. Compute if necessary.
+
+        If no value is cached then execute the creator, cache the result,
+        and return it.
+
+        The creator may be passed in as an argument or bound to the cache
+        by decorating a function or supplied as a constructor argument.
+
+        """
+        result = self._store.get(request, self.NO_VALUE)
+        if result is self.NO_VALUE:
+            if creator is None:
+                creator = self._creator
+                if creator is None:
+                    raise ValueError(
+                        'no creator function has been registered with the '
+                        'cache or supplied to "get_or_create"'
+                    )
+            result = creator(request)
+            self.set(request, result)
+        return result
+
+    def get(self, request, default=NO_VALUE):
+        """
+        Return the value from the cache.
+
+        The cached value is returned or ``default``.
+
+        """
+        return self._store.get(request, default)
+
+    def set(self, request, value):
+        """
+        Update the cache with a new value.
+
+        """
+        already_set = request in self._store
+        self._store[request] = value
+
+        # avoid registering the callback more than once
+        if not already_set:
+            request.add_finished_callback(self._store.pop)
+
+    def clear(self, request):
+        """
+        Delete the value from the cache.
+
+        The cached value is returned or :attr:`.NO_VALUE`.
+
+        """
+        old_value = self.NO_VALUE
+        if request in self._store:
+            old_value = self._store[request]
+
+            # keep a value in the store so that we don't register another
+            # finished callback when set is invoked
+            self._store[request] = self.NO_VALUE
+        return old_value
