@@ -8,8 +8,7 @@
     <meta name="author" content="Pylons Project">
     <link rel="shortcut icon" href="${request.static_url('tutorial:static/pyramid-16x16.png')}">
 
-    <title><span tal:replace="page.__name__ | title"></span> - Pyramid tutorial wiki (based on
-    TurboGears 20-Minute Wiki)</title>
+    <title><span tal:replace="page.__name__ | title"></span> - Pyramid tutorial wiki (based on TurboGears 20-Minute Wiki)</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -39,6 +38,15 @@
                     <a href="${request.application_url}">FrontPage</a>.
                 </p>
             </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="links">
+            <ul>
+              <li><i class="glyphicon glyphicon-cog icon-muted"></i><a href="https://github.com/Pylons/pyramid">Github Project</a></li>
+              <li><i class="glyphicon glyphicon-globe icon-muted"></i><a href="https://webchat.freenode.net/?channels=pyramid">IRC Channel</a></li>
+              <li><i class="glyphicon glyphicon-home icon-muted"></i><a href="https://pylonsproject.org">Pylons Project</a></li>
+            </ul>
           </div>
         </div>
         <div class="row">

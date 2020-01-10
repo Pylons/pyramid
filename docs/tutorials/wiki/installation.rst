@@ -243,8 +243,8 @@ For a successful test run, you should see output that ends like this:
 
 .. code-block:: bash
 
-    ..
-    2 passed in 0.49 seconds
+    ....
+    4 passed in 0.49 seconds
 
 
 Expose test coverage information

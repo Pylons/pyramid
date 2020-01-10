@@ -315,8 +315,8 @@ For a successful test run, you should see output that ends like this:
 
 .. code-block:: bash
 
-    ..
-    2 passed in 0.44 seconds
+    .....
+    5 passed in 0.44 seconds
 
 
 Expose test coverage information

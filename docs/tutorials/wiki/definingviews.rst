@@ -39,8 +39,9 @@ We need to add a dependency on the ``docutils`` package to our ``tutorial`` pack
 Open ``setup.py`` and edit it to look like the following:
 
 .. literalinclude:: src/views/setup.py
-    :linenos:
-    :emphasize-lines: 22
+    :lines: 11-29
+    :lineno-match:
+    :emphasize-lines: 2
     :language: python
 
 Only the highlighted line needs to be added.
@@ -91,7 +92,7 @@ We added some imports and created a regular expression to find "WikiWords".
 We got rid of the ``my_view`` view function and its decorator that was added when originally rendered after we selected the ``zodb`` backend option in the cookiecutter.
 It was only an example and is not relevant to our application.
 
-Then we added four :term:`view callable` functions to our ``views.py`` module:
+Then we added four :term:`view callable` functions to our ``default.py`` module:
 
 * ``view_wiki()`` - Displays the wiki itself. It will answer on the root URL.
 * ``view_page()`` - Displays an individual page.
@@ -102,7 +103,7 @@ We will describe each one briefly in the following sections.
 
 .. note::
 
-    There is nothing special about the filename ``views.py``.
+    There is nothing special about the filename ``default.py``.
     A project may have many view callables throughout its codebase in arbitrarily named files.
     Files that implement view callables often have ``view`` in their names (or may live in a Python subpackage of your application package named ``views``), but this is only by convention.
 
@@ -113,7 +114,7 @@ The ``view_wiki`` view function
 Following is the code for the ``view_wiki`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-    :lines: 13-15
+    :lines: 12-14
     :lineno-match:
     :language: python
 
@@ -133,9 +134,9 @@ The view configuration associated with ``view_wiki`` does not use a ``renderer``
 No renderer is necessary when a view returns a response object.
 
 The ``view_wiki`` view callable always redirects to the URL of a ``Page`` resource named ``FrontPage``.
-To do so, it returns an instance of the :class:`pyramid.httpexceptions.HTTPFound` class.
+To do so, it returns an instance of the :class:`pyramid.httpexceptions.HTTPSeeOther` class.
 Instances of this class implement the :class:`pyramid.interfaces.IResponse` interface, similar to :class:`pyramid.response.Response`.
-It uses the :meth:`pyramid.request.Request.route_url` API to construct an URL to the ``FrontPage`` page resource (in other words, ``http://localhost:6543/FrontPage``), and uses it as the ``location`` of the ``HTTPFound`` response, forming an HTTP redirect.
+It uses the :meth:`pyramid.request.Request.route_url` API to construct an URL to the ``FrontPage`` page resource (in other words, ``http://localhost:6543/FrontPage``), and uses it as the ``location`` of the ``HTTPSeeOther`` response, forming an HTTP redirect.
 
 
 The ``view_page`` view function
@@ -144,7 +145,7 @@ The ``view_page`` view function
 Here is the code for the ``view_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-    :lines: 18-35
+    :lines: 17-34
     :lineno-match:
     :language: python
 
@@ -183,7 +184,7 @@ The ``add_page`` view function
 Here is the code for the ``add_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-    :lines: 38-53
+    :lines: 37-52
     :lineno-match:
     :language: python
 
@@ -231,7 +232,7 @@ The ``edit_page`` view function
 Here is the code for the ``edit_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-    :lines: 56-64
+    :lines: 55-
     :lineno-match:
     :language: python
 
@@ -260,7 +261,7 @@ Open ``tutorial/views/notfound.py`` and make the changes shown by the emphasized
 .. literalinclude:: src/views/tutorial/views/notfound.py
     :linenos:
     :language: python
-    :emphasize-lines: 3-4, 9-12
+    :emphasize-lines: 3, 9-12
 
 We need to import the ``Page`` from our models.
 We eventually return a ``Page`` object as ``page`` into the template ``layout.pt`` to display its name in the title tag.
@@ -282,7 +283,7 @@ Update ``tutorial/templates/layout.pt`` with the following content, as indicated
 
 .. literalinclude:: src/views/tutorial/templates/layout.pt
    :linenos:
-   :emphasize-lines: 11-12, 37-41
+   :emphasize-lines: 11, 36-40
    :language: html
 
 Since we are using a templating engine, we can factor common boilerplate out of our page templates into reusable components.
@@ -291,11 +292,10 @@ We can do this via :term:`METAL` macros and slots.
 -   The cookiecutter defined a macro named ``layout`` (line 1).
     This macro consists of the entire template.
 -   We changed the ``title`` tag to use the ``name`` attribute of a ``page`` object, or if it does not exist then the page title (lines 11-12).
--   The cookiecutter defined a macro customization point or `slot` (line 36).
+-   The cookiecutter defined a macro customization point or `slot` (line 35).
     This slot is inside the macro ``layout``.
     Therefore it can be replaced by content, customizing the macro.
--   We added a ``div`` element with a link to allow the user to return to the front page (lines 37-41).
--   We removed the row of icons and links from the original cookiecutter.
+-   We added a ``div`` element with a link to allow the user to return to the front page (lines 36-40).
 
 .. seealso::
 

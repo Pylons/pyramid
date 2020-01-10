@@ -1,18 +1,17 @@
 from docutils.core import publish_parts
+from pyramid.httpexceptions import HTTPSeeOther
+from pyramid.view import view_config
 import re
 
-from pyramid.httpexceptions import HTTPFound
-from pyramid.view import view_config
-
 from ..models import Page
+
 
 # regular expression used to find WikiWords
 wikiwords = re.compile(r"\b([A-Z]\w+[A-Z]+\w+)")
 
-
 @view_config(context='..models.Wiki')
 def view_wiki(context, request):
-    return HTTPFound(location=request.resource_url(context, 'FrontPage'))
+    return HTTPSeeOther(location=request.resource_url(context, 'FrontPage'))
 
 
 @view_config(context='..models.Page', renderer='tutorial:templates/view.pt')
@@ -45,7 +44,7 @@ def add_page(context, request):
         page.__name__ = pagename
         page.__parent__ = context
         context[pagename] = page
-        return HTTPFound(location=request.resource_url(page))
+        return HTTPSeeOther(location=request.resource_url(page))
     save_url = request.resource_url(context, 'add_page', pagename)
     page = Page('')
     page.__name__ = pagename
@@ -58,7 +57,7 @@ def add_page(context, request):
 def edit_page(context, request):
     if 'form.submitted' in request.params:
         context.data = request.params['body']
-        return HTTPFound(location=request.resource_url(context))
+        return HTTPSeeOther(location=request.resource_url(context))
 
     return dict(page=context,
                 save_url=request.resource_url(context, 'edit_page'))
