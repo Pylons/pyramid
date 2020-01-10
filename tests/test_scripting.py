@@ -1,3 +1,4 @@
+from collections import deque
 import unittest
 
 
@@ -162,6 +163,20 @@ class Test_prepare(unittest.TestCase):
         self.assertEqual(request.context, root)
         self.assertEqual(request.registry, registry)
 
+    def test_closer_invokes_finished_callbacks(self):
+        finish_called = [False]
+
+        def finished_callback(request):
+            finish_called[0] = True
+
+        request = DummyRequest({})
+        request.registry = self._makeRegistry()
+        info = self._callFUT(request=request)
+        request.add_finished_callback(finished_callback)
+        closer = info['closer']
+        closer()
+        self.assertTrue(finish_called[0])
+
 
 class Test__make_request(unittest.TestCase):
     def _callFUT(self, path='/', registry=None):
@@ -234,6 +249,15 @@ class DummyRequest(object):
 
     def __init__(self, environ):
         self.environ = environ
+        self.finished_callbacks = deque()
+
+    def add_finished_callback(self, cb):
+        self.finished_callbacks.append(cb)
+
+    def _process_finished_callbacks(self):
+        while self.finished_callbacks:
+            cb = self.finished_callbacks.popleft()
+            cb(self)
 
 
 class DummyExtensions:

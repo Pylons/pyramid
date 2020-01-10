@@ -73,6 +73,26 @@ def as_sorted_tuple(val):
     return val
 
 
+class SettableProperty(object):
+    def __init__(self, wrapped):
+        self.wrapped = wrapped
+        functools.update_wrapper(self, wrapped)
+
+    def __get__(self, obj, type=None):
+        if obj is None:  # pragma: no cover
+            return self
+        value = obj.__dict__.get(self.wrapped.__name__, _marker)
+        if value is _marker:
+            value = self.wrapped(obj)
+        return value
+
+    def __set__(self, obj, value):
+        obj.__dict__[self.wrapped.__name__] = value
+
+    def __delete__(self, obj):
+        del obj.__dict__[self.wrapped.__name__]
+
+
 class InstancePropertyHelper(object):
     """A helper object for assigning properties and descriptors to instances.
     It is not normally possible to do this because descriptors must be
@@ -94,26 +114,29 @@ class InstancePropertyHelper(object):
         (name, property) pair.
         """
 
-        is_property = isinstance(callable, property)
-        if is_property:
-            fn = callable
-            if name is None:
-                raise ValueError('must specify "name" for a property')
-            if reify:
-                raise ValueError('cannot reify a property')
-        elif name is not None:
-            fn = lambda this: callable(this)
-            fn.__name__ = get_callable_name(name)
-            fn.__doc__ = callable.__doc__
-        else:
+        if name is None:
+            if not hasattr(callable, '__name__'):
+                raise ValueError(
+                    'missing __name__, must specify "name" for property'
+                )
             name = callable.__name__
+        name = get_callable_name(name)
+        is_data_descriptor = hasattr(callable, '__set__')
+        if reify and is_data_descriptor:
+            raise ValueError('cannot reify a data descriptor')
+        if is_data_descriptor:
             fn = callable
-        if reify:
-            import pyramid.decorator  # avoid circular import
+        else:
+            wrapped = lambda this: callable(this)
+            wrapped.__name__ = name
+            wrapped.__doc__ = callable.__doc__
 
-            fn = pyramid.decorator.reify(fn)
-        elif not is_property:
-            fn = property(fn)
+            if reify:
+                import pyramid.decorator  # avoid circular import
+
+                fn = pyramid.decorator.reify(wrapped)
+            else:
+                fn = SettableProperty(wrapped)
 
         return name, fn
 

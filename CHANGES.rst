@@ -71,6 +71,29 @@ Features
 - Fix ``DeprecationWarning`` emitted by using the ``imp`` module.
   See https://github.com/Pylons/pyramid/pull/3553
 
+- Properties created via ``config.add_request_method(..., property=True)`` or
+  ``request.set_property`` used to be readonly. They can now be overridden
+  via ``request.foo = ...`` and until the value is deleted it will return
+  the overridden value. This is most useful when mocking request properties
+  in testing.
+  See https://github.com/Pylons/pyramid/pull/3559
+
+- Finished callbacks are now executed as part of the ``closer`` that is
+  invoked as part of ``pyramid.scripting.prepare`` and
+  ``pyramid.paster.bootstrap``.
+  See https://github.com/Pylons/pyramid/pull/3561
+
+- Added ``pyramid.request.RequestLocalCache`` which can be used to create
+  simple objects that are shared across requests and can be used to store
+  per-request data. This is useful when the source of data is external to
+  the request itself. Often a reified property is used on a request via
+  ``pyramid.config.Configurator.add_request_method``, or
+  ``pyramid.decorator.reify``, and these work great when the data is
+  generated on-demand when accessing the request property. However, often
+  the case is that the data is generated when accessing some other system
+  and then we want to cache the data for the duration of the request.
+  See https://github.com/Pylons/pyramid/pull/3561
+
 Deprecations
 ------------
 

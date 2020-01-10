@@ -535,10 +535,6 @@ class Test_apply_request_extensions(unittest.TestCase):
         self.assertEqual(request.foo('abc'), 'abc')
 
 
-class Dummy(object):
-    pass
-
-
 class Test_subclassing_Request(unittest.TestCase):
     def test_subclass(self):
         from pyramid.interfaces import IRequest
@@ -598,14 +594,124 @@ class Test_subclassing_Request(unittest.TestCase):
         self.assertTrue(IRequest.implementedBy(RequestSub))
 
 
+class TestRequestLocalCache(unittest.TestCase):
+    def _makeOne(self, *args, **kwargs):
+        from pyramid.request import RequestLocalCache
+
+        return RequestLocalCache(*args, **kwargs)
+
+    def test_it_works_with_functions(self):
+        a = [0]
+
+        @self._makeOne()
+        def foo(request):
+            a[0] += 1
+            return a[0]
+
+        req1 = DummyRequest()
+        req2 = DummyRequest()
+        self.assertEqual(foo(req1), 1)
+        self.assertEqual(foo(req2), 2)
+        self.assertEqual(foo(req1), 1)
+        self.assertEqual(foo(req2), 2)
+        self.assertEqual(len(req1.finished_callbacks), 1)
+        self.assertEqual(len(req2.finished_callbacks), 1)
+
+    def test_clear_works(self):
+        a = [0]
+
+        @self._makeOne()
+        def foo(request):
+            a[0] += 1
+            return a[0]
+
+        req = DummyRequest()
+        self.assertEqual(foo(req), 1)
+        self.assertEqual(len(req.finished_callbacks), 1)
+        foo.cache.clear(req)
+        self.assertEqual(foo(req), 2)
+        self.assertEqual(len(req.finished_callbacks), 1)
+
+    def test_set_overrides_current_value(self):
+        a = [0]
+
+        @self._makeOne()
+        def foo(request):
+            a[0] += 1
+            return a[0]
+
+        req = DummyRequest()
+        self.assertEqual(foo(req), 1)
+        self.assertEqual(len(req.finished_callbacks), 1)
+        foo.cache.set(req, 8)
+        self.assertEqual(foo(req), 8)
+        self.assertEqual(len(req.finished_callbacks), 1)
+        self.assertEqual(foo.cache.get(req), 8)
+
+    def test_get_works(self):
+        cache = self._makeOne()
+        req = DummyRequest()
+        self.assertIs(cache.get(req), cache.NO_VALUE)
+        cache.set(req, 2)
+        self.assertIs(cache.get(req), 2)
+
+    def test_creator_in_constructor(self):
+        def foo(request):
+            return 8
+
+        cache = self._makeOne(foo)
+        req = DummyRequest()
+        result = cache.get_or_create(req)
+        self.assertEqual(result, 8)
+
+    def test_decorator_overrides_creator(self):
+        def foo(request):  # pragma: no cover
+            raise AssertionError
+
+        cache = self._makeOne(foo)
+
+        @cache
+        def bar(request):
+            return 8
+
+        req = DummyRequest()
+        result = cache.get_or_create(req)
+        self.assertEqual(result, 8)
+
+    def test_get_or_create_overrides_creator(self):
+        cache = self._makeOne()
+
+        @cache
+        def foo(request):  # pragma: no cover
+            raise AssertionError
+
+        req = DummyRequest()
+        result = cache.get_or_create(req, lambda r: 8)
+        self.assertEqual(result, 8)
+
+    def test_get_or_create_with_no_creator(self):
+        cache = self._makeOne()
+        req = DummyRequest()
+        self.assertRaises(ValueError, cache.get_or_create, req)
+
+
+class Dummy(object):
+    pass
+
+
 class DummyRequest(object):
     def __init__(self, environ=None):
         if environ is None:
             environ = {}
         self.environ = environ
+        self.response_callbacks = []
+        self.finished_callbacks = []
 
     def add_response_callback(self, callback):
-        self.response_callbacks = [callback]
+        self.response_callbacks.append(callback)
+
+    def add_finished_callback(self, callback):
+        self.finished_callbacks.append(callback)
 
     def get_response(self, app):
         return app
