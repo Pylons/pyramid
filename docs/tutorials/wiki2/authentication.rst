@@ -73,7 +73,7 @@ Note the usage of the ``identity_cache`` is optional, but it has several advanta
 - It provides consistency across method invocations to ensure the identity does not change while processing the request.
 
 It is up to individual security policies and applications to determine the best approach with respect to caching.
-Applications is long-running requests may want to avoid caching the identity, or tracking some extra metadata to re-verify it periodically against the authentication source.
+Applications with long-running requests may want to avoid caching the identity, or tracking some extra metadata to re-verify it periodically against the authentication source.
 
 
 Configure the app
