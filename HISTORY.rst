@@ -2530,7 +2530,7 @@ Features
      @view_config(abc=1)
 
   Similar features exist for ``add_route``, and ``add_subscriber``.  See
-  "Adding A Third Party View, Route, or Subscriber Predicate" in the Hooks
+  "Adding A Custom View, Route, or Subscriber Predicate" in the Hooks
   chapter for more information.
 
   Note that changes made to support the above feature now means that only

@@ -306,8 +306,7 @@ class RoutesConfiguratorMixin(object):
 
         \*\*predicates
 
-          Pass extra keyword parameters to use custom or third-party predicates
-          registered via
+          Pass extra keyword parameters to use custom predicates registered via
           :meth:`pyramid.config.Configurator.add_route_predicate`.  More than
           one custom predicate can be used at the same time.  See
           :ref:`view_and_route_predicates` for more information about
@@ -323,7 +322,7 @@ class RoutesConfiguratorMixin(object):
                     'Configurator.add_route is deprecated as of Pyramid 1.5. '
                     'Use "config.add_route_predicate" and use the registered '
                     'route predicate as a predicate argument to add_route '
-                    'instead. See "Adding A Third Party View, Route, or '
+                    'instead. See "Adding A Custom View, Route, or '
                     'Subscriber Predicate" in the "Hooks" chapter of the '
                     'documentation for more information.'
                 ),

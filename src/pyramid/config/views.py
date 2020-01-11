@@ -729,22 +729,19 @@ class ViewsConfiguratorMixin(object):
 
             .. deprecated:: 1.5
                 This value should be a sequence of references to custom
-                predicate callables.  Use custom predicates when no set of
-                predefined predicates do what you need.  Custom predicates
-                can be combined with predefined predicates as necessary.
-                Each custom predicate callable should accept two arguments:
+                predicate callables.  Each custom predicate callable
+                should accept two arguments:
                 ``context`` and ``request`` and should return either
                 ``True`` or ``False`` after doing arbitrary evaluation of
-                the context and/or the request.  The ``predicates`` argument
-                to this method and the ability to register third-party view
-                predicates via
+                the context and/or the request.  The ability to register
+                custom view predicates via
                 :meth:`pyramid.config.Configurator.add_view_predicate`
                 obsoletes this argument, but it is kept around for backwards
                 compatibility.
 
         \*\*view_options
 
-          Pass extra keyword parameters to use custom or third-party predicates
+          Pass extra keyword parameters to use custom predicates
           or set a value for a view deriver. See
           :meth:`pyramid.config.Configurator.add_view_predicate` and
           :meth:`pyramid.config.Configurator.add_view_deriver`. See
@@ -771,7 +768,7 @@ class ViewsConfiguratorMixin(object):
                     'Configurator.add_view is deprecated as of Pyramid 1.5. '
                     'Use "config.add_view_predicate" and use the registered '
                     'view predicate as a predicate argument to add_view '
-                    'instead. See "Adding A Third Party View, Route, or '
+                    'instead. See "Adding A Custom View, Route, or '
                     'Subscriber Predicate" in the "Hooks" chapter of the '
                     'documentation for more information.'
                 ),

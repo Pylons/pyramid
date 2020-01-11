@@ -524,7 +524,7 @@ configured view.
   in your app or by third-party packages extending Pyramid and registered via
   :meth:`pyramid.config.Configurator.add_view_predicate`.  Use custom predicates
   when no set of predefined predicates do what you need.  See
-  :ref:`view_and_route_predicates` for more information about third-party
+  :ref:`view_and_route_predicates` for more information about custom
   predicates.
 
   .. versionadded:: 1.4a1
