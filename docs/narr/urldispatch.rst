@@ -1121,22 +1121,20 @@ See this code:
             return info['match'][self.segment_name] in self.allowed
 
 
-    config.add_route_predicate("any_of", AnyOfPredicate)
+    config.add_route_predicate('any_of', AnyOfPredicate)
     config.add_route('route_to_num', '/{num}', any_of=('num', 'one', 'two', 'three'))
 
 
-An instance of the class defined above is a predicate which ensures that the
-match value named ``segment_name`` is in the set of allowable values
-represented by ``allowed``.  We register this class as a *predicate
-factory* with the ``any_of`` argument name, then we can use that new
-keyword argument with :meth:`~pyramid.config.Configurator.add_route` to
-have Pyramid instantiate the class (the ``('num', 'one', 'two',
-'three')`` value is passed to the constructor as the argument ``val``)
-and use the resulting instance as a custom predicate to check if
-incoming requests match the route or not.
+We register this class as a :term:`predicate factory` with the ``any_of`` keyword argument name.
+Then we use that new keyword argument with :meth:`~pyramid.config.Configurator.add_route`.
+When the route is requested, Pyramid instantiates the ``AnyOfPredicate`` class using the value passed to the ``any_of``
+argument.  The resulting instance is a :term:`predicate`.  It will determine whether incoming requests satisfy its condition.
+In the example above, a request for ``/three`` would match the route's URL pattern and satisfy the route's predicate
+because ``three`` is one of the allowed values, so the route would be matched.  However a request for ``/millions`` will
+match the route's URL pattern but would not satisfy the route's predicate, and the route would not be matched.
 
-A custom route predicate may also *modify* the ``match`` dictionary.  For
-instance, a predicate might do some type conversion of values:
+A custom route predicate may also *modify* the ``match`` dictionary.
+For instance, a predicate might do some type conversion of values:
 
 .. code-block:: python
     :linenos:
@@ -1240,21 +1238,16 @@ route in a set of route predicates:
     config.add_route('ym', '/{year}/{month}', twenty_ten=True)
     config.add_route('ymd', '/{year}/{month}/{day}', twenty_ten=True)
 
-The above predicate, when added to a number of route configurations ensures
-that the year match argument is ``'2010'`` if and only if the route name is
-``'ymd'``, ``'ym'``, or ``'y'``.
+The above predicate, when added to a number of route configurations ensures that the year match
+argument is ``2010`` if and only if the route name is ``ymd``, ``ym``, or ``y``.
 
-The ``text`` method is a way to caption the predicates.  This
-will help you with the ``pviews`` command (see
-:ref:`displaying_application_routes`) and the
-:term:`pyramid_debugtoolbar`.
+The ``text`` method is a way to caption the predicates.  This will help you with the ``pviews``
+command (see :ref:`displaying_application_routes`) and the :term:`pyramid_debugtoolbar`.
 
-The ``phash`` method should return a string that uniquely identifies a
-specific predicate (the name means *predicate hash*).  A good way to do
-that is to use the same argument name and value that in the call to
-``add_route``, like in the examples above.
+The ``phash`` ("predicate hash") method should return a string that uniquely identifies a specific predicate.
+A good way to do that is to use the same argument name and value that are in the call to ``add_route``,
+like in the examples above.
 
-.. XXX add note about predicate matching for boolean custom predicates?
 
 .. seealso::
 
