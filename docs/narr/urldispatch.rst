@@ -1251,7 +1251,7 @@ like in the examples above.
 
 .. seealso::
 
-    See :ref:`registering_thirdparty_predicates` for more information about
+    See :ref:`registering_custom_predicates` for more information about
     custom view, route, and subscriber predicates.
 
     See also :class:`pyramid.interfaces.IRoute` for more API documentation

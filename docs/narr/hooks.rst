@@ -1416,10 +1416,10 @@ The ``ptweens`` command-line utility can be used to report the current implicit
 and explicit tween chains used by an application.  See
 :ref:`displaying_tweens`.
 
-.. _registering_thirdparty_predicates:
+.. _registering_curstom_predicates:
 
-Adding a Third Party View, Route, or Subscriber Predicate
----------------------------------------------------------
+Adding a Custom View, Route, or Subscriber Predicate
+----------------------------------------------------
 
 .. versionadded:: 1.4
 

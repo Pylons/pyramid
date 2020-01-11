@@ -31,7 +31,7 @@ Third-Party Predicates
 
   Similar features exist for :meth:`pyramid.config.Configurator.add_route`,
   and :meth:`pyramid.config.Configurator.add_subscriber`.  See
-  :ref:`registering_thirdparty_predicates` for more information.
+  :ref:`registering_custom_predicates` for more information.
 
 Easy Custom JSON Serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
