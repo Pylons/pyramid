@@ -40,12 +40,9 @@ class RoutesConfiguratorMixin(object):
         inherit_slash=None,
         **predicates
     ):
-        r""" Add a :term:`route configuration` to the current
-        configuration state, as well as possibly a :term:`view
-        configuration` to be used to specify a :term:`view callable`
-        that will be invoked when this route matches.  The arguments
-        to this method are divided into *predicate*, *non-predicate*,
-        and *view-related* types.  :term:`Route predicate` arguments
+        r""" Add a :term:`route configuration` to the current configuration state.
+        The arguments to this method are divided into *predicate* and
+        *non-predicate* types.  :term:`Route predicate` arguments
         narrow the circumstances in which a route will be match a
         request; non-predicate arguments are informational.
 
