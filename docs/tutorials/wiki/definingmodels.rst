@@ -60,7 +60,7 @@ We will use this for a new ``Page`` class in a moment.
 Then we add a ``Wiki`` class.
 
 .. literalinclude:: src/models/tutorial/models/__init__.py
-    :lines: 4-6
+    :pyobject: Wiki
     :lineno-match:
     :language: py
 
@@ -74,7 +74,7 @@ The ``__name__`` of the root model is also always ``None``.
 Now we add a ``Page`` class.
 
 .. literalinclude:: src/models/tutorial/models/__init__.py
-    :lines: 8-10
+    :pyobject: Page
     :lineno-match:
     :language: py
 
@@ -91,7 +91,7 @@ We will create this function in the next chapter.
 As a last step, edit the ``appmaker`` function.
 
 .. literalinclude:: src/models/tutorial/models/__init__.py
-    :lines: 12-20
+    :pyobject: appmaker
     :lineno-match:
     :emphasize-lines: 4-8
     :language: py

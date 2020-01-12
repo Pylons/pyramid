@@ -76,8 +76,8 @@ It is up to individual security policies and applications to determine the best 
 Applications with long-running requests may want to avoid caching the identity, or tracking some extra metadata to re-verify it periodically against the authentication source.
 
 
-Configure the app
-~~~~~~~~~~~~~~~~~
+Add new settings
+~~~~~~~~~~~~~~~~
 
 Our authentication policy is expecting a new setting, ``auth.secret``. Open
 the file ``development.ini`` and add the highlighted line below:

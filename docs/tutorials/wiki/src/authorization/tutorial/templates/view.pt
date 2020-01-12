@@ -2,9 +2,6 @@
     <div metal:fill-slot="content">
 
         <div class="content">
-            <p tal:condition="logged_in" class="pull-right">
-                <a href="${request.application_url}/logout">Logout</a>
-            </p>
             <div tal:replace="structure page_text">
             Page text goes here.
             </div>

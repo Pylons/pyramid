@@ -59,5 +59,7 @@ def edit_page(context, request):
         context.data = request.params['body']
         return HTTPSeeOther(location=request.resource_url(context))
 
-    return dict(page=context,
-                save_url=request.resource_url(context, 'edit_page'))
+    return dict(
+        page=context,
+        save_url=request.resource_url(context, 'edit_page'),
+    )
