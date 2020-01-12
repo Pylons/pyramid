@@ -30,6 +30,7 @@ def login(request):
             headers = remember(request, login)
             return HTTPSeeOther(location=came_from, headers=headers)
         message = 'Failed login'
+        request.response.status = 400
 
     return dict(
         message=message,

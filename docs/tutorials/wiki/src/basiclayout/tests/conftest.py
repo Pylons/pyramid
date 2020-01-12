@@ -3,6 +3,7 @@ from pyramid.paster import get_appsettings
 from pyramid.scripting import prepare
 from pyramid.testing import DummyRequest
 import pytest
+import transaction
 import webtest
 
 from tutorial import main
@@ -25,15 +26,27 @@ def app(app_settings):
     return main({}, **app_settings)
 
 @pytest.fixture
-def testapp(app):
+def tm():
+    tm = transaction.manager
+    tm.begin()
+    tm.doom()
+
+    yield tm
+
+    tm.abort()
+
+@pytest.fixture
+def testapp(app, tm):
     testapp = webtest.TestApp(app, extra_environ={
         'HTTP_HOST': 'example.com',
+        'tm.active': True,
+        'tm.manager': tm,
     })
 
     return testapp
 
 @pytest.fixture
-def app_request(app):
+def app_request(app, tm):
     """
     A real request.
 
@@ -44,12 +57,13 @@ def app_request(app):
     env = prepare(registry=app.registry)
     request = env['request']
     request.host = 'example.com'
+    request.tm = tm
 
     yield request
     env['closer']()
 
 @pytest.fixture
-def dummy_request(app):
+def dummy_request(app, tm):
     """
     A lightweight dummy request.
 
@@ -65,5 +79,6 @@ def dummy_request(app):
     request = DummyRequest()
     request.registry = app.registry
     request.host = 'example.com'
+    request.tm = tm
 
     return request
