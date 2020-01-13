@@ -179,15 +179,15 @@ The console will show ``pip`` checking for packages and installing missing packa
 
     Successfully installed Jinja2-2.10.3 Mako-1.1.0 MarkupSafe-1.1.1 \
     PasteDeploy-2.0.1 Pygments-2.5.2 SQLAlchemy-1.3.12 WebTest-2.0.33 \
-    alembic-1.3.2 attrs-19.3.0 beautifulsoup4-4.8.2 coverage-5.0.1 \
-    hupper-1.9.1 importlib-metadata-1.3.0 more-itertools-8.0.2 packaging-19.2 \
+    alembic-1.3.2 attrs-19.3.0 beautifulsoup4-4.8.2 coverage-5.0.3 \
+    hupper-1.9.1 importlib-metadata-1.4.0 more-itertools-8.1.0 packaging-20.0 \
     plaster-1.0 plaster-pastedeploy-0.7 pluggy-0.13.1 py-1.8.1 \
     pyparsing-2.4.6 pyramid-1.10.4 pyramid-debugtoolbar-4.5.2 \
     pyramid-jinja2-2.8 pyramid-mako-1.1.0 pyramid-retry-2.1 pyramid-tm-2.4 \
     pytest-5.3.2 pytest-cov-2.8.1 python-dateutil-2.8.1 python-editor-1.0.4 \
     repoze.lru-0.7 six-1.13.0 soupsieve-1.9.5 transaction-3.0.0 \
-    translationstring-1.3 tutorial venusian-3.0.0 waitress-1.4.1 \
-    wcwidth-0.1.7 webob-1.8.5 zipp-0.6.0 zope.deprecation-4.4.0 \
+    translationstring-1.3 tutorial venusian-3.0.0 waitress-1.4.2 \
+    wcwidth-0.1.8 webob-1.8.5 zipp-0.6.0 zope.deprecation-4.4.0 \
     zope.interface-4.7.1 zope.sqlalchemy-1.2
 
 Testing requirements are defined in our project's ``setup.py`` file, in the ``tests_require`` and ``extras_require`` stanzas.
