@@ -88,7 +88,7 @@ Update ``tests/conftest.py`` to look like the following, adding the highlighted 
 
 .. literalinclude:: src/tests/tests/conftest.py
     :linenos:
-    :emphasize-lines: 10,68-103,110,117-119
+    :emphasize-lines: 68-103,110,117-119
     :language: python
 
 

@@ -39,6 +39,7 @@ def dbengine(app_settings, ini_file):
     # depending on how we want to initialize the database from scratch
     # we could alternatively call:
     # Base.metadata.create_all(bind=engine)
+    # alembic.command.stamp(alembic_cfg, "head")
     alembic.command.upgrade(alembic_cfg, "head")
 
     yield engine
