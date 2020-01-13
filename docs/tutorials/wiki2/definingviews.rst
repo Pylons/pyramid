@@ -130,7 +130,6 @@ Let's add a new ``tutorial/security.py`` file:
 
 .. literalinclude:: src/views/tutorial/security.py
     :linenos:
-    :emphasize-lines: 5-6
     :language: python
 
 Since we've added a new ``tutorial/security.py`` module, we need to include it.
