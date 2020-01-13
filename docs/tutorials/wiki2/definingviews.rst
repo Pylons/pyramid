@@ -439,7 +439,7 @@ This template is linked from the ``notfound_view`` defined in
 
 .. literalinclude:: src/views/tutorial/views/notfound.py
     :linenos:
-    :emphasize-lines: 6
+    :emphasize-lines: 5
     :language: python
 
 There are several important things to note about this configuration:
