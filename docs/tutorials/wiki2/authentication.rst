@@ -49,20 +49,20 @@ Here we've defined:
 Our new :term:`security policy` defines how our application will remember, forget, and identify users.
 It also handles authorization, which we'll cover in the next chapter (if you're wondering why we didn't implement the ``permits`` method yet).
 
-Identifying the current user is done in a couple steps:
+Identifying the current user is done in a few steps:
 
-1. :app:`Pyramid` invokes a method on the policy requesting identity, userid, or permission to perform an operation.
+#. :app:`Pyramid` invokes a method on the policy requesting identity, userid, or permission to perform an operation.
 
-1. The policy starts by calling :meth:`pyramid.request.RequestLocalCache.get_or_create` to load the identity.
+#. The policy starts by calling :meth:`pyramid.request.RequestLocalCache.get_or_create` to load the identity.
 
-1. The ``MySecurityPolicy.load_identity`` method asks the cookie helper to pull the identity from the request.
+#. The ``MySecurityPolicy.load_identity`` method asks the cookie helper to pull the identity from the request.
    This value is ``None`` if the cookie is missing or the content cannot be verified.
 
-1. The policy then translates the identity into a ``tutorial.models.User`` object by looking for a record in the database.
+#. The policy then translates the identity into a ``tutorial.models.User`` object by looking for a record in the database.
    This is a good spot to confirm that the user is actually allowed to access our application.
    For example, maybe they were marked deleted or banned and we should return ``None`` instead of the ``user`` object.
 
-1. The result is stored in the ``identity_cache`` which ensures that subsequent invocations return the same identity object for the request.
+#. The result is stored in the ``identity_cache`` which ensures that subsequent invocations return the same identity object for the request.
 
 Finally, :attr:`pyramid.request.Request.authenticated_identity` contains either ``None`` or a ``tutorial.models.User`` instance and that value is aliased to ``request.user`` for convenience in our application.
 
