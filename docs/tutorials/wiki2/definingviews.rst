@@ -31,7 +31,7 @@ list.
 Open ``tutorial/setup.py`` and edit it to look like the following:
 
 .. literalinclude:: src/views/setup.py
-    :lines: 11-31
+    :lines: 11-25
     :lineno-match:
     :emphasize-lines: 4
     :language: python
