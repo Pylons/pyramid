@@ -43,8 +43,8 @@ Update ``tutorial/security.py`` with the following content:
 
 Here we've defined:
 
-* A new security policy named ``MySecurityPolicy``, which is implementing most of the :class:`pyramid.interfaces.ISecurityPolicy` interface by tracking a :term:`identity` using a signed cookie implemented by :class:`pyramid.authentication.AuthTktCookieHelper` (lines 7-29).
-* The ``request.user`` computed property is registered for use throughout our application as the authenticated ``tutorial.models.User`` object for the logged-in user (line 38-39).
+* A new security policy named ``MySecurityPolicy``, which is implementing most of the :class:`pyramid.interfaces.ISecurityPolicy` interface by tracking a :term:`identity` using a signed cookie implemented by :class:`pyramid.authentication.AuthTktCookieHelper` (lines 8-34).
+* The ``request.user`` computed property is registered for use throughout our application as the authenticated ``tutorial.models.User`` object for the logged-in user (line 42-44).
 
 Our new :term:`security policy` defines how our application will remember, forget, and identify users.
 It also handles authorization, which we'll cover in the next chapter (if you're wondering why we didn't implement the ``permits`` method yet).
