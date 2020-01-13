@@ -29,10 +29,10 @@ We need to add a dependency, the `bcrypt <https://pypi.org/project/bcrypt/>`_ pa
 package's ``setup.py`` file by assigning this dependency to the ``requires``
 parameter in the ``setup()`` function.
 
-Open ``tutorial/setup.py`` and edit it to look like the following:
+Open ``tutorial/setup.py`` and edit it to look like the following by adding ``bcrypt`` and sorting the packages:
 
 .. literalinclude:: src/models/setup.py
-    :lines: 11-30
+    :lines: 11-24
     :linenos:
     :lineno-match:
     :emphasize-lines: 3
@@ -40,7 +40,6 @@ Open ``tutorial/setup.py`` and edit it to look like the following:
 
 It is a good practice to sort packages alphabetically to make them easier to find.
 Our cookiecutter does not have its packages sorted because it merely tacks on additional packages depending on our selections.
-After adding ``bcrypt`` and sorting packages, we should have the above ``requires`` list.
 
 .. note::
 
