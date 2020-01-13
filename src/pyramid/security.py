@@ -11,28 +11,6 @@ from pyramid.interfaces import (
 )
 from pyramid.threadlocal import get_current_registry
 
-Everyone = 'system.Everyone'
-Authenticated = 'system.Authenticated'
-Allow = 'Allow'
-Deny = 'Deny'
-
-
-class AllPermissionsList(object):
-    """ Stand in 'permission list' to represent all permissions """
-
-    def __iter__(self):
-        return iter(())
-
-    def __contains__(self, other):
-        return True
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__)
-
-
-ALL_PERMISSIONS = AllPermissionsList()
-DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)
-
 NO_PERMISSION_REQUIRED = '__no_permission_required__'
 
 
@@ -129,6 +107,8 @@ def principals_allowed_by_permission(context, permission):
     reg = get_current_registry()
     policy = reg.queryUtility(IAuthorizationPolicy)
     if policy is None:
+        from pyramid.authorization import Everyone  # noqa: F811
+
         return [Everyone]
     return policy.principals_allowed_by_permission(context, permission)
 
@@ -229,62 +209,6 @@ class Allowed(PermitsResult):
     """
 
     boolval = 1
-
-
-class ACLPermitsResult(PermitsResult):
-    def __new__(cls, ace, acl, permission, principals, context):
-        """
-        Create a new instance.
-
-        :param ace: The :term:`ACE` that matched, triggering the result.
-        :param acl: The :term:`ACL` containing ``ace``.
-        :param permission: The required :term:`permission`.
-        :param principals: The list of :term:`principals <principal>` provided.
-        :param context: The :term:`context` providing the :term:`lineage`
-                        searched.
-
-        """
-        fmt = (
-            '%s permission %r via ACE %r in ACL %r on context %r for '
-            'principals %r'
-        )
-        inst = PermitsResult.__new__(
-            cls, fmt, cls.__name__, permission, ace, acl, context, principals
-        )
-        inst.permission = permission
-        inst.ace = ace
-        inst.acl = acl
-        inst.principals = principals
-        inst.context = context
-        return inst
-
-
-class ACLDenied(ACLPermitsResult, Denied):
-    """
-    An instance of ``ACLDenied`` is a specialization of
-    :class:`pyramid.security.Denied` that represents that a security check
-    made explicitly against ACL was denied.  It evaluates equal to all
-    boolean false types.  It also has the following attributes: ``acl``,
-    ``ace``, ``permission``, ``principals``, and ``context``.  These
-    attributes indicate the security values involved in the request.  Its
-    ``__str__`` method prints a summary of these attributes for debugging
-    purposes. The same summary is available as the ``msg`` attribute.
-
-    """
-
-
-class ACLAllowed(ACLPermitsResult, Allowed):
-    """
-    An instance of ``ACLAllowed`` is a specialization of
-    :class:`pyramid.security.Allowed` that represents that a security check
-    made explicitly against ACL was allowed.  It evaluates equal to all
-    boolean true types.  It also has the following attributes: ``acl``,
-    ``ace``, ``permission``, ``principals``, and ``context``.  These
-    attributes indicate the security values involved in the request.  Its
-    ``__str__`` method prints a summary of these attributes for debugging
-    purposes. The same summary is available as the ``msg`` attribute.
-
-    """
 
 
 class SecurityAPIMixin:
@@ -398,9 +322,11 @@ class AuthenticationAPIMixin(object):
         Return the list of 'effective' :term:`principal` identifiers
         for the ``request``. If no :term:`authentication policy` is in effect,
         this will return a one-element list containing the
-        :data:`pyramid.security.Everyone` principal.
+        :data:`pyramid.authorization.Everyone` principal.
 
         """
+        from pyramid.authorization import Everyone  # noqa: F811
+
         security = _get_security_policy(self)
         if security is not None and isinstance(security, LegacySecurityPolicy):
             authn = security._get_authn_policy(self)
@@ -456,3 +382,100 @@ class LegacySecurityPolicy:
         authz = self._get_authz_policy(request)
         principals = authn.effective_principals(request)
         return authz.permits(context, principals, permission)
+
+
+Everyone = 'system.Everyone'
+Authenticated = 'system.Authenticated'
+Allow = 'Allow'
+Deny = 'Deny'
+
+
+class AllPermissionsList(object):
+    """ Stand in 'permission list' to represent all permissions """
+
+    def __iter__(self):
+        return iter(())
+
+    def __contains__(self, other):
+        return True
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__)
+
+
+ALL_PERMISSIONS = AllPermissionsList()
+DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)
+
+
+class ACLPermitsResult(PermitsResult):
+    def __new__(cls, ace, acl, permission, principals, context):
+        """
+        Create a new instance.
+
+        :param ace: The :term:`ACE` that matched, triggering the result.
+        :param acl: The :term:`ACL` containing ``ace``.
+        :param permission: The required :term:`permission`.
+        :param principals: The list of :term:`principals <principal>` provided.
+        :param context: The :term:`context` providing the :term:`lineage`
+                        searched.
+
+        """
+        fmt = (
+            '%s permission %r via ACE %r in ACL %r on context %r for '
+            'principals %r'
+        )
+        inst = PermitsResult.__new__(
+            cls, fmt, cls.__name__, permission, ace, acl, context, principals
+        )
+        inst.permission = permission
+        inst.ace = ace
+        inst.acl = acl
+        inst.principals = principals
+        inst.context = context
+        return inst
+
+
+class ACLDenied(ACLPermitsResult, Denied):
+    """
+    An instance of ``ACLDenied`` is a specialization of
+    :class:`pyramid.security.Denied` that represents that a security check
+    made explicitly against ACL was denied.  It evaluates equal to all
+    boolean false types.  It also has the following attributes: ``acl``,
+    ``ace``, ``permission``, ``principals``, and ``context``.  These
+    attributes indicate the security values involved in the request.  Its
+    ``__str__`` method prints a summary of these attributes for debugging
+    purposes. The same summary is available as the ``msg`` attribute.
+
+    """
+
+
+class ACLAllowed(ACLPermitsResult, Allowed):
+    """
+    An instance of ``ACLAllowed`` is a specialization of
+    :class:`pyramid.security.Allowed` that represents that a security check
+    made explicitly against ACL was allowed.  It evaluates equal to all
+    boolean true types.  It also has the following attributes: ``acl``,
+    ``ace``, ``permission``, ``principals``, and ``context``.  These
+    attributes indicate the security values involved in the request.  Its
+    ``__str__`` method prints a summary of these attributes for debugging
+    purposes. The same summary is available as the ``msg`` attribute.
+
+    """
+
+
+for attr in (
+    'ALL_PERMISSIONS',
+    'DENY_ALL',
+    'ACLAllowed',
+    'ACLDenied',
+    'AllPermissionsList',
+    'Allow',
+    'Authenticated',
+    'Deny',
+    'Everyone',
+):
+    deprecated(
+        attr,
+        '"pyramid.security.{attr}" is deprecated in Pyramid 2.0. Adjust your '
+        'import to "pyramid.authorization.{attr}"'.format(attr=attr),
+    )

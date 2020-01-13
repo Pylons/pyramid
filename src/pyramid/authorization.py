@@ -1,9 +1,49 @@
+import warnings
 from zope.interface import implementer
 
 from pyramid.interfaces import IAuthorizationPolicy
 from pyramid.location import lineage
-from pyramid.security import ACLAllowed, ACLDenied, Allow, Deny, Everyone
 from pyramid.util import is_nonstr_iter
+
+# the simplest way to deprecate the attributes in security.py is to
+# leave them defined there and then import/re-export them here because
+# otherwise there is a difficult-to-resolve circular import between
+# the two modules - in the future when we remove the deprecated code and
+# move it to live here, we will be able to remove this
+with warnings.catch_warnings():
+    warnings.simplefilter('ignore')
+    from pyramid.security import (
+        ACLAllowed as _ACLAllowed,
+        ACLDenied as _ACLDenied,
+        AllPermissionsList as _AllPermissionsList,
+        Allow,
+        Authenticated,
+        Deny,
+        Everyone,
+    )
+
+
+Everyone = Everyone  # api
+Authenticated = Authenticated  # api
+Allow = Allow  # api
+Deny = Deny  # api
+
+
+class AllPermissionsList(_AllPermissionsList):
+    pass
+
+
+ALL_PERMISSIONS = AllPermissionsList()  # api
+DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)  # api
+
+# subclass to fix __qualname__
+class ACLAllowed(_ACLAllowed):
+    pass
+
+
+# subclass to fix __qualname__
+class ACLDenied(_ACLDenied):
+    pass
 
 
 @implementer(IAuthorizationPolicy)
