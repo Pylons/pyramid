@@ -755,11 +755,12 @@ class HTTPForbidden(HTTPClientError):
     argument, ``detail``, should be a string.  The value of this string will
     be used as the ``message`` attribute of the exception object.  The second
     special keyword argument, ``result`` is usually an instance of
-    :class:`pyramid.security.Denied` or :class:`pyramid.authorization.ACLDenied`
-    each of which indicates a reason for the forbidden error.  However,
-    ``result`` is also permitted to be just a plain boolean ``False`` object
-    or ``None``.  The ``result`` value will be used as the ``result``
-    attribute of the exception object.  It defaults to ``None``.
+    :class:`pyramid.security.Denied` or
+    :class:`pyramid.authorization.ACLDenied` each of which indicates a reason
+    for the forbidden error.  However, ``result`` is also permitted to be just
+    a plain boolean ``False`` object or ``None``.  The ``result`` value will
+    be used as the ``result`` attribute of the exception object.
+    It defaults to ``None``.
 
     The :term:`Forbidden View` can use the attributes of a Forbidden
     exception as necessary to provide extended information in an error

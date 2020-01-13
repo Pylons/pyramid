@@ -10,8 +10,8 @@ import warnings
 from webob.cookies import CookieProfile
 from zope.interface import implementer
 
-from pyramid.interfaces import IAuthenticationPolicy, IDebugLogger
 from pyramid.authorization import Authenticated, Everyone
+from pyramid.interfaces import IAuthenticationPolicy, IDebugLogger
 from pyramid.util import (
     SimpleSerializer,
     ascii_,

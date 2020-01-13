@@ -33,9 +33,6 @@ class AllPermissionsList(_AllPermissionsList):
     pass
 
 
-ALL_PERMISSIONS = AllPermissionsList()  # api
-DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)  # api
-
 # subclass to fix __qualname__
 class ACLAllowed(_ACLAllowed):
     pass
@@ -44,6 +41,10 @@ class ACLAllowed(_ACLAllowed):
 # subclass to fix __qualname__
 class ACLDenied(_ACLDenied):
     pass
+
+
+ALL_PERMISSIONS = AllPermissionsList()  # api
+DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)  # api
 
 
 @implementer(IAuthorizationPolicy)
@@ -160,17 +161,17 @@ class ACLHelper:
         of principals that are explicitly granted the ``permission`` in the
         provided ``context``.  We do this by walking 'up' the object graph
         *from the root* to the context.  During this walking process, if we
-        find an explicit :data:`pyramid.authorization.Allow` ACE for a principal
-        that matches the ``permission``, the principal is included in the allow
-        list.  However, if later in the walking process that principal is
-        mentioned in any :data:`pyramid.authorization.Deny` ACE for the
-        permission, the principal is removed from the allow list.  If a
-        :data:`pyramid.authorization.Deny` to the principal
-        :data:`pyramid.authorization.Everyone` is encountered during the walking
-        process that matches the ``permission``, the allow list is cleared for
-        all principals encountered in previous ACLs.  The walking process ends
-        after we've processed the any ACL directly attached to ``context``; a
-        set of principals is returned.
+        find an explicit :data:`pyramid.authorization.Allow` ACE for a
+        principal that matches the ``permission``, the principal is included in
+        the allow list.  However, if later in the walking process that
+        principal is mentioned in any :data:`pyramid.authorization.Deny` ACE
+        for the permission, the principal is removed from the allow list.  If
+        a :data:`pyramid.authorization.Deny` to the principal
+        :data:`pyramid.authorization.Everyone` is encountered during the
+        walking process that matches the ``permission``, the allow list is
+        cleared for all principals encountered in previous ACLs.  The walking
+        process ends after we've processed the any ACL directly attached to
+        ``context``; a set of principals is returned.
 
         """
         allowed = set()
