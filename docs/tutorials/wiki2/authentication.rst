@@ -129,7 +129,7 @@ Open the file ``tutorial/views/default.py`` and fix the following import:
    :emphasize-lines: 2
    :language: python
 
-Change the highlighted line.
+Insert the highlighted line.
 
 In the same file, now edit the ``edit_page`` view function:
 
