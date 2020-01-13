@@ -454,7 +454,7 @@ class Test_EffectivePrincipalsPredicate(unittest.TestCase):
 
     def _testing_authn_policy(self, userid, groupids=tuple()):
         from pyramid.interfaces import IAuthenticationPolicy, ISecurityPolicy
-        from pyramid.security import Everyone, Authenticated
+        from pyramid.authorization import Everyone, Authenticated
         from pyramid.security import LegacySecurityPolicy
 
         class DummyPolicy:
@@ -500,7 +500,7 @@ class Test_EffectivePrincipalsPredicate(unittest.TestCase):
         self.assertTrue(inst(context, request))
 
     def test_it_call_authentication_policy_provides_superset_implicit(self):
-        from pyramid.security import Authenticated
+        from pyramid.authorization import Authenticated
 
         request = testing.DummyRequest()
         self._testing_authn_policy('fred', groupids=('verna', 'bambi'))

@@ -321,15 +321,15 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.authenticated_userid(request), None)
 
     def test_effective_principals_None(self):
-        from pyramid.security import Everyone
+        from pyramid.authorization import Everyone
 
         request = DummyRequest({})
         policy = self._makeOne()
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals_userid_only(self):
-        from pyramid.security import Everyone
-        from pyramid.security import Authenticated
+        from pyramid.authorization import Everyone
+        from pyramid.authorization import Authenticated
 
         request = DummyRequest(
             {'repoze.who.identity': {'repoze.who.userid': 'fred'}}
@@ -341,8 +341,8 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         )
 
     def test_effective_principals_userid_and_groups(self):
-        from pyramid.security import Everyone
-        from pyramid.security import Authenticated
+        from pyramid.authorization import Everyone
+        from pyramid.authorization import Authenticated
 
         request = DummyRequest(
             {
@@ -363,7 +363,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         )
 
     def test_effective_principals_userid_callback_returns_None(self):
-        from pyramid.security import Everyone
+        from pyramid.authorization import Everyone
 
         request = DummyRequest(
             {
@@ -381,7 +381,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals_repoze_who_userid_is_None(self):
-        from pyramid.security import Everyone
+        from pyramid.authorization import Everyone
 
         request = DummyRequest(
             {'repoze.who.identity': {'repoze.who.userid': None}}
@@ -390,7 +390,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals_repoze_who_userid_is_unclean_Everyone(self):
-        from pyramid.security import Everyone
+        from pyramid.authorization import Everyone
 
         request = DummyRequest(
             {'repoze.who.identity': {'repoze.who.userid': 'system.Everyone'}}
@@ -401,7 +401,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
     def test_effective_principals_repoze_who_userid_is_unclean_Authenticated(
         self,
     ):
-        from pyramid.security import Everyone
+        from pyramid.authorization import Everyone
 
         request = DummyRequest(
             {
@@ -498,15 +498,15 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.authenticated_userid(request), 'fred')
 
     def test_effective_principals_None(self):
-        from pyramid.security import Everyone
+        from pyramid.authorization import Everyone
 
         request = DummyRequest({})
         policy = self._makeOne()
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals(self):
-        from pyramid.security import Everyone
-        from pyramid.security import Authenticated
+        from pyramid.authorization import Everyone
+        from pyramid.authorization import Authenticated
 
         request = DummyRequest({'REMOTE_USER': 'fred'})
         policy = self._makeOne()
@@ -601,14 +601,14 @@ class TestAuthTktAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.authenticated_userid(request), 'fred')
 
     def test_effective_principals_no_cookie_identity(self):
-        from pyramid.security import Everyone
+        from pyramid.authorization import Everyone
 
         request = DummyRequest({})
         policy = self._makeOne(None, None)
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals_callback_returns_None(self):
-        from pyramid.security import Everyone
+        from pyramid.authorization import Everyone
 
         request = DummyRequest({})
 
@@ -619,8 +619,8 @@ class TestAuthTktAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals(self):
-        from pyramid.security import Everyone
-        from pyramid.security import Authenticated
+        from pyramid.authorization import Everyone
+        from pyramid.authorization import Authenticated
 
         request = DummyRequest({})
 
@@ -1640,14 +1640,14 @@ class TestSessionAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.authenticated_userid(request), 'fred')
 
     def test_effective_principals_no_identity(self):
-        from pyramid.security import Everyone
+        from pyramid.authorization import Everyone
 
         request = DummyRequest()
         policy = self._makeOne()
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals_callback_returns_None(self):
-        from pyramid.security import Everyone
+        from pyramid.authorization import Everyone
 
         request = DummyRequest(session={'userid': 'fred'})
 
@@ -1658,8 +1658,8 @@ class TestSessionAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals(self):
-        from pyramid.security import Everyone
-        from pyramid.security import Authenticated
+        from pyramid.authorization import Everyone
+        from pyramid.authorization import Authenticated
 
         request = DummyRequest(session={'userid': 'fred'})
 

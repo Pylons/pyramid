@@ -36,12 +36,12 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         self.assertEqual(policy.permits(context, [], 'view'), False)
 
     def test_permits(self):
-        from pyramid.security import Deny
-        from pyramid.security import Allow
-        from pyramid.security import Everyone
-        from pyramid.security import Authenticated
-        from pyramid.security import ALL_PERMISSIONS
-        from pyramid.security import DENY_ALL
+        from pyramid.authorization import Deny
+        from pyramid.authorization import Allow
+        from pyramid.authorization import Everyone
+        from pyramid.authorization import Authenticated
+        from pyramid.authorization import ALL_PERMISSIONS
+        from pyramid.authorization import DENY_ALL
 
         root = DummyContext()
         community = DummyContext(__name__='community', __parent__=root)
@@ -132,7 +132,7 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         )
 
     def test_permits_string_permissions_in_acl(self):
-        from pyramid.security import Allow
+        from pyramid.authorization import Allow
 
         root = DummyContext()
         root.__acl__ = [(Allow, 'wilma', 'view_stuff')]
@@ -145,8 +145,8 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         self.assertEqual(result, False)
 
     def test_principals_allowed_by_permission_direct(self):
-        from pyramid.security import Allow
-        from pyramid.security import DENY_ALL
+        from pyramid.authorization import Allow
+        from pyramid.authorization import DENY_ALL
 
         context = DummyContext()
         acl = [
@@ -162,8 +162,8 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         self.assertEqual(result, ['chrism'])
 
     def test_principals_allowed_by_permission_callable_acl(self):
-        from pyramid.security import Allow
-        from pyramid.security import DENY_ALL
+        from pyramid.authorization import Allow
+        from pyramid.authorization import DENY_ALL
 
         context = DummyContext()
         acl = lambda: [
@@ -179,7 +179,7 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         self.assertEqual(result, ['chrism'])
 
     def test_principals_allowed_by_permission_string_permission(self):
-        from pyramid.security import Allow
+        from pyramid.authorization import Allow
 
         context = DummyContext()
         acl = [(Allow, 'chrism', 'read_it')]
@@ -191,10 +191,10 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         self.assertEqual(list(result), [])
 
     def test_principals_allowed_by_permission(self):
-        from pyramid.security import Allow
-        from pyramid.security import Deny
-        from pyramid.security import DENY_ALL
-        from pyramid.security import ALL_PERMISSIONS
+        from pyramid.authorization import Allow
+        from pyramid.authorization import Deny
+        from pyramid.authorization import DENY_ALL
+        from pyramid.authorization import ALL_PERMISSIONS
 
         root = DummyContext(__name__='', __parent__=None)
         community = DummyContext(__name__='community', __parent__=root)
@@ -236,8 +236,8 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         self.assertEqual(result, [])
 
     def test_principals_allowed_by_permission_deny_not_permission_in_acl(self):
-        from pyramid.security import Deny
-        from pyramid.security import Everyone
+        from pyramid.authorization import Deny
+        from pyramid.authorization import Everyone
 
         context = DummyContext()
         acl = [(Deny, Everyone, 'write')]
@@ -249,8 +249,8 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         self.assertEqual(result, [])
 
     def test_principals_allowed_by_permission_deny_permission_in_acl(self):
-        from pyramid.security import Deny
-        from pyramid.security import Everyone
+        from pyramid.authorization import Deny
+        from pyramid.authorization import Everyone
 
         context = DummyContext()
         acl = [(Deny, Everyone, 'read')]
@@ -262,7 +262,7 @@ class TestACLAuthorizationPolicy(unittest.TestCase):
         self.assertEqual(result, [])
 
     def test_callable_acl(self):
-        from pyramid.security import Allow
+        from pyramid.authorization import Allow
 
         context = DummyContext()
         fn = lambda self: [(Allow, 'bob', 'read')]
@@ -290,12 +290,12 @@ class TestACLHelper(unittest.TestCase):
 
     def test_acl(self):
         from pyramid.authorization import ACLHelper
-        from pyramid.security import Deny
-        from pyramid.security import Allow
-        from pyramid.security import Everyone
-        from pyramid.security import Authenticated
-        from pyramid.security import ALL_PERMISSIONS
-        from pyramid.security import DENY_ALL
+        from pyramid.authorization import Deny
+        from pyramid.authorization import Allow
+        from pyramid.authorization import Everyone
+        from pyramid.authorization import Authenticated
+        from pyramid.authorization import ALL_PERMISSIONS
+        from pyramid.authorization import DENY_ALL
 
         helper = ACLHelper()
         root = DummyContext()
@@ -386,7 +386,7 @@ class TestACLHelper(unittest.TestCase):
 
     def test_string_permissions_in_acl(self):
         from pyramid.authorization import ACLHelper
-        from pyramid.security import Allow
+        from pyramid.authorization import Allow
 
         helper = ACLHelper()
         root = DummyContext()
@@ -399,7 +399,7 @@ class TestACLHelper(unittest.TestCase):
 
     def test_callable_acl(self):
         from pyramid.authorization import ACLHelper
-        from pyramid.security import Allow
+        from pyramid.authorization import Allow
 
         helper = ACLHelper()
         context = DummyContext()
@@ -410,8 +410,8 @@ class TestACLHelper(unittest.TestCase):
 
     def test_principals_allowed_by_permission_direct(self):
         from pyramid.authorization import ACLHelper
-        from pyramid.security import Allow
-        from pyramid.security import DENY_ALL
+        from pyramid.authorization import Allow
+        from pyramid.authorization import DENY_ALL
 
         helper = ACLHelper()
         context = DummyContext()
@@ -428,8 +428,8 @@ class TestACLHelper(unittest.TestCase):
 
     def test_principals_allowed_by_permission_callable_acl(self):
         from pyramid.authorization import ACLHelper
-        from pyramid.security import Allow
-        from pyramid.security import DENY_ALL
+        from pyramid.authorization import Allow
+        from pyramid.authorization import DENY_ALL
 
         helper = ACLHelper()
         context = DummyContext()
@@ -446,7 +446,7 @@ class TestACLHelper(unittest.TestCase):
 
     def test_principals_allowed_by_permission_string_permission(self):
         from pyramid.authorization import ACLHelper
-        from pyramid.security import Allow
+        from pyramid.authorization import Allow
 
         helper = ACLHelper()
         context = DummyContext()
@@ -459,10 +459,10 @@ class TestACLHelper(unittest.TestCase):
 
     def test_principals_allowed_by_permission(self):
         from pyramid.authorization import ACLHelper
-        from pyramid.security import Allow
-        from pyramid.security import Deny
-        from pyramid.security import DENY_ALL
-        from pyramid.security import ALL_PERMISSIONS
+        from pyramid.authorization import Allow
+        from pyramid.authorization import Deny
+        from pyramid.authorization import DENY_ALL
+        from pyramid.authorization import ALL_PERMISSIONS
 
         helper = ACLHelper()
         root = DummyContext(__name__='', __parent__=None)
@@ -506,8 +506,8 @@ class TestACLHelper(unittest.TestCase):
 
     def test_principals_allowed_by_permission_deny_not_permission_in_acl(self):
         from pyramid.authorization import ACLHelper
-        from pyramid.security import Deny
-        from pyramid.security import Everyone
+        from pyramid.authorization import Deny
+        from pyramid.authorization import Everyone
 
         helper = ACLHelper()
         context = DummyContext()
@@ -520,8 +520,8 @@ class TestACLHelper(unittest.TestCase):
 
     def test_principals_allowed_by_permission_deny_permission_in_acl(self):
         from pyramid.authorization import ACLHelper
-        from pyramid.security import Deny
-        from pyramid.security import Everyone
+        from pyramid.authorization import Deny
+        from pyramid.authorization import Everyone
 
         helper = ACLHelper()
         context = DummyContext()

@@ -330,14 +330,13 @@ Pyramid provides :class:`pyramid.authorization.ACLHelper` to assist with an
 ACL-based implementation of ``permits``.  Application-specific code should
 construct a list of principals for the user and call
 :meth:`pyramid.authorization.ACLHelper.permits`, which will return an
-:class:`pyramid.security.ACLAllowed` or :class:`pyramid.security.ACLDenied`
+:class:`pyramid.authorization.ACLAllowed` or :class:`pyramid.authorization.ACLDenied`
 object.  An implementation might look like this:
 
 .. code-block:: python
     :linenos:
 
-    from pyramid.security import Everyone, Authenticated
-    from pyramid.authorization import ACLHelper
+    from pyramid.authorization import ACLHelper, Everyone, Authenticated
 
     class SecurityPolicy:
         def permits(self, request, context, permission):
@@ -358,8 +357,8 @@ For example, an ACL might be attached to the resource for a blog via its class:
 .. code-block:: python
     :linenos:
 
-    from pyramid.security import Allow
-    from pyramid.security import Everyone
+    from pyramid.authorization import Allow
+    from pyramid.authorization import Everyone
 
     class Blog(object):
         __acl__ = [
@@ -374,8 +373,8 @@ Or, if your resources are persistent, an ACL might be specified via the
 .. code-block:: python
     :linenos:
 
-    from pyramid.security import Allow
-    from pyramid.security import Everyone
+    from pyramid.authorization import Allow
+    from pyramid.authorization import Everyone
 
     class Blog(object):
         pass
@@ -401,8 +400,8 @@ properties of the instance.
 .. code-block:: python
     :linenos:
 
-    from pyramid.security import Allow
-    from pyramid.security import Everyone
+    from pyramid.authorization import Allow
+    from pyramid.authorization import Everyone
 
     class Blog(object):
         def __acl__(self):
@@ -435,8 +434,8 @@ Here's an example ACL:
 .. code-block:: python
     :linenos:
 
-    from pyramid.security import Allow
-    from pyramid.security import Everyone
+    from pyramid.authorization import Allow
+    from pyramid.authorization import Everyone
 
     __acl__ = [
         (Allow, Everyone, 'view'),
@@ -444,7 +443,7 @@ Here's an example ACL:
         (Allow, 'group:editors', 'edit'),
     ]
 
-The example ACL indicates that the :data:`pyramid.security.Everyone`
+The example ACL indicates that the :data:`pyramid.authorization.Everyone`
 principal—a special system-defined principal indicating, literally, everyone—is
 allowed to view the blog, and the ``group:editors`` principal is allowed to add
 to and edit the blog.
@@ -453,8 +452,8 @@ Each element of an ACL is an :term:`ACE`, or access control entry. For example,
 in the above code block, there are three ACEs: ``(Allow, Everyone, 'view')``,
 ``(Allow, 'group:editors', 'add')``, and ``(Allow, 'group:editors', 'edit')``.
 
-The first element of any ACE is either :data:`pyramid.security.Allow`, or
-:data:`pyramid.security.Deny`, representing the action to take when the ACE
+The first element of any ACE is either :data:`pyramid.authorization.Allow`, or
+:data:`pyramid.authorization.Deny`, representing the action to take when the ACE
 matches.  The second element is a :term:`principal`.  The third argument is a
 permission or sequence of permission names.
 
@@ -467,9 +466,9 @@ dictated by the ACL*.  So if you have an ACL like this:
 .. code-block:: python
     :linenos:
 
-    from pyramid.security import Allow
-    from pyramid.security import Deny
-    from pyramid.security import Everyone
+    from pyramid.authorization import Allow
+    from pyramid.authorization import Deny
+    from pyramid.authorization import Everyone
 
     __acl__ = [
         (Allow, Everyone, 'view'),
@@ -483,9 +482,9 @@ hand, if you have an ACL like this:
 .. code-block:: python
     :linenos:
 
-    from pyramid.security import Everyone
-    from pyramid.security import Allow
-    from pyramid.security import Deny
+    from pyramid.authorization import Everyone
+    from pyramid.authorization import Allow
+    from pyramid.authorization import Deny
 
     __acl__ = [
         (Deny, Everyone, 'view'),
@@ -503,8 +502,8 @@ can collapse this into a single ACE, as below.
 .. code-block:: python
     :linenos:
 
-    from pyramid.security import Allow
-    from pyramid.security import Everyone
+    from pyramid.authorization import Allow
+    from pyramid.authorization import Everyone
 
     __acl__ = [
         (Allow, Everyone, 'view'),
@@ -520,17 +519,17 @@ can collapse this into a single ACE, as below.
 Special Principal Names
 -----------------------
 
-Special principal names exist in the :mod:`pyramid.security` module.  They can
+Special principal names exist in the :mod:`pyramid.authorization` module.  They can
 be imported for use in your own code to populate ACLs, e.g.,
-:data:`pyramid.security.Everyone`.
+:data:`pyramid.authorization.Everyone`.
 
-:data:`pyramid.security.Everyone`
+:data:`pyramid.authorization.Everyone`
 
   Literally, everyone, no matter what.  This object is actually a string under
   the hood (``system.Everyone``).  Every user *is* the principal named
   "Everyone" during every request, even if a security policy is not in use.
 
-:data:`pyramid.security.Authenticated`
+:data:`pyramid.authorization.Authenticated`
 
   Any user with credentials as determined by the current security policy.  You
   might think of it as any user that is "logged in".  This object is actually a
@@ -543,12 +542,12 @@ be imported for use in your own code to populate ACLs, e.g.,
 Special Permissions
 -------------------
 
-Special permission names exist in the :mod:`pyramid.security` module.  These
+Special permission names exist in the :mod:`pyramid.authorization` module.  These
 can be imported for use in ACLs.
 
 .. _all_permissions:
 
-:data:`pyramid.security.ALL_PERMISSIONS`
+:data:`pyramid.authorization.ALL_PERMISSIONS`
 
   An object representing, literally, *all* permissions.  Useful in an ACL like
   so: ``(Allow, 'fred', ALL_PERMISSIONS)``.  The ``ALL_PERMISSIONS`` object is
@@ -565,7 +564,7 @@ Special ACEs
 ------------
 
 A convenience :term:`ACE` is defined representing a deny to everyone of all
-permissions in :data:`pyramid.security.DENY_ALL`.  This ACE is often used as
+permissions in :data:`pyramid.authorization.DENY_ALL`.  This ACE is often used as
 the *last* ACE of an ACL to explicitly cause inheriting authorization policies
 to "stop looking up the traversal tree" (effectively breaking any inheritance).
 For example, an ACL which allows *only* ``fred`` the view permission for a
@@ -574,18 +573,18 @@ particular resource, despite what inherited ACLs may say, might look like so:
 .. code-block:: python
     :linenos:
 
-    from pyramid.security import Allow
-    from pyramid.security import DENY_ALL
+    from pyramid.authorization import Allow
+    from pyramid.authorization import DENY_ALL
 
     __acl__ = [ (Allow, 'fred', 'view'), DENY_ALL ]
 
-Under the hood, the :data:`pyramid.security.DENY_ALL` ACE equals the
+Under the hood, the :data:`pyramid.authorization.DENY_ALL` ACE equals the
 following:
 
 .. code-block:: python
     :linenos:
 
-    from pyramid.security import ALL_PERMISSIONS
+    from pyramid.authorization import ALL_PERMISSIONS
     __acl__ = [ (Deny, Everyone, ALL_PERMISSIONS) ]
 
 .. index::
@@ -681,7 +680,7 @@ security within view functions imperatively.  It returns instances of objects
 that are effectively booleans.  But these objects are not raw ``True`` or
 ``False`` objects, and have information attached to them about why the
 permission was allowed or denied.  The object will be one of
-:data:`pyramid.security.ACLAllowed`, :data:`pyramid.security.ACLDenied`,
+:data:`pyramid.authorization.ACLAllowed`, :data:`pyramid.authorization.ACLDenied`,
 :data:`pyramid.security.Allowed`, or :data:`pyramid.security.Denied`, as
 documented in :ref:`security_module`.  At the very minimum, these objects will
 have a ``msg`` attribute, which is a string indicating why the permission was

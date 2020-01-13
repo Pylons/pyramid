@@ -92,7 +92,7 @@ def principals_allowed_by_permission(context, permission):
     in effect, return a sequence of :term:`principal` ids that possess
     the permission in the ``context``.  If no authorization policy is
     in effect, this will return a sequence with the single value
-    :mod:`pyramid.security.Everyone` (the special principal
+    :mod:`pyramid.authorization.Everyone` (the special principal
     identifier representing all principals).
 
     .. note::
