@@ -406,7 +406,6 @@ Create ``tutorial/templates/edit.jinja2`` and add the following content:
 
 .. literalinclude:: src/views/tutorial/templates/edit.jinja2
     :linenos:
-    :emphasize-lines: 1,3,12,13,15,18
     :language: html
 
 This template serves two use cases. It is used by ``add_page()`` and
