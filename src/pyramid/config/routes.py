@@ -40,10 +40,10 @@ class RoutesConfiguratorMixin(object):
         inherit_slash=None,
         **predicates
     ):
-        r""" Add a :term:`route configuration` to the current configuration state.
-        The arguments to this method are divided into *predicate* and
-        *non-predicate* types.  :term:`Route predicate` arguments
-        narrow the circumstances in which a route will be match a
+        """ Add a :term:`route configuration` to the current configuration
+        state.  Arguments to ``add_route`` are divided into *predicate*
+        and *non-predicate* types.  :term:`Route predicate` arguments
+        narrow the circumstances in which a route will match a
         request; non-predicate arguments are informational.
 
         Non-Predicate Arguments
@@ -301,7 +301,7 @@ class RoutesConfiguratorMixin(object):
               :ref:`custom_route_predicates` for more information about
               ``info``.
 
-        \*\*predicates
+        \\*\\*predicates
 
           Pass extra keyword parameters to use custom predicates registered via
           :meth:`pyramid.config.Configurator.add_route_predicate`.  More than

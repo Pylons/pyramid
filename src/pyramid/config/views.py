@@ -266,7 +266,7 @@ class ViewsConfiguratorMixin(object):
         exception_only=False,
         **view_options
     ):
-        r""" Add a :term:`view configuration` to the current
+        """ Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
         arguments.  Predicate arguments narrow the circumstances in
@@ -739,7 +739,7 @@ class ViewsConfiguratorMixin(object):
                 obsoletes this argument, but it is kept around for backwards
                 compatibility.
 
-        \*\*view_options
+        \\*\\*view_options
 
           Pass extra keyword parameters to use custom predicates
           or set a value for a view deriver. See

@@ -483,7 +483,7 @@ more to offer:
 .. seealso:: See also:
     :ref:`Quick Tutorial View Classes <qtut_view_classes>`, :ref:`Quick
     Tutorial More View Classes <qtut_more_view_classes>`, :ref:`class_as_view`,
-    :ref:`view_and_route_predicates`.
+    and :ref:`view_and_route_predicates`.
 
 
 Quick project startup with cookiecutters

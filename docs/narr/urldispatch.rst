@@ -1107,7 +1107,7 @@ See this code:
     :linenos:
 
     class AnyOfPredicate:
-        def __init__(self, val):
+        def __init__(self, val, info):
             self.segment_name = val[0]
             self.allowed = tuple(val[0:])
 
@@ -1127,21 +1127,23 @@ See this code:
 
 We register this class as a :term:`predicate factory` with the ``any_of`` keyword argument name.
 Then we use that new keyword argument with :meth:`~pyramid.config.Configurator.add_route`.
-When the route is requested, Pyramid instantiates the ``AnyOfPredicate`` class using the value passed to the ``any_of``
-argument.  The resulting instance is a :term:`predicate`.  It will determine whether incoming requests satisfy its condition.
+When the route is requested, Pyramid instantiates the ``AnyOfPredicate`` class using the value passed to the ``any_of`` argument.
+The resulting instance is a :term:`predicate`.
+It will determine whether incoming requests satisfy its condition.
 In the example above, a request for ``/three`` would match the route's URL pattern and satisfy the route's predicate
-because ``three`` is one of the allowed values, so the route would be matched.  However a request for ``/millions`` will
+because ``three`` is one of the allowed values, so the route would be matched.
+However a request for ``/millions`` will
 match the route's URL pattern but would not satisfy the route's predicate, and the route would not be matched.
 
-A custom route predicate may also *modify* the ``match`` dictionary.
-For instance, a predicate might do some type conversion of values:
+A custom route predicate may also *modify* the ``match`` dictionary.  For
+instance, a predicate might do some type conversion of values:
 
 .. code-block:: python
     :linenos:
 
     class IntegersPredicate:
 
-        def __init__(self, val):
+        def __init__(self, val, info):
             self.segment_names = val
 
         def text(self):
@@ -1175,7 +1177,7 @@ expressions specifying requirements for that marker. For instance:
 
     class IntegersPredicate:
 
-        def __init__(self, val):
+        def __init__(self, val, info):
             self.segment_names = val
 
         def text(self):
@@ -1224,6 +1226,9 @@ route in a set of route predicates:
     :linenos:
 
     class TwentyTenPredicate:
+        def __init__(self, val, info):
+            pass
+
         def text(self):
             return "twenty_ten = True"
 
