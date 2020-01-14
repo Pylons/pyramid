@@ -150,7 +150,7 @@ The expected result should look like the following:
 
 .. code-block:: text
 
-    ...............................
-    31 passed in 8.85 seconds
+    ...........................                                         [100%]
+    27 passed in 6.91s
 
 .. _webtest: https://docs.pylonsproject.org/projects/webtest/en/latest/
