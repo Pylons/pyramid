@@ -342,7 +342,7 @@ On Windows
 
 .. code-block:: doscon
 
-    c:\tutorial> %VENV%\Scripts\pytest --cov --cov-report=term-missing
+    %VENV%\Scripts\pytest --cov --cov-report=term-missing
 
 If successful, you will see output something like this:
 
