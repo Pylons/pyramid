@@ -1130,10 +1130,8 @@ Then we use that new keyword argument with :meth:`~pyramid.config.Configurator.a
 When the route is requested, Pyramid instantiates the ``AnyOfPredicate`` class using the value passed to the ``any_of`` argument.
 The resulting instance is a :term:`predicate`.
 It will determine whether incoming requests satisfy its condition.
-In the example above, a request for ``/three`` would match the route's URL pattern and satisfy the route's predicate
-because ``three`` is one of the allowed values, so the route would be matched.
-However a request for ``/millions`` will
-match the route's URL pattern but would not satisfy the route's predicate, and the route would not be matched.
+In the example above, a request for ``/three`` would match the route's URL pattern and satisfy the route's predicate because ``three`` is one of the allowed values, so the route would be matched.
+However a request for ``/millions`` will match the route's URL pattern but would not satisfy the route's predicate, and the route would not be matched.
 
 A custom route predicate may also *modify* the ``match`` dictionary.  For
 instance, a predicate might do some type conversion of values:
