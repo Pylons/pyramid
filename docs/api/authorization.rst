@@ -17,14 +17,14 @@ Constants
 
     The special principal id named 'Everyone'.  This principal id is
     granted to all requests.  Its actual value is the string
-    'system.Everyone'.
+    ``'system.Everyone'``.
 
 .. attribute:: Authenticated
 
     The special principal id named 'Authenticated'.  This principal id
     is granted to all requests which contain any other non-Everyone
     principal id (according to the :term:`authentication policy`).
-    Its actual value is the string 'system.Authenticated'.
+    Its actual value is the string ``'system.Authenticated'``.
 
 .. attribute:: ALL_PERMISSIONS
 
@@ -52,4 +52,3 @@ Return Values
    :members: msg
 
    .. automethod:: __new__
-
