@@ -7,6 +7,19 @@ Features
 - Add support for Python 3.8.
   See https://github.com/Pylons/pyramid/pull/3547
 
+- New security APIs have been added to support a massive overhaul of the
+  authentication and authorization system. Read
+  "Upgrading Authentication/Authorization" in the "What's New in Pyramid 2.0"
+  document for information about using this new system.
+
+  - ``pyramid.config.Configurator.set_security_policy``.
+  - ``pyramid.interfaces.ISecurityPolicy``
+  - ``pyramid.request.Request.authenticated_identity``.
+  - ``pyramid.authentication.SessionAuthenticationHelper``
+  - ``pyramid.authorization.ACLHelper``
+
+  See https://github.com/Pylons/pyramid/pull/3465
+
 - Changed the default ``serializer`` on
   ``pyramid.session.SignedCookieSessionFactory`` to use
   ``pyramid.session.JSONSerializer`` instead of
@@ -94,8 +107,54 @@ Features
   and then we want to cache the data for the duration of the request.
   See https://github.com/Pylons/pyramid/pull/3561
 
+- Exposed ``pyramid.authorization.ALL_PERMISSIONS`` and
+  ``pyramid.authorization.DENY_ALL`` such that all of the ACL-related constants
+  are now importable from the ``pyramid.authorization`` namespace.
+  See https://github.com/Pylons/pyramid/pull/3563
+
 Deprecations
 ------------
+
+- Deprecated the authentication and authorization interfaces and
+  principal-based support. See "Upgrading Authentication/Authorization" in
+  the "What's New in Pyramid 2.0" document for information on equivalent APIs
+  and notes on upgrading. The following APIs are deprecated as a result of
+  this change:
+
+  - ``pyramid.config.Configurator.set_authentication_policy``
+  - ``pyramid.config.Configurator.set_authorization_policy``
+  - ``pyramid.interfaces.IAuthenticationPolicy``
+  - ``pyramid.interfaces.IAuthorizationPolicy``
+  - ``pyramid.request.Request.effective_principals``
+  - ``pyramid.request.Request.unauthenticated_userid``
+  - ``pyramid.authentication.AuthTktAuthenticationPolicy``
+  - ``pyramid.authentication.RemoteUserAuthenticationPolicy``
+  - ``pyramid.authentication.RepozeWho1AuthenticationPolicy``
+  - ``pyramid.authentication.SessionAuthenticationPolicy``
+  - ``pyramid.authentication.BasicAuthAuthenticationPolicy``
+  - ``pyramid.authorization.ACLAuthorizationPolicy``
+  - The ``effective_principals`` view and route predicates.
+
+  See https://github.com/Pylons/pyramid/pull/3465
+
+- Deprecated ``pyramid.security.principals_allowed_by_permission``. This
+  method continues to work with the deprecated
+  ``pyramid.interfaces.IAuthorizationPolicy`` interface but will not work with
+  the new ``pyramid.interfaces.ISecurityPolicy``.
+  See https://github.com/Pylons/pyramid/pull/3465
+
+- Deprecated several ACL-related aspects of ``pyramid.security``. Equivalent
+  objects should now be imported from the ``pyramid.authorization`` namespace.
+  This includes:
+
+  - ``pyramid.security.Everyone``
+  - ``pyramid.security.Authenticated``
+  - ``pyramid.security.ALL_PERMISSIONS``
+  - ``pyramid.security.DENY_ALL``
+  - ``pyramid.security.ACLAllowed``
+  - ``pyramid.security.ACLDenied``
+
+  See https://github.com/Pylons/pyramid/pull/3563
 
 - Deprecated ``pyramid.session.PickleSerializer``.
   See https://github.com/pylons/pyramid/issues/2709
