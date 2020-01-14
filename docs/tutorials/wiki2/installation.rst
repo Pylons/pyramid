@@ -403,7 +403,7 @@ On Windows
 
 .. code-block:: doscon
 
-    %VENV%\Scripts\pytest --cov=tutorial tutorial\tests.py -q
+    %VENV%\Scripts\pytest --cov=tutorial tests -q
 
 pytest follows :ref:`conventions for Python test discovery
 <pytest:test discovery>`, and the configuration defaults from the cookiecutter
