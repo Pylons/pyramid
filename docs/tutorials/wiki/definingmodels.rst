@@ -43,7 +43,10 @@ Open ``tutorial/models/__init__.py`` file and edit it to look like the following
 
 .. literalinclude:: src/models/tutorial/models/__init__.py
     :linenos:
+    :emphasize-lines: 1,5-11,15-19
     :language: python
+
+The emphasized lines indicate changes, described as follows.
 
 Remove the ``MyModel`` class from the generated ``models/__init__.py`` file.
 The ``MyModel`` class is only a sample and we're not going to use it.
@@ -62,6 +65,7 @@ Then we add a ``Wiki`` class.
 .. literalinclude:: src/models/tutorial/models/__init__.py
     :pyobject: Wiki
     :lineno-match:
+    :emphasize-lines: 1-3
     :language: py
 
 We want it to inherit from the :class:`persistent.mapping.PersistentMapping` class because it provides mapping behavior.
@@ -76,6 +80,7 @@ Now we add a ``Page`` class.
 .. literalinclude:: src/models/tutorial/models/__init__.py
     :pyobject: Page
     :lineno-match:
+    :emphasize-lines: 1-3
     :language: py
 
 This class should inherit from the :class:`persistent.Persistent` class.
@@ -93,7 +98,7 @@ As a last step, edit the ``appmaker`` function.
 .. literalinclude:: src/models/tutorial/models/__init__.py
     :pyobject: appmaker
     :lineno-match:
-    :emphasize-lines: 4-8
+    :emphasize-lines: 3-7
     :language: py
 
 The :term:`root` :term:`resource` of our application is a Wiki instance.
