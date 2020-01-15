@@ -481,9 +481,8 @@ more to offer:
   ``xhr``, ``containment``, and custom predicates.
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial View Classes <qtut_view_classes>`, :ref:`Quick
-    Tutorial More View Classes <qtut_more_view_classes>`, :ref:`class_as_view`,
-    and :ref:`view_and_route_predicates`.
+    :ref:`View Classes <qtut_view_classes>` and :ref:`More View Classes <qtut_more_view_classes>`
+    in the Quick Tutorial, :ref:`class_as_view`, and :ref:`view_and_route_predicates`.
 
 
 Quick project startup with cookiecutters

@@ -1140,7 +1140,6 @@ instance, a predicate might do some type conversion of values:
     :linenos:
 
     class IntegersPredicate:
-
         def __init__(self, val, info):
             self.segment_names = val
 
@@ -1174,7 +1173,6 @@ expressions specifying requirements for that marker. For instance:
     :linenos:
 
     class IntegersPredicate:
-
         def __init__(self, val, info):
             self.segment_names = val
 
