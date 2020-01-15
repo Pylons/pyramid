@@ -29,16 +29,15 @@ Allow = Allow  # api
 Deny = Deny  # api
 
 
+# subclasses to fix __module__
 class AllPermissionsList(_AllPermissionsList):
     pass
 
 
-# subclass to fix __qualname__
 class ACLAllowed(_ACLAllowed):
     pass
 
 
-# subclass to fix __qualname__
 class ACLDenied(_ACLDenied):
     pass
 
