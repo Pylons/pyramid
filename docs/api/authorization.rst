@@ -15,13 +15,13 @@ Constants
 
 .. attribute:: Everyone
 
-    The special principal id named 'Everyone'.  This principal id is
+    The special principal id named ``Everyone``.  This principal id is
     granted to all requests.  Its actual value is the string
     ``'system.Everyone'``.
 
 .. attribute:: Authenticated
 
-    The special principal id named 'Authenticated'.  This principal id
+    The special principal id named ``Authenticated``.  This principal id
     is granted to all requests which contain any other non-Everyone
     principal id (according to the :term:`authentication policy`).
     Its actual value is the string ``'system.Authenticated'``.
