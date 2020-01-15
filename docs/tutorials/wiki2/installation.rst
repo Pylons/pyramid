@@ -386,32 +386,13 @@ Our package doesn't quite have 100% test coverage.
 Test and coverage cookiecutter defaults
 ---------------------------------------
 
-Cookiecutters include configuration defaults for ``pytest`` and test coverage.
-These configuration files are ``pytest.ini`` and ``.coveragerc``, located at
-the root of your package. Without these defaults, we would need to specify the
-path to the module on which we want to run tests and coverage.
+The Pyramid cookiecutter includes configuration defaults for ``pytest`` and test coverage.
+These configuration files are ``pytest.ini`` and ``.coveragerc``, located at the root of your package.
 
-On Unix
-^^^^^^^
+``pytest`` follows :ref:`conventions for Python test discovery <pytest:test discovery>`.
+The configuration defaults from the cookiecutter tell ``pytest`` where to find the module on which we want to run tests and coverage.
 
-.. code-block:: bash
-
-    $VENV/bin/pytest --cov=tutorial tests -q
-
-On Windows
-^^^^^^^^^^
-
-.. code-block:: doscon
-
-    %VENV%\Scripts\pytest --cov=tutorial tests -q
-
-pytest follows :ref:`conventions for Python test discovery
-<pytest:test discovery>`, and the configuration defaults from the cookiecutter
-tell ``pytest`` where to find the module on which we want to run tests and
-coverage.
-
-.. seealso:: See ``pytest``'s documentation for :ref:`pytest:usage` or invoke
-   ``pytest -h`` to see its full set of options.
+.. seealso:: See ``pytest``'s documentation for :ref:`pytest:usage` or invoke ``pytest -h`` to see its full set of options.
 
 
 .. _wiki2-start-the-application:
