@@ -78,7 +78,7 @@ Open the file ``tutorial/__init__.py`` and edit the following lines:
 
 The security policy controls several aspects of authentication and authorization:
 
-- Identifying the current user / :term:`identity` for a ``request``.
+- Identifying the current user's :term:`identity` for a ``request``.
 
 - Authorizating access to resources.
 
@@ -90,7 +90,7 @@ Identifying logged-in users
 
 The ``MySecurityPolicy.authenticated_identity`` method inspects the ``request`` and determines if it came from an authenticated user.
 It does this by utilizing the :class:`pyramid.authentication.AuthTktCookieHelper` class which stores the :term:`identity` in a cryptographically-signed cookie.
-If a ``request`` does contain an identity then we perform a final check to determine if the user is valid in our current ``USERS`` store.
+If a ``request`` does contain an identity, then we perform a final check to determine if the user is valid in our current ``USERS`` store.
 
 
 Authorizing access to resources
@@ -111,9 +111,9 @@ For our application we've defined a list of a few principals:
 - :attr:`pyramid.security.Authenticated`
 - :attr:`pyramid.security.Everyone`
 
-Later, various wiki pages will grant some of these principals access to edit, or add new pages.
+Various wiki pages will grant some of these principals access to edit existing or add new pages.
 
-Finally, there are two helper methods that will help us later to authenticate users.
+Finally there are two helper methods that will help us to authenticate users.
 The first is ``hash_password`` which takes a raw password and transforms it using
 bcrypt into an irreversible representation, a process known as "hashing".
 The second method, ``check_password``, will allow us to compare the hashed value of the submitted password against the hashed value of the password stored in the user's
@@ -140,8 +140,8 @@ the file ``development.ini`` and add the highlighted line below:
    :lineno-match:
    :language: ini
 
-Finally, best practices tell us to use a different secret in each environment, so
-open ``production.ini`` and add a different secret:
+Best practices tell us to use a different secret in each environment.
+Open ``production.ini`` and add a different secret:
 
 .. literalinclude:: src/authorization/production.ini
    :lines: 17-19
@@ -149,7 +149,7 @@ open ``production.ini`` and add a different secret:
    :lineno-match:
    :language: ini
 
-And ``testing.ini``:
+Edit ``testing.ini`` to add its unique secret:
 
 .. literalinclude:: src/authorization/testing.ini
    :lines: 17-19
@@ -202,7 +202,26 @@ We actually need only *one* ACL for the entire system, however, because our secu
 Add permission declarations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Open ``tutorial/views/default.py`` and add a ``permission='edit'`` parameter to the ``@view_config`` decorators for ``add_page()`` and ``edit_page()``:
+Open ``tutorial/views/default.py``.
+Add a ``permission='view'`` parameter to the ``@view_config`` decorators for ``view_wiki()`` and ``view_page()`` as follows:
+
+.. literalinclude:: src/authorization/tutorial/views/default.py
+    :lines: 12
+    :lineno-match:
+    :emphasize-lines: 1
+    :language: python
+
+.. literalinclude:: src/authorization/tutorial/views/default.py
+    :lines: 17-19
+    :lineno-match:
+    :emphasize-lines: 2-3
+    :language: python
+
+Only the highlighted lines, along with their preceding commas, need to be edited and added.
+
+This allows anyone to invoke these two views.
+
+Next add a ``permission='edit'`` parameter to the ``@view_config`` decorators for ``add_page()`` and ``edit_page()``:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
     :lines: 39-41
@@ -219,27 +238,6 @@ Open ``tutorial/views/default.py`` and add a ``permission='edit'`` parameter to 
 Only the highlighted lines, along with their preceding commas, need to be edited and added.
 
 The result is that only users who possess the ``edit`` permission at the time of the request may invoke those two views.
-
-Add a ``permission='view'`` parameter to the ``@view_config`` decorator for
-``view_wiki()`` as follows:
-
-.. literalinclude:: src/authorization/tutorial/views/default.py
-    :lines: 12
-    :lineno-match:
-    :emphasize-lines: 1
-    :language: python
-
-And ``view_page()`` as follows:
-
-.. literalinclude:: src/authorization/tutorial/views/default.py
-    :lines: 17-19
-    :lineno-match:
-    :emphasize-lines: 2-3
-    :language: python
-
-Only the highlighted lines, along with their preceding commas, need to be edited and added.
-
-This allows anyone to invoke these two views.
 
 We are done with the changes needed to control access.
 The changes that follow will add the login and logout feature.
@@ -290,8 +288,8 @@ Create ``tutorial/templates/login.pt`` with the following content:
 The above template is referenced in the login view that we just added in ``views.py``.
 
 
-Add a "Login" and "Logout" links
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add "Login" and "Logout" links
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Open ``tutorial/templates/layout.pt`` and add the following code as indicated by the highlighted lines.
 
