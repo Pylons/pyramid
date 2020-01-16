@@ -2,7 +2,7 @@ from pyramid.httpexceptions import (
     HTTPNotFound,
     HTTPSeeOther,
 )
-from pyramid.security import (
+from pyramid.authorization import (
     Allow,
     Everyone,
 )

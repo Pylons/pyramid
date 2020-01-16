@@ -1,10 +1,10 @@
 from persistent import Persistent
 from persistent.mapping import PersistentMapping
-
-from pyramid.security import (
+from pyramid.authorization import (
     Allow,
     Everyone,
 )
+
 
 class Wiki(PersistentMapping):
     __name__ = None

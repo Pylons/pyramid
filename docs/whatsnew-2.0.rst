@@ -95,4 +95,4 @@ The new :attr:`pyramid.request.Request.authenticated_identity` property will
 output the same result as :attr:`pyramid.request.Request.authenticated_userid`.
 
 If using a security policy, :attr:`pyramid.request.Request.unauthenticated_userid` will return the same value as :attr:`pyramid.request.Request.authenticated_userid`.
-:attr:`pyramid.request.Request.effective_principals` will always return a one-element list containing the :data:`pyramid.security.Everyone` principal, as there is no equivalent in the new security policy.
+:attr:`pyramid.request.Request.effective_principals` will always return a one-element list containing the :data:`pyramid.authorization.Everyone` principal, as there is no equivalent in the new security policy.

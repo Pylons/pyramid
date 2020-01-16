@@ -30,7 +30,7 @@ identifiers that are easier to generalize. The permissions are then written
 against the principals without focusing on the exact user involved.
 
 :app:`Pyramid` defines two builtin principals used in every application:
-:attr:`pyramid.security.Everyone` and :attr:`pyramid.security.Authenticated`.
+:attr:`pyramid.authorization.Everyone` and :attr:`pyramid.authorization.Authenticated`.
 On top of these we have already mentioned the required principals for this
 application in the original design. The user has two possible roles: ``editor``
 or ``basic``. These will be prefixed by the string ``role:`` to avoid clashing
@@ -40,7 +40,7 @@ Open the file ``tutorial/security.py`` and edit it as follows:
 
 .. literalinclude:: src/authorization/tutorial/security.py
    :linenos:
-   :emphasize-lines: 2,5-8,17,42-53
+   :emphasize-lines: 2-6,17,42-53
    :language: python
 
 Only the highlighted lines need to be added.

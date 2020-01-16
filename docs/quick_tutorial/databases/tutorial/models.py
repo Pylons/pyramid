@@ -1,4 +1,4 @@
-from pyramid.security import Allow, Everyone
+from pyramid.authorization import Allow, Everyone
 
 from sqlalchemy import (
     Column,
