@@ -9,6 +9,7 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
     CHANGES = f.read()
 
 requires = [
+    'docutils',
     'plaster_pastedeploy',
     'pyramid',
     'pyramid_chameleon',
@@ -19,7 +20,6 @@ requires = [
     'pyramid_zodbconn',
     'transaction',
     'ZODB3',
-    'docutils',
 ]
 
 tests_require = [

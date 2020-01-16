@@ -72,8 +72,10 @@ intersphinx_mapping = {
     'sqla': ('https://docs.sqlalchemy.org/en/latest/', None),
     'tm': ('https://docs.pylonsproject.org/projects/pyramid-tm/en/latest/', None),
     'toolbar': ('https://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest/', None),
+    'transaction': ('https://transaction.readthedocs.io/en/latest/', None),
     'tutorials': ('https://docs.pylonsproject.org/projects/pyramid-tutorials/en/latest/', None),
     'venusian': ('https://docs.pylonsproject.org/projects/venusian/en/latest/', None),
+    'webtest': ('https://docs.pylonsproject.org/projects/webtest/en/latest/', None),
     'zcml': (
     'https://docs.pylonsproject.org/projects/pyramid-zcml/en/latest/', None),
 }

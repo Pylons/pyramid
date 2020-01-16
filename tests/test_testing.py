@@ -27,9 +27,9 @@ class TestDummySecurityPolicy(unittest.TestCase):
         klass = self._getTargetClass()
         return klass(userid, identity, permissive)
 
-    def test_identify(self):
+    def test_authenticated_identity(self):
         policy = self._makeOne('user', 'identity')
-        self.assertEqual(policy.identify(None), 'identity')
+        self.assertEqual(policy.authenticated_identity(None), 'identity')
 
     def test_authenticated_userid(self):
         policy = self._makeOne('user')

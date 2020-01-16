@@ -32,8 +32,8 @@ class TestingConfiguratorMixin(object):
             :attr:`pyramid.request.Request.authenticated_userid` will have this
             value as well.
         :type userid:  str
-        :param identity:  If provided, the policy's ``identify`` method will
-            return this value.  As a result,
+        :param identity:  If provided, the policy's ``authenticated_identity``
+            method will return this value.  As a result,
             :attr:`pyramid.request.Request.authenticated_identity`` will have
             this value.
         :type identity:  object

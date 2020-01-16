@@ -10,11 +10,12 @@ Editing <strong>{{pagename}}</strong>
 <a href="{{request.route_url('view_page', pagename='FrontPage')}}">FrontPage</a>.
 </p>
 <form action="{{ save_url }}" method="post">
+<input type="hidden" name="csrf_token" value="{{ get_csrf_token() }}">
 <div class="form-group">
     <textarea class="form-control" name="body" rows="10" cols="60">{{ pagedata }}</textarea>
 </div>
 <div class="form-group">
-    <button type="submit" name="form.submitted" value="Save" class="btn btn-default">Save</button>
+    <button type="submit" class="btn btn-default">Save</button>
 </div>
 </form>
 {% endblock content %}

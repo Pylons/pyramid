@@ -35,15 +35,26 @@
             <div class="content">
             {% if request.user is none %}
             <p class="pull-right">
-            <a href="{{ request.route_url('login') }}">Login</a>
+              <a href="{{ request.route_url('login') }}">Login</a>
             </p>
             {% else %}
-            <p class="pull-right">
-            {{request.user.name}} <a href="{{request.route_url('logout')}}">Logout</a>
-            </p>
+            <form class="pull-right" action="{{ request.route_url('logout') }}" method="post">
+              {{request.user.name}}
+              <input type="hidden" name="csrf_token" value="{{ get_csrf_token() }}">
+              <button class="btn btn-link" type="submit">Logout</button>
+            </form>
             {% endif %}
             {% block content %}{% endblock %}
             </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="links">
+            <ul>
+              <li><i class="glyphicon glyphicon-cog icon-muted"></i><a href="https://github.com/Pylons/pyramid">Github Project</a></li>
+              <li><i class="glyphicon glyphicon-globe icon-muted"></i><a href="https://webchat.freenode.net/?channels=pyramid">IRC Channel</a></li>
+              <li><i class="glyphicon glyphicon-home icon-muted"></i><a href="https://pylonsproject.org">Pylons Project</a></li>
+            </ul>
           </div>
         </div>
         <div class="row">

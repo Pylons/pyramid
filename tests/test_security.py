@@ -479,7 +479,7 @@ class TestLegacySecurityPolicy(unittest.TestCase):
         policy = LegacySecurityPolicy()
         _registerAuthenticationPolicy(request.registry, 'userid')
 
-        self.assertEqual(policy.identify(request), 'userid')
+        self.assertEqual(policy.authenticated_identity(request), 'userid')
 
     def test_remember(self):
         from pyramid.security import LegacySecurityPolicy
@@ -532,7 +532,7 @@ class DummySecurityPolicy:
     def __init__(self, result):
         self.result = result
 
-    def identify(self, request):
+    def authenticated_identity(self, request):
         return self.result
 
     def authenticated_userid(self, request):

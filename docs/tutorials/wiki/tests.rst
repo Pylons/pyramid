@@ -4,45 +4,99 @@
 Adding Tests
 ============
 
-We will now add tests for the models and the views and a few functional tests in ``tests/test_it.py``.
+We will now add tests for the models and the views and a few functional tests in the ``tests`` package.
 Tests ensure that an application works, and that it continues to work when changes are made in the future.
 
 
-Test the models
-===============
+Test harness
+============
 
-We write tests for the ``model`` classes and the ``appmaker``.
-We will modify our ``test_it.py`` file, writing a separate test class for each ``model`` class.
-We will also write a test class for the ``appmaker``.
+The project came bootstrapped with some tests and a basic harness.
+These are located in the ``tests`` package at the top-level of the project.
+It is a common practice to put tests into a ``tests`` package alongside the application package, especially as projects grow in size and complexity.
+A useful convention is for each module in the application to contain a corresponding module in the ``tests`` package.
+The test module would have the same name with the prefix ``test_``.
 
-We will add three test classes, one for each of the following:
+The harness consists of the following setup:
 
--   the ``Page`` model named ``PageModelTests``
--   the ``Wiki`` model named ``WikiModelTests``
--   the appmaker named ``AppmakerTests``
+- ``pytest.ini`` - controls basic ``pytest`` configuration, including where to find the tests.
+  We have configured ``pytest`` to search for tests in the application package and in the ``tests`` package.
+
+- ``.coveragerc`` - controls coverage config.
+  In our setup, it works with the ``pytest-cov`` plugin that we use via the ``--cov`` options to the ``pytest`` command.
+
+- ``testing.ini`` - a mirror of ``development.ini`` and ``production.ini`` that contains settings used for executing the test suite.
+  Most importantly, it contains the database connection information used by tests that require the database.
+
+- ``tests_require`` in ``setup.py`` - controls the dependencies installed when testing.
+  When the list is changed, it is necessary to re-run ``$VENV/bin/pip install -e ".[testing]"`` to ensure the new dependencies are installed.
+
+- ``tests/conftest.py`` - the core fixtures available throughout our tests.
+  The fixtures are explained in more detail in the following sections.
+  Open ``tests/conftest.py`` and follow along.
 
 
-Test the views
-==============
+Session-scoped test fixtures
+----------------------------
 
-We will modify our ``test_it.py`` file, adding tests for each view function that we added previously.
-As a result, we will delete the ``ViewTests`` class that the ``zodb`` backend option provided, and add four other test classes: ``ViewWikiTests``, ``ViewPageTests``, ``AddPageTests``, and ``EditPageTests``.
-These test the ``view_wiki``, ``view_page``, ``add_page``, and ``edit_page`` views.
+- ``app_settings`` - the settings ``dict`` parsed from the ``testing.ini`` file that would normally be passed by ``pserve`` into your app's ``main`` function.
+
+- ``app`` - the :app:`Pyramid` WSGI application, implementing the :class:`pyramid.interfaces.IRouter` interface.
+  Most commonly this would be used for functional tests.
+
+
+Per-test fixtures
+-----------------
+
+- ``tm`` - a :class:`transaction.TransactionManager` object controlling a transaction lifecycle.
+  Generally other fixtures would join to the ``tm`` fixture to control their lifecycle and ensure they are aborted at the end of the test.
+
+- ``testapp`` - a :class:`webtest.TestApp` instance wrapping the ``app`` and is used to sending requests into the application and return full response objects that can be inspected.
+  The ``testapp`` is able to mutate the request environ such that the ``tm`` fixture is injected and used by any code that touches ``request.tm``.
+  This should join the ``request.root`` ZODB model to the transaction manager as well, to enable rolling back changes to the database.
+  The ``testapp`` maintains a cookiejar, so it can be used to share state across requests, as well as the transaction database connection.
+
+- ``app_request`` - a :class:`pyramid.request.Request` object that can be used for more lightweight tests versus the full ``testapp``.
+  The ``app_request`` can be passed to view functions and other code that need a fully functional request object.
+
+- ``dummy_request`` - a :class:`pyramid.testing.DummyRequest` object that is very lightweight.
+  This is a great object to pass to view functions that have minimal side-effects as it will be fast and simple.
+
+
+Unit tests
+==========
+
+We can test individual APIs within our codebase to ensure they fulfill the expected contract that the rest of the application expects.
+For example, we will test the password hashing features we added to ``tutorial.security`` and the rest of our models.
+
+Create ``tests/test_models.py`` such that it appears as follows:
+
+.. literalinclude:: src/tests/tests/test_models.py
+    :linenos:
+    :language: python
+
+
+Integration tests
+=================
+
+We can directly execute the view code, bypassing :app:`Pyramid` and testing just the code that we have written.
+These tests use dummy requests that we will prepare appropriately to set the conditions each view expects.
+
+Update ``tests/test_views.py`` such that it appears as follows:
+
+.. literalinclude:: src/tests/tests/test_views.py
+    :linenos:
+    :language: python
 
 
 Functional tests
 ================
 
-We will test the whole application, covering security aspects that are not tested in the unit tests, such as logging in, logging out, checking that the ``viewer`` user cannot add or edit pages, but the ``editor`` user can, and so on.
-As a result we will add two test classes, ``SecurityTests`` and ``FunctionalTests``.
+We will test the whole application, covering security aspects that are not tested in the unit and integration tests, like logging in, logging out, checking that the ``basic`` user cannot edit pages that it did not create, but that the ``editor`` user can, and so on.
 
+Update ``tests/test_functional.py`` such that it appears as follows:
 
-View the results of all our edits to ``tests/test_it.py``
-=========================================================
-
-Open the ``tests/test_it.py`` module, and edit it such that it appears as follows:
-
-.. literalinclude:: src/tests/tests/test_it.py
+.. literalinclude:: src/tests/tests/test_functional.py
     :linenos:
     :language: python
 
@@ -72,4 +126,4 @@ The expected result should look like the following:
 .. code-block:: text
 
     .........................
-    25 passed in 6.87 seconds
+    25 passed in 3.87 seconds
