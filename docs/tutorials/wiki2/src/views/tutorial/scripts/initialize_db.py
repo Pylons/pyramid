@@ -8,6 +8,10 @@ from .. import models
 
 
 def setup_models(dbsession):
+    """
+    Add or update models / fixtures in the database.
+
+    """
     editor = models.User(name='editor', role='editor')
     editor.set_password('editor')
     dbsession.add(editor)

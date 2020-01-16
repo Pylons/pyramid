@@ -55,16 +55,15 @@ Steps
     :language: ini
     :linenos:
 
-#. Get authentication (and for now, authorization policies) and login route
-   into the :term:`configurator` in ``authentication/tutorial/__init__.py``:
-
-   .. literalinclude:: authentication/tutorial/__init__.py
-    :linenos:
-
 #. Create an ``authentication/tutorial/security.py`` module that can find our
-   user information by providing an *authentication policy callback*:
+   user information by providing a :term:`security policy`:
 
    .. literalinclude:: authentication/tutorial/security.py
+    :linenos:
+
+#. Register the ``SecurityPolicy`` with the :term:`configurator` in ``authentication/tutorial/__init__.py``:
+
+   .. literalinclude:: authentication/tutorial/__init__.py
     :linenos:
 
 #. Update the views in ``authentication/tutorial/views.py``:
@@ -107,18 +106,16 @@ Analysis
 Unlike many web frameworks, Pyramid includes a built-in but optional security
 model for authentication and authorization. This security system is intended to
 be flexible and support many needs. In this security model, authentication (who
-are you) and authorization (what are you allowed to do) are not just pluggable,
-but decoupled. To learn one step at a time, we provide a system that identifies
+are you) and authorization (what are you allowed to do) are pluggable.
+To learn one step at a time, we provide a system that identifies
 users and lets them log out.
 
-In this example we chose to use the bundled :ref:`AuthTktAuthenticationPolicy
-<authentication_module>` policy. We enabled it in our configuration and
-provided a ticket-signing secret in our INI file.
+In this example we chose to use the bundled :class:`pyramid.authentication.AuthTktCookieHelper` helper to store the user's logged-in state in a cookie.
+We enabled it in our configuration and provided a ticket-signing secret in our INI file.
 
 Our view class grew a login view. When you reached it via a ``GET`` request, it
 returned a login form. When reached via ``POST``, it processed the submitted
-username and password against the "groupfinder" callable that we registered in
-the configuration.
+username and password against the ``USERS`` data store.
 
 The function ``hash_password`` uses a one-way hashing algorithm with a salt on
 the user's password via ``bcrypt``, instead of storing the password in plain
@@ -134,6 +131,9 @@ submitted password and the user's password stored in the database. If the
 hashed values are equivalent, then the user is authenticated, else
 authentication fails.
 
+Assuming the password was validated, we invoke :func:`pyramid.security.remember` to generate a cookie that is set in the response.
+Subsequent requests return that cookie and identify the user.
+
 In our template, we fetched the ``logged_in`` value from the view class. We use
 this to calculate the logged-in user, if any. In the template we can then
 choose to show a login link to anonymous visitors or a logout link to logged-in
@@ -143,13 +143,9 @@ users.
 Extra credit
 ============
 
-#. What is the difference between a user and a principal?
-
-#. Can I use a database behind my ``groupfinder`` to look up principals?
+#. Can I use a database instead of ``USERS`` to authenticate users?
 
 #. Once I am logged in, does any user-centric information get jammed onto each
    request? Use ``import pdb; pdb.set_trace()`` to answer this.
 
-.. seealso:: See also :ref:`security_chapter`,
-   :ref:`AuthTktAuthenticationPolicy <authentication_module>`, `bcrypt
-   <https://pypi.org/project/bcrypt/>`_
+.. seealso:: See also :ref:`security_chapter`, :class:`pyramid.authentication.AuthTktCookieHelper`, `bcrypt <https://pypi.org/project/bcrypt/>`_

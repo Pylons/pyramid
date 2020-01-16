@@ -58,24 +58,24 @@ dictionary of settings parsed from the ``.ini`` file, which contains
 deployment-related values, such as ``pyramid.reload_templates``,
 ``sqlalchemy.url``, and so on.
 
-Next include the package ``models`` using a dotted Python path. The exact
-setup of the models will be covered later.
+Next include :term:`Jinja2` templating bindings so that we can use renderers
+with the ``.jinja2`` extension within our project.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 8
     :lineno-match:
     :language: py
 
-Next include :term:`Jinja2` templating bindings so that we can use renderers
-with the ``.jinja2`` extension within our project.
+Next include the ``routes`` module using a dotted Python path. This module will
+be explained in the next section.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 9
     :lineno-match:
     :language: py
 
-Next include the ``routes`` module using a dotted Python path. This module will
-be explained in the next section.
+Next include the package ``models`` using a dotted Python path. The exact
+setup of the models will be covered later.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 10
@@ -207,7 +207,7 @@ Without repeating ourselves, we will point out the differences between this view
 Content models with the ``models`` package
 ------------------------------------------
 
-In an SQLAlchemy-based application, a *model* object is an object composed by
+In a SQLAlchemy-based application, a *model* object is an object composed by
 querying the SQL database. The ``models`` package is where the ``alchemy``
 cookiecutter put the classes that implement our models.
 
@@ -348,3 +348,9 @@ code in our stock application.
 
 The ``Index`` import and the ``Index`` object creation in ``mymodel.py`` is
 not required for this tutorial, and will be removed in the next step.
+
+Tests
+-----
+
+The project contains a basic structure for a test suite using ``pytest``.
+The structure is covered later in :ref:`wiki2_adding_tests`.

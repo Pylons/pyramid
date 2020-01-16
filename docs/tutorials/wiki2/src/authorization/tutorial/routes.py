@@ -1,6 +1,6 @@
 from pyramid.httpexceptions import (
     HTTPNotFound,
-    HTTPFound,
+    HTTPSeeOther,
 )
 from pyramid.security import (
     Allow,
@@ -8,6 +8,7 @@ from pyramid.security import (
 )
 
 from . import models
+
 
 def includeme(config):
     config.add_static_view('static', 'static', cache_max_age=3600)
@@ -24,7 +25,7 @@ def new_page_factory(request):
     pagename = request.matchdict['pagename']
     if request.dbsession.query(models.Page).filter_by(name=pagename).count() > 0:
         next_url = request.route_url('edit_page', pagename=pagename)
-        raise HTTPFound(location=next_url)
+        raise HTTPSeeOther(location=next_url)
     return NewPage(pagename)
 
 class NewPage(object):
@@ -52,5 +53,5 @@ class PageResource(object):
         return [
             (Allow, Everyone, 'view'),
             (Allow, 'role:editor', 'edit'),
-            (Allow, str(self.page.creator_id), 'edit'),
+            (Allow, 'u:' + str(self.page.creator_id), 'edit'),
         ]
