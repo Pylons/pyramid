@@ -19,7 +19,7 @@ The test module would have the same name with the prefix ``test_``.
 
 The harness consists of the following setup:
 
-- ``pytest.ini`` - controls basic ``pytest`` config including where to find the tests.
+- ``pytest.ini`` - controls basic ``pytest`` configuration, including where to find the tests.
   We have configured ``pytest`` to search for tests in the application package and in the ``tests`` package.
 
 - ``.coveragerc`` - controls coverage config.
@@ -29,10 +29,11 @@ The harness consists of the following setup:
   Most importantly, it contains the database connection information used by tests that require the database.
 
 - ``tests_require`` in ``setup.py`` - controls the dependencies installed when testing.
-  When the list is changed, it's necessary to re-run ``$VENV/bin/pip install -e ".[testing]"`` to ensure the new dependencies are installed.
+  When the list is changed, it is necessary to re-run ``$VENV/bin/pip install -e ".[testing]"`` to ensure the new dependencies are installed.
 
 - ``tests/conftest.py`` - the core fixtures available throughout our tests.
-  The fixtures are explained in more detail below.
+  The fixtures are explained in more detail in the following sections.
+  Open ``tests/conftest.py`` and follow along.
 
 
 Session-scoped test fixtures
@@ -51,7 +52,7 @@ Per-test fixtures
   Generally other fixtures would join to the ``tm`` fixture to control their lifecycle and ensure they are aborted at the end of the test.
 
 - ``testapp`` - a :class:`webtest.TestApp` instance wrapping the ``app`` and is used to sending requests into the application and return full response objects that can be inspected.
-  The ``testapp`` is able to mutate the request environ such that the ``tm`` fixture is injected and used by any code that's touching ``request.tm``.
+  The ``testapp`` is able to mutate the request environ such that the ``tm`` fixture is injected and used by any code that touches ``request.tm``.
   This should join the ``request.root`` ZODB model to the transaction manager as well, to enable rolling back changes to the database.
   The ``testapp`` maintains a cookiejar, so it can be used to share state across requests, as well as the transaction database connection.
 
@@ -59,14 +60,14 @@ Per-test fixtures
   The ``app_request`` can be passed to view functions and other code that need a fully functional request object.
 
 - ``dummy_request`` - a :class:`pyramid.testing.DummyRequest` object that is very lightweight.
-  This is a great object to pass to view functions that have minimal side-effects as it'll be fast and simple.
+  This is a great object to pass to view functions that have minimal side-effects as it will be fast and simple.
 
 
 Unit tests
 ==========
 
 We can test individual APIs within our codebase to ensure they fulfill the expected contract that the rest of the application expects.
-For example, we'll test the password hashing features we added to ``tutorial.security`` and the rest of our models.
+For example, we will test the password hashing features we added to ``tutorial.security`` and the rest of our models.
 
 Create ``tests/test_models.py`` such that it appears as follows:
 
@@ -78,8 +79,8 @@ Create ``tests/test_models.py`` such that it appears as follows:
 Integration tests
 =================
 
-We can directly execute the view code, bypassing :app:`Pyramid` and testing just the code that we've written.
-These tests use dummy requests that we'll prepare appropriately to set the conditions each view expects.
+We can directly execute the view code, bypassing :app:`Pyramid` and testing just the code that we have written.
+These tests use dummy requests that we will prepare appropriately to set the conditions each view expects.
 
 Update ``tests/test_views.py`` such that it appears as follows:
 
@@ -91,7 +92,7 @@ Update ``tests/test_views.py`` such that it appears as follows:
 Functional tests
 ================
 
-We'll test the whole application, covering security aspects that are not tested in the unit and integration tests, like logging in, logging out, checking that the ``basic`` user cannot edit pages that it didn't create but the ``editor`` user can, and so on.
+We will test the whole application, covering security aspects that are not tested in the unit and integration tests, like logging in, logging out, checking that the ``basic`` user cannot edit pages that it did not create, but that the ``editor`` user can, and so on.
 
 Update ``tests/test_functional.py`` such that it appears as follows:
 
