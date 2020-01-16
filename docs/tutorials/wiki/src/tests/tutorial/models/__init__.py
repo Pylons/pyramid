@@ -4,13 +4,15 @@ from persistent.mapping import PersistentMapping
 from pyramid.security import (
     Allow,
     Everyone,
-    )
+)
 
 class Wiki(PersistentMapping):
     __name__ = None
     __parent__ = None
-    __acl__ = [ (Allow, Everyone, 'view'),
-                (Allow, 'group:editors', 'edit') ]
+    __acl__ = [
+        (Allow, Everyone, 'view'),
+        (Allow, 'group:editors', 'edit'),
+    ]
 
 class Page(Persistent):
     def __init__(self, data):

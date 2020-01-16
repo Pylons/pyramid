@@ -1,4 +1,5 @@
 import bcrypt
+from pyramid.authentication import AuthTktCookieHelper
 
 
 def hash_password(pw):
@@ -12,9 +13,24 @@ def check_password(pw, hashed_pw):
 
 USERS = {'editor': hash_password('editor'),
          'viewer': hash_password('viewer')}
-GROUPS = {'editor': ['group:editors']}
 
 
-def groupfinder(userid, request):
-    if userid in USERS:
-        return GROUPS.get(userid, [])
+class SecurityPolicy:
+    def __init__(self, secret):
+        self.authtkt = AuthTktCookieHelper(secret=secret)
+
+    def authenticated_identity(self, request):
+        identity = self.authtkt.identify(request)
+        if identity is not None and identity['userid'] in USERS:
+            return identity
+
+    def authenticated_userid(self, request):
+        identity = self.authenticated_identity(request)
+        if identity is not None:
+            return identity['userid']
+
+    def remember(self, request, userid, **kw):
+        return self.authtkt.remember(request, userid, **kw)
+
+    def forget(self, request, **kw):
+        return self.authtkt.forget(request, **kw)

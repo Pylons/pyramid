@@ -224,7 +224,7 @@ class SecurityAPIMixin:
         policy = _get_security_policy(self)
         if policy is None:
             return None
-        return policy.identify(self)
+        return policy.authenticated_identity(self)
 
     @property
     def authenticated_userid(self):
@@ -357,7 +357,7 @@ class LegacySecurityPolicy:
     def _get_authz_policy(self, request):
         return request.registry.getUtility(IAuthorizationPolicy)
 
-    def identify(self, request):
+    def authenticated_identity(self, request):
         return self.authenticated_userid(request)
 
     def authenticated_userid(self, request):

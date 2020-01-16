@@ -1,6 +1,7 @@
 from persistent import Persistent
 from persistent.mapping import PersistentMapping
 
+
 class Wiki(PersistentMapping):
     __name__ = None
     __parent__ = None

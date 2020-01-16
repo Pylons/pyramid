@@ -1,67 +1,23 @@
-import unittest
-import transaction
-
-from pyramid import testing
+from tutorial import models
 
 
-class BaseTest(unittest.TestCase):
+def test_password_hash_saved():
+    user = models.User(name='foo', role='bar')
+    assert user.password_hash is None
 
-    def setUp(self):
-        from tutorial.models import get_tm_session
-        self.config = testing.setUp(settings={
-            'sqlalchemy.url': 'sqlite:///:memory:'
-        })
-        self.config.include('tutorial.models')
-        self.config.include('tutorial.routes')
+    user.set_password('secret')
+    assert user.password_hash is not None
 
-        session_factory = self.config.registry['dbsession_factory']
-        self.session = get_tm_session(session_factory, transaction.manager)
+def test_password_hash_not_set():
+    user = models.User(name='foo', role='bar')
+    assert not user.check_password('secret')
 
-        self.init_database()
+def test_correct_password():
+    user = models.User(name='foo', role='bar')
+    user.set_password('secret')
+    assert user.check_password('secret')
 
-    def init_database(self):
-        from tutorial.models.meta import Base
-        session_factory = self.config.registry['dbsession_factory']
-        engine = session_factory.kw['bind']
-        Base.metadata.create_all(engine)
-
-    def tearDown(self):
-        testing.tearDown()
-        transaction.abort()
-
-    def makeUser(self, name, role):
-        from tutorial.models import User
-        return User(name=name, role=role)
-
-
-class TestSetPassword(BaseTest):
-
-    def test_password_hash_saved(self):
-        user = self.makeUser(name='foo', role='bar')
-        self.assertFalse(user.password_hash)
-
-        user.set_password('secret')
-        self.assertTrue(user.password_hash)
-
-
-class TestCheckPassword(BaseTest):
-
-    def test_password_hash_not_set(self):
-        user = self.makeUser(name='foo', role='bar')
-        self.assertFalse(user.password_hash)
-
-        self.assertFalse(user.check_password('secret'))
-
-    def test_correct_password(self):
-        user = self.makeUser(name='foo', role='bar')
-        user.set_password('secret')
-        self.assertTrue(user.password_hash)
-
-        self.assertTrue(user.check_password('secret'))
-
-    def test_incorrect_password(self):
-        user = self.makeUser(name='foo', role='bar')
-        user.set_password('secret')
-        self.assertTrue(user.password_hash)
-
-        self.assertFalse(user.check_password('incorrect'))
+def test_incorrect_password():
+    user = models.User(name='foo', role='bar')
+    user.set_password('secret')
+    assert not user.check_password('incorrect')

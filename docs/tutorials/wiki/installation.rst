@@ -188,15 +188,15 @@ The console will show ``pip`` checking for packages and installing missing packa
     Successfully installed BTrees-4.6.1 Chameleon-3.6.2 Mako-1.1.0 \
     MarkupSafe-1.1.1 PasteDeploy-2.0.1 Pygments-2.5.2 WebTest-2.0.33 \
     ZConfig-3.5.0 ZEO-5.2.1 ZODB-5.5.1 ZODB3-3.11.0 attrs-19.3.0 \
-    beautifulsoup4-4.8.2 cffi-1.13.2 coverage-5.0.1 hupper-1.9.1 \
-    importlib-metadata-1.3.0 more-itertools-8.0.2 packaging-19.2 \
+    beautifulsoup4-4.8.2 cffi-1.13.2 coverage-5.0.3 hupper-1.9.1 \
+    importlib-metadata-1.4.0 more-itertools-8.1.0 packaging-20.0 \
     persistent-4.5.1 plaster-1.0 plaster-pastedeploy-0.7 pluggy-0.13.1 \
     py-1.8.1 pycparser-2.19 pyparsing-2.4.6 pyramid-1.10.4 \
-    pyramid-chameleon-0.3 pyramid-debugtoolbar-4.5.1 pyramid-mako-1.1.0 \
-    pyramid-retry-2.1 pyramid-tm-2.3 pyramid-zodbconn-0.8.1 pytest-5.3.2 \
+    pyramid-chameleon-0.3 pyramid-debugtoolbar-4.5.2 pyramid-mako-1.1.0 \
+    pyramid-retry-2.1 pyramid-tm-2.4 pyramid-zodbconn-0.8.1 pytest-5.3.2 \
     pytest-cov-2.8.1 repoze.lru-0.7 six-1.13.0 soupsieve-1.9.5 \
     transaction-3.0.0 translationstring-1.3 tutorial venusian-3.0.0 \
-    waitress-1.4.1 wcwidth-0.1.7 webob-1.8.5 zc.lockfile-2.0 zdaemon-4.3 \
+    waitress-1.4.2 wcwidth-0.1.8 webob-1.8.5 zc.lockfile-2.0 zdaemon-4.3 \
     zipp-0.6.0 zodbpickle-2.0.0 zodburi-2.4.0 zope.deprecation-4.4.0 \
     zope.interface-4.7.1
 
@@ -243,8 +243,8 @@ For a successful test run, you should see output that ends like this:
 
 .. code-block:: bash
 
-    ..
-    2 passed in 0.49 seconds
+    ....
+    4 passed in 0.49 seconds
 
 
 Expose test coverage information
@@ -279,25 +279,25 @@ If successful, you will see output something like this:
     platform darwin -- Python 3.7.3, pytest-5.3.2, py-1.8.1, pluggy-0.13.1
     rootdir: /filepath/tutorial, inifile: pytest.ini, testpaths: tutorial
     plugins: cov-2.8.1
-    collected 2 items
+    collected 4 items
 
-    tutorial/tests.py ..                                            [100%]
+    tests/test_functional.py ..                                     [ 50%]
+    tests/test_views.py ..                                          [100%]
 
-
-    ---------- coverage: platform darwin, python 3.7.0-final-0 -----------
+    ---------- coverage: platform darwin, python 3.7.3-final-0 -----------
     Name                          Stmts   Miss  Cover   Missing
     -----------------------------------------------------------
-    tutorial/__init__.py             16     11    31%   7-8, 14-22
-    tutorial/models/__init__.py       8      4    50%   9-12
-    tutorial/pshell.py                6      6     0%   1-12
-    tutorial/routes.py                2      2     0%   1-2
+    tutorial/__init__.py             16      0   100%
+    tutorial/models/__init__.py       8      0   100%
+    tutorial/pshell.py                6      4    33%   5-12
+    tutorial/routes.py                2      0   100%
     tutorial/views/__init__.py        0      0   100%
     tutorial/views/default.py         4      0   100%
     tutorial/views/notfound.py        4      0   100%
     -----------------------------------------------------------
-    TOTAL                            40     23    42%
+    TOTAL                            40      4    90%
 
-    ===================== 2 passed in 0.55 seconds =======================
+    ===================== 4 passed in 0.85 seconds =======================
 
 Our package doesn't quite have 100% test coverage.
 
@@ -309,23 +309,6 @@ Test and coverage cookiecutter defaults
 
 The Pyramid cookiecutter includes configuration defaults for ``pytest`` and test coverage.
 These configuration files are ``pytest.ini`` and ``.coveragerc``, located at the root of your package.
-Without these defaults, we would need to specify the path to the module on which we want to run tests and coverage.
-
-
-On Unix
-^^^^^^^
-
-.. code-block:: bash
-
-    $VENV/bin/pytest --cov=tutorial tests.py -q
-
-On Windows
-^^^^^^^^^^
-
-.. code-block:: doscon
-
-    %VENV%\Scripts\pytest --cov=tutorial tests -q
-
 
 ``pytest`` follows :ref:`conventions for Python test discovery <pytest:test discovery>`.
 The configuration defaults from the cookiecutter tell ``pytest`` where to find the module on which we want to run tests and coverage.

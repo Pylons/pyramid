@@ -66,13 +66,21 @@ def includeme(config):
     # use pyramid_retry to retry a request when transient exceptions occur
     config.include('pyramid_retry')
 
-    session_factory = get_session_factory(get_engine(settings))
+    # hook to share the dbengine fixture in testing
+    dbengine = settings.get('dbengine')
+    if not dbengine:
+        dbengine = get_engine(settings)
+
+    session_factory = get_session_factory(dbengine)
     config.registry['dbsession_factory'] = session_factory
 
     # make request.dbsession available for use in Pyramid
-    config.add_request_method(
-        # r.tm is the transaction manager used by pyramid_tm
-        lambda r: get_tm_session(session_factory, r.tm),
-        'dbsession',
-        reify=True
-    )
+    def dbsession(request):
+        # hook to share the dbsession fixture in testing
+        dbsession = request.environ.get('app.dbsession')
+        if dbsession is None:
+            # request.tm is the transaction manager used by pyramid_tm
+            dbsession = get_tm_session(session_factory, request.tm)
+        return dbsession
+
+    config.add_request_method(dbsession, reify=True)

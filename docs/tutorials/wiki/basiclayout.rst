@@ -57,7 +57,7 @@ Next in ``main``, construct a :term:`Configurator` object using a context manage
 See also :term:`Deployment settings`.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
-    :lines: 14
+    :lines: 15
     :lineno-match:
     :language: py
 
@@ -65,35 +65,28 @@ See also :term:`Deployment settings`.
 This will be a dictionary of settings parsed from the ``.ini`` file, which contains
 deployment-related values, such as ``pyramid.reload_templates``, ``zodbconn.uri``, and so on.
 
-Next include support for ``pyramid_tm``, allowing Pyramid requests to join the active transaction as provided by the `transaction <https://pypi.org/project/transaction/>`_ package.
-
-.. literalinclude:: src/basiclayout/tutorial/__init__.py
-    :lines: 15
-    :lineno-match:
-    :language: py
-
-Next include support for ``pyramid_retry`` to retry a request when transient exceptions occur.
+Next include support for the :term:`Chameleon` template rendering bindings, allowing us to use the ``.pt`` templates.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 16
     :lineno-match:
     :language: py
 
-Next include support for ``pyramid_zodbconn``, providing integration between :term:`ZODB` and a Pyramid application.
+Next include support for ``pyramid_tm``, allowing Pyramid requests to join the active transaction as provided by the `transaction <https://pypi.org/project/transaction/>`_ package.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 17
     :lineno-match:
     :language: py
 
-Next set a root factory using our function named ``root_factory``.
+Next include support for ``pyramid_retry`` to retry a request when transient exceptions occur.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 18
     :lineno-match:
     :language: py
 
-Next include support for the :term:`Chameleon` template rendering bindings, allowing us to use the ``.pt`` templates.
+Next include support for ``pyramid_zodbconn``, providing integration between :term:`ZODB` and a Pyramid application.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 19
@@ -104,6 +97,13 @@ Next include routes from the ``.routes`` module.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
     :lines: 20
+    :lineno-match:
+    :language: py
+
+Next set a root factory using our function named ``root_factory``.
+
+.. literalinclude:: src/basiclayout/tutorial/__init__.py
+    :lines: 21
     :lineno-match:
     :language: py
 
@@ -130,7 +130,7 @@ The third argument is an optional ``cache_max_age`` which specifies the number o
 Back into our ``__init__.py``, next perform a :term:`scan`.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
-    :lines: 21
+    :lines: 22
     :lineno-match:
     :language: py
 
@@ -142,7 +142,7 @@ The cookiecutter could have equivalently said ``config.scan('tutorial')``, but i
 Finally use the :meth:`pyramid.config.Configurator.make_wsgi_app` method to return a :term:`WSGI` application.
 
 .. literalinclude:: src/basiclayout/tutorial/__init__.py
-    :lines: 22
+    :lines: 23
     :lineno-match:
     :language: py
 
@@ -262,3 +262,10 @@ The ``development.ini`` (in the ``tutorial`` :term:`project` directory, as oppos
 Note the existence of a ``[app:main]`` section which specifies our WSGI application.
 Our ZODB database settings are specified as the ``zodbconn.uri`` setting within this section.
 When the server is started via ``pserve``, the values within this section are passed as ``**settings`` to the ``main`` function defined in ``__init__.py``.
+
+
+Tests
+-----
+
+The project contains a basic structure for a test suite using ``pytest``.
+The structure is covered later in :ref:`wiki_adding_tests`.

@@ -179,15 +179,15 @@ The console will show ``pip`` checking for packages and installing missing packa
 
     Successfully installed Jinja2-2.10.3 Mako-1.1.0 MarkupSafe-1.1.1 \
     PasteDeploy-2.0.1 Pygments-2.5.2 SQLAlchemy-1.3.12 WebTest-2.0.33 \
-    alembic-1.3.2 attrs-19.3.0 beautifulsoup4-4.8.2 coverage-5.0.1 \
-    hupper-1.9.1 importlib-metadata-1.3.0 more-itertools-8.0.2 packaging-19.2 \
+    alembic-1.3.2 attrs-19.3.0 beautifulsoup4-4.8.2 coverage-5.0.3 \
+    hupper-1.9.1 importlib-metadata-1.4.0 more-itertools-8.1.0 packaging-20.0 \
     plaster-1.0 plaster-pastedeploy-0.7 pluggy-0.13.1 py-1.8.1 \
-    pyparsing-2.4.6 pyramid-1.10.4 pyramid-debugtoolbar-4.5.1 \
-    pyramid-jinja2-2.8 pyramid-mako-1.1.0 pyramid-retry-2.1 pyramid-tm-2.3 \
+    pyparsing-2.4.6 pyramid-1.10.4 pyramid-debugtoolbar-4.5.2 \
+    pyramid-jinja2-2.8 pyramid-mako-1.1.0 pyramid-retry-2.1 pyramid-tm-2.4 \
     pytest-5.3.2 pytest-cov-2.8.1 python-dateutil-2.8.1 python-editor-1.0.4 \
     repoze.lru-0.7 six-1.13.0 soupsieve-1.9.5 transaction-3.0.0 \
-    translationstring-1.3 tutorial venusian-3.0.0 waitress-1.4.1 \
-    wcwidth-0.1.7 webob-1.8.5 zipp-0.6.0 zope.deprecation-4.4.0 \
+    translationstring-1.3 tutorial venusian-3.0.0 waitress-1.4.2 \
+    wcwidth-0.1.8 webob-1.8.5 zipp-0.6.0 zope.deprecation-4.4.0 \
     zope.interface-4.7.1 zope.sqlalchemy-1.2
 
 Testing requirements are defined in our project's ``setup.py`` file, in the ``tests_require`` and ``extras_require`` stanzas.
@@ -315,8 +315,8 @@ For a successful test run, you should see output that ends like this:
 
 .. code-block:: bash
 
-    ..
-    2 passed in 0.44 seconds
+    .....
+    5 passed in 0.44 seconds
 
 
 Expose test coverage information
@@ -342,7 +342,7 @@ On Windows
 
 .. code-block:: doscon
 
-    c:\tutorial> %VENV%\Scripts\pytest --cov --cov-report=term-missing
+    %VENV%\Scripts\pytest --cov --cov-report=term-missing
 
 If successful, you will see output something like this:
 
@@ -350,30 +350,33 @@ If successful, you will see output something like this:
 
     ======================== test session starts ========================
     platform -- Python 3.7.3, pytest-5.3.2, py-1.8.1, pluggy-0.13.1
-    rootdir: <somepath>/tutorial, inifile: pytest.ini, testpaths: tutorial
+    rootdir: <somepath>/tutorial, inifile: pytest.ini, testpaths: tutorial, tests
     plugins: cov-2.8.1
-    collected 2 items
+    collected 5 items
 
-    tutorial/tests.py ..
+    tests/test_functional.py ..
+    tests/test_views.py ...
+    
+    ---------- coverage: platform darwin, python 3.7.4-final-0 -----------
+    Name                                                 Stmts   Miss  Cover   Missing
+    ----------------------------------------------------------------------------------
+    tutorial/__init__.py                                     8      0   100%
+    tutorial/alembic/env.py                                 23      4    83%   28-30, 56
+    tutorial/alembic/versions/20200106_8c274fe5f3c4.py      12      2    83%   31-32
+    tutorial/models/__init__.py                             32      2    94%   71, 82
+    tutorial/models/meta.py                                  5      0   100%
+    tutorial/models/mymodel.py                               8      0   100%
+    tutorial/pshell.py                                       7      5    29%   5-13
+    tutorial/routes.py                                       3      0   100%
+    tutorial/scripts/__init__.py                             0      0   100%
+    tutorial/scripts/initialize_db.py                       22     14    36%   15-16, 20-25, 29-38
+    tutorial/views/__init__.py                               0      0   100%
+    tutorial/views/default.py                               12      0   100%
+    tutorial/views/notfound.py                               4      0   100%
+    ----------------------------------------------------------------------------------
+    TOTAL                                                  136     27    80%
 
-    ------------------ coverage: platform Python 3.7.3 ------------------
-    Name                                Stmts   Miss  Cover   Missing
-    -----------------------------------------------------------------
-    tutorial/__init__.py                    8      6    25%   7-12
-    tutorial/models/__init__.py            24      0   100%
-    tutorial/models/meta.py                 5      0   100%
-    tutorial/models/mymodel.py              8      0   100%
-    tutorial/pshell.py                      7      7     0%   1-13
-    tutorial/routes.py                      3      3     0%   1-3
-    tutorial/scripts/__init__.py            0      0   100%
-    tutorial/scripts/initialize_db.py      22     22     0%   1-38
-    tutorial/views/__init__.py              0      0   100%
-    tutorial/views/default.py              12      0   100%
-    tutorial/views/notfound.py              4      4     0%   1-7
-    -----------------------------------------------------------------
-    TOTAL                                  93     42    55%
-
-    ===================== 2 passed in 0.64 seconds ======================
+    ===================== 5 passed in 0.77 seconds ======================
 
 Our package doesn't quite have 100% test coverage.
 
@@ -383,32 +386,13 @@ Our package doesn't quite have 100% test coverage.
 Test and coverage cookiecutter defaults
 ---------------------------------------
 
-Cookiecutters include configuration defaults for ``pytest`` and test coverage.
-These configuration files are ``pytest.ini`` and ``.coveragerc``, located at
-the root of your package. Without these defaults, we would need to specify the
-path to the module on which we want to run tests and coverage.
+The Pyramid cookiecutter includes configuration defaults for ``pytest`` and test coverage.
+These configuration files are ``pytest.ini`` and ``.coveragerc``, located at the root of your package.
 
-On Unix
-^^^^^^^
+``pytest`` follows :ref:`conventions for Python test discovery <pytest:test discovery>`.
+The configuration defaults from the cookiecutter tell ``pytest`` where to find the module on which we want to run tests and coverage.
 
-.. code-block:: bash
-
-    $VENV/bin/pytest --cov=tutorial tests -q
-
-On Windows
-^^^^^^^^^^
-
-.. code-block:: doscon
-
-    %VENV%\Scripts\pytest --cov=tutorial tutorial\tests.py -q
-
-pytest follows :ref:`conventions for Python test discovery
-<pytest:test discovery>`, and the configuration defaults from the cookiecutter
-tell ``pytest`` where to find the module on which we want to run tests and
-coverage.
-
-.. seealso:: See ``pytest``'s documentation for :ref:`pytest:usage` or invoke
-   ``pytest -h`` to see its full set of options.
+.. seealso:: See ``pytest``'s documentation for :ref:`pytest:usage` or invoke ``pytest -h`` to see its full set of options.
 
 
 .. _wiki2-start-the-application:
