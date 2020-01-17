@@ -10,8 +10,8 @@ import warnings
 from webob.cookies import CookieProfile
 from zope.interface import implementer
 
+from pyramid.authorization import Authenticated, Everyone
 from pyramid.interfaces import IAuthenticationPolicy, IDebugLogger
-from pyramid.security import Authenticated, Everyone
 from pyramid.util import (
     SimpleSerializer,
     ascii_,
@@ -98,7 +98,7 @@ class CallbackAuthenticationPolicy(object):
         """ A list of effective principals derived from request.
 
         This will return a list of principals including, at least,
-        :data:`pyramid.security.Everyone`. If there is no authenticated
+        :data:`pyramid.authorization.Everyone`. If there is no authenticated
         userid, or the ``callback`` returns ``None``, this will be the
         only principal:
 
@@ -108,8 +108,9 @@ class CallbackAuthenticationPolicy(object):
 
         If the ``callback`` does not return ``None`` and an authenticated
         userid is found, then the principals will include
-        :data:`pyramid.security.Authenticated`, the ``authenticated_userid``
-        and the list of principals returned by the ``callback``:
+        :data:`pyramid.authorization.Authenticated`, the
+        ``authenticated_userid`` and the list of principals returned by the
+        ``callback``:
 
         .. code-block:: python
 
@@ -274,13 +275,14 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         """ A list of effective principals derived from the identity.
 
         This will return a list of principals including, at least,
-        :data:`pyramid.security.Everyone`. If there is no identity, or
+        :data:`pyramid.authorization.Everyone`. If there is no identity, or
         the ``callback`` returns ``None``, this will be the only principal.
 
         If the ``callback`` does not return ``None`` and an identity is
         found, then the principals will include
-        :data:`pyramid.security.Authenticated`, the ``authenticated_userid``
-        and the list of principals returned by the ``callback``.
+        :data:`pyramid.authorization.Authenticated`, the
+        ``authenticated_userid`` and the list of principals returned by the
+        ``callback``.
 
         """
         effective_principals = [Everyone]

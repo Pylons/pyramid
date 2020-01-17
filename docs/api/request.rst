@@ -202,7 +202,7 @@
       currently authenticated, but this depends on the
       :term:`authentication policy` in effect.  If no :term:`authentication
       policy` is in effect, this will return a sequence containing only the
-      :attr:`pyramid.security.Everyone` principal.
+      :attr:`pyramid.authorization.Everyone` principal.
 
    .. method:: invoke_subrequest(request, use_tweens=False)
 

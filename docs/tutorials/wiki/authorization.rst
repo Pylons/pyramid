@@ -108,8 +108,8 @@ For our application we've defined a list of a few principals:
 
 - ``u:<userid>``
 - ``group:editor``
-- :attr:`pyramid.security.Authenticated`
-- :attr:`pyramid.security.Everyone`
+- :attr:`pyramid.authorization.Authenticated`
+- :attr:`pyramid.authorization.Everyone`
 
 Various wiki pages will grant some of these principals access to edit existing or add new pages.
 
@@ -176,9 +176,9 @@ Add the following lines to the ``Wiki`` class:
     :emphasize-lines: 4-7
     :language: python
 
-We import :data:`~pyramid.security.Allow`, an action which means that
+We import :data:`~pyramid.authorization.Allow`, an action which means that
 permission is allowed.
-We also import :data:`~pyramid.security.Everyone`, a special :term:`principal` that is associated to all requests.
+We also import :data:`~pyramid.authorization.Everyone`, a special :term:`principal` that is associated to all requests.
 Both are used in the :term:`ACE` entries that make up the ACL.
 
 The ACL is a list that needs to be named ``__acl__`` and be an attribute of a class.

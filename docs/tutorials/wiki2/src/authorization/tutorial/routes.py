@@ -1,10 +1,10 @@
+from pyramid.authorization import (
+    Allow,
+    Everyone,
+)
 from pyramid.httpexceptions import (
     HTTPNotFound,
     HTTPSeeOther,
-)
-from pyramid.security import (
-    Allow,
-    Everyone,
 )
 
 from . import models

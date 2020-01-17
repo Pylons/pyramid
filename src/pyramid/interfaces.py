@@ -554,8 +554,8 @@ class IAuthenticationPolicy(Interface):
         """ Return a sequence representing the effective principals
         typically including the :term:`userid` and any groups belonged
         to by the current user, always including 'system' groups such
-        as ``pyramid.security.Everyone`` and
-        ``pyramid.security.Authenticated``.
+        as ``pyramid.authorization.Everyone`` and
+        ``pyramid.authorization.Authenticated``.
 
         """
 

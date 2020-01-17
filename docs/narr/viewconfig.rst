@@ -501,7 +501,7 @@ configured view.
   :meth:`pyramid.request.Request.effective_principals` method indicates that
   every principal named in the argument list is present in the current request,
   this predicate will return True; otherwise it will return False.  For
-  example: ``effective_principals=pyramid.security.Authenticated`` or
+  example: ``effective_principals=pyramid.authorization.Authenticated`` or
   ``effective_principals=('fred', 'group:admins')``.
 
   .. versionadded:: 1.4a4

@@ -1,9 +1,49 @@
+import warnings
 from zope.interface import implementer
 
 from pyramid.interfaces import IAuthorizationPolicy
 from pyramid.location import lineage
-from pyramid.security import ACLAllowed, ACLDenied, Allow, Deny, Everyone
 from pyramid.util import is_nonstr_iter
+
+# the simplest way to deprecate the attributes in security.py is to
+# leave them defined there and then import/re-export them here because
+# otherwise there is a difficult-to-resolve circular import between
+# the two modules - in the future when we remove the deprecated code and
+# move it to live here, we will be able to remove this
+with warnings.catch_warnings():
+    warnings.simplefilter('ignore')
+    from pyramid.security import (
+        ACLAllowed as _ACLAllowed,
+        ACLDenied as _ACLDenied,
+        AllPermissionsList as _AllPermissionsList,
+        Allow,
+        Authenticated,
+        Deny,
+        Everyone,
+    )
+
+
+Everyone = Everyone  # api
+Authenticated = Authenticated  # api
+Allow = Allow  # api
+Deny = Deny  # api
+
+
+# subclasses to fix __module__
+class AllPermissionsList(_AllPermissionsList):
+    pass
+
+
+class ACLAllowed(_ACLAllowed):
+    pass
+
+
+class ACLDenied(_ACLDenied):
+    pass
+
+
+ALL_PERMISSIONS = AllPermissionsList()  # api
+DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)  # api
 
 
 @implementer(IAuthorizationPolicy)
@@ -29,9 +69,9 @@ class ACLAuthorizationPolicy(object):
 
     def permits(self, context, principals, permission):
         """ Return an instance of
-        :class:`pyramid.security.ACLAllowed` instance if the policy
+        :class:`pyramid.authorization.ACLAllowed` instance if the policy
         permits access, return an instance of
-        :class:`pyramid.security.ACLDenied` if not."""
+        :class:`pyramid.authorization.ACLDenied` if not."""
         return self.helper.permits(context, principals, permission)
 
     def principals_allowed_by_permission(self, context, permission):
@@ -54,9 +94,9 @@ class ACLHelper:
     """
 
     def permits(self, context, principals, permission):
-        """ Return an instance of :class:`pyramid.security.ACLAllowed` if the
-        ACL allows access a user with the given principals, return an instance
-        of :class:`pyramid.security.ACLDenied` if not.
+        """ Return an instance of :class:`pyramid.authorization.ACLAllowed` if
+        the ACL allows access a user with the given principals, return an
+        instance of :class:`pyramid.authorization.ACLDenied` if not.
 
         When checking if principals are allowed, the security policy consults
         the ``context`` for an ACL first.  If no ACL exists on the context, or
@@ -65,18 +105,18 @@ class ACLHelper:
         so on, until the lineage is exhausted or we determine that the policy
         permits or denies.
 
-        During this processing, if any :data:`pyramid.security.Deny`
+        During this processing, if any :data:`pyramid.authorization.Deny`
         ACE is found matching any principal in ``principals``, stop
         processing by returning an
-        :class:`pyramid.security.ACLDenied` instance (equals
+        :class:`pyramid.authorization.ACLDenied` instance (equals
         ``False``) immediately.  If any
-        :data:`pyramid.security.Allow` ACE is found matching any
+        :data:`pyramid.authorization.Allow` ACE is found matching any
         principal, stop processing by returning an
-        :class:`pyramid.security.ACLAllowed` instance (equals
+        :class:`pyramid.authorization.ACLAllowed` instance (equals
         ``True``) immediately.  If we exhaust the context's
         :term:`lineage`, and no ACE has explicitly permitted or denied
         access, return an instance of
-        :class:`pyramid.security.ACLDenied` (equals ``False``).
+        :class:`pyramid.authorization.ACLDenied` (equals ``False``).
 
         """
         acl = '<No ACL found on any object in resource lineage>'
@@ -120,17 +160,17 @@ class ACLHelper:
         of principals that are explicitly granted the ``permission`` in the
         provided ``context``.  We do this by walking 'up' the object graph
         *from the root* to the context.  During this walking process, if we
-        find an explicit :data:`pyramid.security.Allow` ACE for a principal
-        that matches the ``permission``, the principal is included in the allow
-        list.  However, if later in the walking process that principal is
-        mentioned in any :data:`pyramid.security.Deny` ACE for the permission,
-        the principal is removed from the allow list.  If a
-        :data:`pyramid.security.Deny` to the principal
-        :data:`pyramid.security.Everyone` is encountered during the walking
-        process that matches the ``permission``, the allow list is cleared for
-        all principals encountered in previous ACLs.  The walking process ends
-        after we've processed the any ACL directly attached to ``context``; a
-        set of principals is returned.
+        find an explicit :data:`pyramid.authorization.Allow` ACE for a
+        principal that matches the ``permission``, the principal is included in
+        the allow list.  However, if later in the walking process that
+        principal is mentioned in any :data:`pyramid.authorization.Deny` ACE
+        for the permission, the principal is removed from the allow list.  If
+        a :data:`pyramid.authorization.Deny` to the principal
+        :data:`pyramid.authorization.Everyone` is encountered during the
+        walking process that matches the ``permission``, the allow list is
+        cleared for all principals encountered in previous ACLs.  The walking
+        process ends after we've processed the any ACL directly attached to
+        ``context``; a set of principals is returned.
 
         """
         allowed = set()
