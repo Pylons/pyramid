@@ -1128,6 +1128,7 @@ See this code:
 We register this class as a :term:`predicate factory` with the ``any_of`` keyword argument name.
 Then we use that new keyword argument with :meth:`~pyramid.config.Configurator.add_route`.
 When the route is requested, Pyramid instantiates the ``AnyOfPredicate`` class using the value passed to the ``any_of`` argument.
+(The ``info`` parameter passed to the factory contains some metadata, you can ignore it for now.)
 The resulting instance is a :term:`predicate`.
 It will determine whether incoming requests satisfy its condition.
 In the example above, a request for ``/three`` would match the route's URL pattern and satisfy the route's predicate because ``three`` is one of the allowed values, so the route would be matched.
