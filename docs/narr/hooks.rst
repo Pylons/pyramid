@@ -1416,10 +1416,10 @@ The ``ptweens`` command-line utility can be used to report the current implicit
 and explicit tween chains used by an application.  See
 :ref:`displaying_tweens`.
 
-.. _registering_thirdparty_predicates:
+.. _registering_custom_predicates:
 
-Adding a Third Party View, Route, or Subscriber Predicate
----------------------------------------------------------
+Adding a Custom View, Route, or Subscriber Predicate
+----------------------------------------------------
 
 .. versionadded:: 1.4
 
@@ -1446,7 +1446,7 @@ Likewise, a similar predicate can be used as a *route* predicate:
     config.add_route('name', '/foo', request_method='POST')
 
 Many other built-in predicates exists (``request_param``, and others).  You can
-add third-party predicates to the list of available predicates by using one of
+add custom predicates to the list of available predicates by using one of
 :meth:`pyramid.config.Configurator.add_view_predicate` or
 :meth:`pyramid.config.Configurator.add_route_predicate`.  The former adds a
 view predicate, the latter a route predicate.
@@ -1564,7 +1564,7 @@ event type.
             self.val = val
 
         def text(self):
-            return 'path_startswith = %s' % (self.val,)
+            return 'request_path_startswith = %s' % (self.val,)
 
         phash = text
 

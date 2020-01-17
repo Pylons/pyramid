@@ -1087,11 +1087,8 @@ A convenience context manager exists to set the route prefix for any
 Custom Route Predicates
 -----------------------
 
-Each of the predicate callables fed to the ``custom_predicates`` argument of
-:meth:`~pyramid.config.Configurator.add_route` must be a callable accepting two
-arguments.  The first argument passed to a custom predicate is a dictionary
-conventionally named ``info``.  The second argument is the current
-:term:`request` object.
+A predicate is a callable that accepts two arguments: a dictionary
+conventionally named ``info``, and the current :term:`request` object.
 
 The ``info`` dictionary has a number of contained values, including ``match``
 and ``route``. ``match`` is a dictionary which represents the arguments matched
@@ -1100,52 +1097,71 @@ was matched (see :class:`pyramid.interfaces.IRoute` for the API of such a route
 object).
 
 ``info['match']`` is useful when predicates need access to the route match.
-For example:
+Imagine you want to define a route when a part of the URL matches some
+specific values.  You could define three view configurations, each one
+with its own ``match_param`` value (see :ref:`predicate_view_args`), but
+you want to think of it as one route, and associate it with one view.
+See this code:
 
 .. code-block:: python
     :linenos:
 
-    def any_of(segment_name, *allowed):
-        def predicate(info, request):
-            if info['match'][segment_name] in allowed:
-                return True
-        return predicate
+    class AnyOfPredicate:
+        def __init__(self, val, info):
+            self.segment_name = val[0]
+            self.allowed = tuple(val[0:])
 
-    num_one_two_or_three = any_of('num', 'one', 'two', 'three')
+        def text(self):
+            args = (self.segment_name,) + self.allowed
+            return 'any_of = %s' % (args,)
 
-    config.add_route('route_to_num', '/{num}',
-                     custom_predicates=(num_one_two_or_three,))
+        phash = text
 
-The above ``any_of`` function generates a predicate which ensures that the
-match value named ``segment_name`` is in the set of allowable values
-represented by ``allowed``.  We use this ``any_of`` function to generate a
-predicate function named ``num_one_two_or_three``, which ensures that the
-``num`` segment is one of the values ``one``, ``two``, or ``three`` , and use
-the result as a custom predicate by feeding it inside a tuple to the
-``custom_predicates`` argument to
-:meth:`~pyramid.config.Configurator.add_route`.
+        def __call__(self, info, request):
+            return info['match'][self.segment_name] in self.allowed
+
+
+    config.add_route_predicate('any_of', AnyOfPredicate)
+    config.add_route('route_to_num', '/{num}', any_of=('num', 'one', 'two', 'three'))
+
+
+We register this class as a :term:`predicate factory` with the ``any_of`` keyword argument name.
+Then we use that new keyword argument with :meth:`~pyramid.config.Configurator.add_route`.
+When the route is requested, Pyramid instantiates the ``AnyOfPredicate`` class using the value passed to the ``any_of`` argument.
+(The ``info`` parameter passed to the factory contains some metadata, you can ignore it for now.)
+The resulting instance is a :term:`predicate`.
+It will determine whether incoming requests satisfy its condition.
+In the example above, a request for ``/three`` would match the route's URL pattern and satisfy the route's predicate because ``three`` is one of the allowed values, so the route would be matched.
+However a request for ``/millions`` will match the route's URL pattern but would not satisfy the route's predicate, and the route would not be matched.
 
 A custom route predicate may also *modify* the ``match`` dictionary.  For
 instance, a predicate might do some type conversion of values:
 
 .. code-block:: python
-     :linenos:
+    :linenos:
 
-     def integers(*segment_names):
-         def predicate(info, request):
-             match = info['match']
-             for segment_name in segment_names:
-                 try:
-                     match[segment_name] = int(match[segment_name])
-                 except (TypeError, ValueError):
-                     pass
-             return True
-         return predicate
+    class IntegersPredicate:
+        def __init__(self, val, info):
+            self.segment_names = val
 
-     ymd_to_int = integers('year', 'month', 'day')
+        def text(self):
+            return 'integers = %s' % (self.segment_names,)
 
-     config.add_route('ymd', '/{year}/{month}/{day}',
-                      custom_predicates=(ymd_to_int,))
+        phash = text
+
+        def __call__(self, info, request):
+            match = info['match']
+            for segment_name in self.segment_names:
+                try:
+                    match[segment_name] = int(match[segment_name])
+                except (TypeError, ValueError):
+                    pass
+            return True
+
+
+    config.add_route_predicate('integers', IntegersPredicate)
+    config.add_route('ymd', '/{year}/{month}/{day}',
+                     integers=('year', 'month', 'day'))
 
 Note that a conversion predicate is still a predicate, so it must return
 ``True`` or ``False``. A predicate that does *only* conversion, such as the one
@@ -1157,18 +1173,25 @@ expressions specifying requirements for that marker. For instance:
 .. code-block:: python
     :linenos:
 
-    def integers(*segment_names):
-        def predicate(info, request):
+    class IntegersPredicate:
+        def __init__(self, val, info):
+            self.segment_names = val
+
+        def text(self):
+            return 'integers = %s' % (self.segment_names,)
+
+        phash = text
+
+        def __call__(self, info, request):
             match = info['match']
-            for segment_name in segment_names:
+            for segment_name in self.segment_names:
                 match[segment_name] = int(match[segment_name])
             return True
-        return predicate
 
-    ymd_to_int = integers('year', 'month', 'day')
 
-    config.add_route('ymd', '/{year:\d+}/{month:\d+}/{day:\d+}',
-                     custom_predicates=(ymd_to_int,))
+    config.add_route_predicate('integers', IntegersPredicate)
+    config.add_route('ymd', r'/{year:\d+}/{month:\d+}/{day:\d+}',
+                     integers=('year', 'month', 'day'))
 
 Now the try/except is no longer needed because the route will not match at all
 unless these markers match ``\d+`` which requires them to be valid digits for
@@ -1199,60 +1222,39 @@ route in a set of route predicates:
 .. code-block:: python
     :linenos:
 
-    def twenty_ten(info, request):
-        if info['route'].name in ('ymd', 'ym', 'y'):
-            return info['match']['year'] == '2010'
+    class TwentyTenPredicate:
+        def __init__(self, val, info):
+            pass
 
-    config.add_route('y', '/{year}', custom_predicates=(twenty_ten,))
-    config.add_route('ym', '/{year}/{month}', custom_predicates=(twenty_ten,))
-    config.add_route('ymd', '/{year}/{month}/{day}',
-                     custom_predicates=(twenty_ten,))
+        def text(self):
+            return "twenty_ten = True"
 
-The above predicate, when added to a number of route configurations ensures
-that the year match argument is '2010' if and only if the route name is 'ymd',
-'ym', or 'y'.
+        phash = text
 
-You can also caption the predicates by setting the ``__text__`` attribute. This
-will help you with the ``pviews`` command (see
-:ref:`displaying_application_routes`) and the ``pyramid_debugtoolbar``.
+        def __call__(self, info, request):
+            if info['route'].name in ('ymd', 'ym', 'y'):
+                return info['match']['year'] == '2010'
 
-If a predicate is a class, just add ``__text__`` property in a standard manner.
+    config.add_route_predicate('twenty_ten', TwentyTenPredicate)
+    config.add_route('y', '/{year}', twenty_ten=True)
+    config.add_route('ym', '/{year}/{month}', twenty_ten=True)
+    config.add_route('ymd', '/{year}/{month}/{day}', twenty_ten=True)
 
-.. code-block:: python
-    :linenos:
+The above predicate, when added to a number of route configurations ensures that the year match
+argument is ``2010`` if and only if the route name is ``ymd``, ``ym``, or ``y``.
 
-    class DummyCustomPredicate1(object):
-        def __init__(self):
-            self.__text__ = 'my custom class predicate'
+The ``text`` method is a way to caption the predicates.  This will help you with the ``pviews``
+command (see :ref:`displaying_application_routes`) and the :term:`pyramid_debugtoolbar`.
 
-    class DummyCustomPredicate2(object):
-        __text__ = 'my custom class predicate'
+The ``phash`` ("predicate hash") method should return a string that uniquely identifies a specific predicate.
+A good way to do that is to use the same argument name and value that are in the call to ``add_route``,
+like in the examples above.
 
-If a predicate is a method, you'll need to assign it after method declaration
-(see `PEP 232 <https://www.python.org/dev/peps/pep-0232/>`_).
-
-.. code-block:: python
-    :linenos:
-
-    def custom_predicate():
-        pass
-    custom_predicate.__text__ = 'my custom method predicate'
-
-If a predicate is a classmethod, using ``@classmethod`` will not work, but you
-can still easily do it by wrapping it in a classmethod call.
-
-.. code-block:: python
-    :linenos:
-
-    def classmethod_predicate():
-        pass
-    classmethod_predicate.__text__ = 'my classmethod predicate'
-    classmethod_predicate = classmethod(classmethod_predicate)
-
-The same will work with ``staticmethod``, using ``staticmethod`` instead of
-``classmethod``.
 
 .. seealso::
+
+    See :ref:`registering_custom_predicates` for more information about
+    custom view, route, and subscriber predicates.
 
     See also :class:`pyramid.interfaces.IRoute` for more API documentation
     about route objects.

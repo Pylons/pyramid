@@ -478,12 +478,11 @@ more to offer:
 
 - One route leading to multiple views, based on information in the request or
   data such as ``request_param``, ``request_method``, ``accept``, ``header``,
-  ``xhr``, ``containment``, and ``custom_predicates``
+  ``xhr``, ``containment``, and custom predicates.
 
 .. seealso:: See also:
-    :ref:`Quick Tutorial View Classes <qtut_view_classes>`, :ref:`Quick
-    Tutorial More View Classes <qtut_more_view_classes>`, and
-    :ref:`class_as_view`.
+    :ref:`View Classes <qtut_view_classes>` and :ref:`More View Classes <qtut_more_view_classes>`
+    in the Quick Tutorial, :ref:`class_as_view`, and :ref:`view_and_route_predicates`.
 
 
 Quick project startup with cookiecutters

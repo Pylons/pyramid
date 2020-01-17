@@ -40,13 +40,10 @@ class RoutesConfiguratorMixin(object):
         inherit_slash=None,
         **predicates
     ):
-        """ Add a :term:`route configuration` to the current
-        configuration state, as well as possibly a :term:`view
-        configuration` to be used to specify a :term:`view callable`
-        that will be invoked when this route matches.  The arguments
-        to this method are divided into *predicate*, *non-predicate*,
-        and *view-related* types.  :term:`Route predicate` arguments
-        narrow the circumstances in which a route will be match a
+        """ Add a :term:`route configuration` to the current configuration
+        state.  Arguments to ``add_route`` are divided into *predicate*
+        and *non-predicate* types.  :term:`Route predicate` arguments
+        narrow the circumstances in which a route will match a
         request; non-predicate arguments are informational.
 
         Non-Predicate Arguments
@@ -283,6 +280,8 @@ class RoutesConfiguratorMixin(object):
 
           .. versionadded:: 1.4a4
 
+          .. deprecated:: 2.0
+
         custom_predicates
 
           .. deprecated:: 1.5
@@ -302,14 +301,13 @@ class RoutesConfiguratorMixin(object):
               :ref:`custom_route_predicates` for more information about
               ``info``.
 
-        predicates
+        \\*\\*predicates
 
-          Pass a key/value pair here to use a third-party predicate
-          registered via
+          Pass extra keyword parameters to use custom predicates registered via
           :meth:`pyramid.config.Configurator.add_route_predicate`.  More than
-          one key/value pair can be used at the same time.  See
+          one custom predicate can be used at the same time.  See
           :ref:`view_and_route_predicates` for more information about
-          third-party predicates.
+          custom predicates.
 
           .. versionadded:: 1.4
 
@@ -321,7 +319,7 @@ class RoutesConfiguratorMixin(object):
                     'Configurator.add_route is deprecated as of Pyramid 1.5. '
                     'Use "config.add_route_predicate" and use the registered '
                     'route predicate as a predicate argument to add_route '
-                    'instead. See "Adding A Third Party View, Route, or '
+                    'instead. See "Adding A Custom View, Route, or '
                     'Subscriber Predicate" in the "Hooks" chapter of the '
                     'documentation for more information.'
                 ),
