@@ -1190,7 +1190,7 @@ expressions specifying requirements for that marker. For instance:
 
 
     config.add_route_predicate('integers', IntegersPredicate)
-    config.add_route('ymd', '/{year:\d+}/{month:\d+}/{day:\d+}',
+    config.add_route('ymd', r'/{year:\d+}/{month:\d+}/{day:\d+}',
                      integers=('year', 'month', 'day'))
 
 Now the try/except is no longer needed because the route will not match at all
