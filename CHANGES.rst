@@ -255,3 +255,7 @@ Documentation Changes
 
 - Fix docs build for Sphinx 2.0.
   See https://github.com/Pylons/pyramid/pull/3480
+
+- Significant updates to the wiki, wiki2 tutorials to demonstrate the new
+  security policy usage as well as a much more production-ready test harness.
+  See https://github.com/Pylons/pyramid/pull/3557
