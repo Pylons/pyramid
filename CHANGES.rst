@@ -165,14 +165,23 @@ Backward Incompatibilities
 --------------------------
 
 - Drop support for Python 2.7.
+  https://github.com/Pylons/pyramid/pull/3421
 
 - Drop support for Python 3.4.
   See https://github.com/Pylons/pyramid/pull/3547
+
+- Removed the ``pyramid.compat`` module. Integrators should use the ``six``
+  module or vendor shims they are using into their own codebases going forward.
+  https://github.com/Pylons/pyramid/pull/3421
 
 - ``pcreate`` and the builtin scaffolds have been removed in favor of
   using the ``cookiecutter`` tool and the ``pyramid-cookiecutter-starter``
   cookiecutter. The script and scaffolds were deprecated in Pyramid 1.8.
   See https://github.com/Pylons/pyramid/pull/3406
+
+- Changed the default ``hashalg`` on
+  ``pyramid.authentication.AuthTktCookieHelper`` to ``sha512``.
+  See https://github.com/Pylons/pyramid/pull/3557
 
 - Removed ``pyramid.interfaces.ITemplateRenderer``. This interface was
   deprecated since Pyramid 1.5 and was an interface
@@ -237,10 +246,6 @@ Backward Incompatibilities
   ``pyramid.config.Configurator.set_default_csrf_options`` and the
   ``require_csrf`` view option to enable automatic CSRF checking.
   See https://github.com/Pylons/pyramid/pull/3521
-
-- Changed the default ``hashalg`` on
-  ``pyramid.authentication.AuthTktCookieHelper`` to ``sha512``.
-  See https://github.com/Pylons/pyramid/pull/3557
 
 Documentation Changes
 ---------------------
