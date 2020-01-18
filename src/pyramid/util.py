@@ -121,7 +121,7 @@ class InstancePropertyHelper(object):
                 )
             name = callable.__name__
         name = get_callable_name(name)
-        is_data_descriptor = hasattr(callable, '__set__')
+        is_data_descriptor = inspect.isdatadescriptor(callable)
         if reify and is_data_descriptor:
             raise ValueError('cannot reify a data descriptor')
         if is_data_descriptor:
