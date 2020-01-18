@@ -74,6 +74,8 @@ def as_sorted_tuple(val):
 
 
 class SettableProperty(object):
+    # this is just like reify but does not store the computed result on
+    # the class such that subsequent invocations invoke the callable again
     def __init__(self, wrapped):
         self.wrapped = wrapped
         functools.update_wrapper(self, wrapped)
@@ -81,16 +83,7 @@ class SettableProperty(object):
     def __get__(self, obj, type=None):
         if obj is None:  # pragma: no cover
             return self
-        value = obj.__dict__.get(self.wrapped.__name__, _marker)
-        if value is _marker:
-            value = self.wrapped(obj)
-        return value
-
-    def __set__(self, obj, value):
-        obj.__dict__[self.wrapped.__name__] = value
-
-    def __delete__(self, obj):
-        del obj.__dict__[self.wrapped.__name__]
+        return self.wrapped(obj)
 
 
 class InstancePropertyHelper(object):

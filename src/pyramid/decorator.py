@@ -41,5 +41,9 @@ class reify(object):
         if inst is None:
             return self
         val = self.wrapped(inst)
+        # reify is a non-data-descriptor which is leveraging the fact
+        # that it is not invoked if the equivalent attribute is defined in the
+        # object's dict, so the setattr here effectively hides this descriptor
+        # from subsequent lookups
         setattr(inst, self.wrapped.__name__, val)
         return val
