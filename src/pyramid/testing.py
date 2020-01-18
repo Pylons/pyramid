@@ -15,7 +15,7 @@ from pyramid.response import _get_response_factory
 from pyramid.security import AuthenticationAPIMixin, SecurityAPIMixin
 from pyramid.threadlocal import get_current_registry, manager
 from pyramid.url import URLMethodsMixin
-from pyramid.util import PYPY, InstancePropertyMixin, text_
+from pyramid.util import PYPY, InstancePropertyMixin
 from pyramid.view import ViewMethodsMixin
 
 _marker = object()
@@ -260,7 +260,7 @@ class DummySession(dict):
         return storage
 
     def new_csrf_token(self):
-        token = text_('0123456789012345678901234567890123456789')
+        token = '0123456789012345678901234567890123456789'
         self['_csrft_'] = token
         return token
 
