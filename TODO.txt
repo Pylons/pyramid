@@ -30,12 +30,6 @@ Nice-to-Have
 - Fix deployment recipes in cookbook (discourage proxying without changing
   server).
 
-- Try "with transaction.manager" in an exception view with SQLA (preempt
-  homina homina response about how to write "to the database" from within in
-  an exception view).  Note: tried this and couldn't formulate the right
-  situation where the database could not be written to within an exception
-  view (but didn't try exhaustively).
-
 - Add narrative docs for wsgiapp and wsgiapp2.
 
 - Basic WSGI documentation (pipeline / app / server).
