@@ -133,6 +133,3 @@ Probably Bad Ideas
         c.add_view(..)
 
 - _fix_registry should dictify the registry being fixed.
-
-- Apply a prefix to the userid principal to avoid poisoning the principal
-  namespace. See https://github.com/Pylons/pyramid/issues/2060

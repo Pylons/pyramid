@@ -1,22 +1,93 @@
 What's New in Pyramid 2.0
 =========================
 
-This article explains the new features in :app:`Pyramid` version 2.0 as
-compared to its predecessor, :app:`Pyramid` 1.10. It also documents backwards
-incompatibilities between the two versions and deprecations added to
-:app:`Pyramid` 2.0, as well as software dependency changes and notable
-documentation additions.
+This article explains the new features in :app:`Pyramid` version 2.0 as compared to its predecessor, :app:`Pyramid` 1.10.
+It also documents backwards incompatibilities between the two versions and deprecations added to :app:`Pyramid` 2.0, as well as software dependency changes and notable documentation additions.
+
+.. note::
+
+    This is the first release of :app:`Pyramid` that does not support Python 2, which is now End-of-Life and no longer receiving critical security updates by the PSF.
 
 Feature Additions
 -----------------
 
 The feature additions in Pyramid 2.0 are as follows:
 
-- The authentication and authorization policies of Pyramid 1.x have been merged
-  into a single :term:`security policy` in Pyramid 2.0.  For details on how to
-  migrate to the new security policy, see :ref:`upgrading_auth`.
-  Authentication and authorization policies can still be used and will continue
-  to function normally for the time being.
+- The authentication and authorization policies of Pyramid 1.x have been merged into a single :term:`security policy` in Pyramid 2.0.
+  For details on how to migrate to the new security policy, see :ref:`upgrading_auth`.
+  Authentication and authorization policies can still be used and will continue to function normally for the time being.
+
+  New security APIs have been added to support an overhaul of the authentication and authorization system.
+  Read :ref:`upgrading_auth` for information about using this new system.
+
+  - :meth:`pyramid.config.Configurator.set_security_policy`
+  - :class:`pyramid.interfaces.ISecurityPolicy`
+  - :attr:`pyramid.request.Request.authenticated_identity`
+  - :class:`pyramid.authentication.AuthTktCookieHelper` (available in Pyramid 1.x)
+  - :class:`pyramid.authentication.SessionAuthenticationHelper`
+  - :class:`pyramid.authorization.ACLHelper`
+
+  See https://github.com/Pylons/pyramid/pull/3465
+
+- Changed the default ``serializer`` on :class:`pyramid.session.SignedCookieSessionFactory` to use :class:`pyramid.session.JSONSerializer` instead of :class:`pyramid.session.PickleSerializer`.
+  Read "Changes to ISession in Pyramid 2.0" in the "Sessions" chapter of the documentation for more information about why this change was made.
+  See https://github.com/Pylons/pyramid/pull/3413
+
+- It is now possible to control whether a route pattern contains a trailing
+  slash when it is composed with a route prefix using
+  ``config.include(..., route_prefix=...)`` or
+  ``with config.route_prefix_context(...)``. This can be done by specifying
+  an empty pattern and setting the new argument
+  ``inherit_slash=True``. For example:
+
+  .. code-block:: python
+
+      with config.route_prefix_context('/users'):
+          config.add_route('users', '', inherit_slash=True)
+
+  In the example, the resulting pattern will be ``/users``. Similarly, if the
+  route prefix were ``/users/`` then the final pattern would be ``/users/``.
+  If the ``pattern`` was ``'/'``, then the final pattern would always be
+  ``/users/``. This new setting is only available if the pattern supplied
+  to ``add_route`` is the empty string (``''``).
+  See https://github.com/Pylons/pyramid/pull/3420
+
+- A new parameter, ``allow_no_origin``, was added to :meth:`pyramid.config.Configurator.set_default_csrf_options` as well as :func:`pyramid.csrf.check_csrf_origin`.
+  This option controls whether a request is rejected if it has no ``Origin`` or ``Referer`` header - often the result of a user configuring their browser not to send a ``Referer`` header for privacy reasons even on same-domain requests.
+  The default is to reject requests without a known origin.
+  It is also possible to allow the special ``Origin: null`` header by adding it to the ``pyramid.csrf_trusted_origins`` list in the settings.
+  See https://github.com/Pylons/pyramid/pull/3512 and https://github.com/Pylons/pyramid/pull/3518
+
+- A new parameter, ``check_origin``, was added to :meth:`pyramid.config.Configurator.set_default_csrf_options` which disables origin checking entirely.
+  See https://github.com/Pylons/pyramid/pull/3518
+
+- Added :class:`pyramid.interfaces.IPredicateInfo` which defines the object passed to predicate factories as their second argument.
+  See https://github.com/Pylons/pyramid/pull/3514
+
+- Added support for serving pre-compressed static assets by using the ``content_encodings`` argument of :meth:`pyramid.config.Configurator.add_static_view` and :func:`pyramid.static.static_view`.
+  See https://github.com/Pylons/pyramid/pull/3537
+
+- Fix ``DeprecationWarning`` emitted by using the ``imp`` module.
+  See https://github.com/Pylons/pyramid/pull/3553
+
+- Properties created via ``config.add_request_method(..., property=True)`` or ``request.set_property`` used to be readonly.
+  They can now be overridden via ``request.foo = ...`` and until the value is deleted it will return the overridden value.
+  This is most useful when mocking request properties in testing.
+  See https://github.com/Pylons/pyramid/pull/3559
+
+- Finished callbacks are now executed as part of the ``closer`` that is invoked as part of :func:`pyramid.scripting.prepare` and :func:`pyramid.paster.bootstrap`.
+  See https://github.com/Pylons/pyramid/pull/3561
+
+- Added :class:`pyramid.request.RequestLocalCache` which can be used to create simple objects that are shared across requests and can be used to store per-request data.
+  This is useful when the source of data is external to the request itself.
+  Often a reified property is used on a request via :meth:`pyramid.config.Configurator.add_request_method`, or :class:`pyramid.decorator.reify`.
+  These work great when the data is generated on-demand when accessing the request property.
+  However, often the case is that the data is generated when accessing some other system
+  and then we want to cache the data for the duration of the request.
+  See https://github.com/Pylons/pyramid/pull/3561
+
+- Exposed :data:`pyramid.authorization.ALL_PERMISSIONS` and :data:`pyramid.authorization.DENY_ALL` such that all of the ACL-related constants are now importable from the ``pyramid.authorization`` namespace.
+  See https://github.com/Pylons/pyramid/pull/3563
 
 Deprecations
 ------------
