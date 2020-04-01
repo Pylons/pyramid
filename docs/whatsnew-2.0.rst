@@ -14,11 +14,11 @@ Feature Additions
 The feature additions in Pyramid 2.0 are as follows:
 
 - The authentication and authorization policies of Pyramid 1.x have been merged into a single :term:`security policy` in Pyramid 2.0.
-  For details on how to migrate to the new security policy, see :ref:`upgrading_auth`.
+  For details on how to migrate to the new security policy, see :ref:`upgrading_auth_20`.
   Authentication and authorization policies can still be used and will continue to function normally for the time being.
 
   New security APIs have been added to support an overhaul of the authentication and authorization system.
-  Read :ref:`upgrading_auth` for information about using this new system.
+  Read :ref:`upgrading_auth_20` for information about using this new system.
 
   - :meth:`pyramid.config.Configurator.set_security_policy`
   - :class:`pyramid.interfaces.ISecurityPolicy`
@@ -95,7 +95,7 @@ Deprecations
 - Authentication and authorization policies have been deprecated in favor of
   the new :term:`security policy`.
 
-.. _upgrading_auth:
+.. _upgrading_auth_20:
 
 Upgrading Authentication/Authorization
 --------------------------------------

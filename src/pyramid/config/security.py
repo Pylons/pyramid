@@ -122,7 +122,7 @@ class SecurityConfiguratorMixin:
         .. deprecated:: 2.0
 
             Authentication policies have been replaced by security policies.
-            See :ref:`upgrading_auth` for more information.
+            See :ref:`upgrading_auth_20` for more information.
 
         Override the :app:`Pyramid` :term:`authorization policy` in the
         current configuration.  The ``policy`` argument must be an instance

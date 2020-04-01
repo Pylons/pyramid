@@ -535,7 +535,7 @@ class IAuthenticationPolicy(Interface):
     .. deprecated:: 2.0
 
         Authentication policies have been removed in favor of security
-        policies.  See :ref:`upgrading_auth` for more information.
+        policies.  See :ref:`upgrading_auth_20` for more information.
 
     """
 
@@ -595,7 +595,7 @@ class IAuthorizationPolicy(Interface):
     .. deprecated:: 2.0
 
         Authentication policies have been removed in favor of security
-        policies.  See :ref:`upgrading_auth` for more information.
+        policies.  See :ref:`upgrading_auth_20` for more information.
 
     """
 
