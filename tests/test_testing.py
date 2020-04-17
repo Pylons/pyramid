@@ -258,7 +258,7 @@ class TestDummyRequest(unittest.TestCase):
 
         registry = Registry('this_test')
 
-        class ResponseFactory(object):
+        class ResponseFactory:
             pass
 
         registry.registerUtility(lambda r: ResponseFactory(), IResponseFactory)
@@ -695,7 +695,7 @@ class DummyFactory:
         """ """
 
 
-class DummyRegistry(object):
+class DummyRegistry:
     inited = 0
     __name__ = 'name'
 
@@ -703,7 +703,7 @@ class DummyRegistry(object):
         self.inited = self.inited + 1
 
 
-class DummyRendererInfo(object):
+class DummyRendererInfo:
     def __init__(self, kw):
         self.__dict__.update(kw)
 

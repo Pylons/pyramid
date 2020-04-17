@@ -280,7 +280,7 @@ ${body}'''
                 if comment:
                     html_comment = escape(comment)
 
-                class JsonPageTemplate(object):
+                class JsonPageTemplate:
                     def __init__(self, excobj):
                         self.excobj = excobj
 

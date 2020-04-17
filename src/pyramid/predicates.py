@@ -12,7 +12,7 @@ from pyramid.util import as_sorted_tuple, is_nonstr_iter, object_description
 _marker = object()
 
 
-class XHRPredicate(object):
+class XHRPredicate:
     def __init__(self, val, config):
         self.val = bool(val)
 
@@ -25,7 +25,7 @@ class XHRPredicate(object):
         return bool(request.is_xhr) is self.val
 
 
-class RequestMethodPredicate(object):
+class RequestMethodPredicate:
     def __init__(self, val, config):
         request_method = as_sorted_tuple(val)
         if 'GET' in request_method and 'HEAD' not in request_method:
@@ -42,7 +42,7 @@ class RequestMethodPredicate(object):
         return request.method in self.val
 
 
-class PathInfoPredicate(object):
+class PathInfoPredicate:
     def __init__(self, val, config):
         self.orig = val
         try:
@@ -60,7 +60,7 @@ class PathInfoPredicate(object):
         return self.val.match(request.upath_info) is not None
 
 
-class RequestParamPredicate(object):
+class RequestParamPredicate:
     def __init__(self, val, config):
         val = as_sorted_tuple(val)
         reqs = []
@@ -96,7 +96,7 @@ class RequestParamPredicate(object):
         return True
 
 
-class HeaderPredicate(object):
+class HeaderPredicate:
     def __init__(self, val, config):
         name = val
         v = None
@@ -127,7 +127,7 @@ class HeaderPredicate(object):
         return self.val.match(val) is not None
 
 
-class AcceptPredicate(object):
+class AcceptPredicate:
     def __init__(self, values, config):
         if not is_nonstr_iter(values):
             values = (values,)
@@ -142,7 +142,7 @@ class AcceptPredicate(object):
         return bool(request.accept.acceptable_offers(self.values))
 
 
-class ContainmentPredicate(object):
+class ContainmentPredicate:
     def __init__(self, val, config):
         self.val = config.maybe_dotted(val)
 
@@ -156,7 +156,7 @@ class ContainmentPredicate(object):
         return find_interface(ctx, self.val) is not None
 
 
-class RequestTypePredicate(object):
+class RequestTypePredicate:
     def __init__(self, val, config):
         self.val = val
 
@@ -169,7 +169,7 @@ class RequestTypePredicate(object):
         return self.val.providedBy(request)
 
 
-class MatchParamPredicate(object):
+class MatchParamPredicate:
     def __init__(self, val, config):
         val = as_sorted_tuple(val)
         self.val = val
@@ -193,7 +193,7 @@ class MatchParamPredicate(object):
         return True
 
 
-class CustomPredicate(object):
+class CustomPredicate:
     def __init__(self, func, config):
         self.func = func
 
@@ -217,7 +217,7 @@ class CustomPredicate(object):
         return self.func(context, request)
 
 
-class TraversePredicate(object):
+class TraversePredicate:
     # Can only be used as a *route* "predicate"; it adds 'traverse' to the
     # matchdict if it's specified in the routing args.  This causes the
     # ResourceTreeTraverser to use the resolved traverse pattern as the
@@ -247,7 +247,7 @@ class TraversePredicate(object):
         return True
 
 
-class PhysicalPathPredicate(object):
+class PhysicalPathPredicate:
     def __init__(self, val, config):
         if is_nonstr_iter(val):
             self.val = tuple(val)
@@ -266,7 +266,7 @@ class PhysicalPathPredicate(object):
         return False
 
 
-class EffectivePrincipalsPredicate(object):
+class EffectivePrincipalsPredicate:
     def __init__(self, val, config):
         if is_nonstr_iter(val):
             self.val = set(val)
@@ -287,7 +287,7 @@ class EffectivePrincipalsPredicate(object):
         return False
 
 
-class Notted(object):
+class Notted:
     def __init__(self, predicate):
         self.predicate = predicate
 

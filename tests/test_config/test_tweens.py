@@ -117,7 +117,7 @@ class TestTweensConfiguratorMixin(unittest.TestCase):
     def test_add_tween_instance(self):
         from pyramid.exceptions import ConfigurationError
 
-        class ATween(object):
+        class ATween:
             pass
 
         atween = ATween()

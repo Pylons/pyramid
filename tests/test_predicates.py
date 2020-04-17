@@ -537,7 +537,7 @@ class TestNotted(unittest.TestCase):
         self.assertEqual(inst(None, None), True)
 
 
-class predicate(object):
+class predicate:
     def __repr__(self):
         return 'predicate'
 
@@ -545,11 +545,11 @@ class predicate(object):
         return 1
 
 
-class Dummy(object):
+class Dummy:
     pass
 
 
-class DummyPredicate(object):
+class DummyPredicate:
     def __init__(self, result):
         self.result = result
 

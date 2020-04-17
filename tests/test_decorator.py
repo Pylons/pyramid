@@ -26,5 +26,5 @@ class TestReify(unittest.TestCase):
         self.assertEqual(result, decorator)
 
 
-class Dummy(object):
+class Dummy:
     pass

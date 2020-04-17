@@ -272,7 +272,7 @@ class SecurityAPIMixin:
         return policy.permits(self, context, permission)
 
 
-class AuthenticationAPIMixin(object):
+class AuthenticationAPIMixin:
     """ Mixin for Request class providing compatibility properties. """
 
     @property
@@ -390,7 +390,7 @@ Allow = 'Allow'
 Deny = 'Deny'
 
 
-class AllPermissionsList(object):
+class AllPermissionsList:
     """ Stand in 'permission list' to represent all permissions """
 
     def __iter__(self):

@@ -1,11 +1,11 @@
-class RootFactory(object):
+class RootFactory:
     __acl__ = [('Allow', 'fred', 'view')]
 
     def __init__(self, request):
         pass
 
 
-class LocalRootFactory(object):
+class LocalRootFactory:
     __acl__ = [('Allow', 'bob', 'view')]
 
     def __init__(self, request):

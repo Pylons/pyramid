@@ -47,7 +47,7 @@ DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)  # api
 
 
 @implementer(IAuthorizationPolicy)
-class ACLAuthorizationPolicy(object):
+class ACLAuthorizationPolicy:
     """ An :term:`authorization policy` which consults an :term:`ACL`
     object attached to a :term:`context` to determine authorization
     information about a :term:`principal` or multiple principals.

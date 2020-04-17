@@ -132,7 +132,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO': '/index.html'})
 
-        class _Wrapper(object):
+        class _Wrapper:
             def __init__(self, file, block_size=None):
                 self.file = file
                 self.block_size = block_size

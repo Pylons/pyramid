@@ -213,7 +213,7 @@ class Dummy:
 dummy_root = Dummy()
 
 
-class DummyFactory(object):
+class DummyFactory:
     @classmethod
     def blank(cls, path):
         req = DummyRequest({'path': path})
@@ -224,7 +224,7 @@ class DummyFactory(object):
         self.kw = kw
 
 
-class DummyRegistry(object):
+class DummyRegistry:
     def __init__(self, utilities):
         self.utilities = utilities
 
@@ -243,7 +243,7 @@ class DummyApp:
         return dummy_root
 
 
-class DummyRequest(object):
+class DummyRequest:
     matchdict = None
     matched_route = None
 

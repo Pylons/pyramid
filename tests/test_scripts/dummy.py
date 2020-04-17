@@ -3,7 +3,7 @@ from zope.interface import implementer
 from pyramid.interfaces import IMultiView
 
 
-class DummyTweens(object):
+class DummyTweens:
     def __init__(self, implicit, explicit):
         self._implicit = implicit
         self.explicit = explicit
@@ -20,7 +20,7 @@ class Dummy:
 dummy_root = Dummy()
 
 
-class DummyRegistry(object):
+class DummyRegistry:
     settings = {}
 
     def queryUtility(self, iface, default=None, name=''):
@@ -30,7 +30,7 @@ class DummyRegistry(object):
 dummy_registry = DummyRegistry()
 
 
-class DummyShell(object):
+class DummyShell:
     env = {}
     help = ''
     called = False
@@ -54,7 +54,7 @@ class DummyApp:
         self.registry = dummy_registry
 
 
-class DummyMapper(object):
+class DummyMapper:
     def __init__(self, *routes):
         self.routes = routes
 
@@ -62,7 +62,7 @@ class DummyMapper(object):
         return self.routes
 
 
-class DummyRoute(object):
+class DummyRoute:
     def __init__(
         self, name, pattern, factory=None, matchdict=None, predicate=None
     ):
@@ -91,7 +91,7 @@ class DummyRequest:
         self.matchdict = {}
 
 
-class DummyView(object):
+class DummyView:
     def __init__(self, **attrs):
         self.__request_attrs__ = attrs
 
@@ -100,18 +100,18 @@ class DummyView(object):
 
 
 @implementer(IMultiView)
-class DummyMultiView(object):
+class DummyMultiView:
     def __init__(self, *views, **attrs):
         self.views = [(None, view, None) for view in views]
         self.__request_attrs__ = attrs
 
 
-class DummyCloser(object):
+class DummyCloser:
     def __call__(self):
         self.called = True
 
 
-class DummyBootstrap(object):
+class DummyBootstrap:
     def __init__(
         self,
         app=None,
@@ -154,7 +154,7 @@ class DummyBootstrap(object):
         }
 
 
-class DummyEntryPoint(object):
+class DummyEntryPoint:
     def __init__(self, name, module):
         self.name = name
         self.module = module
@@ -163,7 +163,7 @@ class DummyEntryPoint(object):
         return self.module
 
 
-class DummyPkgResources(object):
+class DummyPkgResources:
     def __init__(self, entry_point_values):
         self.entry_points = []
 
@@ -174,13 +174,13 @@ class DummyPkgResources(object):
         return self.entry_points
 
 
-class dummy_setup_logging(object):
+class dummy_setup_logging:
     def __call__(self, config_uri, global_conf):
         self.config_uri = config_uri
         self.defaults = global_conf
 
 
-class DummyLoader(object):
+class DummyLoader:
     def __init__(
         self, settings=None, app_settings=None, app=None, server=None
     ):

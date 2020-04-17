@@ -62,7 +62,7 @@ class WGSIAppPlusViewConfigTests(unittest.TestCase):
         self.assertEqual(view.__original_view__, wsgiapptest)
 
 
-class IntegrationBase(object):
+class IntegrationBase:
     root_factory = None
     package = None
 
@@ -966,7 +966,7 @@ class AcceptContentTypeTest(unittest.TestCase):
         self.assertEqual(res.content_type, 'text/x-fallback')
 
 
-class DummyContext(object):
+class DummyContext:
     pass
 
 

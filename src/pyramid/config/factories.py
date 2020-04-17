@@ -15,7 +15,7 @@ from pyramid.traversal import DefaultRootFactory
 from pyramid.util import InstancePropertyHelper, get_callable_name
 
 
-class FactoriesConfiguratorMixin(object):
+class FactoriesConfiguratorMixin:
     @action_method
     def set_root_factory(self, factory):
         """ Add a :term:`root factory` to the current configuration
@@ -257,7 +257,7 @@ class FactoriesConfiguratorMixin(object):
 
 
 @implementer(IRequestExtensions)
-class _RequestExtensions(object):
+class _RequestExtensions:
     def __init__(self):
         self.descriptors = {}
         self.methods = {}

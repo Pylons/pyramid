@@ -135,7 +135,7 @@ def render_view(context, request, name='', secure=True):
     return b''.join(iterable)
 
 
-class view_config(object):
+class view_config:
     """ A function, class or method :term:`decorator` which allows a
     developer to create view registrations nearer to a :term:`view
     callable` definition than use :term:`imperative
@@ -261,7 +261,7 @@ def view_defaults(**settings):
     return wrap
 
 
-class AppendSlashNotFoundViewFactory(object):
+class AppendSlashNotFoundViewFactory:
     """ There can only be one :term:`Not Found view` in any
     :app:`Pyramid` application.  Even if you use
     :func:`pyramid.view.append_slash_notfound_view` as the Not
@@ -348,7 +348,7 @@ view as the Not Found view::
 """
 
 
-class notfound_view_config(object):
+class notfound_view_config:
     """
     .. versionadded:: 1.3
 
@@ -444,7 +444,7 @@ class notfound_view_config(object):
         return wrapped
 
 
-class forbidden_view_config(object):
+class forbidden_view_config:
     """
     .. versionadded:: 1.3
 
@@ -508,7 +508,7 @@ class forbidden_view_config(object):
         return wrapped
 
 
-class exception_view_config(object):
+class exception_view_config:
     """
     .. versionadded:: 1.8
 
@@ -666,7 +666,7 @@ def _call_view(
     return response
 
 
-class ViewMethodsMixin(object):
+class ViewMethodsMixin:
     """ Request methods mixin for BaseRequest having to do with executing
     views """
 

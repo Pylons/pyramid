@@ -18,7 +18,7 @@ TranslationStringFactory = TranslationStringFactory  # PyFlakes
 DEFAULT_PLURAL = lambda n: int(n != 1)
 
 
-class Localizer(object):
+class Localizer:
     """
     An object providing translation and pluralizations related to
     the current request's locale name.  A
@@ -366,7 +366,7 @@ class Translations(gettext.GNUTranslations, object):
         return self._domains.get(domain, self).ngettext(singular, plural, num)
 
 
-class LocalizerRequestMixin(object):
+class LocalizerRequestMixin:
     @reify
     def localizer(self):
         """ Convenience property to return a localizer """

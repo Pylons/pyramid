@@ -10,7 +10,7 @@ _marker = object()
 
 
 @implementer(IRoute)
-class Route(object):
+class Route:
     def __init__(
         self, name, pattern, factory=None, predicates=(), pregenerator=None
     ):
@@ -24,7 +24,7 @@ class Route(object):
 
 
 @implementer(IRoutesMapper)
-class RoutesMapper(object):
+class RoutesMapper:
     def __init__(self):
         self.routelist = []
         self.static_routes = []

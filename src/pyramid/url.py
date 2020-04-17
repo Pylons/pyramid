@@ -56,7 +56,7 @@ def parse_url_overrides(request, kw):
     return app_url, qs, frag
 
 
-class URLMethodsMixin(object):
+class URLMethodsMixin:
     """ Request methods mixin for BaseRequest having to do with URL
     generation """
 

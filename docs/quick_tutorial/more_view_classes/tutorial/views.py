@@ -5,7 +5,7 @@ from pyramid.view import (
 
 
 @view_defaults(route_name='hello')
-class TutorialViews(object):
+class TutorialViews:
     def __init__(self, request):
         self.request = request
         self.view_name = 'TutorialViews'

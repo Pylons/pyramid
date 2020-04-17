@@ -8,7 +8,7 @@ DEFAULT_RENDERERS = (
 )
 
 
-class RenderingConfiguratorMixin(object):
+class RenderingConfiguratorMixin:
     def add_default_renderers(self):
         for name, renderer in DEFAULT_RENDERERS:
             self.add_renderer(name, renderer)

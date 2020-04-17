@@ -6,7 +6,7 @@ from pyramid.renderers import RendererHelper
 from pyramid.traversal import split_path_info
 
 
-class TestingConfiguratorMixin(object):
+class TestingConfiguratorMixin:
     # testing API
     def testing_securitypolicy(
         self,

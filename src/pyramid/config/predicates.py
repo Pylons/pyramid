@@ -11,7 +11,7 @@ MAX_ORDER = 1 << 30
 DEFAULT_PHASH = md5().hexdigest()
 
 
-class PredicateConfiguratorMixin(object):
+class PredicateConfiguratorMixin:
     def get_predlist(self, name):
         predlist = self.registry.queryUtility(IPredicateList, name=name)
         if predlist is None:
@@ -52,7 +52,7 @@ class PredicateConfiguratorMixin(object):
         )  # must be registered early
 
 
-class not_(object):
+class not_:
     """
 
     You can invert the meaning of any predicate value by wrapping it in a call
@@ -96,7 +96,7 @@ class not_(object):
 # over = before
 
 
-class PredicateInfo(object):
+class PredicateInfo:
     def __init__(self, package, registry, settings, maybe_dotted):
         self.package = package
         self.registry = registry
@@ -104,7 +104,7 @@ class PredicateInfo(object):
         self.maybe_dotted = maybe_dotted
 
 
-class PredicateList(object):
+class PredicateList:
     def __init__(self):
         self.sorter = TopologicalSorter()
         self.last_added = None

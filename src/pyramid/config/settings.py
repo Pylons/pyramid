@@ -3,7 +3,7 @@ import os
 from pyramid.settings import asbool, aslist
 
 
-class SettingsConfiguratorMixin(object):
+class SettingsConfiguratorMixin:
     def _set_settings(self, mapping):
         if mapping is None:
             mapping = {}

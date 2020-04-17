@@ -332,7 +332,7 @@ class DummyRequest:
         self.cookies = {}
 
 
-class DummyAccept(object):
+class DummyAccept:
     def __init__(self, *matches, **kw):
         self.matches = list(matches)
         self.contains = kw.pop('contains', False)

@@ -68,10 +68,10 @@ class TestCallerModule(unittest.TestCase):
         self.assertNotEqual(result, test_path)
 
     def test_it_no___name__(self):
-        class DummyFrame(object):
+        class DummyFrame:
             f_globals = {}
 
-        class DummySys(object):
+        class DummySys:
             def _getframe(self, level):
                 return DummyFrame()
 
@@ -627,7 +627,7 @@ class TestDottedNameResolver(unittest.TestCase):
         self.assertEqual(typ.package, None)
 
 
-class DummyPkgResource(object):
+class DummyPkgResource:
     pass
 
 

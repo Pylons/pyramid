@@ -27,7 +27,7 @@ class Page(Base):
     body = Column(Text)
 
 
-class Root(object):
+class Root:
     __acl__ = [(Allow, Everyone, 'view'),
                (Allow, 'group:editors', 'edit')]
 

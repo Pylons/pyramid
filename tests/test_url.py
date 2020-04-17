@@ -34,7 +34,7 @@ class TestURLMethodsMixin(unittest.TestCase):
         from pyramid.interfaces import IResourceURL
         from zope.interface import Interface
 
-        class DummyResourceURL(object):
+        class DummyResourceURL:
             physical_path = '/context/'
             virtual_path = '/context/'
 
@@ -1081,7 +1081,7 @@ class Test_route_url(unittest.TestCase):
         return route_url(route_name, request, *elements, **kw)
 
     def _makeRequest(self):
-        class Request(object):
+        class Request:
             def route_url(self, route_name, *elements, **kw):
                 self.route_name = route_name
                 self.elements = elements
@@ -1106,7 +1106,7 @@ class Test_route_path(unittest.TestCase):
         return route_path(route_name, request, *elements, **kw)
 
     def _makeRequest(self):
-        class Request(object):
+        class Request:
             def route_path(self, route_name, *elements, **kw):
                 self.route_name = route_name
                 self.elements = elements
@@ -1131,7 +1131,7 @@ class Test_resource_url(unittest.TestCase):
         return resource_url(resource, request, *elements, **kw)
 
     def _makeRequest(self):
-        class Request(object):
+        class Request:
             def resource_url(self, resource, *elements, **kw):
                 self.resource = resource
                 self.elements = elements
@@ -1156,7 +1156,7 @@ class Test_static_url(unittest.TestCase):
         return static_url(path, request, **kw)
 
     def _makeRequest(self):
-        class Request(object):
+        class Request:
             def static_url(self, path, **kw):
                 self.path = path
                 self.kw = kw
@@ -1193,7 +1193,7 @@ class Test_static_path(unittest.TestCase):
         return static_path(path, request, **kw)
 
     def _makeRequest(self):
-        class Request(object):
+        class Request:
             def static_path(self, path, **kw):
                 self.path = path
                 self.kw = kw
@@ -1230,7 +1230,7 @@ class Test_current_route_url(unittest.TestCase):
         return current_route_url(request, *elements, **kw)
 
     def _makeRequest(self):
-        class Request(object):
+        class Request:
             def current_route_url(self, *elements, **kw):
                 self.elements = elements
                 self.kw = kw
@@ -1253,7 +1253,7 @@ class Test_current_route_path(unittest.TestCase):
         return current_route_path(request, *elements, **kw)
 
     def _makeRequest(self):
-        class Request(object):
+        class Request:
             def current_route_path(self, *elements, **kw):
                 self.elements = elements
                 self.kw = kw
@@ -1410,7 +1410,7 @@ class Test_with_route_prefix(unittest.TestCase):
         assert self.config.route_prefix == 'old_prefix'
 
 
-class DummyContext(object):
+class DummyContext:
     def __init__(self, next=None):
         self.next = next
 

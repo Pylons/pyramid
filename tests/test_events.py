@@ -377,7 +377,7 @@ class TestBeforeRender(unittest.TestCase):
         self.assertTrue(event.rendering_val is val)
 
 
-class DummyConfigurator(object):
+class DummyConfigurator:
     def __init__(self):
         self.subscribed = []
 
@@ -388,11 +388,11 @@ class DummyConfigurator(object):
             self.subscribed.append((wrapped, ifaces, predicates))
 
 
-class DummyRegistry(object):
+class DummyRegistry:
     pass
 
 
-class DummyVenusian(object):
+class DummyVenusian:
     def __init__(self):
         self.attached = []
 

@@ -27,7 +27,7 @@ class TestPShellCommand(unittest.TestCase):
             cmd.get_config_loader = self.loader
         if patch_args:
 
-            class Args(object):
+            class Args:
                 pass
 
             self.args = Args()
@@ -35,7 +35,7 @@ class TestPShellCommand(unittest.TestCase):
             cmd.args.config_uri = self.args.config_uri
         if patch_options:
 
-            class Options(object):
+            class Options:
                 pass
 
             self.options = Options()

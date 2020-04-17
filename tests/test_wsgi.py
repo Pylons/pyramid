@@ -121,7 +121,7 @@ def dummyapp(environ, start_response):
     """ """
 
 
-class DummyApp(object):
+class DummyApp:
     def __call__(self, environ, start_response):
         """ """
 

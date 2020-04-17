@@ -11,7 +11,7 @@ from pyramid.util import (
 )
 
 
-class TweensConfiguratorMixin(object):
+class TweensConfiguratorMixin:
     def add_tween(self, tween_factory, under=None, over=None):
         """
         .. versionadded:: 1.2
@@ -162,7 +162,7 @@ class TweensConfiguratorMixin(object):
 
 
 @implementer(ITweens)
-class Tweens(object):
+class Tweens:
     def __init__(self):
         self.sorter = TopologicalSorter(
             default_before=None,

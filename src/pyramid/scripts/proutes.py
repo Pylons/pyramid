@@ -211,7 +211,7 @@ def get_route_data(route, registry):
     return final_routes
 
 
-class PRoutesCommand(object):
+class PRoutesCommand:
     description = """\
     Print all URL dispatch routes used by a Pyramid application in the
     order in which they are evaluated.  Each route includes the name of the

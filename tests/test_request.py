@@ -26,7 +26,7 @@ class TestRequest(unittest.TestCase):
         from pyramid.interfaces import IResourceURL
         from zope.interface import Interface
 
-        class DummyResourceURL(object):
+        class DummyResourceURL:
             def __init__(self, context, request):
                 self.physical_path = '/context/'
                 self.virtual_path = '/context/'
@@ -311,7 +311,7 @@ class TestRequest(unittest.TestCase):
         def adapter(ob):
             return object()
 
-        class Foo(object):
+        class Foo:
             pass
 
         foo = Foo()
@@ -324,7 +324,7 @@ class TestRequest(unittest.TestCase):
         request = self._makeOne()
         request.registry = self.config.registry
 
-        class Foo(object):
+        class Foo:
             pass
 
         foo = Foo()
@@ -695,11 +695,11 @@ class TestRequestLocalCache(unittest.TestCase):
         self.assertRaises(ValueError, cache.get_or_create, req)
 
 
-class Dummy(object):
+class Dummy:
     pass
 
 
-class DummyRequest(object):
+class DummyRequest:
     def __init__(self, environ=None):
         if environ is None:
             environ = {}

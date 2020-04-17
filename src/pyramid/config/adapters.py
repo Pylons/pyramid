@@ -7,7 +7,7 @@ from pyramid.interfaces import IResourceURL, IResponse, ITraverser
 from pyramid.util import takes_one_arg
 
 
-class AdaptersConfiguratorMixin(object):
+class AdaptersConfiguratorMixin:
     @action_method
     def add_subscriber(self, subscriber, iface=None, **predicates):
         """Add an event :term:`subscriber` for the event stream

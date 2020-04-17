@@ -153,7 +153,7 @@ class TestRouter(unittest.TestCase):
     def test_request_factory(self):
         from pyramid.interfaces import IRequestFactory
 
-        class DummyRequestFactory(object):
+        class DummyRequestFactory:
             pass
 
         self.registry.registerUtility(DummyRequestFactory, IRequestFactory)
@@ -378,7 +378,7 @@ class TestRouter(unittest.TestCase):
         context = DummyContext()
         self._registerTraverserFactory(context)
 
-        class Extensions(object):
+        class Extensions:
             def __init__(self):
                 self.methods = {}
                 self.descriptors = {}
@@ -1642,7 +1642,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result[1], None)
 
 
-class DummyPredicate(object):
+class DummyPredicate:
     def __call__(self, info, request):
         return True
 
@@ -1685,7 +1685,7 @@ class DummyStartResponse:
 
 
 @implementer(IResponse)
-class DummyResponse(object):
+class DummyResponse:
     headerlist = ()
     app_iter = ()
     environ = None

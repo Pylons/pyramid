@@ -407,7 +407,7 @@ class TestIntrospectable(unittest.TestCase):
         )
 
 
-class DummyIntrospector(object):
+class DummyIntrospector:
     def __init__(self):
         self.intrs = []
         self.relations = []
@@ -429,7 +429,7 @@ class DummyModule:
     __file__ = ''
 
 
-class DummyIntrospectable(object):
+class DummyIntrospectable:
     category_name = 'category'
     discriminator = 'discriminator'
     title = 'title'
@@ -447,5 +447,5 @@ class IDummyEvent(Interface):
 
 
 @implementer(IDummyEvent)
-class DummyEvent(object):
+class DummyEvent:
     pass

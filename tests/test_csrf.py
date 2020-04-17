@@ -5,7 +5,7 @@ from pyramid.config import Configurator
 
 
 class TestLegacySessionCSRFStoragePolicy(unittest.TestCase):
-    class MockSession(object):
+    class MockSession:
         def __init__(self, current_token='02821185e4c94269bdc38e6eeae0a2f8'):
             self.current_token = current_token
 
@@ -455,7 +455,7 @@ class Test_check_csrf_origin(unittest.TestCase):
         self.assertFalse(self._callFUT(request, raises=False))
 
 
-class DummyRequest(object):
+class DummyRequest:
     registry = None
     session = None
     response_callback = None
@@ -469,12 +469,12 @@ class DummyRequest(object):
         self.response_callback = callback
 
 
-class MockResponse(object):
+class MockResponse:
     def __init__(self):
         self.headerlist = []
 
 
-class DummyCSRF(object):
+class DummyCSRF:
     def new_csrf_token(self, request):
         return 'e5e9e30a08b34ff9842ff7d2b958c14b'
 

@@ -24,7 +24,7 @@ def python_shell_runner(env, help, interact=interact):
     interact(banner, local=env)
 
 
-class PShellCommand(object):
+class PShellCommand:
     description = """\
     Open an interactive shell with a Pyramid app loaded.  This command
     accepts one positional argument named "config_uri" which specifies the

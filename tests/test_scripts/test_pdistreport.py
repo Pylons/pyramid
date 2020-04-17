@@ -64,7 +64,7 @@ class TestPDistReportCommand(unittest.TestCase):
         )
 
 
-class DummyPkgResources(object):
+class DummyPkgResources:
     def __init__(self, working_set=()):
         self.working_set = working_set
 
@@ -72,12 +72,12 @@ class DummyPkgResources(object):
         return Version('1')
 
 
-class Version(object):
+class Version:
     def __init__(self, version):
         self.version = version
 
 
-class DummyDistribution(object):
+class DummyDistribution:
     def __init__(self, name):
         self.project_name = name
         self.version = '1'

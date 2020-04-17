@@ -26,11 +26,11 @@ from pyramid.util import (
 from pyramid.view import ViewMethodsMixin
 
 
-class TemplateContext(object):
+class TemplateContext:
     pass
 
 
-class CallbackMethodsMixin(object):
+class CallbackMethodsMixin:
     @reify
     def finished_callbacks(self):
         return deque()

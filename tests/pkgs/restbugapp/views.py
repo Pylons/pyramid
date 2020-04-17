@@ -1,7 +1,7 @@
 from pyramid.response import Response
 
 
-class BaseRESTView(object):
+class BaseRESTView:
     def __init__(self, context, request):
         self.context = context
         self.request = request

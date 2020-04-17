@@ -1,7 +1,7 @@
 from pyramid.threadlocal import get_current_registry
 
 
-class ZCAConfiguratorMixin(object):
+class ZCAConfiguratorMixin:
     def hook_zca(self):
         """ Call :func:`zope.component.getSiteManager.sethook` with the
         argument :data:`pyramid.threadlocal.get_current_registry`, causing

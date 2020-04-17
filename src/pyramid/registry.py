@@ -115,7 +115,7 @@ class Registry(Components, dict):
 
 
 @implementer(IIntrospector)
-class Introspector(object):
+class Introspector:
     def __init__(self):
         self._refs = {}
         self._categories = {}
@@ -266,7 +266,7 @@ class Introspectable(dict):
             )
 
 
-class Deferred(object):
+class Deferred:
     """ Can be used by a third-party configuration extender to wrap a
     :term:`discriminator` during configuration if an immediately hashable
     discriminator cannot be computed because it relies on unresolved values.

@@ -1,4 +1,4 @@
-class NotAnException(object):
+class NotAnException:
     pass
 
 
@@ -6,11 +6,11 @@ class AnException(Exception):
     pass
 
 
-class RouteContext(object):
+class RouteContext:
     pass
 
 
-class RouteContext2(object):
+class RouteContext2:
     pass
 
 

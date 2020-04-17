@@ -71,7 +71,7 @@ def get_current_registry(
     return manager.get()['registry']
 
 
-class RequestContext(object):
+class RequestContext:
     def __init__(self, request):
         self.request = request
 

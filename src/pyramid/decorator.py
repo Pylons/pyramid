@@ -1,7 +1,7 @@
 from functools import update_wrapper
 
 
-class reify(object):
+class reify:
     """ Use as a class method decorator.  It operates almost exactly like the
     Python ``@property`` decorator, but it puts the result of the method it
     decorates into the instance dict after the first call, effectively
@@ -13,7 +13,7 @@ class reify(object):
 
         >>> from pyramid.decorator import reify
 
-        >>> class Foo(object):
+        >>> class Foo:
         ...     @reify
         ...     def jammy(self):
         ...         print('jammy called')

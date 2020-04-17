@@ -16,7 +16,7 @@ from pyramid.util import (
 
 
 @implementer(ICSRFStoragePolicy)
-class LegacySessionCSRFStoragePolicy(object):
+class LegacySessionCSRFStoragePolicy:
     """ A CSRF storage policy that defers control of CSRF storage to the
     session.
 
@@ -49,7 +49,7 @@ class LegacySessionCSRFStoragePolicy(object):
 
 
 @implementer(ICSRFStoragePolicy)
-class SessionCSRFStoragePolicy(object):
+class SessionCSRFStoragePolicy:
     """ A CSRF storage policy that persists the CSRF token in the session.
 
     Note that using this CSRF implementation requires that
@@ -92,7 +92,7 @@ class SessionCSRFStoragePolicy(object):
 
 
 @implementer(ICSRFStoragePolicy)
-class CookieCSRFStoragePolicy(object):
+class CookieCSRFStoragePolicy:
     """ An alternative CSRF implementation that stores its information in
     unauthenticated cookies, known as the 'Double Submit Cookie' method in the
     `OWASP CSRF guidelines

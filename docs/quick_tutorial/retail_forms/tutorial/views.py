@@ -18,7 +18,7 @@ class WikiPage(colander.MappingSchema):
     )
 
 
-class WikiViews(object):
+class WikiViews:
     def __init__(self, request):
         self.request = request
 

@@ -580,7 +580,7 @@ def quote_path_segment(segment, safe=PATH_SEGMENT_SAFE):
 
 
 @implementer(ITraverser)
-class ResourceTreeTraverser(object):
+class ResourceTreeTraverser:
     """ A resource tree traverser that should be used (for speed) when
     every resource in the tree supplies a ``__name__`` and
     ``__parent__`` attribute (ie. every resource in the tree is
@@ -711,7 +711,7 @@ ModelGraphTraverser = (
 
 
 @implementer(IResourceURL)
-class ResourceURL(object):
+class ResourceURL:
     VH_ROOT_KEY = VH_ROOT_KEY
 
     def __init__(self, resource, request):

@@ -17,7 +17,7 @@ from pyramid.urldispatch import RoutesMapper
 from pyramid.util import as_sorted_tuple, is_nonstr_iter
 
 
-class RoutesConfiguratorMixin(object):
+class RoutesConfiguratorMixin:
     @action_method
     def add_route(
         self,

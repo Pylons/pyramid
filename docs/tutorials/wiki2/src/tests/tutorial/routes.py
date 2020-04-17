@@ -28,7 +28,7 @@ def new_page_factory(request):
         raise HTTPSeeOther(location=next_url)
     return NewPage(pagename)
 
-class NewPage(object):
+class NewPage:
     def __init__(self, pagename):
         self.pagename = pagename
 
@@ -45,7 +45,7 @@ def page_factory(request):
         raise HTTPNotFound
     return PageResource(page)
 
-class PageResource(object):
+class PageResource:
     def __init__(self, page):
         self.page = page
 

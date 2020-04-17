@@ -85,7 +85,7 @@ class OverrideProvider(pkg_resources.DefaultProvider):
 
 
 @implementer(IPackageOverrides)
-class PackageOverrides(object):
+class PackageOverrides:
     # pkg_resources arg in kw args below for testing
     def __init__(self, package, pkg_resources=pkg_resources):
         loader = self._real_loader = getattr(package, '__loader__', None)
@@ -206,7 +206,7 @@ class FileOverride:
             return self.source, ''
 
 
-class PackageAssetSource(object):
+class PackageAssetSource:
     """
     An asset source relative to a package.
 
@@ -258,7 +258,7 @@ class PackageAssetSource(object):
             return pkg_resources.resource_listdir(self.pkg_name, path)
 
 
-class FSAssetSource(object):
+class FSAssetSource:
     """
     An asset source relative to a path in the filesystem.
 
@@ -306,7 +306,7 @@ class FSAssetSource(object):
             return os.listdir(path)
 
 
-class AssetsConfiguratorMixin(object):
+class AssetsConfiguratorMixin:
     def _override(
         self, package, path, override_source, PackageOverrides=PackageOverrides
     ):
