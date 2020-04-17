@@ -205,7 +205,8 @@ class PredicateList:
         score = 0
         for bit in weights:
             score = score | bit
-        order = (MAX_ORDER - score) / (len(preds) + 1)
+        order = (MAX_ORDER - score) // (len(preds) + 1)
+
         return order, preds, phash.hexdigest()
 
 
