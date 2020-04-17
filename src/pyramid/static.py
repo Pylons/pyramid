@@ -327,7 +327,7 @@ class QueryStringConstantCacheBuster(QueryStringCacheBuster):
     """
 
     def __init__(self, token, param='x'):
-        super(QueryStringConstantCacheBuster, self).__init__(param=param)
+        super().__init__(param=param)
         self._token = token
 
     def tokenize(self, request, subpath, kw):

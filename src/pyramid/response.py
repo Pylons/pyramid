@@ -47,7 +47,7 @@ class FileResponse(Response):
     ):
         if content_type is None:
             content_type, content_encoding = _guess_type(path)
-        super(FileResponse, self).__init__(
+        super().__init__(
             conditional_response=True,
             content_type=content_type,
             content_encoding=content_encoding,

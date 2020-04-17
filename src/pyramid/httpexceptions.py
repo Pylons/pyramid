@@ -534,7 +534,7 @@ ${html_comment}'''
     ):
         if location is None:
             raise ValueError("HTTP redirects need a location to redirect to.")
-        super(_HTTPMove, self).__init__(
+        super().__init__(
             detail=detail,
             headers=headers,
             comment=comment,
