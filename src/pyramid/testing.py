@@ -203,10 +203,8 @@ class DummyResource:
 
     __iter__ = keys
 
-    def __nonzero__(self):
+    def __bool__(self):
         return True
-
-    __bool__ = __nonzero__
 
     def __len__(self):
         return len(self.subs)

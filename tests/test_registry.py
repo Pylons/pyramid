@@ -11,9 +11,9 @@ class TestRegistry(unittest.TestCase):
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
 
-    def test___nonzero__(self):
+    def test___bool__(self):
         registry = self._makeOne()
-        self.assertEqual(registry.__nonzero__(), True)
+        self.assertEqual(registry.__bool__(), True)
 
     def test__lock(self):
         registry = self._makeOne()
@@ -379,10 +379,6 @@ class TestIntrospectable(unittest.TestCase):
             repr(inst),
             "<Introspectable category 'category', discriminator 'discrim'>",
         )
-
-    def test___nonzero__(self):
-        inst = self._makeOnePopulated()
-        self.assertEqual(inst.__nonzero__(), True)
 
     def test___bool__(self):
         inst = self._makeOnePopulated()

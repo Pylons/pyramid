@@ -103,10 +103,6 @@ class TestDummyResource(unittest.TestCase):
         self.assertEqual(L(resource.keys()), L(resource.subs.keys()))
         self.assertEqual(len(resource), 2)
 
-    def test_nonzero(self):
-        resource = self._makeOne()
-        self.assertEqual(resource.__nonzero__(), True)
-
     def test_bool(self):
         resource = self._makeOne()
         self.assertEqual(resource.__bool__(), True)
