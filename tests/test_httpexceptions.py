@@ -75,7 +75,7 @@ class Test__no_escape(unittest.TestCase):
 
     def test_unicode(self):
         class DummyUnicodeObject:
-            def __unicode__(self):
+            def __str__(self):
                 return text_('42')
 
         duo = DummyUnicodeObject()

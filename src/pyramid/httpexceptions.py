@@ -143,8 +143,6 @@ def _no_escape(value):
     if value is None:
         return ''
     if not isinstance(value, str):
-        if hasattr(value, '__unicode__'):
-            value = value.__unicode__()
         if isinstance(value, bytes):
             value = text_(value, 'utf-8')
         else:
