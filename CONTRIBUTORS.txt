@@ -350,3 +350,5 @@ Contributors
 - Jan Likar, 2019/11/07
 
 - Andrea Borghi, 2019/11/11
+
+- Sergey Maranchuk, 2020/04/18
