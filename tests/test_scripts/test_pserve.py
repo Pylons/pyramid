@@ -137,10 +137,10 @@ class TestPServeCommand(unittest.TestCase):
         finally:
             pserve.hupper = orig_hupper
 
-        self.assertEquals(
+        self.assertEqual(
             dummy_start_reloader.args, ('pyramid.scripts.pserve.main',)
         )
-        self.assertEquals(
+        self.assertEqual(
             dummy_start_reloader.kwargs,
             {
                 'reload_interval': 1,

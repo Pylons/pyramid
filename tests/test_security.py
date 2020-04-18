@@ -327,7 +327,7 @@ class TestAuthenticatedIdentity(unittest.TestCase):
 
     def test_identity_no_security_policy(self):
         request = _makeRequest()
-        self.assertEquals(request.authenticated_identity, None)
+        self.assertEqual(request.authenticated_identity, None)
 
     def test_identity(self):
         request = _makeRequest()

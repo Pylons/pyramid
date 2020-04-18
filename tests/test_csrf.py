@@ -215,7 +215,7 @@ class Test_get_csrf_token(unittest.TestCase):
 
         csrf_token = self._callFUT(request)
 
-        self.assertEquals(csrf_token, '02821185e4c94269bdc38e6eeae0a2f8')
+        self.assertEqual(csrf_token, '02821185e4c94269bdc38e6eeae0a2f8')
 
 
 class Test_new_csrf_token(unittest.TestCase):
@@ -237,7 +237,7 @@ class Test_new_csrf_token(unittest.TestCase):
 
         csrf_token = self._callFUT(request)
 
-        self.assertEquals(csrf_token, 'e5e9e30a08b34ff9842ff7d2b958c14b')
+        self.assertEqual(csrf_token, 'e5e9e30a08b34ff9842ff7d2b958c14b')
 
 
 class Test_check_csrf_token(unittest.TestCase):
