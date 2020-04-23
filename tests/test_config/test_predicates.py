@@ -312,6 +312,20 @@ class TestPredicateList(unittest.TestCase):
         self.assertEqual(predicates[10].text(), 'classmethod predicate')
         self.assertTrue(predicates[11].text().startswith('custom predicate'))
 
+    def test_predicate_text_is_correct_when_multiple(self):
+        _, predicates, _ = self._callFUT(
+            request_method=('one', 'two'),
+            request_param=('param1', 'param2=on'),
+            header='header:text/*',
+            accept=('accept1', 'accept2'),
+            match_param=('foo=bar', 'baz=bim'),
+        )
+        self.assertEqual(predicates[0].text(), "request_method = one,two")
+        self.assertEqual(predicates[1].text(), 'request_param param1,param2=on')
+        self.assertEqual(predicates[2].text(), 'header header=text/*')
+        self.assertEqual(predicates[3].text(), 'accept = accept1, accept2')
+        self.assertEqual(predicates[4].text(), "match_param baz=bim,foo=bar")
+
     def test_match_param_from_string(self):
         _, predicates, _ = self._callFUT(match_param='foo=bar')
         request = DummyRequest()
