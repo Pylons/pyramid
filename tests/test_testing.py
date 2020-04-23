@@ -103,10 +103,6 @@ class TestDummyResource(unittest.TestCase):
         self.assertEqual(L(resource.keys()), L(resource.subs.keys()))
         self.assertEqual(len(resource), 2)
 
-    def test_nonzero(self):
-        resource = self._makeOne()
-        self.assertEqual(resource.__nonzero__(), True)
-
     def test_bool(self):
         resource = self._makeOne()
         self.assertEqual(resource.__bool__(), True)
@@ -258,7 +254,7 @@ class TestDummyRequest(unittest.TestCase):
 
         registry = Registry('this_test')
 
-        class ResponseFactory(object):
+        class ResponseFactory:
             pass
 
         registry.registerUtility(lambda r: ResponseFactory(), IResponseFactory)
@@ -695,7 +691,7 @@ class DummyFactory:
         """ """
 
 
-class DummyRegistry(object):
+class DummyRegistry:
     inited = 0
     __name__ = 'name'
 
@@ -703,7 +699,7 @@ class DummyRegistry(object):
         self.inited = self.inited + 1
 
 
-class DummyRendererInfo(object):
+class DummyRendererInfo:
     def __init__(self, kw):
         self.__dict__.update(kw)
 

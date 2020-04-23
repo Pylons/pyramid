@@ -63,7 +63,7 @@ class TestJSON(unittest.TestCase):
         self.assertEqual(result, '{"a": "%s"}' % now.isoformat())
 
     def test_with_custom_serializer(self):
-        class Serializer(object):
+        class Serializer:
             def __call__(self, obj, **kw):
                 self.obj = obj
                 self.kw = kw
@@ -82,7 +82,7 @@ class TestJSON(unittest.TestCase):
         request = testing.DummyRequest()
         outerself = self
 
-        class MyObject(object):
+        class MyObject:
             def __init__(self, x):
                 self.x = x
 
@@ -96,7 +96,7 @@ class TestJSON(unittest.TestCase):
         self.assertEqual(result, '[{"x": 1}, {"x": 2}]')
 
     def test_with_object_adapter_no___json__(self):
-        class MyObject(object):
+        class MyObject:
             def __init__(self, x):
                 self.x = x
 
@@ -163,14 +163,14 @@ class TestRendererHelper(unittest.TestCase):
         verifyObject(IRendererInfo, helper)
 
     def test_settings_registry_settings_is_None(self):
-        class Dummy(object):
+        class Dummy:
             settings = None
 
         helper = self._makeOne(registry=Dummy)
         self.assertEqual(helper.settings, {})
 
     def test_settings_registry_name_is_None(self):
-        class Dummy(object):
+        class Dummy:
             settings = None
 
         helper = self._makeOne(registry=Dummy)
@@ -178,7 +178,7 @@ class TestRendererHelper(unittest.TestCase):
         self.assertEqual(helper.type, '')
 
     def test_settings_registry_settings_is_not_None(self):
-        class Dummy(object):
+        class Dummy:
             settings = {'a': 1}
 
         helper = self._makeOne(registry=Dummy)
@@ -202,7 +202,7 @@ class TestRendererHelper(unittest.TestCase):
     def _registerResponseFactory(self):
         from pyramid.interfaces import IResponseFactory
 
-        class ResponseFactory(object):
+        class ResponseFactory:
             pass
 
         self.config.registry.registerUtility(
@@ -254,7 +254,7 @@ class TestRendererHelper(unittest.TestCase):
     def test_render_explicit_registry(self):
         factory = self._registerRendererFactory()
 
-        class DummyRegistry(object):
+        class DummyRegistry:
             def __init__(self):
                 self.responses = [factory, lambda *arg: {}, None]
 
@@ -372,7 +372,7 @@ class TestRendererHelper(unittest.TestCase):
     def test_with_alternate_response_factory(self):
         from pyramid.interfaces import IResponseFactory
 
-        class ResponseFactory(object):
+        class ResponseFactory:
             def __init__(self):
                 pass
 
@@ -560,7 +560,7 @@ class Test_render(unittest.TestCase):
     def test_no_response_to_preserve(self):
         from pyramid.decorator import reify
 
-        class DummyRequestWithClassResponse(object):
+        class DummyRequestWithClassResponse:
             _response = DummyResponse()
             _response.content_type = None
             _response.default_content_type = None
@@ -639,7 +639,7 @@ class Test_render_to_response(unittest.TestCase):
     def test_no_response_to_preserve(self):
         from pyramid.decorator import reify
 
-        class DummyRequestWithClassResponse(object):
+        class DummyRequestWithClassResponse:
             _response = DummyResponse()
             _response.content_type = None
             _response.default_content_type = None
@@ -655,7 +655,7 @@ class Test_render_to_response(unittest.TestCase):
         self.assertFalse('response' in request.__dict__)
 
     def test_custom_response_object(self):
-        class DummyRequestWithClassResponse(object):
+        class DummyRequestWithClassResponse:
             pass
 
         request = DummyRequestWithClassResponse()

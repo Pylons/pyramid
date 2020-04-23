@@ -4,7 +4,7 @@ from pyramid.interfaces import ILocaleNegotiator, ITranslationDirectories
 from pyramid.path import AssetResolver
 
 
-class I18NConfiguratorMixin(object):
+class I18NConfiguratorMixin:
     @action_method
     def set_locale_negotiator(self, negotiator):
         """

@@ -27,7 +27,7 @@ from pyramid.view import _call_view
 
 
 @implementer(IRouter)
-class Router(object):
+class Router:
 
     debug_notfound = False
     debug_routematch = False

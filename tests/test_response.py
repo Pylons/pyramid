@@ -78,7 +78,7 @@ class TestFileResponse(unittest.TestCase):
         from pyramid import response
         from pyramid.util import text_
 
-        class FakeMimetypesModule(object):
+        class FakeMimetypesModule:
             def guess_type(self, *arg, **kw):
                 return text_('foo/bar'), None
 
@@ -218,11 +218,11 @@ class TestGetResponseFactory(unittest.TestCase):
         self.assertTrue(isinstance(response, Response))
 
 
-class Dummy(object):
+class Dummy:
     pass
 
 
-class DummyConfigurator(object):
+class DummyConfigurator:
     def __init__(self):
         self.adapters = []
 
@@ -230,7 +230,7 @@ class DummyConfigurator(object):
         self.adapters.append((wrapped, type_or_iface))
 
 
-class DummyVenusian(object):
+class DummyVenusian:
     def __init__(self):
         self.attached = []
 

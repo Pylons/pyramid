@@ -75,7 +75,7 @@ view_description = view_description  # bw-compat
 
 
 @implementer(IMultiView)
-class MultiView(object):
+class MultiView:
     def __init__(self, name):
         self.name = name
         self.media_views = {}
@@ -235,7 +235,7 @@ def combine_decorators(*decorators):
     return decorated
 
 
-class ViewsConfiguratorMixin(object):
+class ViewsConfiguratorMixin:
     @viewdefaults
     @action_method
     def add_view(
@@ -2125,7 +2125,7 @@ def runtime_exc_view(view, excview):
 
 
 @implementer(IViewDeriverInfo)
-class ViewDeriverInfo(object):
+class ViewDeriverInfo:
     def __init__(
         self, view, registry, package, predicates, exception_only, options
     ):
@@ -2142,7 +2142,7 @@ class ViewDeriverInfo(object):
 
 
 @implementer(IStaticURLInfo)
-class StaticURLInfo(object):
+class StaticURLInfo:
     def __init__(self):
         self.registrations = []
         self.cache_busters = []

@@ -13,7 +13,7 @@ from pyramid.response import FileResponse, _guess_type
 from pyramid.traversal import traversal_path_info
 
 
-class static_view(object):
+class static_view:
     """ An instance of this class is a callable which can act as a
     :app:`Pyramid` :term:`view callable`; this view will serve
     static files from a directory on disk based on the ``root_dir``
@@ -285,7 +285,7 @@ def _secure_path(path_tuple):
     return encoded
 
 
-class QueryStringCacheBuster(object):
+class QueryStringCacheBuster:
     """
     An implementation of :class:`~pyramid.interfaces.ICacheBuster` which adds
     a token for cache busting in the query string of an asset URL.
@@ -327,14 +327,14 @@ class QueryStringConstantCacheBuster(QueryStringCacheBuster):
     """
 
     def __init__(self, token, param='x'):
-        super(QueryStringConstantCacheBuster, self).__init__(param=param)
+        super().__init__(param=param)
         self._token = token
 
     def tokenize(self, request, subpath, kw):
         return self._token
 
 
-class ManifestCacheBuster(object):
+class ManifestCacheBuster:
     """
     An implementation of :class:`~pyramid.interfaces.ICacheBuster` which
     uses a supplied manifest file to map an asset path to a cache-busted

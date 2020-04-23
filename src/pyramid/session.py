@@ -39,7 +39,7 @@ def manage_changed(wrapped):
     return changed
 
 
-class PickleSerializer(object):
+class PickleSerializer:
     """
     .. deprecated:: 2.0
 

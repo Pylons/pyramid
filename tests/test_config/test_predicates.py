@@ -200,7 +200,7 @@ class TestPredicateList(unittest.TestCase):
     def test_different_custom_predicates_with_same_hash(self):
         from pyramid.config.predicates import predvalseq
 
-        class PredicateWithHash(object):
+        class PredicateWithHash:
             def __hash__(self):
                 return 1
 
@@ -443,7 +443,7 @@ class Test_sort_accept_offers(unittest.TestCase):
         )
 
 
-class DummyCustomPredicate(object):
+class DummyCustomPredicate:
     def __init__(self):
         self.__text__ = 'custom predicate'
 
@@ -458,7 +458,7 @@ class DummyCustomPredicate(object):
         pass  # pragma: no cover
 
 
-class Dummy(object):
+class Dummy:
     def __init__(self, **kw):
         self.__dict__.update(**kw)
 
@@ -475,7 +475,7 @@ class DummyRequest:
         self.cookies = {}
 
 
-class DummyConfigurator(object):
+class DummyConfigurator:
     package = 'dummy package'
     registry = 'dummy registry'
 

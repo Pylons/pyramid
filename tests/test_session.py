@@ -6,7 +6,7 @@ import unittest
 from pyramid import testing
 
 
-class SharedCookieSessionTests(object):
+class SharedCookieSessionTests:
     def test_ctor_no_cookie(self):
         request = testing.DummyRequest()
         session = self._makeOne(request)
@@ -603,11 +603,11 @@ class TestPickleSerializer(unittest.TestCase):
         self.assertIsInstance(result, bytes)
 
 
-class Dummy(object):
+class Dummy:
     pass
 
 
-class DummySerializer(object):
+class DummySerializer:
     def dumps(self, value):
         return base64.b64encode(json.dumps(value).encode('utf-8'))
 
@@ -634,6 +634,6 @@ class DummySessionFactory(dict):
         self._dirty = True
 
 
-class DummyResponse(object):
+class DummyResponse:
     def __init__(self):
         self.headerlist = []

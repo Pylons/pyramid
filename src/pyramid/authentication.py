@@ -23,7 +23,7 @@ from pyramid.util import (
 VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
 
 
-class CallbackAuthenticationPolicy(object):
+class CallbackAuthenticationPolicy:
     """ Abstract class """
 
     debug = False
@@ -660,7 +660,7 @@ def b64decode(v):
 
 
 # this class licensed under the MIT license (stolen from Paste)
-class AuthTicket(object):
+class AuthTicket:
     """
     This class represents an authentication token.  You must pass in
     the shared secret, the userid, and the IP address.  Optionally you
@@ -821,7 +821,7 @@ def encode_ip_timestamp(ip, timestamp):
     return bytes_(ip_chars + ts_chars)
 
 
-class AuthTktCookieHelper(object):
+class AuthTktCookieHelper:
     """
     A helper class for security policies that obtains data from an "auth
     ticket" cookie.

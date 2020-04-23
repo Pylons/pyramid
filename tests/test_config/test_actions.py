@@ -1072,7 +1072,7 @@ def _conflictFunctions(e):
             yield confinst.function
 
 
-class DummyActionState(object):
+class DummyActionState:
     autocommit = False
     info = ''
 
@@ -1083,7 +1083,7 @@ class DummyActionState(object):
         self.actions.append((arg, kw))
 
 
-class DummyIntrospectable(object):
+class DummyIntrospectable:
     def __init__(self):
         self.registered = []
 

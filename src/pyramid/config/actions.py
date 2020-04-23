@@ -15,7 +15,7 @@ from pyramid.registry import undefer
 from pyramid.util import is_nonstr_iter, reraise
 
 
-class ActionConfiguratorMixin(object):
+class ActionConfiguratorMixin:
     @property
     def action_info(self):
         info = self.info  # usually a ZCML action (ParserInfo) if self.info
@@ -155,7 +155,7 @@ class ActionConfiguratorMixin(object):
 
 
 # this class is licensed under the ZPL (stolen from Zope)
-class ActionState(object):
+class ActionState:
     def __init__(self):
         # NB "actions" is an API, dep'd upon by pyramid_zcml's load_zcml func
         self.actions = []
@@ -330,7 +330,7 @@ class ActionState(object):
                 self.actions = []
 
 
-class ConflictResolverState(object):
+class ConflictResolverState:
     def __init__(self):
         # keep a set of resolved discriminators to test against to ensure
         # that a new action does not conflict with something already executed
@@ -527,7 +527,7 @@ def expand_action_tuple(
 
 
 @implementer(IActionInfo)
-class ActionInfo(object):
+class ActionInfo:
     def __init__(self, file, line, function, src):
         self.file = file
         self.line = line

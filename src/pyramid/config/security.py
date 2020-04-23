@@ -18,7 +18,7 @@ from pyramid.security import LegacySecurityPolicy
 from pyramid.util import as_sorted_tuple
 
 
-class SecurityConfiguratorMixin(object):
+class SecurityConfiguratorMixin:
     def add_default_security(self):
         self.set_csrf_storage_policy(LegacySessionCSRFStoragePolicy())
 
@@ -371,7 +371,7 @@ class SecurityConfiguratorMixin(object):
 
 
 @implementer(IDefaultCSRFOptions)
-class DefaultCSRFOptions(object):
+class DefaultCSRFOptions:
     def __init__(
         self,
         require_csrf,

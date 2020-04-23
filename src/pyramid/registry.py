@@ -57,7 +57,7 @@ class Registry(Components, dict):
     def _clear_view_lookup_cache(self):
         self._view_lookup_cache = {}
 
-    def __nonzero__(self):
+    def __bool__(self):
         # defeat bool determination via dict.__len__
         return True
 
@@ -115,7 +115,7 @@ class Registry(Components, dict):
 
 
 @implementer(IIntrospector)
-class Introspector(object):
+class Introspector:
     def __init__(self):
         self._refs = {}
         self._categories = {}
@@ -245,10 +245,8 @@ class Introspectable(dict):
             self.discriminator,
         )
 
-    def __nonzero__(self):
+    def __bool__(self):
         return True
-
-    __bool__ = __nonzero__  # py3
 
     def register(self, introspector, action_info):
         self.discriminator = undefer(self.discriminator)
@@ -266,7 +264,7 @@ class Introspectable(dict):
             )
 
 
-class Deferred(object):
+class Deferred:
     """ Can be used by a third-party configuration extender to wrap a
     :term:`discriminator` during configuration if an immediately hashable
     discriminator cannot be computed because it relies on unresolved values.

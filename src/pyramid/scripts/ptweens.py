@@ -13,7 +13,7 @@ def main(argv=sys.argv, quiet=False):
     return command.run()
 
 
-class PTweensCommand(object):
+class PTweensCommand:
     description = """\
     Print all implicit and explicit tween objects used by a Pyramid
     application.  The handler output includes whether the system is using an

@@ -244,7 +244,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
 
         config = self._makeOne(autocommit=True)
 
-        class Adapter(object):
+        class Adapter:
             def __init__(self, other):
                 self.other = other
 
@@ -257,7 +257,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
 
         config = self._makeOne(autocommit=True)
 
-        class Adapter(object):
+        class Adapter:
             pass
 
         config.add_response_adapter(None, Adapter)
@@ -396,23 +396,23 @@ class Test_eventonly(unittest.TestCase):
         self.assertTrue(self._callFUT(acallable))
 
 
-class DummyTraverser(object):
+class DummyTraverser:
     def __init__(self, root):
         self.root = root
 
 
-class DummyIface(object):
+class DummyIface:
     pass
 
 
-class DummyResourceURL(object):
+class DummyResourceURL:
     def __init__(self, resource, request):
         self.resource = resource
         self.request = request
 
 
 def predicate_maker(name):
-    class Predicate(object):
+    class Predicate:
         def __init__(self, val, config):
             self.val = val
 

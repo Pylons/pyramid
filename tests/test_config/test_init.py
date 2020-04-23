@@ -435,10 +435,10 @@ class ConfiguratorTests(unittest.TestCase):
             pass
 
         @implementer(IFoo)
-        class Foo(object):
+        class Foo:
             pass
 
-        class Bar(object):
+        class Bar:
             pass
 
         adaptation = ()
@@ -925,7 +925,7 @@ test_config.dummy_include2"""
 
         config = self._makeOne()
 
-        class DummyInspect(object):
+        class DummyInspect:
             def getmodule(self, c):
                 return inspect.getmodule(c)
 
@@ -1419,7 +1419,7 @@ class DummyRequest:
         self.cookies = {}
 
 
-class DummyThreadLocalManager(object):
+class DummyThreadLocalManager:
     def __init__(self):
         self.pushed = {'registry': None, 'request': None}
         self.popped = False
@@ -1434,7 +1434,7 @@ class DummyThreadLocalManager(object):
         self.popped = True
 
 
-class DummyRegistry(object):
+class DummyRegistry:
     def __init__(self, adaptation=None, util=None):
         self.utilities = []
         self.adapters = []
@@ -1458,5 +1458,5 @@ class DummyRegistry(object):
         return self.util
 
 
-class DummyPredicate(object):
+class DummyPredicate:
     pass

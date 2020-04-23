@@ -4,7 +4,7 @@ import unittest
 from . import dummy
 
 
-class DummyIntrospector(object):
+class DummyIntrospector:
     def __init__(self):
         self.relations = {}
         self.introspectables = {}

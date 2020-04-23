@@ -532,7 +532,7 @@ class TestLocalizerRequestMixin(unittest.TestCase):
         self.assertEqual(result.translate('Approve', 'deformsite'), 'Approve')
 
 
-class DummyRequest(object):
+class DummyRequest:
     def __init__(self):
         self.params = {}
         self.cookies = {}
@@ -542,7 +542,7 @@ def dummy_negotiator(request):
     return 'bogus'
 
 
-class DummyTranslations(object):
+class DummyTranslations:
     def ugettext(self, text):
         return text
 

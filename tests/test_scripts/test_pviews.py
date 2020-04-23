@@ -51,7 +51,7 @@ class TestPViewsCommand(unittest.TestCase):
         registry = Registry()
 
         @implementer(IMultiView)
-        class View1(object):
+        class View1:
             pass
 
         request = dummy.DummyRequest()
@@ -105,7 +105,7 @@ class TestPViewsCommand(unittest.TestCase):
         registry = Registry()
 
         @implementer(IMultiView)
-        class View1(object):
+        class View1:
             pass
 
         request = dummy.DummyRequest()
@@ -147,7 +147,7 @@ class TestPViewsCommand(unittest.TestCase):
         registry.registerUtility(IMyRoute, IRouteRequest, name='a')
 
         @implementer(IMyRoot)
-        class Factory(object):
+        class Factory:
             def __init__(self, request):
                 pass
 
@@ -190,7 +190,7 @@ class TestPViewsCommand(unittest.TestCase):
         registry.registerUtility(IMyRoute2, IRouteRequest, name='b')
 
         @implementer(IMyRoot)
-        class Factory(object):
+        class Factory:
             def __init__(self, request):
                 pass
 
@@ -242,7 +242,7 @@ class TestPViewsCommand(unittest.TestCase):
         registry.registerUtility(IMyRoute2, IRouteRequest, name='b')
 
         @implementer(IMyRoot)
-        class Factory(object):
+        class Factory:
             def __init__(self, request):
                 pass
 

@@ -2,7 +2,7 @@ from pyramid.events import subscriber
 from pyramid.view import view_config
 
 
-class Yup(object):
+class Yup:
     def __init__(self, val, config):
         self.val = val
 
@@ -15,12 +15,12 @@ class Yup(object):
         return getattr(event.response, 'yup', False)
 
 
-class Foo(object):
+class Foo:
     def __init__(self, response):
         self.response = response
 
 
-class Bar(object):
+class Bar:
     pass
 
 

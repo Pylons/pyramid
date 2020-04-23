@@ -177,7 +177,7 @@ def string_renderer_factory(info):
 _marker = object()
 
 
-class JSON(object):
+class JSON:
     """ Renderer that returns a JSON-encoded string.
 
     Configure a custom JSON renderer using the
@@ -243,7 +243,7 @@ class JSON(object):
 
         .. code-block:: python
 
-           class Foo(object):
+           class Foo:
                x = 5
 
            def foo_adapter(obj, request):
@@ -397,7 +397,7 @@ class JSONP(JSON):
 
 
 @implementer(IRendererInfo)
-class RendererHelper(object):
+class RendererHelper:
     def __init__(self, name=None, package=None, registry=None):
         if name and '.' in name:
             rtype = os.path.splitext(name)[1]

@@ -47,7 +47,7 @@ class FileResponse(Response):
     ):
         if content_type is None:
             content_type, content_encoding = _guess_type(path)
-        super(FileResponse, self).__init__(
+        super().__init__(
             conditional_response=True,
             content_type=content_type,
             content_encoding=content_encoding,
@@ -69,7 +69,7 @@ class FileResponse(Response):
             self.cache_expires = cache_max_age
 
 
-class FileIter(object):
+class FileIter:
     """ A fixed-block-size iterator for use as a WSGI app_iter.
 
     ``file`` is a Python file pointer (or at least an object with a ``read``
@@ -95,7 +95,7 @@ class FileIter(object):
         self.file.close()
 
 
-class response_adapter(object):
+class response_adapter:
     """ Decorator activated via a :term:`scan` which treats the function
     being decorated as a :term:`response adapter` for the set of types or
     interfaces passed as ``*types_or_ifaces`` to the decorator constructor.

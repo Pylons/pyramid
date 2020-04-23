@@ -48,5 +48,5 @@ class TestLineage(unittest.TestCase):
 
 
 @implementer(ILocation)
-class Location(object):
+class Location:
     __name__ = __parent__ = None

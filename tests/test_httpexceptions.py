@@ -74,8 +74,8 @@ class Test__no_escape(unittest.TestCase):
         )
 
     def test_unicode(self):
-        class DummyUnicodeObject(object):
-            def __unicode__(self):
+        class DummyUnicodeObject:
+            def __str__(self):
                 return text_('42')
 
         duo = DummyUnicodeObject()
@@ -392,7 +392,7 @@ class TestHTTPException(unittest.TestCase):
         exc = cls(body_template='${REQUEST_METHOD}')
         environ = _makeEnviron()
 
-        class Choke(object):
+        class Choke:
             def __str__(self):  # pragma no cover
                 raise ValueError
 
@@ -514,11 +514,11 @@ class TestHTTPMethodNotAllowed(unittest.TestCase):
         )
 
 
-class DummyRequest(object):
+class DummyRequest:
     exception = None
 
 
-class DummyStartResponse(object):
+class DummyStartResponse:
     def __call__(self, status, headerlist):
         self.status = status
         self.headerlist = headerlist

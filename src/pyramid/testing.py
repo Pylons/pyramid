@@ -21,7 +21,7 @@ from pyramid.view import ViewMethodsMixin
 _marker = object()
 
 
-class DummyRootFactory(object):
+class DummyRootFactory:
     __parent__ = None
     __name__ = None
 
@@ -30,7 +30,7 @@ class DummyRootFactory(object):
             self.__dict__.update(request['bfg.routes.matchdict'])
 
 
-class DummySecurityPolicy(object):
+class DummySecurityPolicy:
     """ A standin for a :term:`security policy`."""
 
     def __init__(
@@ -69,7 +69,7 @@ class DummySecurityPolicy(object):
         return self.forget_result
 
 
-class DummyTemplateRenderer(object):
+class DummyTemplateRenderer:
     """
     An instance of this class is returned from
     :meth:`pyramid.config.Configurator.testing_add_renderer`.  It has a
@@ -203,10 +203,8 @@ class DummyResource:
 
     __iter__ = keys
 
-    def __nonzero__(self):
+    def __bool__(self):
         return True
-
-    __bool__ = __nonzero__
 
     def __len__(self):
         return len(self.subs)
@@ -555,7 +553,7 @@ def cleanUp(*arg, **kw):
     return setUp(*arg, **kw)
 
 
-class DummyRendererFactory(object):
+class DummyRendererFactory:
     """ Registered by
     :meth:`pyramid.config.Configurator.testing_add_renderer` as
     a dummy renderer factory.  The indecision about what to use as a
@@ -592,7 +590,7 @@ class DummyRendererFactory(object):
         return renderer
 
 
-class MockTemplate(object):
+class MockTemplate:
     def __init__(self, response):
         self._received = {}
         self.response = response

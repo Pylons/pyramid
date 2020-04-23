@@ -119,7 +119,7 @@ class TestPServeCommand(unittest.TestCase):
 
         class AttrDict(dict):
             def __init__(self, *args, **kwargs):
-                super(AttrDict, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
                 self.__dict__ = self
 
         def dummy_start_reloader(*args, **kwargs):
@@ -137,10 +137,10 @@ class TestPServeCommand(unittest.TestCase):
         finally:
             pserve.hupper = orig_hupper
 
-        self.assertEquals(
+        self.assertEqual(
             dummy_start_reloader.args, ('pyramid.scripts.pserve.main',)
         )
-        self.assertEquals(
+        self.assertEqual(
             dummy_start_reloader.kwargs,
             {
                 'reload_interval': 1,

@@ -30,7 +30,7 @@ def main(argv=sys.argv, quiet=False, original_ignore_files=None):
     return command.run()
 
 
-class PServeCommand(object):
+class PServeCommand:
 
     description = """\
     This command serves a web application that uses a PasteDeploy

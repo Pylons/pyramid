@@ -11,9 +11,9 @@ class TestRegistry(unittest.TestCase):
     def _makeOne(self, *args, **kw):
         return self._getTargetClass()(*args, **kw)
 
-    def test___nonzero__(self):
+    def test___bool__(self):
         registry = self._makeOne()
-        self.assertEqual(registry.__nonzero__(), True)
+        self.assertEqual(registry.__bool__(), True)
 
     def test__lock(self):
         registry = self._makeOne()
@@ -380,10 +380,6 @@ class TestIntrospectable(unittest.TestCase):
             "<Introspectable category 'category', discriminator 'discrim'>",
         )
 
-    def test___nonzero__(self):
-        inst = self._makeOnePopulated()
-        self.assertEqual(inst.__nonzero__(), True)
-
     def test___bool__(self):
         inst = self._makeOnePopulated()
         self.assertEqual(inst.__bool__(), True)
@@ -407,7 +403,7 @@ class TestIntrospectable(unittest.TestCase):
         )
 
 
-class DummyIntrospector(object):
+class DummyIntrospector:
     def __init__(self):
         self.intrs = []
         self.relations = []
@@ -429,7 +425,7 @@ class DummyModule:
     __file__ = ''
 
 
-class DummyIntrospectable(object):
+class DummyIntrospectable:
     category_name = 'category'
     discriminator = 'discriminator'
     title = 'title'
@@ -447,5 +443,5 @@ class IDummyEvent(Interface):
 
 
 @implementer(IDummyEvent)
-class DummyEvent(object):
+class DummyEvent:
     pass

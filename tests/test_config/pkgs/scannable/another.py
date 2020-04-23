@@ -18,7 +18,7 @@ def stacked(context, request):
     return 'another_stacked'
 
 
-class stacked_class(object):
+class stacked_class:
     def __init__(self, context, request):
         self.context = context
         self.request = request
@@ -49,7 +49,7 @@ oldstyle_grokked_class = view_config(
 )(oldstyle_grokked_class)
 
 
-class grokked_class(object):
+class grokked_class:
     def __init__(self, context, request):
         self.context = context
         self.request = request
@@ -63,7 +63,7 @@ grokked_class = view_config(
 )(grokked_class)
 
 
-class Foo(object):
+class Foo:
     def __call__(self, context, request):
         return 'another_grokked_instance'
 

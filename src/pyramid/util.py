@@ -73,7 +73,7 @@ def as_sorted_tuple(val):
     return val
 
 
-class SettableProperty(object):
+class SettableProperty:
     # this is just like reify but does not store the computed result on
     # the class such that subsequent invocations invoke the callable again
     def __init__(self, wrapped):
@@ -86,7 +86,7 @@ class SettableProperty(object):
         return self.wrapped(obj)
 
 
-class InstancePropertyHelper(object):
+class InstancePropertyHelper:
     """A helper object for assigning properties and descriptors to instances.
     It is not normally possible to do this because descriptors must be
     defined on the class itself.
@@ -187,7 +187,7 @@ class InstancePropertyHelper(object):
             self.apply_properties(target, self.properties)
 
 
-class InstancePropertyMixin(object):
+class InstancePropertyMixin:
     """ Mixin that will allow an instance to add properties at
     run-time as if they had been defined via @property or @reify
     on the class itself.
@@ -250,7 +250,7 @@ class InstancePropertyMixin(object):
         )
 
 
-class WeakOrderedSet(object):
+class WeakOrderedSet:
     """ Maintain a set of items.
 
     Each item is stored as a weakref to avoid extending their lifetime.
@@ -410,7 +410,7 @@ def shortrepr(object, closer):
     return r
 
 
-class Sentinel(object):
+class Sentinel:
     def __init__(self, repr):
         self.repr = repr
 
@@ -422,7 +422,7 @@ FIRST = Sentinel('FIRST')
 LAST = Sentinel('LAST')
 
 
-class TopologicalSorter(object):
+class TopologicalSorter:
     """ A utility class which can be used to perform topological sorts against
     tuple-like data."""
 
@@ -695,7 +695,7 @@ def takes_one_arg(callee, attr=None, argname=None):
     return False
 
 
-class SimpleSerializer(object):
+class SimpleSerializer:
     def loads(self, bstruct):
         return text_(bstruct)
 

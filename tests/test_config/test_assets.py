@@ -820,7 +820,7 @@ class TestPackageOverrides(unittest.TestCase):
         self.assertEqual(loader._got_source, 'whatever')
 
 
-class AssetSourceIntegrationTests(object):
+class AssetSourceIntegrationTests:
     def test_get_filename(self):
         source = self._makeOne('')
         self.assertEqual(

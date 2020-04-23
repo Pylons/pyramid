@@ -1962,7 +1962,7 @@ class DummyContext:
     pass
 
 
-class DummyCookies(object):
+class DummyCookies:
     def __init__(self, cookie):
         self.cookie = cookie
 
@@ -2007,7 +2007,7 @@ class DummyCookieHelper:
         return []
 
 
-class DummyAuthTktModule(object):
+class DummyAuthTktModule:
     def __init__(
         self,
         timestamp=0,
@@ -2034,7 +2034,7 @@ class DummyAuthTktModule(object):
 
         self.parse_ticket = parse_ticket
 
-        class AuthTicket(object):
+        class AuthTicket:
             def __init__(self, secret, userid, remote_addr, **kw):
                 self.secret = secret
                 self.userid = userid

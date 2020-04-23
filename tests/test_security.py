@@ -248,7 +248,7 @@ class TestViewExecutionPermitted(unittest.TestCase):
         from pyramid.interfaces import ISecuredView
         from pyramid.interfaces import IViewClassifier
 
-        class Checker(object):
+        class Checker:
             def __permitted__(self, context, request):
                 self.context = context
                 self.request = request
@@ -277,7 +277,7 @@ class TestViewExecutionPermitted(unittest.TestCase):
         context = DummyContext()
         request = testing.DummyRequest({})
 
-        class DummyView(object):
+        class DummyView:
             pass
 
         view = DummyView()
@@ -327,7 +327,7 @@ class TestAuthenticatedIdentity(unittest.TestCase):
 
     def test_identity_no_security_policy(self):
         request = _makeRequest()
-        self.assertEquals(request.authenticated_identity, None)
+        self.assertEqual(request.authenticated_identity, None)
 
     def test_identity(self):
         request = _makeRequest()

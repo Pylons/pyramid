@@ -80,7 +80,7 @@ def package_path(package):
     return prefix
 
 
-class _CALLER_PACKAGE(object):
+class _CALLER_PACKAGE:
     def __repr__(self):  # pragma: no cover (for docs)
         return 'pyramid.path.CALLER_PACKAGE'
 
@@ -88,7 +88,7 @@ class _CALLER_PACKAGE(object):
 CALLER_PACKAGE = _CALLER_PACKAGE()
 
 
-class Resolver(object):
+class Resolver:
     def __init__(self, package=CALLER_PACKAGE):
         if package in (None, CALLER_PACKAGE):
             self.package = package
@@ -393,7 +393,7 @@ class DottedNameResolver(Resolver):
 
 
 @implementer(IAssetDescriptor)
-class PkgResourcesAssetDescriptor(object):
+class PkgResourcesAssetDescriptor:
     pkg_resources = pkg_resources
 
     def __init__(self, pkg_name, path):
@@ -422,7 +422,7 @@ class PkgResourcesAssetDescriptor(object):
 
 
 @implementer(IAssetDescriptor)
-class FSAssetDescriptor(object):
+class FSAssetDescriptor:
     def __init__(self, path):
         self.path = os.path.abspath(path)
 

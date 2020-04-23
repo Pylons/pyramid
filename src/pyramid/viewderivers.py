@@ -39,7 +39,7 @@ def requestonly(view, attr=None):
 
 @implementer(IViewMapper)
 @provider(IViewMapperFactory)
-class DefaultViewMapper(object):
+class DefaultViewMapper:
     def __init__(self, **kw):
         self.attr = kw.get('attr')
 

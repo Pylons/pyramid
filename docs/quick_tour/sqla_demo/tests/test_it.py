@@ -43,7 +43,7 @@ class BaseTest(unittest.TestCase):
 class TestMyViewSuccessCondition(BaseTest):
 
     def setUp(self):
-        super(TestMyViewSuccessCondition, self).setUp()
+        super().setUp()
         self.init_database()
 
         from sqla_demo.models import MyModel

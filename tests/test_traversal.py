@@ -506,7 +506,7 @@ class FindInterfaceTests(unittest.TestCase):
         self.assertEqual(result.__name__, 'root')
 
     def test_it_class(self):
-        class DummyRoot(object):
+        class DummyRoot:
             def __init__(self, child):
                 self.child = child
 
@@ -870,7 +870,7 @@ class QuotePathSegmentTests(unittest.TestCase):
         self.assertEqual(result, '12345')
 
     def test_other(self):
-        class Foo(object):
+        class Foo:
             def __str__(self):
                 return 'abc'
 
@@ -1188,7 +1188,7 @@ class TestDefaultRootFactory(unittest.TestCase):
         return self._getTargetClass()(environ)
 
     def test_it(self):
-        class DummyRequest(object):
+        class DummyRequest:
             pass
 
         root = self._makeOne(DummyRequest())
@@ -1235,7 +1235,7 @@ class Test__join_path_tuple(unittest.TestCase):
 
 
 def make_traverser(result):
-    class DummyTraverser(object):
+    class DummyTraverser:
         def __init__(self, context):
             self.context = context
             context.wascontext = True
@@ -1247,7 +1247,7 @@ def make_traverser(result):
     return DummyTraverser
 
 
-class DummyContext(object):
+class DummyContext:
     __parent__ = None
 
     def __init__(self, next=None, name=None):

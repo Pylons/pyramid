@@ -73,7 +73,7 @@ class TestDeriveView(unittest.TestCase):
             raise AssertionError
 
     def test_instance_returns_non_adaptable(self):
-        class AView(object):
+        class AView:
             def __call__(self, request):
                 return None
 
@@ -129,7 +129,7 @@ class TestDeriveView(unittest.TestCase):
     def test_requestonly_default_method_returns_non_adaptable(self):
         request = DummyRequest()
 
-        class AView(object):
+        class AView:
             def __init__(self, request):
                 pass
 
@@ -155,7 +155,7 @@ class TestDeriveView(unittest.TestCase):
     def test_requestonly_nondefault_method_returns_non_adaptable(self):
         request = DummyRequest()
 
-        class AView(object):
+        class AView:
             def __init__(self, request):
                 pass
 
@@ -191,7 +191,7 @@ class TestDeriveView(unittest.TestCase):
     def test_requestonly_function_with_renderer(self):
         response = DummyResponse()
 
-        class moo(object):
+        class moo:
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, 'OK')
@@ -235,7 +235,7 @@ class TestDeriveView(unittest.TestCase):
     def test_requestonly_function_with_renderer_request_has_view(self):
         response = DummyResponse()
 
-        class moo(object):
+        class moo:
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, 'OK')
@@ -261,7 +261,7 @@ class TestDeriveView(unittest.TestCase):
     def test_class_without_attr(self):
         response = DummyResponse()
 
-        class View(object):
+        class View:
             def __init__(self, request):
                 pass
 
@@ -276,7 +276,7 @@ class TestDeriveView(unittest.TestCase):
     def test_class_with_attr(self):
         response = DummyResponse()
 
-        class View(object):
+        class View:
             def __init__(self, request):
                 pass
 
@@ -314,7 +314,7 @@ class TestDeriveView(unittest.TestCase):
     def test_as_newstyle_class_context_and_request(self):
         response = DummyResponse()
 
-        class view(object):
+        class view:
             def __init__(self, context, request):
                 pass
 
@@ -334,7 +334,7 @@ class TestDeriveView(unittest.TestCase):
     def test_as_newstyle_class_requestonly(self):
         response = DummyResponse()
 
-        class view(object):
+        class view:
             def __init__(self, context, request):
                 pass
 
@@ -924,7 +924,7 @@ class TestDeriveView(unittest.TestCase):
     def test_as_newstyle_class_context_and_request_attr_and_renderer(self):
         response = DummyResponse()
 
-        class renderer(object):
+        class renderer:
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, {'a': '1'})
@@ -935,7 +935,7 @@ class TestDeriveView(unittest.TestCase):
             def clone(self):
                 return self
 
-        class View(object):
+        class View:
             def __init__(self, context, request):
                 pass
 
@@ -956,7 +956,7 @@ class TestDeriveView(unittest.TestCase):
     def test_as_newstyle_class_requestonly_attr_and_renderer(self):
         response = DummyResponse()
 
-        class renderer(object):
+        class renderer:
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, {'a': '1'})
@@ -967,7 +967,7 @@ class TestDeriveView(unittest.TestCase):
             def clone(self):
                 return self
 
-        class View(object):
+        class View:
             def __init__(self, request):
                 pass
 
@@ -988,7 +988,7 @@ class TestDeriveView(unittest.TestCase):
     def test_as_oldstyle_cls_context_request_attr_and_renderer(self):
         response = DummyResponse()
 
-        class renderer(object):
+        class renderer:
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, {'a': '1'})
@@ -1020,7 +1020,7 @@ class TestDeriveView(unittest.TestCase):
     def test_as_oldstyle_cls_requestonly_attr_and_renderer(self):
         response = DummyResponse()
 
-        class renderer(object):
+        class renderer:
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, {'a': '1'})
@@ -1052,7 +1052,7 @@ class TestDeriveView(unittest.TestCase):
     def test_as_instance_context_and_request_attr_and_renderer(self):
         response = DummyResponse()
 
-        class renderer(object):
+        class renderer:
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, {'a': '1'})
@@ -1081,7 +1081,7 @@ class TestDeriveView(unittest.TestCase):
     def test_as_instance_requestonly_attr_and_renderer(self):
         response = DummyResponse()
 
-        class renderer(object):
+        class renderer:
             def render_view(inself, req, resp, view_inst, ctx):
                 self.assertEqual(req, request)
                 self.assertEqual(resp, {'a': '1'})
@@ -1110,7 +1110,7 @@ class TestDeriveView(unittest.TestCase):
     def test_with_view_mapper_config_specified(self):
         response = DummyResponse()
 
-        class mapper(object):
+        class mapper:
             def __init__(self, **kw):
                 self.kw = kw
 
@@ -2046,7 +2046,7 @@ class TestDeriverIntegration(unittest.TestCase):
 
 
 @implementer(IResponse)
-class DummyResponse(object):
+class DummyResponse:
     content_type = None
     default_content_type = None
     body = None

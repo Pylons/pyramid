@@ -14,7 +14,7 @@ def main(argv=sys.argv, quiet=False):
     return command.run()
 
 
-class PViewsCommand(object):
+class PViewsCommand:
     description = """\
     Print, for a given URL, the views that might match. Underneath each
     potentially matching route, list the predicates required. Underneath
@@ -102,7 +102,7 @@ class PViewsCommand(object):
         adapters = registry.adapters
 
         @implementer(IMultiView)
-        class RoutesMultiView(object):
+        class RoutesMultiView:
             def __init__(self, infos, context_iface, root_factory, request):
                 self.views = []
                 for info in infos:

@@ -13,7 +13,7 @@ def main(argv=sys.argv, quiet=False):
     return command.run()
 
 
-class PRequestCommand(object):
+class PRequestCommand:
     description = """\
     Submit a HTTP request to a web application.
 
