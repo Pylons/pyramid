@@ -4,6 +4,10 @@ unreleased
 Features
 --------
 
+- It is now possible to pass multiple values to the ``header`` predicate
+  for route and view configuration.
+  See https://github.com/Pylons/pyramid/pull/3576
+
 - Add support for Python 3.8.
   See https://github.com/Pylons/pyramid/pull/3547
 

@@ -671,7 +671,8 @@ class ViewsConfiguratorMixin:
         header
 
           This value represents an HTTP header name or a header
-          name/value pair.  If the value contains a ``:`` (colon), it
+          name/value pair, or a sequence of them.
+          If the value contains a ``:`` (colon), it
           will be considered a name/value pair
           (e.g. ``User-Agent:Mozilla/.*`` or ``Host:localhost``).  The
           value portion should be a regular expression.  If the value

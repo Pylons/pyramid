@@ -220,7 +220,8 @@ class RoutesConfiguratorMixin:
         header
 
           This argument represents an HTTP header name or a header
-          name/value pair.  If the argument contains a ``:`` (colon),
+          name/value pair, or a sequence of them.
+          If the argument contains a ``:`` (colon),
           it will be considered a name/value pair
           (e.g. ``User-Agent:Mozilla/.*`` or ``Host:localhost``).  If
           the value contains a colon, the value portion should be a

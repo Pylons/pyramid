@@ -448,10 +448,10 @@ configured view.
   associated view callable.
 
 ``header``
-  This value represents an HTTP header name or a header name/value pair.
+  This value matches one or more HTTP header names or header name/value pairs.
 
-  If ``header`` is specified, it must be a header name or a
-  ``headername:headervalue`` pair.
+  If ``header`` is specified, it must be a string or a sequence of strings,
+  each being a header name or a ``headername:headervalue`` pair.
 
   If ``header`` is specified without a value (a bare header name only, e.g.,
   ``If-Modified-Since``), the view will only be invoked if the HTTP header
