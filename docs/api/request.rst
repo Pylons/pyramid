@@ -14,7 +14,7 @@
                      model_url, resource_url, resource_path, set_property, 
                      effective_principals, authenticated_userid,
                      unauthenticated_userid, has_permission,
-                     invoke_exception_view, localizer
+                     invoke_exception_view, localizer, response, session
 
    .. attribute:: context
 
