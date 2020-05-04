@@ -1,0 +1,5 @@
+# Set the default behaviour, in case poeple don't have core.autocrlf set
+* text=auto
+
+# Always lf, this file size is checked in a test
+tests/fixtures/static/encoded.html text eol=lf
