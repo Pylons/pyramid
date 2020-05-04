@@ -384,9 +384,9 @@ def app_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
 
 def setup(app):
     app.add_role('app', app_role)
-    app.add_directive('frontmatter', FrontMatter, 1, (0, 0, 0))
-    app.add_directive('mainmatter', MainMatter, 1, (0, 0, 0))
-    app.add_directive('backmatter', BackMatter, 1, (0, 0, 0))
+    app.add_directive('frontmatter', FrontMatter)
+    app.add_directive('mainmatter', MainMatter)
+    app.add_directive('backmatter', BackMatter)
     app.connect('autodoc-process-signature', resig)
 
 
