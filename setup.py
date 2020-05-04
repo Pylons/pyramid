@@ -51,7 +51,7 @@ docs_extras = [
     'sphinxcontrib-autoprogram',
 ]
 
-testing_extras = tests_require + ['coverage', 'nose']
+testing_extras = tests_require + ['coverage', 'pytest', 'pytest-cov']
 
 branch_version = ".".join(VERSION.split(".")[:2])
 
