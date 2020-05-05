@@ -1,6 +1,6 @@
 name: Build and test
 
-on: 
+on:
     # Only on pushes to master or one of the release branches we build on push
     push:
         branches:
@@ -28,6 +28,14 @@ jobs:
                     - x64
                     - x86
 
+                include:
+                    # Only run coverage on ubuntu-latest, except on pypy3
+                    - os: "ubuntu-latest"
+                      pytest-args: "--cov"
+                    - os: "ubuntu-latest"
+                      py: "pypy3"
+                      pytest-args: ""
+
                 exclude:
                     # Linux and macOS don't have x86 python
                     - os: "ubuntu-latest"
@@ -49,7 +57,7 @@ jobs:
                   architecture: ${{ matrix.architecture }}
             - run: pip install tox
             - name: Running tox
-              run: tox -e py
+              run: tox -e py -- ${{ matrix.pytest-args }}
     coverage:
         runs-on: ubuntu-latest
         name: Validate coverage
@@ -61,7 +69,7 @@ jobs:
                   python-version: 3.8
                   architecture: x64
             - run: pip install tox
-            - run: tox -e py38,coverage
+            - run: tox -e py38-cover,coverage
     docs:
         runs-on: ubuntu-latest
         name: Build the documentation
