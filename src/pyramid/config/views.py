@@ -671,25 +671,23 @@ class ViewsConfiguratorMixin:
         header
 
           This value can be a string or an iterable of strings for HTTP
-          header names.  Any string that does not contain a ``:``
-          (colon) will be considered to be the header name (e.g.
-          ``If-Modified-Since``).  In this case, the header specified by
-          the name must be present in the request for this predicate
-          to be true.
+          header names.  The header names are determined as follow:
 
-          If a string contains a colon, it will be considered a
-          name/value pair (e.g. ``User-Agent:Mozilla/.*`` or
-          ``Host:localhost``), where the value part is a regular
-          expression.  The header specified by the name must be present in
-          the request *and* the regular expression specified as the
-          value must match the header value.
+          - If a string does not contain a ``:`` (colon), it will be
+            considered to be the header name (e.g.  ``If-Modified-Since``).
+            In this case, the header specified by the name must be present
+            in the request for this string to match.  Case is not significant.
 
-          Whether or not the strings
-          represent a header name or a header name/value pair, the
-          case of the header name is not significant.  If this
-          predicate returns ``False``, route matching continues.
-          When the value is an iterable of strings, they must all
-          return ``True`` for this predicate to return ``True``.
+          - If a string contains a colon, it will be considered a
+            name/value pair (e.g. ``User-Agent:Mozilla/.*`` or
+            ``Host:localhost``), where the value part is a regular
+            expression.  The header specified by the name must be present
+            in the request *and* the regular expression specified as the
+            value must match the header value.  Case is not significant for
+            the header name, but it is for the value.
+
+          All strings must be matched for this predicate to return ``True``.
+          If this predicate returns ``False``, view matching continues.
 
         path_info
 
