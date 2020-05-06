@@ -219,24 +219,26 @@ class RoutesConfiguratorMixin:
 
         header
 
-          This argument represents an HTTP header name or a header
-          name/value pair, or a sequence of them.
-          If the argument contains a ``:`` (colon),
-          it will be considered a name/value pair
-          (e.g. ``User-Agent:Mozilla/.*`` or ``Host:localhost``).  If
-          the value contains a colon, the value portion should be a
-          regular expression.  If the value does not contain a colon,
-          the entire value will be considered to be the header name
-          (e.g. ``If-Modified-Since``).  If the value evaluates to a
-          header name only without a value, the header specified by
+          This value can be a string or an iterable of strings for HTTP
+          header names.  Any string that does not contain a ``:``
+          (colon) will be considered to be the header name (e.g.
+          ``If-Modified-Since``).  In this case, the header specified by
           the name must be present in the request for this predicate
-          to be true.  If the value evaluates to a header name/value
-          pair, the header specified by the name must be present in
+          to be true.
+
+          If a string contains a colon, it will be considered a
+          name/value pair (e.g. ``User-Agent:Mozilla/.*`` or
+          ``Host:localhost``), where the value part is a regular
+          expression.  The header specified by the name must be present in
           the request *and* the regular expression specified as the
-          value must match the header value.  Whether or not the value
-          represents a header name or a header name/value pair, the
+          value must match the header value.
+
+          Whether or not the strings
+          represent a header name or a header name/value pair, the
           case of the header name is not significant.  If this
           predicate returns ``False``, route matching continues.
+          When the value is an iterable of strings, they must all
+          return ``True`` for this predicate to return ``True``.
 
         accept
 
