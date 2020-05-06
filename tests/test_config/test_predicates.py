@@ -392,6 +392,12 @@ class TestPredicateList(unittest.TestCase):
         request.headers = {'foo': 'nobar', 'baz': 'foo'}
         self.assertFalse(predicates[0](Dummy(), request))
 
+    def test_header_with_value_fails_case(self):
+        _, predicates, _ = self._callFUT(header='foo:bar')
+        request = DummyRequest()
+        request.headers = {'foo': 'BAR'}
+        self.assertFalse(predicates[0](Dummy(), request))
+
     def test_header_multiple(self):
         _, predicates, _ = self._callFUT(header=('foo', 'content-length'))
         request = DummyRequest()
