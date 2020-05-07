@@ -85,7 +85,7 @@ class RoutesMapper:
             if match is not None:
                 preds = route.predicates
                 info = {'match': match, 'route': route}
-                if preds and not all((p(info, request) for p in preds)):
+                if preds and not all(p(info, request) for p in preds):
                     continue
                 return info
 

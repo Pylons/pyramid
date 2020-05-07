@@ -89,13 +89,11 @@ class TestPServeCommand(unittest.TestCase):
         self.assertEqual(loader.calls[0]['defaults'], {'a': '1'})
         self.assertEqual(
             inst.watch_files,
-            set(
-                [
-                    os.path.abspath('/base/foo'),
-                    os.path.abspath('/baz'),
-                    os.path.abspath(os.path.join(here, '*.py')),
-                ]
-            ),
+            {
+                os.path.abspath('/base/foo'),
+                os.path.abspath('/baz'),
+                os.path.abspath(os.path.join(here, '*.py')),
+            },
         )
 
     def test_config_file_finds_open_url(self):

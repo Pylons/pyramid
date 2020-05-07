@@ -271,7 +271,7 @@ class EffectivePrincipalsPredicate:
         if is_nonstr_iter(val):
             self.val = set(val)
         else:
-            self.val = set((val,))
+            self.val = {val}
 
     def text(self):
         return 'effective_principals = %s' % sorted(list(self.val))

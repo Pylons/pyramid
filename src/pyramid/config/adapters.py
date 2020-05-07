@@ -121,7 +121,7 @@ class AdaptersConfiguratorMixin:
             # with all args, the eventonly hack would not have been required.
             # At this point, though, using .subscriptions and manual execution
             # is not possible without badly breaking backwards compatibility.
-            if all((predicate(*arg) for predicate in predicates)):
+            if all(predicate(*arg) for predicate in predicates):
                 return derived_subscriber(*arg)
 
         if hasattr(subscriber, '__name__'):

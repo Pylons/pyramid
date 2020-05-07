@@ -388,7 +388,7 @@ class RoutesConfiguratorMixin:
                     scheme = parsed.scheme
                 else:
                     scheme = request.scheme
-                kw['_app_url'] = '{0}://{1}'.format(scheme, parsed.netloc)
+                kw['_app_url'] = '{}://{}'.format(scheme, parsed.netloc)
 
                 if original_pregenerator:
                     elements, kw = original_pregenerator(request, elements, kw)

@@ -220,7 +220,7 @@ def get_localizer(request):
     return request.localizer
 
 
-class Translations(gettext.GNUTranslations, object):
+class Translations(gettext.GNUTranslations):
     """An extended translation catalog class (ripped off from Babel) """
 
     DEFAULT_DOMAIN = 'messages'

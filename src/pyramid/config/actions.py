@@ -398,8 +398,8 @@ def resolveConflicts(actions, state=None):
         # error out if we went backward in order
         if state.min_order is not None and order < state.min_order:
             r = [
-                'Actions were added to order={0} after execution had moved '
-                'on to order={1}. Conflicting actions: '.format(
+                'Actions were added to order={} after execution had moved '
+                'on to order={}. Conflicting actions: '.format(
                     order, state.min_order
                 )
             ]
