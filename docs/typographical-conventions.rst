@@ -98,10 +98,11 @@ ini:
 
 .. code-block:: ini
 
-    [nosetests]
-    match=^test
-    where=pyramid
-    nocapture=1
+    [tool:pytest]
+    python_files = test_*.py
+    testpaths =
+        tests
+    addopts = -W always --cov
 
 Interactive Python:
 
