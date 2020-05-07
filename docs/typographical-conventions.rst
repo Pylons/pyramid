@@ -102,7 +102,7 @@ ini:
     python_files = test_*.py
     testpaths =
         tests
-    addopts = -W always --cov
+    addopts = -W always
 
 Interactive Python:
 

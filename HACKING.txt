@@ -89,10 +89,10 @@ Running Tests
   to your virtual environment:
 
     # run a single test
-    $ $TOX -e py -- --no-cov tests/test_httpexceptions.py::TestHTTPMethodNotAllowed::test_it_with_default_body_tmpl
+    $ $TOX -e py -- tests/test_httpexceptions.py::TestHTTPMethodNotAllowed::test_it_with_default_body_tmpl
 
     # run all tests in a class
-    $ $TOX -e py -- --no-cov tests/test_httpexceptions.py::TestHTTPMethodNotAllowed
+    $ $TOX -e py -- tests/test_httpexceptions.py::TestHTTPMethodNotAllowed
 
 - For more information on how to use pytest, please refer to the pytest
   documentation for selecting tests:
