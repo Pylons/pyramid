@@ -196,7 +196,7 @@ def predicated_view(view, info):
         return view(context, request)
 
     def checker(context, request):
-        return all((predicate(context, request) for predicate in preds))
+        return all(predicate(context, request) for predicate in preds)
 
     predicate_wrapper.__predicated__ = checker
     predicate_wrapper.__predicates__ = preds

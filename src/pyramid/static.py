@@ -260,7 +260,7 @@ def _add_vary(response, option):
     response.vary = vary
 
 
-_seps = set(['/', os.sep])
+_seps = {'/', os.sep}
 
 
 def _contains_slash(item):
@@ -269,7 +269,7 @@ def _contains_slash(item):
             return True
 
 
-_has_insecure_pathelement = set(['..', '.', '']).intersection
+_has_insecure_pathelement = {'..', '.', ''}.intersection
 
 
 @lru_cache(1000)

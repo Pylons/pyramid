@@ -82,7 +82,7 @@ def _get_request_methods(route_request_methods, view_request_methods):
     if has_methods and not request_methods:
         request_methods = '<route mismatch>'
     elif request_methods:
-        if excludes and request_methods == set([ANY_KEY]):
+        if excludes and request_methods == {ANY_KEY}:
             for exclude in excludes:
                 request_methods.add('!%s' % exclude)
 
