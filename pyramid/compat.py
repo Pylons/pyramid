@@ -194,7 +194,7 @@ else:
 
 try:
     import configparser
-except ImportError:
+except ImportError:  # pragma: nocover (virtualenv pulls in configparser backport)
     import ConfigParser as configparser
 
 try:
