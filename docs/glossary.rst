@@ -1153,7 +1153,7 @@ Glossary
       packaging.
 
    cookiecutter
-      A command-line utility that creates projects from :ref:`cookiecutters <cookiecutter:readme>` (project templates), e.g., creating a Python package project from a Python package project template.
+      A command-line utility that creates projects from `cookiecutters <https://cookiecutter.readthedocs.io/en/latest/>`_ (project templates), e.g., creating a Python package project from a Python package project template.
 
       Pyramid cookiecutters include:
 
