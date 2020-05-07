@@ -387,7 +387,7 @@ class JSONP(JSON):
                         )
 
                     ct = 'application/javascript'
-                    body = '/**/{0}({1});'.format(callback, val)
+                    body = '/**/{}({});'.format(callback, val)
                 response = request.response
                 if response.content_type == response.default_content_type:
                     response.content_type = ct

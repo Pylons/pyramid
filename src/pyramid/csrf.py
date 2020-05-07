@@ -360,6 +360,6 @@ def check_csrf_origin(
     if not any(
         is_same_domain(originp.netloc, host) for host in trusted_origins
     ):
-        return _fail("{0} does not match any trusted origins.".format(origin))
+        return _fail("{} does not match any trusted origins.".format(origin))
 
     return True
