@@ -472,7 +472,7 @@ class Test_object_description(unittest.TestCase):
         self.assertEqual(self._callFUT(('a', 'b')), "('a', 'b')")
 
     def test_set(self):
-        self.assertEqual(self._callFUT(set(['a'])), "{'a'}")
+        self.assertEqual(self._callFUT({'a'}), "{'a'}")
 
     def test_list(self):
         self.assertEqual(self._callFUT(['a']), "['a']")
@@ -492,8 +492,7 @@ class Test_object_description(unittest.TestCase):
     def test_method(self):
         self.assertEqual(
             self._callFUT(self.test_method),
-            'method test_method of class tests.test_util.'
-            'Test_object_description',
+            'function tests.test_util.test_method',
         )
 
     def test_class(self):

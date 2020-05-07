@@ -3099,7 +3099,7 @@ class TestMultiView(unittest.TestCase):
         )
         mv.add('view5', 100, accept='text/xml')
         self.assertEqual(mv.media_views['text/xml'], [(100, 'view5', None)])
-        self.assertEqual(set(mv.accepts), set(['text/xml', 'text/html']))
+        self.assertEqual(set(mv.accepts), {'text/xml', 'text/html'})
         self.assertEqual(mv.views, [(99, 'view2', None), (100, 'view', None)])
 
     def test_add_with_phash(self):

@@ -6,6 +6,7 @@ source =
 [paths]
 source =
     src/pyramid
+    */src/pyramid
     */site-packages/pyramid
 
 [report]

@@ -335,7 +335,7 @@ def check_csrf_origin(
             request.registry.settings.get("pyramid.csrf_trusted_origins", [])
         )
 
-    if request.host_port not in set(["80", "443"]):
+    if request.host_port not in {"80", "443"}:
         trusted_origins.append("{0.domain}:{0.host_port}".format(request))
     else:
         trusted_origins.append(request.domain)
@@ -360,6 +360,6 @@ def check_csrf_origin(
     if not any(
         is_same_domain(originp.netloc, host) for host in trusted_origins
     ):
-        return _fail("{0} does not match any trusted origins.".format(origin))
+        return _fail("{} does not match any trusted origins.".format(origin))
 
     return True

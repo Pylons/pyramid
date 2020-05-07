@@ -196,7 +196,7 @@ def predicated_view(view, info):
         return view(context, request)
 
     def checker(context, request):
-        return all((predicate(context, request) for predicate in preds))
+        return all(predicate(context, request) for predicate in preds)
 
     predicate_wrapper.__predicated__ = checker
     predicate_wrapper.__predicates__ = preds
@@ -2322,7 +2322,7 @@ class StaticURLInfo:
         rawspec = None
 
         if pkg_name is not None:
-            pathspec = '{0}:{1}{2}'.format(pkg_name, pkg_subpath, subpath)
+            pathspec = '{}:{}{}'.format(pkg_name, pkg_subpath, subpath)
             overrides = registry.queryUtility(IPackageOverrides, name=pkg_name)
             if overrides is not None:
                 resource_name = posixpath.join(pkg_subpath, subpath)
@@ -2330,7 +2330,7 @@ class StaticURLInfo:
                 for source, filtered_path in sources:
                     rawspec = source.get_path(filtered_path)
                     if hasattr(source, 'pkg_name'):
-                        rawspec = '{0}:{1}'.format(source.pkg_name, rawspec)
+                        rawspec = '{}:{}'.format(source.pkg_name, rawspec)
                     break
 
         else:
