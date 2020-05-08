@@ -312,6 +312,20 @@ class TestPredicateList(unittest.TestCase):
         self.assertEqual(predicates[10].text(), 'classmethod predicate')
         self.assertTrue(predicates[11].text().startswith('custom predicate'))
 
+    def test_predicate_text_is_correct_when_multiple(self):
+        _, predicates, _ = self._callFUT(
+            request_method=('one', 'two'),
+            request_param=('par2=on', 'par1'),
+            header=('header2', 'header1:val.*'),
+            accept=('accept1', 'accept2'),
+            match_param=('foo=bar', 'baz=bim'),
+        )
+        self.assertEqual(predicates[0].text(), "request_method = one,two")
+        self.assertEqual(predicates[1].text(), 'request_param par1,par2=on')
+        self.assertEqual(predicates[2].text(), 'header header1=val.*, header2')
+        self.assertEqual(predicates[3].text(), 'accept = accept1, accept2')
+        self.assertEqual(predicates[4].text(), "match_param baz=bim,foo=bar")
+
     def test_match_param_from_string(self):
         _, predicates, _ = self._callFUT(match_param='foo=bar')
         request = DummyRequest()
@@ -353,6 +367,72 @@ class TestPredicateList(unittest.TestCase):
         hash1, _, __ = self._callFUT(request_method=('GET',))
         hash2, _, __ = self._callFUT(request_method='GET')
         self.assertEqual(hash1, hash2)
+
+    def test_header_simple(self):
+        _, predicates, _ = self._callFUT(header='foo')
+        request = DummyRequest()
+        request.headers = {'foo': 'bars', 'baz': 'foo'}
+        self.assertTrue(predicates[0](Dummy(), request))
+
+    def test_header_simple_fails(self):
+        _, predicates, _ = self._callFUT(header='content-length')
+        request = DummyRequest()
+        request.headers = {'foo': 'bars', 'baz': 'foo'}
+        self.assertFalse(predicates[0](Dummy(), request))
+
+    def test_header_with_value(self):
+        _, predicates, _ = self._callFUT(header='foo:bar')
+        request = DummyRequest()
+        request.headers = {'foo': 'bars', 'baz': 'foo'}
+        self.assertTrue(predicates[0](Dummy(), request))
+
+    def test_header_with_value_fails(self):
+        _, predicates, _ = self._callFUT(header='foo:bar')
+        request = DummyRequest()
+        request.headers = {'foo': 'nobar', 'baz': 'foo'}
+        self.assertFalse(predicates[0](Dummy(), request))
+
+    def test_header_with_value_fails_case(self):
+        _, predicates, _ = self._callFUT(header='foo:bar')
+        request = DummyRequest()
+        request.headers = {'foo': 'BAR'}
+        self.assertFalse(predicates[0](Dummy(), request))
+
+    def test_header_multiple(self):
+        _, predicates, _ = self._callFUT(header=('foo', 'content-length'))
+        request = DummyRequest()
+        request.headers = {'foo': 'bars', 'content-length': '42'}
+        self.assertTrue(predicates[0](Dummy(), request))
+
+    def test_header_multiple_fails(self):
+        _, predicates, _ = self._callFUT(header=('foo', 'content-encoding'))
+        request = DummyRequest()
+        request.headers = {'foo': 'bars', 'content-length': '42'}
+        self.assertFalse(predicates[0](Dummy(), request))
+
+    def test_header_multiple_with_values(self):
+        _, predicates, _ = self._callFUT(header=('foo:bar', 'spam:egg'))
+        request = DummyRequest()
+        request.headers = {'foo': 'bars', 'spam': 'eggs'}
+        self.assertTrue(predicates[0](Dummy(), request))
+
+    def test_header_multiple_with_values_fails(self):
+        _, predicates, _ = self._callFUT(header=('foo:bar', 'spam:egg$'))
+        request = DummyRequest()
+        request.headers = {'foo': 'bars', 'spam': 'eggs'}
+        self.assertFalse(predicates[0](Dummy(), request))
+
+    def test_header_multiple_mixed(self):
+        _, predicates, _ = self._callFUT(header=('foo:bar', 'spam'))
+        request = DummyRequest()
+        request.headers = {'foo': 'bars', 'spam': 'ham'}
+        self.assertTrue(predicates[0](Dummy(), request))
+
+    def test_header_multiple_mixed_fails(self):
+        _, predicates, _ = self._callFUT(header=('foo:bar', 'spam'))
+        request = DummyRequest()
+        request.headers = {'foo': 'nobar', 'spamme': 'ham'}
+        self.assertFalse(predicates[0](Dummy(), request))
 
     def test_unknown_predicate(self):
         from pyramid.exceptions import ConfigurationError
@@ -472,6 +552,7 @@ class DummyRequest:
             environ = {}
         self.environ = environ
         self.params = {}
+        self.headers = {}
         self.cookies = {}
 
 

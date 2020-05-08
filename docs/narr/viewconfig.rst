@@ -391,7 +391,7 @@ configured view.
   the ``REQUEST_METHOD`` of the :term:`WSGI` environment.
 
 ``request_param``
-  This value can be any string or a sequence of strings.  A view declaration
+  This argument can be any string or a sequence of strings.  A view declaration
   with this argument ensures that the view will only be called when the
   :term:`request` has a key in the ``request.params`` dictionary (an HTTP
   ``GET`` or ``POST`` variable) that has a name which matches the supplied
@@ -406,7 +406,7 @@ configured view.
   consideration of keys and values in the ``request.params`` dictionary.
 
 ``match_param``
-  This param may be either a single string of the format "key=value" or a tuple
+  This argument may be either a single string of the format "key=value" or a tuple
   containing one or more of these strings.
 
   This argument ensures that the view will only be called when the
@@ -448,24 +448,23 @@ configured view.
   associated view callable.
 
 ``header``
-  This value represents an HTTP header name or a header name/value pair.
+  This param matches one or more HTTP header names or header name/value pairs.
+  If specified, this param must be a string or a sequence of strings,
+  each string being a header name or a ``headername:headervalue`` pair.
 
-  If ``header`` is specified, it must be a header name or a
-  ``headername:headervalue`` pair.
+  - Each string specified as a bare header name without a value (for example
+    ``If-Modified-Since``) will match a request if it contains an HTTP header
+    with that same name.  The case of the name is not significant, and the
+    header may have any value in the request.
 
-  If ``header`` is specified without a value (a bare header name only, e.g.,
-  ``If-Modified-Since``), the view will only be invoked if the HTTP header
-  exists with any value in the request.
+  - Each string specified as a name/value pair (that is, if it contains a ``:``
+    (colon), like ``User-Agent:Mozilla/.*``) will match a request only if it
+    contains an HTTP header with the requested name (ignoring case, so
+    ``User-Agent`` or ``user-agent`` would both match), *and* the value of the
+    HTTP header matches the value requested (``Mozilla/.*`` in our example).
+    The value portion is interpreted as a regular expression.
 
-  If ``header`` is specified, and possesses a name/value pair (e.g.,
-  ``User-Agent:Mozilla/.*``), the view will only be invoked if the HTTP header
-  exists *and* the HTTP header matches the value requested.  When the
-  ``headervalue`` contains a ``:`` (colon), it will be considered a name/value
-  pair (e.g., ``User-Agent:Mozilla/.*`` or ``Host:localhost``).  The value
-  portion should be a regular expression.
-
-  Whether or not the value represents a header name or a header name/value
-  pair, the case of the header name is not significant.
+  The view will only be invoked if all strings are matching.
 
   If ``header`` is not specified, the composition, presence, or absence of HTTP
   headers is not taken into consideration when deciding whether or not to

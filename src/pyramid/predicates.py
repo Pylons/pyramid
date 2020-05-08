@@ -98,33 +98,43 @@ class RequestParamPredicate:
 
 class HeaderPredicate:
     def __init__(self, val, config):
-        name = val
-        v = None
-        if ':' in name:
-            name, val_str = name.split(':', 1)
-            try:
-                v = re.compile(val_str)
-            except re.error as why:
-                raise ConfigurationError(why.args[0])
-        if v is None:
-            self._text = 'header %s' % (name,)
-        else:
-            self._text = 'header %s=%s' % (name, val_str)
-        self.name = name
-        self.val = v
+        values = []
+
+        val = as_sorted_tuple(val)
+        for name in val:
+            v, val_str = None, None
+            if ':' in name:
+                name, val_str = name.split(':', 1)
+                try:
+                    v = re.compile(val_str)
+                except re.error as why:
+                    raise ConfigurationError(why.args[0])
+
+            values.append((name, v, val_str))
+
+        self.val = values
 
     def text(self):
-        return self._text
+        return 'header %s' % ', '.join(
+            '%s=%s' % (name, val_str) if val_str else name
+            for name, _, val_str in self.val
+        )
 
     phash = text
 
     def __call__(self, context, request):
-        if self.val is None:
-            return self.name in request.headers
-        val = request.headers.get(self.name)
-        if val is None:
-            return False
-        return self.val.match(val) is not None
+        for name, val, _ in self.val:
+            if val is None:
+                if name not in request.headers:
+                    return False
+            else:
+                value = request.headers.get(name)
+                if value is None:
+                    return False
+                if val.match(value) is None:
+                    return False
+
+        return True
 
 
 class AcceptPredicate:
