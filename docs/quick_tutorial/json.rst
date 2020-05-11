@@ -85,7 +85,7 @@ to return a JSON encoding of the view data. We did this by:
 - Providing a ``@view_config`` that associated that route name with an existing
   view.
 
-- *Overriding* the view defaults in the view config that mentions the
+- *Overriding* the view config in the view config that mentions the
   ``hello_json`` route, so that when the route is matched, we use the JSON
   renderer rather than the ``home.pt`` template renderer that would otherwise 
   be used.
