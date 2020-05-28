@@ -1035,8 +1035,8 @@ class AuthTktCookieHelper:
                 domains.append('.' + cur_domain.split('.', 1)[1])
             else:
                 domains.append(None)
-                domains.append(cur_domain)
                 if self.wild_domain:
+                    domains.append(cur_domain)
                     domains.append('.' + cur_domain)
 
         profile = self.cookie_profile(request)

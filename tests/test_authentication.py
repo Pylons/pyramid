@@ -1177,17 +1177,11 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         helper = self._makeOne('secret', wild_domain=False)
         request = self._makeRequest()
         result = helper.remember(request, 'other')
-        self.assertEqual(len(result), 2)
+        self.assertEqual(len(result), 1)
 
         self.assertEqual(result[0][0], 'Set-Cookie')
         self.assertTrue(result[0][1].endswith('; Path=/; SameSite=Lax'))
         self.assertTrue(result[0][1].startswith('auth_tkt='))
-
-        self.assertEqual(result[1][0], 'Set-Cookie')
-        self.assertTrue(
-            result[1][1].endswith('; Domain=localhost; Path=/; SameSite=Lax')
-        )
-        self.assertTrue(result[1][1].startswith('auth_tkt='))
 
     def test_remember_parent_domain(self):
         helper = self._makeOne('secret', parent_domain=True)
