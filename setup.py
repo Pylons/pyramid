@@ -51,7 +51,11 @@ docs_extras = [
     'sphinxcontrib-autoprogram',
 ]
 
-testing_extras = tests_require + ['coverage', 'pytest', 'pytest-cov']
+testing_extras = tests_require + [
+    'coverage',
+    'pytest>=5.4.2',  # unittest.TestCase funkyness, see commit 77c1505ab
+    'pytest-cov',
+]
 
 branch_version = ".".join(VERSION.split(".")[:2])
 
