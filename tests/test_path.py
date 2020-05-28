@@ -101,10 +101,10 @@ class TestCallerPackage(unittest.TestCase):
         self.assertEqual(result, tests)
 
     def test_it_level_3(self):
-        import _pytest
+        import unittest
 
         result = self._callFUT(3)
-        self.assertEqual(result, _pytest)
+        self.assertEqual(result, unittest)
 
     def test_it_package(self):
         import tests
