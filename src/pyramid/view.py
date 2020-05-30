@@ -201,6 +201,16 @@ class view_config:
         ``view_config`` will work ONLY on module top level members
         because of the limitation of ``venusian.Scanner.scan``.
 
+        Also it will ONLY work on views present as plaintext python
+        files (*.py), ignoring all non-*.py ones which also includes
+        *.pyc and *.pyo (python precompiled byte code / optimized) files.
+
+        Another venusian specific precondition to take into account is that
+        python packages to be found by venusian need to have a __init__.py
+        file in their root directory.
+
+        This is a limitation in venusian documented in:
+        https://docs.pylonsproject.org/projects/venusian/en/latest/#using-venusian
     """
 
     venusian = venusian  # for testing injection
