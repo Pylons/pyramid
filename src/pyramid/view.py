@@ -212,6 +212,7 @@ class view_config:
         -   On Python source (``.py``) files.
             Compiled Python files (``.pyc``, ``.pyo``) without a corresponding
             source file are ignored.
+
         .. seealso::
 
             See also the `Venusian documentation
