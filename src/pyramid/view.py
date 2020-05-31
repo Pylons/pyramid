@@ -196,11 +196,27 @@ class view_config:
         See also :ref:`mapping_views_using_a_decorator_section` for
         details about using :class:`pyramid.view.view_config`.
 
-    .. warning::
+    .. note::
 
-        ``view_config`` will work ONLY on module top level members
-        because of the limitation of ``venusian.Scanner.scan``.
+        Because of a limitation of ``venusian.Scanner.scan``, note that
+        ``view_config`` will work only for the following conditions.
 
+        -   In Python packages that have an ``__init__.py`` file in their
+            directory.
+
+            .. seealso::
+
+                See also https://github.com/Pylons/venusian/issues/68
+
+        -   On module top level members.
+        -   On Python source (``.py``) files.
+            Compiled Python files (``.pyc``, ``.pyo``) without a corresponding
+            source file are ignored.
+
+        .. seealso::
+
+            See also the `Venusian documentation
+            <https://docs.pylonsproject.org/projects/venusian/en/latest/#using-venusian>`_.
     """
 
     venusian = venusian  # for testing injection
