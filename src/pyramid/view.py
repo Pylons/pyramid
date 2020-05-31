@@ -198,7 +198,7 @@ class view_config:
 
     .. note::
 
-        Because of the limitation of ``venusian.Scanner.scan``, note that
+        Because of a limitation of ``venusian.Scanner.scan``, note that
         ``view_config`` will work only for the following conditions.
 
         -   In Python packages that have an ``__init__.py`` file in their
