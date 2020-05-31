@@ -114,9 +114,9 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
                     content, vars, filename=full,
                     template_renderer=template_renderer
                     )
-            except SkipTemplate: 
+            except SkipTemplate:
                 continue # pragma: no cover
-            if content is None:  
+            if content is None:
                 continue  # pragma: no cover
         already_exists = os.path.exists(dest_full)
         if already_exists:
@@ -134,7 +134,7 @@ def copy_dir(source, dest, vars, verbosity, simulate, indent=0,
                     simulate=simulate, out_=out_):
                     continue
             elif not overwrite:
-                continue # pragma: no cover 
+                continue # pragma: no cover
         if verbosity and use_pkg_resources:
             out('%sCopying %s to %s' % (pad, full, dest_full))
         elif verbosity:
@@ -183,10 +183,20 @@ def query_interactive(src_fn, dest_fn, src_content, dest_content,
         dest_content.splitlines(),
         src_content.splitlines(),
         dest_fn, src_fn))
-    added = len([l for l in u_diff if l.startswith('+') and
-                 not l.startswith('+++')])
-    removed = len([l for l in u_diff if l.startswith('-') and
-                   not l.startswith('---')])
+    added = len(
+        [
+            line
+            for line in u_diff
+            if line.startswith('+') and not line.startswith('+++')
+        ]
+    )
+    removed = len(
+        [
+            line
+            for line in u_diff
+            if line.startswith('-') and not line.startswith('---')
+        ]
+    )
     if added > removed:
         msg = '; %i lines added' % (added - removed)
     elif removed > added:
