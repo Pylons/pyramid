@@ -236,10 +236,18 @@ def query_interactive(
         )
     )
     added = len(
-        [l for l in u_diff if l.startswith('+') and not l.startswith('+++')]
+        [
+            line
+            for line in u_diff
+            if line.startswith('+') and not line.startswith('+++')
+        ]
     )
     removed = len(
-        [l for l in u_diff if l.startswith('-') and not l.startswith('---')]
+        [
+            line
+            for line in u_diff
+            if line.startswith('-') and not line.startswith('---')
+        ]
     )
     if added > removed:
         msg = '; %i lines added' % (added - removed)
