@@ -271,7 +271,7 @@ class Translations(gettext.GNUTranslations, object):
         if locales is not None:
             if not isinstance(locales, (list, tuple)):
                 locales = [locales]
-            locales = [str(l) for l in locales]
+            locales = [str(locale) for locale in locales]
         if not domain:
             domain = cls.DEFAULT_DOMAIN
         filename = gettext.find(domain, dirname, locales)

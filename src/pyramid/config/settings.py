@@ -78,7 +78,7 @@ def Settings(d=None, _environ_=os.environ, **kw):
         value = type_(value)
         d.update({k: value for k in keys})
 
-    def O(settings_key, override_key):  # noqa: E743
+    def O(settings_key, override_key):  # noqa: E743, E741
         for key in expand_key(settings_key):
             d[key] = d[key] or d[override_key]
 
