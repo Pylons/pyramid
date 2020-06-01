@@ -143,7 +143,7 @@ class PServeCommand:
 
     def out(self, msg):  # pragma: no cover
         if self.args.verbose > 0:
-            print(msg)
+            print(msg, file=sys.stderr)
 
     def get_config_path(self, loader):
         return os.path.abspath(loader.uri.path)
@@ -296,7 +296,10 @@ def wsgiref_server_runner(wsgi_app, global_conf, **kw):  # pragma: no cover
     host = kw.get('host', '0.0.0.0')
     port = int(kw.get('port', 8080))
     server = make_server(host, port, wsgi_app)
-    print('Starting HTTP server on http://%s:%s' % (host, port))
+    print(
+        'Starting HTTP server on http://%s:%s' % (host, port),
+        file=sys.stderr
+    )
     server.serve_forever()
 
 
@@ -416,10 +419,14 @@ def cherrypy_server_runner(
         if host == '0.0.0.0':
             print(
                 'serving on 0.0.0.0:%s view at %s://127.0.0.1:%s'
-                % (port, protocol, port)
+                % (port, protocol, port),
+                file=sys.stderr
             )
         else:
-            print('serving on %s://%s:%s' % (protocol, host, port))
+            print(
+                'serving on %s://%s:%s' % (protocol, host, port),
+                file=sys.stderr
+            )
         server.start()
     except (KeyboardInterrupt, SystemExit):
         server.stop()
