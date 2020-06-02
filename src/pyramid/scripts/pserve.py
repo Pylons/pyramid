@@ -297,8 +297,7 @@ def wsgiref_server_runner(wsgi_app, global_conf, **kw):  # pragma: no cover
     port = int(kw.get('port', 8080))
     server = make_server(host, port, wsgi_app)
     print(
-        'Starting HTTP server on http://%s:%s' % (host, port),
-        file=sys.stderr
+        'Starting HTTP server on http://%s:%s' % (host, port), file=sys.stderr
     )
     server.serve_forever()
 
@@ -420,12 +419,12 @@ def cherrypy_server_runner(
             print(
                 'serving on 0.0.0.0:%s view at %s://127.0.0.1:%s'
                 % (port, protocol, port),
-                file=sys.stderr
+                file=sys.stderr,
             )
         else:
             print(
                 'serving on %s://%s:%s' % (protocol, host, port),
-                file=sys.stderr
+                file=sys.stderr,
             )
         server.start()
     except (KeyboardInterrupt, SystemExit):
