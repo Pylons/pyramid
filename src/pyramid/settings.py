@@ -21,9 +21,10 @@ def aslist_cronly(value):
 
 
 def aslist(value, flatten=True):
-    """ Return a list. Separating the input based on newlines
-    and, if flatten=True (the default), also split on spaces within
-    each line when value is a string."""
+    """ Return a list, separating the input based on newlines.
+    Also if ``flatten`` is ``True`` (the default), and if the line
+    is a string, then the line will be split on spaces.
+    """
     values = aslist_cronly(value)
     if not flatten:
         return values
