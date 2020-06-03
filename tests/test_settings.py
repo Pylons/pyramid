@@ -69,6 +69,14 @@ class Test_aslist(unittest.TestCase):
         result = self._callFUT(['abc', 'def'])
         self.assertEqual(list(result), ['abc', 'def'])
 
+    def test_with_integer(self):
+        result = self._callFUT([1])
+        self.assertEqual(result, [1])
+
+    def test_with_integer_no_flatten(self):
+        result = self._callFUT([1], flatten=False)
+        self.assertEqual(result, [1])
+
     def test_with_string(self):
         result = self._callFUT('abc def')
         self.assertEqual(result, ['abc', 'def'])
@@ -84,3 +92,7 @@ class Test_aslist(unittest.TestCase):
     def test_with_string_crsep_spacesep_no_flatten(self):
         result = self._callFUT(' abc\n def ghi ', flatten=False)
         self.assertEqual(result, ['abc', 'def ghi'])
+
+    def test_with_string_crsep_spacesep_and_integer(self):
+        result = self._callFUT([' abc def ghi ', 1])
+        self.assertEqual(result, ['abc', 'def', 'ghi', 1])

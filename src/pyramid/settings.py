@@ -21,14 +21,17 @@ def aslist_cronly(value):
 
 
 def aslist(value, flatten=True):
-    """ Return a list of strings, separating the input based on newlines
+    """ Return a list. Separating the input based on newlines
     and, if flatten=True (the default), also split on spaces within
-    each line."""
+    each line when value is a string."""
     values = aslist_cronly(value)
     if not flatten:
         return values
     result = []
     for value in values:
-        subvalues = value.split()
-        result.extend(subvalues)
+        if isinstance(value, str):
+            value = value.split()
+            result.extend(value)
+        else:
+            result.append(value)
     return result
