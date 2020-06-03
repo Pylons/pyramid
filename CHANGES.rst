@@ -116,6 +116,10 @@ Features
   are now importable from the ``pyramid.authorization`` namespace.
   See https://github.com/Pylons/pyramid/pull/3563
 
+- ``pserve`` now outputs verbose messaging to `stderr` instead of `stdout`
+  to circumvent buffering issues that exist by default on `stdout`.
+  See https://github.com/Pylons/pyramid/pull/3593
+
 Deprecations
 ------------
 
