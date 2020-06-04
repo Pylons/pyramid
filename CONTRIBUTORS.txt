@@ -352,3 +352,5 @@ Contributors
 - Andrea Borghi, 2019/11/11
 
 - Sergey Maranchuk, 2020/04/18
+
+- Thibault Ravera, 2020/06/03

@@ -4,6 +4,9 @@ unreleased
 Features
 --------
 
+- The ``aslist`` method now handles non-string object when flattening.
+  See https://github.com/Pylons/pyramid/pull/3594
+
 - It is now possible to pass multiple values to the ``header`` predicate
   for route and view configuration.
   See https://github.com/Pylons/pyramid/pull/3576
