@@ -1025,24 +1025,20 @@ class AuthTktCookieHelper:
         self.hashalg = hashalg
 
     def _get_cookies(self, request, value, max_age=None):
-        cur_domain = request.domain
-
-        domains = []
         if self.domain:
-            domains.append(self.domain)
+            domain = self.domain
         else:
+            cur_domain = request.domain
             if self.parent_domain and cur_domain.count('.') > 1:
-                domains.append('.' + cur_domain.split('.', 1)[1])
+                domain = cur_domain.split('.', 1)[1]
+            elif self.wild_domain:
+                domain = cur_domain
             else:
-                domains.append(None)
-                if self.wild_domain:
-                    domains.append(cur_domain)
-                    domains.append('.' + cur_domain)
+                domain = None
 
         profile = self.cookie_profile(request)
 
-        kw = {}
-        kw['domains'] = domains
+        kw = {'domains': [domain]}
         if max_age is not None:
             kw['max_age'] = max_age
 
