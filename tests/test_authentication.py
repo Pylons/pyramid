@@ -1281,8 +1281,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         name, value = result[0]
         self.assertEqual(name, 'Set-Cookie')
         self.assertTrue(
-            'SameSite=Strict' in [x.strip() for x in value.split(';')],
-            value,
+            'SameSite=Strict' in [x.strip() for x in value.split(';')], value,
         )
 
     def test_remember_samesite_default(self):
@@ -1294,8 +1293,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         name, value = result[0]
         self.assertEqual(name, 'Set-Cookie')
         self.assertTrue(
-            'SameSite=Lax' in [x.strip() for x in value.split(';')],
-            value,
+            'SameSite=Lax' in [x.strip() for x in value.split(';')], value,
         )
 
     def test_remember_unicode_but_ascii_token(self):
