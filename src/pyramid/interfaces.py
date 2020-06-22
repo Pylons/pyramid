@@ -113,6 +113,14 @@ class IResponse(Interface):
         """ Return a new app_iter built from the response app_iter that
         serves up only the given start:stop range. """
 
+    authenticated_identity = Attribute(
+        """XXX Doc doc"""
+    )
+
+    authenticated_userid = Attribute(
+        """XXX Doc doc"""
+    )
+
     body = Attribute(
         """The body of the response, as a str. This will read in the entire
         app_iter if necessary."""
@@ -232,6 +240,10 @@ class IResponse(Interface):
     headerlist = Attribute(""" The list of response headers. """)
 
     headers = Attribute(""" The headers in a dictionary-like object """)
+
+    is_authenticated = Attribute(
+        """XXX doc doc"""
+    )
 
     last_modified = Attribute(
         """ Gets and sets and deletes the Last-Modified header. For more

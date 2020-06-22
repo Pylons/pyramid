@@ -494,6 +494,12 @@ configured view.
 
   .. versionadded:: 1.4a3
 
+``is_authenticated``
+
+  XXX doc doc
+
+  .. versionadded:: 2.0
+
 ``effective_principals``
   If specified, this value should be a :term:`principal` identifier or a
   sequence of principal identifiers.  If the
@@ -504,6 +510,8 @@ configured view.
   ``effective_principals=('fred', 'group:admins')``.
 
   .. versionadded:: 1.4a4
+
+  .. deprecated:: TODO add
 
 ``custom_predicates``
   If ``custom_predicates`` is specified, it must be a sequence of references to

@@ -712,6 +712,12 @@ class ViewsConfiguratorMixin:
 
           .. versionadded:: 1.4a3
 
+        is_authenticated
+
+          XXX doc doc
+
+          ..versionadded:: 2.0
+
         effective_principals
 
           If specified, this value should be a :term:`principal` identifier or
@@ -1205,6 +1211,7 @@ class ViewsConfiguratorMixin:
             ('request_type', p.RequestTypePredicate),
             ('match_param', p.MatchParamPredicate),
             ('physical_path', p.PhysicalPathPredicate),
+            ('is_authenticated', p.IsAuthenticatedPredicate),
             ('effective_principals', p.EffectivePrincipalsPredicate),
             ('custom', p.CustomPredicate),
         ):

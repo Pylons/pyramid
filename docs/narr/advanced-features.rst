@@ -34,7 +34,7 @@ For our example above, you can do this instead:
 .. code-block:: python
     :linenos:
 
-    @view_config(route_name="items", effective_principals=pyramid.authorization.Authenticated)
+    @view_config(route_name="items", is_authenticated=True)
     def auth_view(request):
         # do one thing
 

@@ -276,6 +276,19 @@ class PhysicalPathPredicate:
         return False
 
 
+class IsAuthenticatedPredicate:
+    def __init__(self, val, config):
+        self.val = val
+
+    def text(self):
+        return "is_authenticated = %r" % (self.val,)
+
+    phash = text
+
+    def __call__(self, context, request):
+        return request.is_authenticated == self.val
+
+
 class EffectivePrincipalsPredicate:
     def __init__(self, val, config):
         if is_nonstr_iter(val):

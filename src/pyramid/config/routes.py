@@ -268,6 +268,12 @@ class RoutesConfiguratorMixin:
 
               Removed support for media ranges.
 
+        is_authenticated
+
+          XXX doc doc
+
+          .. versionadded:: 2.0
+
         effective_principals
 
           If specified, this value should be a :term:`principal` identifier or
@@ -537,6 +543,7 @@ class RoutesConfiguratorMixin:
             ('request_param', p.RequestParamPredicate),
             ('header', p.HeaderPredicate),
             ('accept', p.AcceptPredicate),
+            ('is_authenticated', p.IsAuthenticatedPredicate),
             ('effective_principals', p.EffectivePrincipalsPredicate),
             ('custom', p.CustomPredicate),
             ('traverse', p.TraversePredicate),
