@@ -270,7 +270,12 @@ class RoutesConfiguratorMixin:
 
         is_authenticated
 
-          XXX doc doc
+          This value, if specified, should be either ``True`` or ``False``.
+          If it is specified and is ``True``, the route will only match if
+          the request has an authenticated user, as determined by the
+          :term:`security policy` in use.  If it is specified and ``False``,
+          the route will only match if the request does not have an
+          authenticated user.
 
           .. versionadded:: 2.0
 

@@ -496,7 +496,11 @@ configured view.
 
 ``is_authenticated``
 
-  XXX doc doc
+  This value, if specified, must be either ``True`` or ``False``.  If it is
+  specified and is ``True``, the request must be for an authenticated user,
+  as determined by the :term:`security policy` in use.  If it is specified and
+  ``False``, the associated view callable will be invoked only if the request
+  does not have an authenticated user.
 
   .. versionadded:: 2.0
 
@@ -511,7 +515,7 @@ configured view.
 
   .. versionadded:: 1.4a4
 
-  .. deprecated:: TODO add
+  .. deprecated:: 2.0
 
 ``custom_predicates``
   If ``custom_predicates`` is specified, it must be a sequence of references to

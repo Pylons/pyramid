@@ -246,7 +246,7 @@ class SecurityAPIMixin:
 
     @property
     def is_authenticated(self):
-        """Return True if a user is authenticated for this request."""
+        """Return ``True`` if a user is authenticated for this request."""
         return self.authenticated_identity is not None
 
     def has_permission(self, permission, context=None):

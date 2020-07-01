@@ -454,13 +454,28 @@ class TestPredicateList(unittest.TestCase):
         self.assertFalse(predicates[0](Dummy(), request))
 
     def test_is_authenticated_true_matches(self):
-        ...
+        _, predicates, _ = self._callFUT(is_authenticated=True)
+        request = DummyRequest()
+        request.is_authenticated = True
+        self.assertTrue(predicates[0](Dummy(), request))
+
     def test_is_authenticated_true_fails(self):
-        ...
+        _, predicates, _ = self._callFUT(is_authenticated=True)
+        request = DummyRequest()
+        request.is_authenticated = False
+        self.assertFalse(predicates[0](Dummy(), request))
+
     def test_is_authenticated_false_matches(self):
-        ...
+        _, predicates, _ = self._callFUT(is_authenticated=False)
+        request = DummyRequest()
+        request.is_authenticated = False
+        self.assertTrue(predicates[0](Dummy(), request))
+
     def test_is_authenticated_false_fails(self):
-        ...
+        _, predicates, _ = self._callFUT(is_authenticated=False)
+        request = DummyRequest()
+        request.is_authenticated = True
+        self.assertFalse(predicates[0](Dummy(), request))
 
     def test_unknown_predicate(self):
         from pyramid.exceptions import ConfigurationError

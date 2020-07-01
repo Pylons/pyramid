@@ -114,11 +114,13 @@ class IResponse(Interface):
         serves up only the given start:stop range. """
 
     authenticated_identity = Attribute(
-        """XXX Doc doc"""
+        """An object representing the authenticated user, as determined by
+        the security policy in use, or ``None`` for unauthenticated requests.
+        The object's class and meaning is defined by the security policy."""
     )
 
     authenticated_userid = Attribute(
-        """XXX Doc doc"""
+        """A string to identify the authenticated user or ``None``."""
     )
 
     body = Attribute(
@@ -242,7 +244,8 @@ class IResponse(Interface):
     headers = Attribute(""" The headers in a dictionary-like object """)
 
     is_authenticated = Attribute(
-        """XXX doc doc"""
+        """A boolean indicating whether the request has an authenticated
+        user, as determined by the security policy in use."""
     )
 
     last_modified = Attribute(
