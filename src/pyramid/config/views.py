@@ -714,13 +714,14 @@ class ViewsConfiguratorMixin:
 
         is_authenticated
 
-          This value, if specified, should be either ``True`` or ``False``.
-          If it is specified and is ``True``, the request must be for an
-          authenticated user, as determined by the :term:`security policy` in
-          use.  If it is specified and ``False``, the associated view callable
-          will match only if the request does not have an authenticated user.
+          This value, if specified, must be either ``True`` or ``False``.
+          If it is specified and ``True``, only a request from an authenticated
+          user, as determined by the :term:`security policy` in use, will
+          satisfy the predicate.
+          If it is specified and ``False``, only a request from a user who is
+          not authenticated will satisfy the predicate.
 
-          ..versionadded:: 2.0
+          .. versionadded:: 2.0
 
         effective_principals
 
@@ -736,6 +737,7 @@ class ViewsConfiguratorMixin:
           .. versionadded:: 1.4a4
 
           .. deprecated:: 2.0
+              Use ``is_authenticated`` or a custom predicate.
 
         custom_predicates
 
