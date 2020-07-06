@@ -22,10 +22,13 @@ Features
   - ``pyramid.config.Configurator.set_security_policy``.
   - ``pyramid.interfaces.ISecurityPolicy``
   - ``pyramid.request.Request.authenticated_identity``.
+  - ``pyramid.request.Request.is_authenticated``
   - ``pyramid.authentication.SessionAuthenticationHelper``
   - ``pyramid.authorization.ACLHelper``
+  - ``is_authenticated=True/False`` predicate for route and view configs
 
-  See https://github.com/Pylons/pyramid/pull/3465
+  See https://github.com/Pylons/pyramid/pull/3465 and
+  https://github.com/Pylons/pyramid/pull/3598
 
 - Changed the default ``serializer`` on
   ``pyramid.session.SignedCookieSessionFactory`` to use

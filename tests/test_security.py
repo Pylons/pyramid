@@ -393,6 +393,29 @@ class TestUnAuthenticatedUserId(unittest.TestCase):
         self.assertEqual(request.unauthenticated_userid, 'wat')
 
 
+class TestIsAuthenticated(unittest.TestCase):
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def test_no_security_policy(self):
+        request = _makeRequest()
+        self.assertIs(request.is_authenticated, False)
+
+    def test_with_security_policy(self):
+        request = _makeRequest()
+        _registerSecurityPolicy(request.registry, '123')
+        self.assertIs(request.is_authenticated, True)
+
+    def test_with_legacy_security_policy(self):
+        request = _makeRequest()
+        _registerAuthenticationPolicy(request.registry, 'yo')
+        _registerLegacySecurityPolicy(request.registry)
+        self.assertEqual(request.authenticated_userid, 'yo')
+
+
 class TestEffectivePrincipals(unittest.TestCase):
     def setUp(self):
         testing.setUp()

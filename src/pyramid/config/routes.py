@@ -268,6 +268,17 @@ class RoutesConfiguratorMixin:
 
               Removed support for media ranges.
 
+        is_authenticated
+
+          This value, if specified, must be either ``True`` or ``False``.
+          If it is specified and ``True``, only a request from an authenticated
+          user, as determined by the :term:`security policy` in use, will
+          satisfy the predicate.
+          If it is specified and ``False``, only a request from a user who is
+          not authenticated will satisfy the predicate.
+
+          .. versionadded:: 2.0
+
         effective_principals
 
           If specified, this value should be a :term:`principal` identifier or
@@ -282,6 +293,7 @@ class RoutesConfiguratorMixin:
           .. versionadded:: 1.4a4
 
           .. deprecated:: 2.0
+              Use ``is_authenticated`` or a custom predicate.
 
         custom_predicates
 
@@ -537,6 +549,7 @@ class RoutesConfiguratorMixin:
             ('request_param', p.RequestParamPredicate),
             ('header', p.HeaderPredicate),
             ('accept', p.AcceptPredicate),
+            ('is_authenticated', p.IsAuthenticatedPredicate),
             ('effective_principals', p.EffectivePrincipalsPredicate),
             ('custom', p.CustomPredicate),
             ('traverse', p.TraversePredicate),

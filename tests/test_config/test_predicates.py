@@ -19,6 +19,7 @@ class TestPredicateList(unittest.TestCase):
             ('containment', predicates.ContainmentPredicate),
             ('request_type', predicates.RequestTypePredicate),
             ('match_param', predicates.MatchParamPredicate),
+            ('is_authenticated', predicates.IsAuthenticatedPredicate),
             ('custom', predicates.CustomPredicate),
             ('traverse', predicates.TraversePredicate),
         ):
@@ -38,6 +39,19 @@ class TestPredicateList(unittest.TestCase):
     def test_ordering_number_of_predicates(self):
         from pyramid.config.predicates import predvalseq
 
+        order0, _, _ = self._callFUT(
+            xhr='xhr',
+            request_method='request_method',
+            path_info='path_info',
+            request_param='param',
+            match_param='foo=bar',
+            header='header',
+            accept='accept',
+            is_authenticated=True,
+            containment='containment',
+            request_type='request_type',
+            custom=predvalseq([DummyCustomPredicate()]),
+        )
         order1, _, _ = self._callFUT(
             xhr='xhr',
             request_method='request_method',
@@ -121,6 +135,7 @@ class TestPredicateList(unittest.TestCase):
         )
         order11, _, _ = self._callFUT(xhr='xhr')
         order12, _, _ = self._callFUT()
+        self.assertTrue(order1 > order0)
         self.assertEqual(order1, order2)
         self.assertTrue(order3 > order2)
         self.assertTrue(order4 > order3)
@@ -131,7 +146,7 @@ class TestPredicateList(unittest.TestCase):
         self.assertTrue(order9 > order8)
         self.assertTrue(order10 > order9)
         self.assertTrue(order11 > order10)
-        self.assertTrue(order12 > order10)
+        self.assertTrue(order12 > order11)
 
     def test_ordering_importance_of_predicates(self):
         from pyramid.config.predicates import predvalseq
@@ -145,7 +160,8 @@ class TestPredicateList(unittest.TestCase):
         order7, _, _ = self._callFUT(containment='containment')
         order8, _, _ = self._callFUT(request_type='request_type')
         order9, _, _ = self._callFUT(match_param='foo=bar')
-        order10, _, _ = self._callFUT(
+        order10, _, _ = self._callFUT(is_authenticated=True)
+        order11, _, _ = self._callFUT(
             custom=predvalseq([DummyCustomPredicate()])
         )
         self.assertTrue(order1 > order2)
@@ -157,6 +173,7 @@ class TestPredicateList(unittest.TestCase):
         self.assertTrue(order7 > order8)
         self.assertTrue(order8 > order9)
         self.assertTrue(order9 > order10)
+        self.assertTrue(order10 > order11)
 
     def test_ordering_importance_and_number(self):
         from pyramid.config.predicates import predvalseq
@@ -296,6 +313,7 @@ class TestPredicateList(unittest.TestCase):
                 ]
             ),
             match_param='foo=bar',
+            is_authenticated=False,
         )
         self.assertEqual(predicates[0].text(), 'xhr = True')
         self.assertEqual(
@@ -308,9 +326,10 @@ class TestPredicateList(unittest.TestCase):
         self.assertEqual(predicates[6].text(), 'containment = containment')
         self.assertEqual(predicates[7].text(), 'request_type = request_type')
         self.assertEqual(predicates[8].text(), "match_param foo=bar")
-        self.assertEqual(predicates[9].text(), 'custom predicate')
-        self.assertEqual(predicates[10].text(), 'classmethod predicate')
-        self.assertTrue(predicates[11].text().startswith('custom predicate'))
+        self.assertEqual(predicates[9].text(), "is_authenticated = False")
+        self.assertEqual(predicates[10].text(), 'custom predicate')
+        self.assertEqual(predicates[11].text(), 'classmethod predicate')
+        self.assertTrue(predicates[12].text().startswith('custom predicate'))
 
     def test_predicate_text_is_correct_when_multiple(self):
         _, predicates, _ = self._callFUT(
@@ -432,6 +451,30 @@ class TestPredicateList(unittest.TestCase):
         _, predicates, _ = self._callFUT(header=('foo:bar', 'spam'))
         request = DummyRequest()
         request.headers = {'foo': 'nobar', 'spamme': 'ham'}
+        self.assertFalse(predicates[0](Dummy(), request))
+
+    def test_is_authenticated_true_matches(self):
+        _, predicates, _ = self._callFUT(is_authenticated=True)
+        request = DummyRequest()
+        request.is_authenticated = True
+        self.assertTrue(predicates[0](Dummy(), request))
+
+    def test_is_authenticated_true_fails(self):
+        _, predicates, _ = self._callFUT(is_authenticated=True)
+        request = DummyRequest()
+        request.is_authenticated = False
+        self.assertFalse(predicates[0](Dummy(), request))
+
+    def test_is_authenticated_false_matches(self):
+        _, predicates, _ = self._callFUT(is_authenticated=False)
+        request = DummyRequest()
+        request.is_authenticated = False
+        self.assertTrue(predicates[0](Dummy(), request))
+
+    def test_is_authenticated_false_fails(self):
+        _, predicates, _ = self._callFUT(is_authenticated=False)
+        request = DummyRequest()
+        request.is_authenticated = True
         self.assertFalse(predicates[0](Dummy(), request))
 
     def test_unknown_predicate(self):

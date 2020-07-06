@@ -184,6 +184,18 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
         request.params = {}
         self.assertEqual(predicate(None, request), False)
 
+    def test_add_route_with_is_authenticated(self):
+        config = self._makeOne(autocommit=True)
+        config.add_route('name', 'path', is_authenticated=True)
+        route = self._assertRoute(config, 'name', 'path', 1)
+        predicate = route.predicates[0]
+        request = self._makeRequest(config)
+        request.is_authenticated = True
+        self.assertEqual(predicate(None, request), True)
+        request = self._makeRequest(config)
+        request.is_authenticated = False
+        self.assertEqual(predicate(None, request), False)
+
     def test_add_route_with_custom_predicates(self):
         import warnings
 

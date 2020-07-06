@@ -244,6 +244,11 @@ class SecurityAPIMixin:
             return None
         return policy.authenticated_userid(self)
 
+    @property
+    def is_authenticated(self):
+        """Return ``True`` if a user is authenticated for this request."""
+        return self.authenticated_identity is not None
+
     def has_permission(self, permission, context=None):
         """ Given a permission and an optional context, returns an instance of
         :data:`pyramid.security.Allowed` if the permission is granted to this

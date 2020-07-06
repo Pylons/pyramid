@@ -1742,6 +1742,46 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         request.is_xhr = False
         self._assertNotFound(wrapper, None, request)
 
+    def test_add_view_with_is_authenticated_true_matches(self):
+        from pyramid.renderers import null_renderer as nr
+
+        view = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, is_authenticated=True, renderer=nr)
+        wrapper = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        request.is_authenticated = True
+        self.assertEqual(wrapper(None, request), 'OK')
+
+    def test_add_view_with_is_authenticated_true_no_match(self):
+        view = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, is_authenticated=True)
+        wrapper = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        request.is_authenticated = False
+        self._assertNotFound(wrapper, None, request)
+
+    def test_add_view_with_is_authenticated_false_matches(self):
+        from pyramid.renderers import null_renderer as nr
+
+        view = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, is_authenticated=False, renderer=nr)
+        wrapper = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        request.is_authenticated = False
+        self.assertEqual(wrapper(None, request), 'OK')
+
+    def test_add_view_with_is_authenticated_false_no_match(self):
+        view = lambda *arg: 'OK'
+        config = self._makeOne(autocommit=True)
+        config.add_view(view=view, is_authenticated=False)
+        wrapper = self._getViewCallable(config)
+        request = self._makeRequest(config)
+        request.is_authenticated = True
+        self._assertNotFound(wrapper, None, request)
+
     def test_add_view_with_header_badregex(self):
         view = lambda *arg: 'OK'
         config = self._makeOne()

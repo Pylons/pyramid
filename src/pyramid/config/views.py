@@ -712,6 +712,17 @@ class ViewsConfiguratorMixin:
 
           .. versionadded:: 1.4a3
 
+        is_authenticated
+
+          This value, if specified, must be either ``True`` or ``False``.
+          If it is specified and ``True``, only a request from an authenticated
+          user, as determined by the :term:`security policy` in use, will
+          satisfy the predicate.
+          If it is specified and ``False``, only a request from a user who is
+          not authenticated will satisfy the predicate.
+
+          .. versionadded:: 2.0
+
         effective_principals
 
           If specified, this value should be a :term:`principal` identifier or
@@ -726,6 +737,7 @@ class ViewsConfiguratorMixin:
           .. versionadded:: 1.4a4
 
           .. deprecated:: 2.0
+              Use ``is_authenticated`` or a custom predicate.
 
         custom_predicates
 
@@ -1205,6 +1217,7 @@ class ViewsConfiguratorMixin:
             ('request_type', p.RequestTypePredicate),
             ('match_param', p.MatchParamPredicate),
             ('physical_path', p.PhysicalPathPredicate),
+            ('is_authenticated', p.IsAuthenticatedPredicate),
             ('effective_principals', p.EffectivePrincipalsPredicate),
             ('custom', p.CustomPredicate),
         ):
