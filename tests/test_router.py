@@ -161,11 +161,9 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(router.request_factory, DummyRequestFactory)
 
     def test_tween_factories(self):
-        from pyramid.interfaces import ITweens
         from pyramid.config.tweens import Tweens
+        from pyramid.interfaces import IResponse, ITweens, IViewClassifier
         from pyramid.response import Response
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IResponse
 
         tweens = Tweens()
         self.registry.registerUtility(tweens, ITweens)
@@ -346,9 +344,8 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(ValueError, router, environ, start_response)
 
     def test_call_view_returns_adapted_response(self):
+        from pyramid.interfaces import IResponse, IViewClassifier
         from pyramid.response import Response
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IResponse
 
         context = DummyContext()
         self._registerTraverserFactory(context)
@@ -369,9 +366,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(start_response.status, '200 OK')
 
     def test_call_with_request_extensions(self):
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IRequestExtensions
-        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import (
+            IRequest,
+            IRequestExtensions,
+            IViewClassifier,
+        )
         from pyramid.request import Request
         from pyramid.util import InstancePropertyHelper
 
@@ -461,14 +460,12 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.root, context)
 
     def test_call_view_registered_specific_success(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
+        from zope.interface import Interface, directlyProvides
 
         class IContext(Interface):
             pass
 
-        from pyramid.interfaces import IRequest
-        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest, IViewClassifier
 
         context = DummyContext()
         directlyProvides(context, IContext)
@@ -492,8 +489,8 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.root, context)
 
     def test_call_view_registered_specific_fail(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
+        from zope.interface import Interface, directlyProvides
+
         from pyramid.httpexceptions import HTTPNotFound
         from pyramid.interfaces import IViewClassifier
 
@@ -517,15 +514,14 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(HTTPNotFound, router, environ, start_response)
 
     def test_call_view_raises_forbidden(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
+        from zope.interface import Interface, directlyProvides
+
         from pyramid.httpexceptions import HTTPForbidden
 
         class IContext(Interface):
             pass
 
-        from pyramid.interfaces import IRequest
-        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest, IViewClassifier
 
         context = DummyContext()
         directlyProvides(context, IContext)
@@ -542,15 +538,13 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(why.args[0], 'unauthorized')
 
     def test_call_view_raises_notfound(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
+        from zope.interface import Interface, directlyProvides
 
         class IContext(Interface):
             pass
 
-        from pyramid.interfaces import IRequest
-        from pyramid.interfaces import IViewClassifier
         from pyramid.httpexceptions import HTTPNotFound
+        from pyramid.interfaces import IRequest, IViewClassifier
 
         context = DummyContext()
         directlyProvides(context, IContext)
@@ -565,15 +559,14 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(why.args[0], 'notfound')
 
     def test_call_view_raises_response_cleared(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
+        from zope.interface import Interface, directlyProvides
+
         from pyramid.interfaces import IExceptionViewClassifier
 
         class IContext(Interface):
             pass
 
-        from pyramid.interfaces import IRequest
-        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest, IViewClassifier
 
         context = DummyContext()
         directlyProvides(context, IContext)
@@ -599,14 +592,12 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(itera, [b'OK'])
 
     def test_call_request_has_response_callbacks(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
+        from zope.interface import Interface, directlyProvides
 
         class IContext(Interface):
             pass
 
-        from pyramid.interfaces import IRequest
-        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest, IViewClassifier
 
         context = DummyContext()
         directlyProvides(context, IContext)
@@ -628,14 +619,12 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(response.called_back, True)
 
     def test_call_request_has_finished_callbacks_when_view_succeeds(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
+        from zope.interface import Interface, directlyProvides
 
         class IContext(Interface):
             pass
 
-        from pyramid.interfaces import IRequest
-        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest, IViewClassifier
 
         context = DummyContext()
         directlyProvides(context, IContext)
@@ -657,14 +646,12 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(environ['called_back'], True)
 
     def test_call_request_has_finished_callbacks_when_view_raises(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
+        from zope.interface import Interface, directlyProvides
 
         class IContext(Interface):
             pass
 
-        from pyramid.interfaces import IRequest
-        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import IRequest, IViewClassifier
 
         context = DummyContext()
         directlyProvides(context, IContext)
@@ -697,11 +684,13 @@ class TestRouter(unittest.TestCase):
         exc_raised(NotImplementedError, router, environ, start_response)
 
     def test_call_eventsends(self):
-        from pyramid.interfaces import INewRequest
-        from pyramid.interfaces import INewResponse
-        from pyramid.interfaces import IBeforeTraversal
-        from pyramid.interfaces import IContextFound
-        from pyramid.interfaces import IViewClassifier
+        from pyramid.interfaces import (
+            IBeforeTraversal,
+            IContextFound,
+            INewRequest,
+            INewResponse,
+            IViewClassifier,
+        )
 
         context = DummyContext()
         self._registerTraverserFactory(context)
@@ -730,9 +719,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, response.app_iter)
 
     def test_call_newrequest_evllist_exc_can_be_caught_by_exceptionview(self):
-        from pyramid.interfaces import INewRequest
-        from pyramid.interfaces import IExceptionViewClassifier
-        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            INewRequest,
+            IRequest,
+        )
 
         context = DummyContext()
         self._registerTraverserFactory(context)
@@ -822,10 +813,9 @@ class TestRouter(unittest.TestCase):
         )
 
     def test_call_route_matches_doesnt_overwrite_subscriber_iface(self):
-        from pyramid.interfaces import INewRequest
-        from pyramid.interfaces import IViewClassifier
-        from zope.interface import alsoProvides
-        from zope.interface import Interface
+        from zope.interface import Interface, alsoProvides
+
+        from pyramid.interfaces import INewRequest, IViewClassifier
 
         self._registerRouteRequest('foo')
 
@@ -867,10 +857,10 @@ class TestRouter(unittest.TestCase):
         self.assertTrue(IFoo.providedBy(request))
 
     def test_root_factory_raises_notfound(self):
-        from pyramid.interfaces import IRootFactory
+        from zope.interface import Interface, directlyProvides
+
         from pyramid.httpexceptions import HTTPNotFound
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
+        from pyramid.interfaces import IRootFactory
 
         def rootfactory(request):
             raise HTTPNotFound('from root factory')
@@ -889,10 +879,10 @@ class TestRouter(unittest.TestCase):
         self.assertTrue('from root factory' in why.args[0])
 
     def test_root_factory_raises_forbidden(self):
-        from pyramid.interfaces import IRootFactory
+        from zope.interface import Interface, directlyProvides
+
         from pyramid.httpexceptions import HTTPForbidden
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
+        from pyramid.interfaces import IRootFactory
 
         def rootfactory(request):
             raise HTTPForbidden('from root factory')
@@ -911,9 +901,9 @@ class TestRouter(unittest.TestCase):
         self.assertTrue('from root factory' in why.args[0])
 
     def test_root_factory_exception_propagating(self):
+        from zope.interface import Interface, directlyProvides
+
         from pyramid.interfaces import IRootFactory
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
 
         def rootfactory(request):
             raise RuntimeError()
@@ -939,16 +929,17 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(RuntimeError, router, environ, start_response)
 
     def test_call_view_exception_propagating(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
+        from zope.interface import Interface, directlyProvides
 
         class IContext(Interface):
             pass
 
-        from pyramid.interfaces import IRequest
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IRequestFactory
-        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IRequest,
+            IRequestFactory,
+            IViewClassifier,
+        )
 
         def rfactory(environ):
             return request
@@ -989,9 +980,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(request.exc_info[:2], (RuntimeError, error))
 
     def test_call_view_raises_exception_view(self):
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
-        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IRequest,
+            IViewClassifier,
+        )
 
         response = DummyResponse()
         exception_response = DummyResponse()
@@ -1017,9 +1010,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ["Hello, world"])
 
     def test_call_view_raises_super_exception_sub_exception_view(self):
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
-        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IRequest,
+            IViewClassifier,
+        )
 
         class SuperException(Exception):
             pass
@@ -1046,9 +1041,11 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(SuperException, router, environ, start_response)
 
     def test_call_view_raises_sub_exception_super_exception_view(self):
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
-        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IRequest,
+            IViewClassifier,
+        )
 
         class SuperException(Exception):
             pass
@@ -1076,9 +1073,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ["Hello, world"])
 
     def test_call_view_raises_exception_another_exception_view(self):
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
-        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IRequest,
+            IViewClassifier,
+        )
 
         class MyException(Exception):
             pass
@@ -1105,9 +1104,11 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(MyException, router, environ, start_response)
 
     def test_root_factory_raises_exception_view(self):
-        from pyramid.interfaces import IRootFactory
-        from pyramid.interfaces import IRequest
-        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IRequest,
+            IRootFactory,
+        )
 
         def rootfactory(request):
             raise RuntimeError()
@@ -1130,8 +1131,7 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(app_iter, ["Hello, world"])
 
     def test_traverser_raises_exception_view(self):
-        from pyramid.interfaces import IRequest
-        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import IExceptionViewClassifier, IRequest
 
         environ = self._makeEnviron()
         context = DummyContext()
@@ -1152,9 +1152,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ["Hello, world"])
 
     def test_exception_view_returns_non_iresponse(self):
-        from pyramid.interfaces import IRequest
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IRequest,
+            IViewClassifier,
+        )
 
         environ = self._makeEnviron()
         response = DummyResponse()
@@ -1176,8 +1178,10 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(ValueError, router, environ, start_response)
 
     def test_call_route_raises_route_exception_view(self):
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IViewClassifier,
+        )
 
         req_iface = self._registerRouteRequest('foo')
         self._connectRoute('foo', 'archives/:action/:article', None)
@@ -1200,9 +1204,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ["Hello, world"])
 
     def test_call_view_raises_exception_route_view(self):
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
-        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IRequest,
+            IViewClassifier,
+        )
 
         req_iface = self._registerRouteRequest('foo')
         self._connectRoute('foo', 'archives/:action/:article', None)
@@ -1224,9 +1230,11 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(RuntimeError, router, environ, start_response)
 
     def test_call_route_raises_exception_view(self):
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
-        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IRequest,
+            IViewClassifier,
+        )
 
         req_iface = self._registerRouteRequest('foo')
         self._connectRoute('foo', 'archives/:action/:article', None)
@@ -1249,9 +1257,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ["Hello, world"])
 
     def test_call_route_raises_super_exception_sub_exception_view(self):
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
-        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IRequest,
+            IViewClassifier,
+        )
 
         class SuperException(Exception):
             pass
@@ -1279,9 +1289,11 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(SuperException, router, environ, start_response)
 
     def test_call_route_raises_sub_exception_super_exception_view(self):
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
-        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IRequest,
+            IViewClassifier,
+        )
 
         class SuperException(Exception):
             pass
@@ -1310,9 +1322,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ["Hello, world"])
 
     def test_call_route_raises_exception_another_exception_view(self):
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
-        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IRequest,
+            IViewClassifier,
+        )
 
         class MyException(Exception):
             pass
@@ -1340,9 +1354,11 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(MyException, router, environ, start_response)
 
     def test_call_route_raises_exception_view_specializing(self):
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
-        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IRequest,
+            IViewClassifier,
+        )
 
         req_iface = self._registerRouteRequest('foo')
         self._connectRoute('foo', 'archives/:action/:article', None)
@@ -1375,8 +1391,10 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result, ["Hello, special world"])
 
     def test_call_route_raises_exception_view_another_route(self):
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IViewClassifier,
+        )
 
         req_iface = self._registerRouteRequest('foo')
         another_req_iface = self._registerRouteRequest('bar')
@@ -1399,9 +1417,11 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(RuntimeError, router, environ, start_response)
 
     def test_call_view_raises_exception_view_route(self):
-        from pyramid.interfaces import IRequest
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IRequest,
+            IViewClassifier,
+        )
 
         req_iface = self._registerRouteRequest('foo')
         response = DummyResponse()
@@ -1424,8 +1444,7 @@ class TestRouter(unittest.TestCase):
 
     def test_call_view_raises_predicate_mismatch(self):
         from pyramid.exceptions import PredicateMismatch
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import IRequest, IViewClassifier
 
         view = DummyView(DummyResponse(), raise_exception=PredicateMismatch)
         self._registerView(view, '', IViewClassifier, IRequest, None)
@@ -1436,8 +1455,7 @@ class TestRouter(unittest.TestCase):
 
     def test_call_view_predicate_mismatch_doesnt_hide_views(self):
         from pyramid.exceptions import PredicateMismatch
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IRequest, IResponse
+        from pyramid.interfaces import IRequest, IResponse, IViewClassifier
         from pyramid.response import Response
 
         class BaseContext:
@@ -1470,11 +1488,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(app_iter, [b'abc'])
 
     def test_call_view_multiple_predicate_mismatches_dont_hide_views(self):
-        from pyramid.exceptions import PredicateMismatch
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IRequest, IResponse
-        from pyramid.response import Response
         from zope.interface import Interface, implementer
+
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.interfaces import IRequest, IResponse, IViewClassifier
+        from pyramid.response import Response
 
         class IBaseContext(Interface):
             pass
@@ -1512,10 +1530,10 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(app_iter, [b'abc'])
 
     def test_call_view_predicate_mismatch_doesnt_find_unrelated_views(self):
-        from pyramid.exceptions import PredicateMismatch
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IRequest
         from zope.interface import Interface, implementer
+
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.interfaces import IRequest, IViewClassifier
 
         class IContext(Interface):
             pass
@@ -1562,9 +1580,11 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(resp.body, b'foo')
 
     def test_execution_policy_bubbles_exception(self):
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
-        from pyramid.interfaces import IRequest
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IRequest,
+            IViewClassifier,
+        )
 
         class Exception1(Exception):
             pass
@@ -1594,10 +1614,10 @@ class TestRouter(unittest.TestCase):
         self.assertRaises(Exception2, lambda: router(environ, start_response))
 
     def test_request_context_with_statement(self):
-        from pyramid.threadlocal import get_current_request
         from pyramid.interfaces import IExecutionPolicy
         from pyramid.request import Request
         from pyramid.response import Response
+        from pyramid.threadlocal import get_current_request
 
         registry = self.config.registry
         result = []
@@ -1617,10 +1637,10 @@ class TestRouter(unittest.TestCase):
         self.assertEqual(result[1], None)
 
     def test_request_context_manually(self):
-        from pyramid.threadlocal import get_current_request
         from pyramid.interfaces import IExecutionPolicy
         from pyramid.request import Request
         from pyramid.response import Response
+        from pyramid.threadlocal import get_current_request
 
         registry = self.config.registry
         result = []

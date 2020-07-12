@@ -5,8 +5,8 @@ from pyramid.util import text_
 
 class TestPredicateList(unittest.TestCase):
     def _makeOne(self):
-        from pyramid.config.predicates import PredicateList
         from pyramid import predicates
+        from pyramid.config.predicates import PredicateList
 
         inst = PredicateList()
         for name, factory in (

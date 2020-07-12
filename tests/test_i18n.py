@@ -499,8 +499,8 @@ class TestLocalizerRequestMixin(unittest.TestCase):
         self.assertEqual(request.localizer, dummy)
 
     def test_localizer_from_mo(self):
-        from pyramid.interfaces import ITranslationDirectories
         from pyramid.i18n import Localizer
+        from pyramid.interfaces import ITranslationDirectories
 
         localedirs = [localedir]
         self.config.registry.registerUtility(
@@ -517,8 +517,8 @@ class TestLocalizerRequestMixin(unittest.TestCase):
         self.assertTrue(hasattr(result, 'pluralize'))
 
     def test_localizer_from_mo_bad_mo(self):
-        from pyramid.interfaces import ITranslationDirectories
         from pyramid.i18n import Localizer
+        from pyramid.interfaces import ITranslationDirectories
 
         localedirs = [localedir]
         self.config.registry.registerUtility(

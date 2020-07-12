@@ -8,7 +8,7 @@ def includeme(config):
         name='dummyskin.html',
         request_type='.views.IDummy',
     )
-    from .models import fixture, IFixture
+    from .models import IFixture, fixture
 
     config.registry.registerUtility(fixture, IFixture)
     config.add_view('.views.fixture_view', name='another.html')

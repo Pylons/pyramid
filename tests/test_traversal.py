@@ -119,12 +119,14 @@ class ResourceTreeTraverserTests(unittest.TestCase):
 
     def test_class_conforms_to_ITraverser(self):
         from zope.interface.verify import verifyClass
+
         from pyramid.interfaces import ITraverser
 
         verifyClass(ITraverser, self._getTargetClass())
 
     def test_instance_conforms_to_ITraverser(self):
         from zope.interface.verify import verifyObject
+
         from pyramid.interfaces import ITraverser
 
         context = DummyContext()
@@ -494,8 +496,7 @@ class FindInterfaceTests(unittest.TestCase):
         bar.__name__ = 'bar'
         baz.__parent__ = bar
         baz.__name__ = 'baz'
-        from zope.interface import directlyProvides
-        from zope.interface import Interface
+        from zope.interface import Interface, directlyProvides
 
         class IFoo(Interface):
             pass
@@ -552,8 +553,9 @@ class FindResourceTests(unittest.TestCase):
         from pyramid.threadlocal import get_current_registry
 
         reg = get_current_registry()
-        from pyramid.interfaces import ITraverser
         from zope.interface import Interface
+
+        from pyramid.interfaces import ITraverser
 
         reg.registerAdapter(traverser, (Interface,), ITraverser)
 
@@ -888,8 +890,9 @@ class ResourceURLTests(unittest.TestCase):
         return ResourceURL
 
     def test_instance_conforms_to_IResourceURL(self):
-        from pyramid.interfaces import IResourceURL
         from zope.interface.verify import verifyObject
+
+        from pyramid.interfaces import IResourceURL
 
         context = DummyContext()
         request = DummyRequest()
@@ -978,8 +981,9 @@ class TestVirtualRoot(unittest.TestCase):
         from pyramid.threadlocal import get_current_registry
 
         reg = get_current_registry()
-        from pyramid.interfaces import ITraverser
         from zope.interface import Interface
+
+        from pyramid.interfaces import ITraverser
 
         reg.registerAdapter(traverser, (Interface,), ITraverser)
 
@@ -1051,8 +1055,9 @@ class TraverseTests(unittest.TestCase):
         from pyramid.threadlocal import get_current_registry
 
         reg = get_current_registry()
-        from pyramid.interfaces import ITraverser
         from zope.interface import Interface
+
+        from pyramid.interfaces import ITraverser
 
         reg.registerAdapter(traverser, (Interface,), ITraverser)
 

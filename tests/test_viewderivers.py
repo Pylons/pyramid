@@ -877,9 +877,8 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(predicates, [True, True])
 
     def test_with_wrapper_viewname(self):
+        from pyramid.interfaces import IView, IViewClassifier
         from pyramid.response import Response
-        from pyramid.interfaces import IView
-        from pyramid.interfaces import IViewClassifier
 
         inner_response = Response('OK')
 
@@ -1192,6 +1191,7 @@ class TestDeriveView(unittest.TestCase):
 
     def test_http_cached_view_integer(self):
         import datetime
+
         from pyramid.response import Response
 
         response = Response('OK')
@@ -1214,6 +1214,7 @@ class TestDeriveView(unittest.TestCase):
 
     def test_http_cached_view_timedelta(self):
         import datetime
+
         from pyramid.response import Response
 
         response = Response('OK')
@@ -1238,6 +1239,7 @@ class TestDeriveView(unittest.TestCase):
 
     def test_http_cached_view_tuple(self):
         import datetime
+
         from pyramid.response import Response
 
         response = Response('OK')
@@ -1984,9 +1986,8 @@ class TestDeriverIntegration(unittest.TestCase):
         self, config, ctx_iface=None, request_iface=None, name=''
     ):
         from zope.interface import Interface
-        from pyramid.interfaces import IRequest
-        from pyramid.interfaces import IView
-        from pyramid.interfaces import IViewClassifier
+
+        from pyramid.interfaces import IRequest, IView, IViewClassifier
 
         classifier = IViewClassifier
         if ctx_iface is None:

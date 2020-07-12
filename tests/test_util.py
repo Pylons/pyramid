@@ -630,7 +630,7 @@ class TestTopologicalSorter(unittest.TestCase):
         )
 
     def test_sorted_ordering_5(self):
-        from pyramid.util import LAST, FIRST
+        from pyramid.util import FIRST, LAST
 
         sorter = self._makeOne()
         add = sorter.add

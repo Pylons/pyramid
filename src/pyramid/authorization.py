@@ -15,8 +15,8 @@ with warnings.catch_warnings():
     from pyramid.security import (
         ACLAllowed as _ACLAllowed,
         ACLDenied as _ACLDenied,
-        AllPermissionsList as _AllPermissionsList,
         Allow,
+        AllPermissionsList as _AllPermissionsList,
         Authenticated,
         Deny,
         Everyone,

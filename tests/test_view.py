@@ -34,8 +34,8 @@ class BaseTest:
         return environ
 
     def _makeRequest(self, **environ):
-        from pyramid.request import Request
         from pyramid.registry import Registry
+        from pyramid.request import Request
 
         environ = self._makeEnviron(**environ)
         request = Request(environ)
@@ -412,8 +412,8 @@ class RenderViewToIterableTests(BaseTest, unittest.TestCase):
         self.assertEqual(iterable, [b'anotherview'])
 
     def test_verify_output_bytestring(self):
-        from pyramid.request import Request
         from pyramid.config import Configurator
+        from pyramid.request import Request
         from pyramid.view import render_view
 
         config = Configurator(settings={})
@@ -711,8 +711,8 @@ class TestViewConfigDecorator(unittest.TestCase):
         self.assertEqual(config.pkg, tests)
 
     def test_call_with_renderer_IRendererInfo(self):
-        import tests
         from pyramid.interfaces import IRendererInfo
+        import tests
 
         @implementer(IRendererInfo)
         class DummyRendererHelper:

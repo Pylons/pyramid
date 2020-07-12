@@ -54,8 +54,8 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(val, True)
 
     def test_testing_resources(self):
-        from pyramid.traversal import find_resource
         from pyramid.interfaces import ITraverser
+        from pyramid.traversal import find_resource
 
         ob1 = object()
         ob2 = object()

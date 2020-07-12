@@ -31,9 +31,11 @@ class ConfiguratorTests(unittest.TestCase):
         name='',
         exception_view=False,
     ):
-        from pyramid.interfaces import IView
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IView,
+            IViewClassifier,
+        )
 
         if exception_view:  # pragma: no cover
             classifier = IExceptionViewClassifier
@@ -66,9 +68,9 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_ctor_no_registry(self):
         import sys
-        from pyramid.interfaces import ISettings
+
         from pyramid.config import Configurator
-        from pyramid.interfaces import IRendererFactory
+        from pyramid.interfaces import IRendererFactory, ISettings
 
         config = Configurator()
         this_pkg = sys.modules['tests.test_config']
@@ -177,6 +179,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_ctor_with_package_registry(self):
         import sys
+
         from pyramid.config import Configurator
 
         pkg = sys.modules['pyramid']
@@ -297,8 +300,8 @@ class ConfiguratorTests(unittest.TestCase):
         )
 
     def test_ctor_httpexception_view_default(self):
-        from pyramid.interfaces import IExceptionResponse
         from pyramid.httpexceptions import default_exceptionresponse_view
+        from pyramid.interfaces import IExceptionResponse
 
         config = self._makeOne()
         view = self._getViewCallable(
@@ -428,8 +431,7 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(reg.events, (1,))
 
     def test__fix_registry_queryAdapterOrSelf(self):
-        from zope.interface import Interface
-        from zope.interface import implementer
+        from zope.interface import Interface, implementer
 
         class IFoo(Interface):
             pass
@@ -494,6 +496,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_setup_registry_registers_default_exceptionresponse_views(self):
         from webob.exc import WSGIHTTPException
+
         from pyramid.interfaces import IExceptionResponse
         from pyramid.view import default_exceptionresponse_view
 
@@ -533,6 +536,7 @@ class ConfiguratorTests(unittest.TestCase):
 
     def test_setup_registry_registers_default_webob_iresponse_adapter(self):
         from webob import Response
+
         from pyramid.interfaces import IResponse
 
         config = self._makeOne()
@@ -543,10 +547,11 @@ class ConfiguratorTests(unittest.TestCase):
         )
 
     def test_setup_registry_explicit_notfound_trumps_iexceptionresponse(self):
-        from pyramid.renderers import null_renderer
         from zope.interface import implementedBy
+
         from pyramid.httpexceptions import HTTPNotFound
         from pyramid.registry import Registry
+        from pyramid.renderers import null_renderer
 
         reg = Registry()
         config = self._makeOne(reg, autocommit=True)
@@ -566,8 +571,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, 'OK')
 
     def test_setup_registry_custom_settings(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import ISettings
+        from pyramid.registry import Registry
 
         settings = {'reload_templates': True, 'mysetting': True}
         reg = Registry()
@@ -579,8 +584,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(settings['mysetting'], True)
 
     def test_setup_registry_debug_logger_None_default(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import IDebugLogger
+        from pyramid.registry import Registry
 
         reg = Registry()
         config = self._makeOne(reg)
@@ -589,8 +594,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(logger.name, 'tests.test_config')
 
     def test_setup_registry_debug_logger_non_None(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import IDebugLogger
+        from pyramid.registry import Registry
 
         logger = object()
         reg = Registry()
@@ -600,8 +605,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(logger, result)
 
     def test_setup_registry_debug_logger_name(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import IDebugLogger
+        from pyramid.registry import Registry
 
         reg = Registry()
         config = self._makeOne(reg)
@@ -610,8 +615,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result.name, 'foo')
 
     def test_setup_registry_authentication_policy(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.registry import Registry
 
         policy = object()
         reg = Registry()
@@ -622,8 +627,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(policy, result)
 
     def test_setup_registry_authentication_policy_dottedname(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.registry import Registry
 
         reg = Registry()
         config = self._makeOne(reg)
@@ -635,8 +640,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(result, tests.test_config)
 
     def test_setup_registry_authorization_policy_dottedname(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import IAuthorizationPolicy
+        from pyramid.registry import Registry
 
         reg = Registry()
         config = self._makeOne(reg)
@@ -661,8 +666,8 @@ class ConfiguratorTests(unittest.TestCase):
         config = self.assertRaises(ConfigurationExecutionError, config.commit)
 
     def test_setup_registry_no_default_root_factory(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import IRootFactory
+        from pyramid.registry import Registry
 
         reg = Registry()
         config = self._makeOne(reg)
@@ -671,8 +676,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(reg.queryUtility(IRootFactory), None)
 
     def test_setup_registry_dottedname_root_factory(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import IRootFactory
+        from pyramid.registry import Registry
 
         reg = Registry()
         config = self._makeOne(reg)
@@ -684,8 +689,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(reg.getUtility(IRootFactory), tests.test_config)
 
     def test_setup_registry_locale_negotiator_dottedname(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import ILocaleNegotiator
+        from pyramid.registry import Registry
 
         reg = Registry()
         config = self._makeOne(reg)
@@ -698,8 +703,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(utility, tests.test_config)
 
     def test_setup_registry_locale_negotiator(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import ILocaleNegotiator
+        from pyramid.registry import Registry
 
         reg = Registry()
         config = self._makeOne(reg)
@@ -711,8 +716,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(utility, negotiator)
 
     def test_setup_registry_request_factory(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import IRequestFactory
+        from pyramid.registry import Registry
 
         reg = Registry()
         config = self._makeOne(reg)
@@ -724,8 +729,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(utility, factory)
 
     def test_setup_registry_response_factory(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import IResponseFactory
+        from pyramid.registry import Registry
 
         reg = Registry()
         config = self._makeOne(reg)
@@ -737,8 +742,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(utility, factory)
 
     def test_setup_registry_request_factory_dottedname(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import IRequestFactory
+        from pyramid.registry import Registry
 
         reg = Registry()
         config = self._makeOne(reg)
@@ -751,8 +756,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(utility, tests.test_config)
 
     def test_setup_registry_alternate_renderers(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import IRendererFactory
+        from pyramid.registry import Registry
 
         renderer = object()
         reg = Registry()
@@ -762,8 +767,8 @@ class ConfiguratorTests(unittest.TestCase):
         self.assertEqual(reg.getUtility(IRendererFactory, 'yeah'), renderer)
 
     def test_setup_registry_default_permission(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import IDefaultPermission
+        from pyramid.registry import Registry
 
         reg = Registry()
         config = self._makeOne(reg)
@@ -829,8 +834,8 @@ test_config.dummy_include2"""
 
     def test_make_wsgi_app(self):
         import pyramid.config
-        from pyramid.router import Router
         from pyramid.interfaces import IApplicationCreated
+        from pyramid.router import Router
 
         manager = DummyThreadLocalManager()
         config = self._makeOne()
@@ -920,8 +925,9 @@ test_config.dummy_include2"""
         root_config.include(dummy_subapp, route_prefix='nested')
 
     def test_include_with_missing_source_file(self):
-        from pyramid.exceptions import ConfigurationError
         import inspect
+
+        from pyramid.exceptions import ConfigurationError
 
         config = self._makeOne()
 
@@ -973,8 +979,9 @@ test_config.dummy_include2"""
 
     def test_scan_integration(self):
         from zope.interface import alsoProvides
+
         from pyramid.view import render_view_to_response
-        import tests.test_config.pkgs.scannable as package
+        from tests.test_config.pkgs import scannable as package
 
         config = self._makeOne(autocommit=True)
         config.scan(package)
@@ -1079,8 +1086,9 @@ test_config.dummy_include2"""
 
     def test_scan_integration_with_ignore(self):
         from zope.interface import alsoProvides
+
         from pyramid.view import render_view_to_response
-        import tests.test_config.pkgs.scannable as package
+        from tests.test_config.pkgs import scannable as package
 
         config = self._makeOne(autocommit=True)
         config.scan(package, ignore='tests.test_config.pkgs.scannable.another')
@@ -1100,6 +1108,7 @@ test_config.dummy_include2"""
 
     def test_scan_integration_dottedname_package(self):
         from zope.interface import alsoProvides
+
         from pyramid.view import render_view_to_response
 
         config = self._makeOne(autocommit=True)
@@ -1143,8 +1152,8 @@ test_config.dummy_include2"""
             sys.path.remove(path)
 
     def test_scan_integration_conflict(self):
-        from tests.test_config.pkgs import selfscan
         from pyramid.config import Configurator
+        from tests.test_config.pkgs import selfscan
 
         c = Configurator()
         c.scan(selfscan)

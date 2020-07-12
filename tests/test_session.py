@@ -14,6 +14,7 @@ class SharedCookieSessionTests:
 
     def test_instance_conforms(self):
         from zope.interface.verify import verifyObject
+
         from pyramid.interfaces import ISession
 
         request = testing.DummyRequest()
@@ -477,8 +478,8 @@ class TestSignedCookieSession(SharedCookieSessionTests, unittest.TestCase):
         self.assertEqual(session['state'], 1)
 
     def test_invalid_data_size(self):
-        from hashlib import sha512
         import base64
+        from hashlib import sha512
 
         request = testing.DummyRequest()
         num_bytes = sha512().digest_size - 1

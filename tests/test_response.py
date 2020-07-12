@@ -75,6 +75,7 @@ class TestFileResponse(unittest.TestCase):
         # version of Python.  See https://github.com/Pylons/pyramid/issues/1360
         # for more information.
         import mimetypes as old_mimetypes
+
         from pyramid import response
         from pyramid.util import text_
 

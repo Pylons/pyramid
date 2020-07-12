@@ -31,8 +31,8 @@ class Test_excview_tween_factory(unittest.TestCase):
         self.assertIsNone(request.exc_info)
 
     def test_it_catches_notfound(self):
-        from pyramid.request import Request
         from pyramid.httpexceptions import HTTPNotFound
+        from pyramid.request import Request
 
         self.config.add_notfound_view(lambda exc, request: exc)
 

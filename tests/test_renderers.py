@@ -157,6 +157,7 @@ class TestRendererHelper(unittest.TestCase):
 
     def test_instance_conforms(self):
         from zope.interface.verify import verifyObject
+
         from pyramid.interfaces import IRendererInfo
 
         helper = self._makeOne()
@@ -419,8 +420,9 @@ class TestRendererHelper(unittest.TestCase):
         registry = self.config.registry
         settings = {}
         registry.settings = settings
-        from pyramid.interfaces import IRendererFactory
         import os
+
+        from pyramid.interfaces import IRendererFactory
 
         here = os.path.dirname(os.path.abspath(__file__))
         fixture = os.path.join(here, 'fixtures/minimal.pt')
@@ -444,8 +446,9 @@ class TestRendererHelper(unittest.TestCase):
         registry = self.config.registry
         settings = {}
         registry.settings = settings
-        from pyramid.interfaces import IRendererFactory
         import os
+
+        from pyramid.interfaces import IRendererFactory
 
         here = os.path.dirname(os.path.abspath(__file__))
         fixture = os.path.join(here, 'fixtures/minimal.pt')
@@ -482,6 +485,7 @@ class TestNullRendererHelper(unittest.TestCase):
 
     def test_instance_conforms(self):
         from zope.interface.verify import verifyObject
+
         from pyramid.interfaces import IRendererInfo
 
         helper = self._makeOne()

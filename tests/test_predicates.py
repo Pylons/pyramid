@@ -453,8 +453,8 @@ class Test_EffectivePrincipalsPredicate(unittest.TestCase):
         return EffectivePrincipalsPredicate(val, config)
 
     def _testing_authn_policy(self, userid, groupids=tuple()):
+        from pyramid.authorization import Authenticated, Everyone
         from pyramid.interfaces import IAuthenticationPolicy, ISecurityPolicy
-        from pyramid.authorization import Everyone, Authenticated
         from pyramid.security import LegacySecurityPolicy
 
         class DummyPolicy:

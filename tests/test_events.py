@@ -13,15 +13,17 @@ class NewRequestEventTests(unittest.TestCase):
         return self._getTargetClass()(request)
 
     def test_class_conforms_to_INewRequest(self):
-        from pyramid.interfaces import INewRequest
         from zope.interface.verify import verifyClass
+
+        from pyramid.interfaces import INewRequest
 
         klass = self._getTargetClass()
         verifyClass(INewRequest, klass)
 
     def test_instance_conforms_to_INewRequest(self):
-        from pyramid.interfaces import INewRequest
         from zope.interface.verify import verifyObject
+
+        from pyramid.interfaces import INewRequest
 
         request = DummyRequest()
         inst = self._makeOne(request)
@@ -43,15 +45,17 @@ class NewResponseEventTests(unittest.TestCase):
         return self._getTargetClass()(request, response)
 
     def test_class_conforms_to_INewResponse(self):
-        from pyramid.interfaces import INewResponse
         from zope.interface.verify import verifyClass
+
+        from pyramid.interfaces import INewResponse
 
         klass = self._getTargetClass()
         verifyClass(INewResponse, klass)
 
     def test_instance_conforms_to_INewResponse(self):
-        from pyramid.interfaces import INewResponse
         from zope.interface.verify import verifyObject
+
+        from pyramid.interfaces import INewResponse
 
         request = DummyRequest()
         response = DummyResponse()
@@ -76,14 +80,16 @@ class ApplicationCreatedEventTests(unittest.TestCase):
         return self._getTargetClass()(context)
 
     def test_class_conforms_to_IApplicationCreated(self):
-        from pyramid.interfaces import IApplicationCreated
         from zope.interface.verify import verifyClass
+
+        from pyramid.interfaces import IApplicationCreated
 
         verifyClass(IApplicationCreated, self._getTargetClass())
 
     def test_object_conforms_to_IApplicationCreated(self):
-        from pyramid.interfaces import IApplicationCreated
         from zope.interface.verify import verifyObject
+
+        from pyramid.interfaces import IApplicationCreated
 
         verifyObject(IApplicationCreated, self._makeOne())
 
@@ -95,14 +101,16 @@ class WSGIApplicationCreatedEventTests(ApplicationCreatedEventTests):
         return WSGIApplicationCreatedEvent
 
     def test_class_conforms_to_IWSGIApplicationCreatedEvent(self):
-        from pyramid.interfaces import IWSGIApplicationCreatedEvent
         from zope.interface.verify import verifyClass
+
+        from pyramid.interfaces import IWSGIApplicationCreatedEvent
 
         verifyClass(IWSGIApplicationCreatedEvent, self._getTargetClass())
 
     def test_object_conforms_to_IWSGIApplicationCreatedEvent(self):
-        from pyramid.interfaces import IWSGIApplicationCreatedEvent
         from zope.interface.verify import verifyObject
+
+        from pyramid.interfaces import IWSGIApplicationCreatedEvent
 
         verifyObject(IWSGIApplicationCreatedEvent, self._makeOne())
 
@@ -120,12 +128,14 @@ class ContextFoundEventTests(unittest.TestCase):
 
     def test_class_conforms_to_IContextFound(self):
         from zope.interface.verify import verifyClass
+
         from pyramid.interfaces import IContextFound
 
         verifyClass(IContextFound, self._getTargetClass())
 
     def test_instance_conforms_to_IContextFound(self):
         from zope.interface.verify import verifyObject
+
         from pyramid.interfaces import IContextFound
 
         verifyObject(IContextFound, self._makeOne())
@@ -139,12 +149,14 @@ class AfterTraversalEventTests(ContextFoundEventTests):
 
     def test_class_conforms_to_IAfterTraversal(self):
         from zope.interface.verify import verifyClass
+
         from pyramid.interfaces import IAfterTraversal
 
         verifyClass(IAfterTraversal, self._getTargetClass())
 
     def test_instance_conforms_to_IAfterTraversal(self):
         from zope.interface.verify import verifyObject
+
         from pyramid.interfaces import IAfterTraversal
 
         verifyObject(IAfterTraversal, self._makeOne())
@@ -163,12 +175,14 @@ class BeforeTraversalEventTests(unittest.TestCase):
 
     def test_class_conforms_to_IBeforeTraversal(self):
         from zope.interface.verify import verifyClass
+
         from pyramid.interfaces import IBeforeTraversal
 
         verifyClass(IBeforeTraversal, self._getTargetClass())
 
     def test_instance_conforms_to_IBeforeTraversal(self):
         from zope.interface.verify import verifyObject
+
         from pyramid.interfaces import IBeforeTraversal
 
         verifyObject(IBeforeTraversal, self._makeOne())
@@ -312,6 +326,7 @@ class TestBeforeRender(unittest.TestCase):
     )  # see https://github.com/Pylons/pyramid/issues/3237
     def test_instance_conforms(self):
         from zope.interface.verify import verifyObject
+
         from pyramid.interfaces import IBeforeRender
 
         event = self._makeOne({})

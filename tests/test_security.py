@@ -243,10 +243,10 @@ class TestViewExecutionPermitted(unittest.TestCase):
         return view_execution_permitted(*arg, **kw)
 
     def _registerSecuredView(self, view_name, allow=True):
-        from pyramid.threadlocal import get_current_registry
         from zope.interface import Interface
-        from pyramid.interfaces import ISecuredView
-        from pyramid.interfaces import IViewClassifier
+
+        from pyramid.interfaces import ISecuredView, IViewClassifier
+        from pyramid.threadlocal import get_current_registry
 
         class Checker:
             def __permitted__(self, context, request):
@@ -266,10 +266,9 @@ class TestViewExecutionPermitted(unittest.TestCase):
 
     def test_no_permission(self):
         from zope.interface import Interface
+
+        from pyramid.interfaces import ISettings, IView, IViewClassifier
         from pyramid.threadlocal import get_current_registry
-        from pyramid.interfaces import ISettings
-        from pyramid.interfaces import IView
-        from pyramid.interfaces import IViewClassifier
 
         settings = dict(debug_authorization=True)
         reg = get_current_registry()
@@ -291,8 +290,8 @@ class TestViewExecutionPermitted(unittest.TestCase):
         self.assertEqual(result, True)
 
     def test_no_view_registered(self):
-        from pyramid.threadlocal import get_current_registry
         from pyramid.interfaces import ISettings
+        from pyramid.threadlocal import get_current_registry
 
         settings = dict(debug_authorization=True)
         reg = get_current_registry()
@@ -302,8 +301,8 @@ class TestViewExecutionPermitted(unittest.TestCase):
         self.assertRaises(TypeError, self._callFUT, context, request, '')
 
     def test_with_permission(self):
-        from zope.interface import Interface
-        from zope.interface import directlyProvides
+        from zope.interface import Interface, directlyProvides
+
         from pyramid.interfaces import IRequest
 
         class IContext(Interface):
@@ -459,8 +458,8 @@ class TestHasPermission(unittest.TestCase):
         testing.tearDown()
 
     def _makeOne(self):
-        from pyramid.security import SecurityAPIMixin
         from pyramid.registry import Registry
+        from pyramid.security import SecurityAPIMixin
 
         mixin = SecurityAPIMixin()
         mixin.registry = Registry()

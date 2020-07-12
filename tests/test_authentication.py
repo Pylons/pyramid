@@ -239,12 +239,14 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
 
     def test_class_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyClass
+
         from pyramid.interfaces import IAuthenticationPolicy
 
         verifyClass(IAuthenticationPolicy, self._getTargetClass())
 
     def test_instance_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyObject
+
         from pyramid.interfaces import IAuthenticationPolicy
 
         verifyObject(IAuthenticationPolicy, self._makeOne())
@@ -328,8 +330,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals_userid_only(self):
-        from pyramid.authorization import Everyone
-        from pyramid.authorization import Authenticated
+        from pyramid.authorization import Authenticated, Everyone
 
         request = DummyRequest(
             {'repoze.who.identity': {'repoze.who.userid': 'fred'}}
@@ -341,8 +342,7 @@ class TestRepozeWho1AuthenticationPolicy(unittest.TestCase):
         )
 
     def test_effective_principals_userid_and_groups(self):
-        from pyramid.authorization import Everyone
-        from pyramid.authorization import Authenticated
+        from pyramid.authorization import Authenticated, Everyone
 
         request = DummyRequest(
             {
@@ -467,12 +467,14 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
 
     def test_class_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyClass
+
         from pyramid.interfaces import IAuthenticationPolicy
 
         verifyClass(IAuthenticationPolicy, self._getTargetClass())
 
     def test_instance_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyObject
+
         from pyramid.interfaces import IAuthenticationPolicy
 
         verifyObject(IAuthenticationPolicy, self._makeOne())
@@ -505,8 +507,7 @@ class TestRemoteUserAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals(self):
-        from pyramid.authorization import Everyone
-        from pyramid.authorization import Authenticated
+        from pyramid.authorization import Authenticated, Everyone
 
         request = DummyRequest({'REMOTE_USER': 'fred'})
         policy = self._makeOne()
@@ -619,8 +620,7 @@ class TestAuthTktAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals(self):
-        from pyramid.authorization import Everyone
-        from pyramid.authorization import Authenticated
+        from pyramid.authorization import Authenticated, Everyone
 
         request = DummyRequest({})
 
@@ -654,12 +654,14 @@ class TestAuthTktAuthenticationPolicy(unittest.TestCase):
 
     def test_class_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyClass
+
         from pyramid.interfaces import IAuthenticationPolicy
 
         verifyClass(IAuthenticationPolicy, self._getTargetClass())
 
     def test_instance_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyObject
+
         from pyramid.interfaces import IAuthenticationPolicy
 
         verifyObject(IAuthenticationPolicy, self._makeOne(None, None))
@@ -1596,12 +1598,14 @@ class TestSessionAuthenticationPolicy(unittest.TestCase):
 
     def test_class_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyClass
+
         from pyramid.interfaces import IAuthenticationPolicy
 
         verifyClass(IAuthenticationPolicy, self._getTargetClass())
 
     def test_instance_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyObject
+
         from pyramid.interfaces import IAuthenticationPolicy
 
         verifyObject(IAuthenticationPolicy, self._makeOne())
@@ -1658,8 +1662,7 @@ class TestSessionAuthenticationPolicy(unittest.TestCase):
         self.assertEqual(policy.effective_principals(request), [Everyone])
 
     def test_effective_principals(self):
-        from pyramid.authorization import Everyone
-        from pyramid.authorization import Authenticated
+        from pyramid.authorization import Authenticated, Everyone
 
         request = DummyRequest(session={'userid': 'fred'})
 
@@ -1755,6 +1758,7 @@ class TestBasicAuthAuthenticationPolicy(unittest.TestCase):
 
     def test_class_implements_IAuthenticationPolicy(self):
         from zope.interface.verify import verifyClass
+
         from pyramid.interfaces import IAuthenticationPolicy
 
         verifyClass(IAuthenticationPolicy, self._getTargetClass())

@@ -31,8 +31,9 @@ class TestURLMethodsMixin(unittest.TestCase):
         return request
 
     def _registerResourceURL(self, reg):
-        from pyramid.interfaces import IResourceURL
         from zope.interface import Interface
+
+        from pyramid.interfaces import IResourceURL
 
         class DummyResourceURL:
             physical_path = '/context/'
@@ -684,8 +685,9 @@ class TestURLMethodsMixin(unittest.TestCase):
         )
 
     def test_current_route_url_with_request_query(self):
-        from pyramid.interfaces import IRoutesMapper
         from webob.multidict import GetDict
+
+        from pyramid.interfaces import IRoutesMapper
 
         request = self._makeOne()
         request.GET = GetDict([('q', '123')], {})
@@ -698,8 +700,9 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(result, 'http://example.com:5432/1/2/3?q=123')
 
     def test_current_route_url_with_request_query_duplicate_entries(self):
-        from pyramid.interfaces import IRoutesMapper
         from webob.multidict import GetDict
+
+        from pyramid.interfaces import IRoutesMapper
 
         request = self._makeOne()
         request.GET = GetDict(
@@ -716,8 +719,9 @@ class TestURLMethodsMixin(unittest.TestCase):
         )
 
     def test_current_route_url_with_query_override(self):
-        from pyramid.interfaces import IRoutesMapper
         from webob.multidict import GetDict
+
+        from pyramid.interfaces import IRoutesMapper
 
         request = self._makeOne()
         request.GET = GetDict([('q', '123')], {})
@@ -834,8 +838,8 @@ class TestURLMethodsMixin(unittest.TestCase):
         self.assertEqual(info.args, ('tests:static/foo.css', request, {}))
 
     def test_static_url_abspath_integration_with_staticurlinfo(self):
-        from pyramid.interfaces import IStaticURLInfo
         from pyramid.config.views import StaticURLInfo
+        from pyramid.interfaces import IStaticURLInfo
 
         info = StaticURLInfo()
         here = os.path.abspath(os.path.dirname(__file__))
@@ -850,8 +854,8 @@ class TestURLMethodsMixin(unittest.TestCase):
         )
 
     def test_static_url_noscheme_uses_scheme_from_request(self):
-        from pyramid.interfaces import IStaticURLInfo
         from pyramid.config.views import StaticURLInfo
+        from pyramid.interfaces import IStaticURLInfo
 
         info = StaticURLInfo()
         here = os.path.abspath(os.path.dirname(__file__))
