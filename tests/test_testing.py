@@ -134,8 +134,8 @@ class TestDummyRequest(unittest.TestCase):
         self.assertEqual(request.environ['PATH_INFO'], '/foo')
 
     def test_defaults(self):
-        from pyramid.threadlocal import get_current_registry
         from pyramid.testing import DummySession
+        from pyramid.threadlocal import get_current_registry
 
         request = self._makeOne()
         self.assertEqual(request.method, 'GET')
@@ -214,8 +214,8 @@ class TestDummyRequest(unittest.TestCase):
 
     def test_registry_is_config_registry_when_setup_is_called_after_ctor(self):
         # see https://github.com/Pylons/pyramid/issues/165
-        from pyramid.registry import Registry
         from pyramid.config import Configurator
+        from pyramid.registry import Registry
 
         request = self._makeOne()
         try:
@@ -233,8 +233,8 @@ class TestDummyRequest(unittest.TestCase):
 
     def test_del_registry(self):
         # see https://github.com/Pylons/pyramid/issues/165
-        from pyramid.registry import Registry
         from pyramid.config import Configurator
+        from pyramid.registry import Registry
 
         request = self._makeOne()
         request.registry = 'abc'
@@ -249,8 +249,8 @@ class TestDummyRequest(unittest.TestCase):
             config.end()
 
     def test_response_with_responsefactory(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import IResponseFactory
+        from pyramid.registry import Registry
 
         registry = Registry('this_test')
 
@@ -351,9 +351,8 @@ class Test_setUp(unittest.TestCase):
         self.assertEqual(result, hook)
 
     def test_it_defaults(self):
-        from pyramid.threadlocal import manager
-        from pyramid.threadlocal import get_current_registry
         from pyramid.registry import Registry
+        from pyramid.threadlocal import get_current_registry, manager
 
         old = True
         manager.push(old)
@@ -597,6 +596,7 @@ class TestDummySession(unittest.TestCase):
     )  # see https://github.com/Pylons/pyramid/issues/3237
     def test_instance_conforms(self):
         from zope.interface.verify import verifyObject
+
         from pyramid.interfaces import ISession
 
         session = self._makeOne()

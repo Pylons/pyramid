@@ -9,12 +9,12 @@ if 0:
 
         @classmethod
         def test_docs(cls):
+            import manuel.capture
+            import manuel.codeblock
+            import manuel.ignore
+            import manuel.testing
             import os
             import pkg_resources
-            import manuel.testing
-            import manuel.codeblock
-            import manuel.capture
-            import manuel.ignore
 
             m = manuel.ignore.Manuel()
             m += manuel.codeblock.Manuel()

@@ -20,8 +20,8 @@ def z_view(request):
 
 
 def includeme(config):
-    from pyramid.authorization import ACLAuthorizationPolicy
     from pyramid.authentication import AuthTktAuthenticationPolicy
+    from pyramid.authorization import ACLAuthorizationPolicy
 
     authn_policy = AuthTktAuthenticationPolicy('seekt1t', hashalg='sha512')
     authz_policy = ACLAuthorizationPolicy()

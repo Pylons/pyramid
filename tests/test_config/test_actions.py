@@ -23,9 +23,12 @@ class ActionConfiguratorMixinTests(unittest.TestCase):
         exception_view=False,
     ):
         from zope.interface import Interface
-        from pyramid.interfaces import IView
-        from pyramid.interfaces import IViewClassifier
-        from pyramid.interfaces import IExceptionViewClassifier
+
+        from pyramid.interfaces import (
+            IExceptionViewClassifier,
+            IView,
+            IViewClassifier,
+        )
 
         if exception_view:  # pragma: no cover
             classifier = IExceptionViewClassifier
@@ -1041,12 +1044,14 @@ class TestActionInfo(unittest.TestCase):
 
     def test_class_conforms(self):
         from zope.interface.verify import verifyClass
+
         from pyramid.interfaces import IActionInfo
 
         verifyClass(IActionInfo, self._getTargetClass())
 
     def test_instance_conforms(self):
         from zope.interface.verify import verifyObject
+
         from pyramid.interfaces import IActionInfo
 
         verifyObject(IActionInfo, self._makeOne('f', 0, 'f', 'f'))

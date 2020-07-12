@@ -34,8 +34,8 @@ def wsgiapptest(environ, start_response):
 
 class WGSIAppPlusViewConfigTests(unittest.TestCase):
     def test_it(self):
-        from venusian import ATTACH_ATTR
         import types
+        from venusian import ATTACH_ATTR
 
         self.assertTrue(getattr(wsgiapptest, ATTACH_ATTR))
         self.assertIsInstance(wsgiapptest, types.FunctionType)
@@ -45,10 +45,9 @@ class WGSIAppPlusViewConfigTests(unittest.TestCase):
         self.assertEqual(result, '123')
 
     def test_scanned(self):
-        from pyramid.interfaces import IRequest
-        from pyramid.interfaces import IView
-        from pyramid.interfaces import IViewClassifier
         from pyramid.config import Configurator
+        from pyramid.interfaces import IRequest, IView, IViewClassifier
+
         from . import test_integration
 
         config = Configurator()
@@ -281,8 +280,9 @@ class TestStaticAppNoSubpath(unittest.TestCase):
     staticapp = static_view(os.path.join(here, 'fixtures'), use_subpath=False)
 
     def _makeRequest(self, extra):
-        from pyramid.request import Request
         from io import BytesIO
+
+        from pyramid.request import Request
 
         kw = {
             'PATH_INFO': '',

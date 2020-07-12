@@ -14,8 +14,9 @@ class TestRoute(unittest.TestCase):
         return self._getTargetClass()(*arg)
 
     def test_provides_IRoute(self):
-        from pyramid.interfaces import IRoute
         from zope.interface.verify import verifyObject
+
+        from pyramid.interfaces import IRoute
 
         verifyObject(IRoute, self._makeOne('name', 'pattern'))
 
@@ -75,8 +76,9 @@ class RoutesMapperTests(unittest.TestCase):
         return klass()
 
     def test_provides_IRoutesMapper(self):
-        from pyramid.interfaces import IRoutesMapper
         from zope.interface.verify import verifyObject
+
+        from pyramid.interfaces import IRoutesMapper
 
         verifyObject(IRoutesMapper, self._makeOne())
 

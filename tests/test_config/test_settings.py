@@ -50,8 +50,8 @@ class TestSettingsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(settings['b'], 2)
 
     def test_add_settings_settings_not_yet_registered(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import ISettings
+        from pyramid.registry import Registry
 
         reg = Registry()
         config = self._makeOne(reg)
@@ -60,8 +60,8 @@ class TestSettingsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(settings['a'], 1)
 
     def test_add_settings_settings_None(self):
-        from pyramid.registry import Registry
         from pyramid.interfaces import ISettings
+        from pyramid.registry import Registry
 
         reg = Registry()
         config = self._makeOne(reg)

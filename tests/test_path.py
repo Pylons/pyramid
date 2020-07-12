@@ -28,6 +28,7 @@ class TestCallerPath(unittest.TestCase):
 
     def test_memoization_has_abspath(self):
         import os
+
         from . import test_path
 
         test_path.__abspath__ = '/foo/bar'
@@ -36,6 +37,7 @@ class TestCallerPath(unittest.TestCase):
 
     def test_memoization_success(self):
         import os
+
         from . import test_path
 
         result = self._callFUT('a/b/c')
@@ -166,8 +168,8 @@ class TestPackageOf(unittest.TestCase):
         self.assertEqual(result, tests)
 
     def test_it_module(self):
-        import tests.test_path
         import tests
+        import tests.test_path
 
         package = DummyPackageOrModule(tests.test_path)
         result = self._callFUT(package)
@@ -222,8 +224,8 @@ class TestResolver(unittest.TestCase):
         return self._getTargetClass()(package)
 
     def test_get_package_caller_package(self):
-        import tests
         from pyramid.path import CALLER_PACKAGE
+        import tests
 
         self.assertEqual(self._makeOne(CALLER_PACKAGE).get_package(), tests)
 
@@ -295,8 +297,7 @@ class TestAssetResolver(unittest.TestCase):
         self.assertRaises(ValueError, inst.resolve, 'test_asset.py')
 
     def test_resolve_relspec_caller_package(self):
-        from pyramid.path import PkgResourcesAssetDescriptor
-        from pyramid.path import CALLER_PACKAGE
+        from pyramid.path import CALLER_PACKAGE, PkgResourcesAssetDescriptor
 
         inst = self._makeOne(CALLER_PACKAGE)
         r = inst.resolve('test_asset.py')
@@ -314,14 +315,16 @@ class TestPkgResourcesAssetDescriptor(unittest.TestCase):
         return self._getTargetClass()(pkg, path)
 
     def test_class_conforms_to_IAssetDescriptor(self):
-        from pyramid.interfaces import IAssetDescriptor
         from zope.interface.verify import verifyClass
+
+        from pyramid.interfaces import IAssetDescriptor
 
         verifyClass(IAssetDescriptor, self._getTargetClass())
 
     def test_instance_conforms_to_IAssetDescriptor(self):
-        from pyramid.interfaces import IAssetDescriptor
         from zope.interface.verify import verifyObject
+
+        from pyramid.interfaces import IAssetDescriptor
 
         verifyObject(IAssetDescriptor, self._makeOne())
 
@@ -369,14 +372,16 @@ class TestFSAssetDescriptor(unittest.TestCase):
         return self._getTargetClass()(path)
 
     def test_class_conforms_to_IAssetDescriptor(self):
-        from pyramid.interfaces import IAssetDescriptor
         from zope.interface.verify import verifyClass
+
+        from pyramid.interfaces import IAssetDescriptor
 
         verifyClass(IAssetDescriptor, self._getTargetClass())
 
     def test_instance_conforms_to_IAssetDescriptor(self):
-        from pyramid.interfaces import IAssetDescriptor
         from zope.interface.verify import verifyObject
+
+        from pyramid.interfaces import IAssetDescriptor
 
         verifyObject(IAssetDescriptor, self._makeOne())
 
@@ -611,6 +616,7 @@ class TestDottedNameResolver(unittest.TestCase):
 
     def test_ctor_module(self):
         import tests
+
         from . import test_path
 
         typ = self._makeOne(test_path)

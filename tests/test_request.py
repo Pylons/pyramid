@@ -23,8 +23,9 @@ class TestRequest(unittest.TestCase):
         return self._getTargetClass()(environ)
 
     def _registerResourceURL(self):
-        from pyramid.interfaces import IResourceURL
         from zope.interface import Interface
+
+        from pyramid.interfaces import IResourceURL
 
         class DummyResourceURL:
             def __init__(self, context, request):
@@ -37,12 +38,14 @@ class TestRequest(unittest.TestCase):
 
     def test_class_conforms_to_IRequest(self):
         from zope.interface.verify import verifyClass
+
         from pyramid.interfaces import IRequest
 
         verifyClass(IRequest, self._getTargetClass())
 
     def test_instance_conforms_to_IRequest(self):
         from zope.interface.verify import verifyObject
+
         from pyramid.interfaces import IRequest
 
         verifyObject(IRequest, self._makeOne())
@@ -555,10 +558,11 @@ class Test_subclassing_Request(unittest.TestCase):
         self.assertTrue(hasattr(RequestSub, '__provides__'))
 
     def test_subclass_with_implementer(self):
+        from zope.interface import implementer
+
         from pyramid.interfaces import IRequest
         from pyramid.request import Request
         from pyramid.util import InstancePropertyHelper
-        from zope.interface import implementer
 
         @implementer(IRequest)
         class RequestSub(Request):

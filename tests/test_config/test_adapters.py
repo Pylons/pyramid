@@ -11,8 +11,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         return config
 
     def test_add_subscriber_defaults(self):
-        from zope.interface import implementer
-        from zope.interface import Interface
+        from zope.interface import Interface, implementer
 
         class IEvent(Interface):
             pass
@@ -36,8 +35,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(len(L), 2)
 
     def test_add_subscriber_iface_specified(self):
-        from zope.interface import implementer
-        from zope.interface import Interface
+        from zope.interface import Interface, implementer
 
         class IEvent(Interface):
             pass
@@ -61,8 +59,8 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(len(L), 1)
 
     def test_add_subscriber_dottednames(self):
-        import tests.test_config
         from pyramid.interfaces import INewRequest
+        import tests.test_config
 
         config = self._makeOne(autocommit=True)
         config.add_subscriber(
@@ -75,8 +73,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(handler.required, (INewRequest,))
 
     def test_add_object_event_subscriber(self):
-        from zope.interface import implementer
-        from zope.interface import Interface
+        from zope.interface import Interface, implementer
 
         class IEvent(Interface):
             pass
@@ -100,8 +97,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(len(L), 1)
 
     def test_add_subscriber_with_specific_type_and_predicates_True(self):
-        from zope.interface import implementer
-        from zope.interface import Interface
+        from zope.interface import Interface, implementer
 
         class IEvent(Interface):
             pass
@@ -132,8 +128,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(len(L), 1)
 
     def test_add_subscriber_with_default_type_predicates_True(self):
-        from zope.interface import implementer
-        from zope.interface import Interface
+        from zope.interface import Interface, implementer
 
         class IEvent(Interface):
             pass
@@ -164,8 +159,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(len(L), 1)
 
     def test_add_subscriber_with_specific_type_and_predicates_False(self):
-        from zope.interface import implementer
-        from zope.interface import Interface
+        from zope.interface import Interface, implementer
 
         class IEvent(Interface):
             pass
@@ -193,8 +187,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(len(L), 0)
 
     def test_add_subscriber_with_default_type_predicates_False(self):
-        from zope.interface import implementer
-        from zope.interface import Interface
+        from zope.interface import Interface, implementer
 
         class IEvent(Interface):
             pass
@@ -347,6 +340,7 @@ class AdaptersConfiguratorMixinTests(unittest.TestCase):
 
     def test_add_resource_url_nodefault_resource_iface(self):
         from zope.interface import Interface
+
         from pyramid.interfaces import IResourceURL
 
         config = self._makeOne(autocommit=True)

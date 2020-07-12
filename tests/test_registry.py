@@ -100,8 +100,8 @@ class TestIntrospector(unittest.TestCase):
         return self._getTargetClass()()
 
     def test_conformance(self):
-        from zope.interface.verify import verifyClass
-        from zope.interface.verify import verifyObject
+        from zope.interface.verify import verifyClass, verifyObject
+
         from pyramid.interfaces import IIntrospector
 
         verifyClass(IIntrospector, self._getTargetClass())
@@ -346,8 +346,8 @@ class TestIntrospectable(unittest.TestCase):
         return self._makeOne('category', 'discrim', 'title', 'type')
 
     def test_conformance(self):
-        from zope.interface.verify import verifyClass
-        from zope.interface.verify import verifyObject
+        from zope.interface.verify import verifyClass, verifyObject
+
         from pyramid.interfaces import IIntrospectable
 
         verifyClass(IIntrospectable, self._getTargetClass())

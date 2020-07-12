@@ -45,8 +45,7 @@ class TestTweensConfiguratorMixin(unittest.TestCase):
 
     def test_add_tweens_names_with_underover(self):
         from pyramid.interfaces import ITweens
-        from pyramid.tweens import excview_tween_factory
-        from pyramid.tweens import MAIN
+        from pyramid.tweens import MAIN, excview_tween_factory
 
         config = self._makeOne()
         config.add_tween('tests.test_config.dummy_tween_factory', over=MAIN)
@@ -316,7 +315,7 @@ class TestTweens(unittest.TestCase):
         )
 
     def test_implicit_ordering_5(self):
-        from pyramid.tweens import MAIN, INGRESS
+        from pyramid.tweens import INGRESS, MAIN
 
         tweens = self._makeOne()
         add = tweens.add_implicit

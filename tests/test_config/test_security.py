@@ -20,8 +20,7 @@ class ConfiguratorSecurityMethodsTests(unittest.TestCase):
         self.assertEqual(config.registry.getUtility(ISecurityPolicy), policy)
 
     def test_set_authentication_policy_with_security_policy(self):
-        from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.interfaces import ISecurityPolicy
+        from pyramid.interfaces import IAuthorizationPolicy, ISecurityPolicy
 
         config = self._makeOne()
         security_policy = object()
@@ -46,9 +45,11 @@ class ConfiguratorSecurityMethodsTests(unittest.TestCase):
         )
 
     def test_set_authentication_policy_with_authz_policy(self):
-        from pyramid.interfaces import IAuthenticationPolicy
-        from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.interfaces import ISecurityPolicy
+        from pyramid.interfaces import (
+            IAuthenticationPolicy,
+            IAuthorizationPolicy,
+            ISecurityPolicy,
+        )
         from pyramid.security import LegacySecurityPolicy
 
         config = self._makeOne()
@@ -65,9 +66,11 @@ class ConfiguratorSecurityMethodsTests(unittest.TestCase):
         )
 
     def test_set_authentication_policy_with_authz_policy_autocommit(self):
-        from pyramid.interfaces import IAuthenticationPolicy
-        from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.interfaces import ISecurityPolicy
+        from pyramid.interfaces import (
+            IAuthenticationPolicy,
+            IAuthorizationPolicy,
+            ISecurityPolicy,
+        )
         from pyramid.security import LegacySecurityPolicy
 
         config = self._makeOne(autocommit=True)
@@ -100,8 +103,10 @@ class ConfiguratorSecurityMethodsTests(unittest.TestCase):
         )
 
     def test_set_authorization_policy_with_authn_policy(self):
-        from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import (
+            IAuthenticationPolicy,
+            IAuthorizationPolicy,
+        )
 
         config = self._makeOne()
         authn_policy = object()
@@ -114,8 +119,10 @@ class ConfiguratorSecurityMethodsTests(unittest.TestCase):
         )
 
     def test_set_authorization_policy_with_authn_policy_autocommit(self):
-        from pyramid.interfaces import IAuthorizationPolicy
-        from pyramid.interfaces import IAuthenticationPolicy
+        from pyramid.interfaces import (
+            IAuthenticationPolicy,
+            IAuthorizationPolicy,
+        )
 
         config = self._makeOne(autocommit=True)
         authn_policy = object()
