@@ -18,8 +18,8 @@ exclude = '''
 )/
 '''
 
- # This next section only exists for people that have their editors
-# automatically call isort, black already sorts entries on its own when run.
+# This next section only exists for people that have their editors
+# automatically call isort.
 [tool.isort]
 profile = "black"
 multi_line_output = 3
