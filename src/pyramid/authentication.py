@@ -571,7 +571,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     ``samesite``
 
         Default: ``'Lax'``.  The 'samesite' option of the session cookie. Set
-        the value to ``None`` to turn off the samesite option.
+        the value to the string ``'None'`` to turn off the samesite option.
 
     .. versionchanged:: 1.4
 
