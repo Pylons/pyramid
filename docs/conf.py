@@ -70,7 +70,7 @@ intersphinx_mapping = {
     'pylonswebframework': ('https://docs.pylonsproject.org/projects/pylons-webframework/en/latest/', None),
     'python': ('https://docs.python.org/3', None),
     'pytest': ('https://docs.pytest.org/en/latest/', None),
-    'sphinx': ('http://www.sphinx-doc.org/en/latest', None),
+    'sphinx': ('https://www.sphinx-doc.org/en/master/', None),
     'sqla': ('https://docs.sqlalchemy.org/en/latest', None),
     'tm': ('https://docs.pylonsproject.org/projects/pyramid-tm/en/latest/', None),
     'toolbar': ('https://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest', None),
