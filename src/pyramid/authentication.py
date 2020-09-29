@@ -579,7 +579,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
     ``samesite``
 
         Default: ``'Lax'``.  The 'samesite' option of the session cookie. Set
-        the value to ``None`` to turn off the samesite option.
+        the value to the string ``'None'`` to turn off the samesite option.
 
         This option is available as of :app:`Pyramid` 1.10.
 
