@@ -11,7 +11,7 @@ from pyramid.security import ACLAllowed, ACLDenied, Allow, Deny, Everyone
 
 @implementer(IAuthorizationPolicy)
 class ACLAuthorizationPolicy(object):
-    """ An :term:`authorization policy` which consults an :term:`ACL`
+    """An :term:`authorization policy` which consults an :term:`ACL`
     object attached to a :term:`context` to determine authorization
     information about a :term:`principal` or multiple principals.
     If the context is part of a :term:`lineage`, the context's parents
@@ -62,7 +62,7 @@ class ACLAuthorizationPolicy(object):
     """
 
     def permits(self, context, principals, permission):
-        """ Return an instance of
+        """Return an instance of
         :class:`pyramid.security.ACLAllowed` instance if the policy
         permits access, return an instance of
         :class:`pyramid.security.ACLDenied` if not."""
@@ -100,7 +100,7 @@ class ACLAuthorizationPolicy(object):
         )
 
     def principals_allowed_by_permission(self, context, permission):
-        """ Return the set of principals explicitly granted the
+        """Return the set of principals explicitly granted the
         permission named ``permission`` according to the ACL directly
         attached to the ``context`` as well as inherited ACLs based on
         the :term:`lineage`."""

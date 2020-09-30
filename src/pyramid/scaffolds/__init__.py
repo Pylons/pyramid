@@ -9,12 +9,12 @@ from pyramid.scaffolds.template import Template  # API
 
 class PyramidTemplate(Template):
     """
-     A class that can be used as a base class for Pyramid scaffolding
-     templates.
+    A class that can be used as a base class for Pyramid scaffolding
+    templates.
     """
 
     def pre(self, command, output_dir, vars):
-        """ Overrides :meth:`pyramid.scaffolds.template.Template.pre`, adding
+        """Overrides :meth:`pyramid.scaffolds.template.Template.pre`, adding
         several variables to the default variables list (including
         ``random_string``, and ``package_logger``).  It also prevents common
         misnamings (such as naming a package "site" or naming a package
@@ -29,7 +29,7 @@ class PyramidTemplate(Template):
         return Template.pre(self, command, output_dir, vars)
 
     def post(self, command, output_dir, vars):  # pragma: no cover
-        """ Overrides :meth:`pyramid.scaffolds.template.Template.post`, to
+        """Overrides :meth:`pyramid.scaffolds.template.Template.post`, to
         print "Welcome to Pyramid.  Sorry for the convenience." after a
         successful scaffolding rendering."""
 

@@ -13,7 +13,7 @@ from pyramid.util import SimpleSerializer, is_same_domain, strings_differ
 
 @implementer(ICSRFStoragePolicy)
 class LegacySessionCSRFStoragePolicy(object):
-    """ A CSRF storage policy that defers control of CSRF storage to the
+    """A CSRF storage policy that defers control of CSRF storage to the
     session.
 
     This policy maintains compatibility with legacy ISession implementations
@@ -32,7 +32,7 @@ class LegacySessionCSRFStoragePolicy(object):
         return request.session.new_csrf_token()
 
     def get_csrf_token(self, request):
-        """ Returns the currently active CSRF token from the session,
+        """Returns the currently active CSRF token from the session,
         generating a new one if needed."""
         return request.session.get_csrf_token()
 
@@ -46,7 +46,7 @@ class LegacySessionCSRFStoragePolicy(object):
 
 @implementer(ICSRFStoragePolicy)
 class SessionCSRFStoragePolicy(object):
-    """ A CSRF storage policy that persists the CSRF token in the session.
+    """A CSRF storage policy that persists the CSRF token in the session.
 
     Note that using this CSRF implementation requires that
     a :term:`session factory` is configured.
@@ -72,7 +72,7 @@ class SessionCSRFStoragePolicy(object):
         return token
 
     def get_csrf_token(self, request):
-        """ Returns the currently active CSRF token from the session,
+        """Returns the currently active CSRF token from the session,
         generating a new one if needed."""
         token = request.session.get(self.key, None)
         if not token:
@@ -89,7 +89,7 @@ class SessionCSRFStoragePolicy(object):
 
 @implementer(ICSRFStoragePolicy)
 class CookieCSRFStoragePolicy(object):
-    """ An alternative CSRF implementation that stores its information in
+    """An alternative CSRF implementation that stores its information in
     unauthenticated cookies, known as the 'Double Submit Cookie' method in the
     `OWASP CSRF guidelines <https://www.owasp.org/index.php/
     Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet#
@@ -142,7 +142,7 @@ class CookieCSRFStoragePolicy(object):
         return token
 
     def get_csrf_token(self, request):
-        """ Returns the currently active CSRF token by checking the cookies
+        """Returns the currently active CSRF token by checking the cookies
         sent with the current request."""
         bound_cookies = self.cookie_profile.bind(request)
         token = bound_cookies.get_value()
@@ -159,7 +159,7 @@ class CookieCSRFStoragePolicy(object):
 
 
 def get_csrf_token(request):
-    """ Get the currently active CSRF token for the request passed, generating
+    """Get the currently active CSRF token for the request passed, generating
     a new one using ``new_csrf_token(request)`` if one does not exist. This
     calls the equivalent method in the chosen CSRF protection implementation.
 
@@ -172,7 +172,7 @@ def get_csrf_token(request):
 
 
 def new_csrf_token(request):
-    """ Generate a new CSRF token for the request passed and persist it in an
+    """Generate a new CSRF token for the request passed and persist it in an
     implementation defined manner. This calls the equivalent method in the
     chosen CSRF protection implementation.
 
@@ -187,7 +187,7 @@ def new_csrf_token(request):
 def check_csrf_token(
     request, token='csrf_token', header='X-CSRF-Token', raises=True
 ):
-    """ Check the CSRF token returned by the
+    """Check the CSRF token returned by the
     :class:`pyramid.interfaces.ICSRFStoragePolicy` implementation against the
     value in ``request.POST.get(token)`` (if a POST request) or
     ``request.headers.get(header)``. If a ``token`` keyword is not supplied to

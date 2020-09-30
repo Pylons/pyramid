@@ -65,7 +65,7 @@ class InstancePropertyHelper(object):
 
     @classmethod
     def make_property(cls, callable, name=None, reify=False):
-        """ Convert a callable into one suitable for adding to the
+        """Convert a callable into one suitable for adding to the
         instance. This will return a 2-tuple containing the computed
         (name, property) pair.
         """
@@ -148,13 +148,13 @@ class InstancePropertyHelper(object):
 
 
 class InstancePropertyMixin(object):
-    """ Mixin that will allow an instance to add properties at
+    """Mixin that will allow an instance to add properties at
     run-time as if they had been defined via @property or @reify
     on the class itself.
     """
 
     def set_property(self, callable, name=None, reify=False):
-        """ Add a callable or a property descriptor to the instance.
+        """Add a callable or a property descriptor to the instance.
 
         Properties, unlike attributes, are lazily evaluated by executing
         an underlying callable when accessed. They can be useful for
@@ -211,7 +211,7 @@ class InstancePropertyMixin(object):
 
 
 class WeakOrderedSet(object):
-    """ Maintain a set of items.
+    """Maintain a set of items.
 
     Each item is stored as a weakref to avoid extending their lifetime.
 
@@ -310,7 +310,7 @@ def strings_differ(string1, string2, compare_digest=compare_digest):
 
 
 def object_description(object):
-    """ Produce a human-consumable text description of ``object``,
+    """Produce a human-consumable text description of ``object``,
     usually involving a Python dotted name. For example:
 
     >>> object_description(None)
@@ -391,7 +391,7 @@ LAST = Sentinel('LAST')
 
 
 class TopologicalSorter(object):
-    """ A utility class which can be used to perform topological sorts against
+    """A utility class which can be used to perform topological sorts against
     tuple-like data."""
 
     def __init__(
@@ -428,7 +428,7 @@ class TopologicalSorter(object):
                 self.order.remove((name, u))
 
     def add(self, name, val, after=None, before=None):
-        """ Add a node to the sort input.  The ``name`` should be a string or
+        """Add a node to the sort input.  The ``name`` should be a string or
         any other hashable object, the ``val`` should be the sortable (doesn't
         need to be hashable).  ``after`` and ``before`` represents the name of
         one of the other sortables (or a sequence of such named) or one of the

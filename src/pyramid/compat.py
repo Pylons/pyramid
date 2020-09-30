@@ -44,7 +44,7 @@ else:
 
 
 def text_(s, encoding='latin-1', errors='strict'):
-    """ If ``s`` is an instance of ``binary_type``, return
+    """If ``s`` is an instance of ``binary_type``, return
     ``s.decode(encoding, errors)``, otherwise return ``s``"""
     if isinstance(s, binary_type):
         return s.decode(encoding, errors)
@@ -52,7 +52,7 @@ def text_(s, encoding='latin-1', errors='strict'):
 
 
 def bytes_(s, encoding='latin-1', errors='strict'):
-    """ If ``s`` is an instance of ``text_type``, return
+    """If ``s`` is an instance of ``text_type``, return
     ``s.encode(encoding, errors)``, otherwise return ``s``"""
     if isinstance(s, text_type):
         return s.encode(encoding, errors)
@@ -87,7 +87,7 @@ Python 2: If ``s`` is an instance of ``text_type``, return
 if PY2:
 
     def native_(s, encoding='latin-1', errors='strict'):
-        """ If ``s`` is an instance of ``text_type``, return
+        """If ``s`` is an instance of ``text_type``, return
         ``s.encode(encoding, errors)``, otherwise return ``str(s)``"""
         if isinstance(s, text_type):
             return s.encode(encoding, errors)
@@ -97,7 +97,7 @@ if PY2:
 else:
 
     def native_(s, encoding='latin-1', errors='strict'):
-        """ If ``s`` is an instance of ``text_type``, return
+        """If ``s`` is an instance of ``text_type``, return
         ``s``, otherwise return ``str(s, encoding, errors)``"""
         if isinstance(s, text_type):
             return s

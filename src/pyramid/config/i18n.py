@@ -47,7 +47,7 @@ class I18NConfiguratorMixin(object):
 
     @action_method
     def add_translation_dirs(self, *specs, **kw):
-        """ Add one or more :term:`translation directory` paths to the
+        """Add one or more :term:`translation directory` paths to the
         current configuration state.  The ``specs`` argument is a
         sequence that may contain absolute directory paths
         (e.g. ``/usr/share/locale``) or :term:`asset specification`

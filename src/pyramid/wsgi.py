@@ -3,7 +3,7 @@ from pyramid.request import call_app_with_subpath_as_path_info
 
 
 def wsgiapp(wrapped):
-    """ Decorator to turn a WSGI application into a :app:`Pyramid`
+    """Decorator to turn a WSGI application into a :app:`Pyramid`
     :term:`view callable`.  This decorator differs from the
     :func:`pyramid.wsgi.wsgiapp2` decorator inasmuch as fixups of
     ``PATH_INFO`` and ``SCRIPT_NAME`` within the WSGI environment *are
@@ -44,7 +44,7 @@ def wsgiapp(wrapped):
 
 
 def wsgiapp2(wrapped):
-    """ Decorator to turn a WSGI application into a :app:`Pyramid`
+    """Decorator to turn a WSGI application into a :app:`Pyramid`
     view callable.  This decorator differs from the
     :func:`pyramid.wsgi.wsgiapp` decorator inasmuch as fixups of
     ``PATH_INFO`` and ``SCRIPT_NAME`` within the WSGI environment

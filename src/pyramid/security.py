@@ -193,7 +193,7 @@ def forget(request):
 
 
 def principals_allowed_by_permission(context, permission):
-    """ Provided a ``context`` (a resource object), and a ``permission``
+    """Provided a ``context`` (a resource object), and a ``permission``
     (a string or unicode object), if an :term:`authorization policy` is
     in effect, return a sequence of :term:`principal` ids that possess
     the permission in the ``context``.  If no authorization policy is
@@ -217,7 +217,7 @@ def principals_allowed_by_permission(context, permission):
 
 
 def view_execution_permitted(context, request, name=''):
-    """ If the view specified by ``context`` and ``name`` is protected
+    """If the view specified by ``context`` and ``name`` is protected
     by a :term:`permission`, check the permission associated with the
     view using the effective authentication/authorization policies and
     the ``request``.  Return a boolean result.  If no
@@ -369,7 +369,7 @@ class AuthenticationAPIMixin(object):
 
     @property
     def authenticated_userid(self):
-        """ Return the userid of the currently authenticated user or
+        """Return the userid of the currently authenticated user or
         ``None`` if there is no :term:`authentication policy` in effect or
         there is no currently authenticated user.
 
@@ -382,7 +382,7 @@ class AuthenticationAPIMixin(object):
 
     @property
     def unauthenticated_userid(self):
-        """ Return an object which represents the *claimed* (not verified) user
+        """Return an object which represents the *claimed* (not verified) user
         id of the credentials present in the request. ``None`` if there is no
         :term:`authentication policy` in effect or there is no user data
         associated with the current request.  This differs from
@@ -399,7 +399,7 @@ class AuthenticationAPIMixin(object):
 
     @property
     def effective_principals(self):
-        """ Return the list of 'effective' :term:`principal` identifiers
+        """Return the list of 'effective' :term:`principal` identifiers
         for the ``request``. If no :term:`authentication policy` is in effect,
         this will return a one-element list containing the
         :data:`pyramid.security.Everyone` principal.
@@ -414,7 +414,7 @@ class AuthenticationAPIMixin(object):
 
 class AuthorizationAPIMixin(object):
     def has_permission(self, permission, context=None):
-        """ Given a permission and an optional context, returns an instance of
+        """Given a permission and an optional context, returns an instance of
         :data:`pyramid.security.Allowed` if the permission is granted to this
         request with the provided context, or the context already associated
         with the request.  Otherwise, returns an instance of

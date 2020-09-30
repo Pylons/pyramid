@@ -38,7 +38,7 @@ class ActionConfiguratorMixin(object):
         introspectables=(),
         **extra
     ):
-        """ Register an action which will be executed when
+        """Register an action which will be executed when
         :meth:`pyramid.config.Configurator.commit` is called (or executed
         immediately if ``autocommit`` is ``True``).
 
@@ -188,8 +188,8 @@ class ActionState(object):
         introspectables=(),
         **extra
     ):
-        """Add an action with the given discriminator, callable and arguments
-        """
+        """Add an action with the given discriminator, callable, and
+        arguments"""
         if kw is None:
             kw = {}
         action = extra
@@ -542,7 +542,7 @@ class ActionInfo(object):
 
 
 def action_method(wrapped):
-    """ Wrapper to provide the right conflict info report data when a method
+    """Wrapper to provide the right conflict info report data when a method
     that calls Configurator.action calls another that does the same.  Not a
     documented API but used by some external systems."""
 

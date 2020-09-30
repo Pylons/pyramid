@@ -14,7 +14,7 @@ def setup_logging(config_uri, global_conf=None):
 
 
 def get_app(config_uri, name=None, options=None):
-    """ Return the WSGI application named ``name`` in the PasteDeploy
+    """Return the WSGI application named ``name`` in the PasteDeploy
     config file specified by ``config_uri``.
 
     ``options``, if passed, should be a dictionary used as variable assignments
@@ -31,7 +31,7 @@ def get_app(config_uri, name=None, options=None):
 
 
 def get_appsettings(config_uri, name=None, options=None):
-    """ Return a dictionary representing the key/value pairs in an ``app``
+    """Return a dictionary representing the key/value pairs in an ``app``
     section within the file represented by ``config_uri``.
 
     ``options``, if passed, should be a dictionary used as variable assignments
@@ -48,7 +48,7 @@ def get_appsettings(config_uri, name=None, options=None):
 
 
 def bootstrap(config_uri, request=None, options=None):
-    """ Load a WSGI application from the PasteDeploy config file specified
+    """Load a WSGI application from the PasteDeploy config file specified
     by ``config_uri``. The environment will be configured as if it is
     currently serving ``request``, leaving a natural environment in place
     to write scripts that can generate URLs and utilize renderers.

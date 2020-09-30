@@ -142,7 +142,7 @@ class DummyTemplateRenderer(object):
         return val
 
     def assert_(self, **kw):
-        """ Accept an arbitrary set of assertion key/value pairs.  For
+        """Accept an arbitrary set of assertion key/value pairs.  For
         each assertion key/value pair assert that the renderer
         (eg. :func:`pyramid.renderers.render_to_response`)
         received the key with a value that equals the asserted
@@ -173,7 +173,7 @@ class DummyResource:
     def __init__(
         self, __name__=None, __parent__=None, __provides__=None, **kw
     ):
-        """ The resource's ``__name__`` attribute will be set to the
+        """The resource's ``__name__`` attribute will be set to the
         value of the ``__name__`` argument, and the resource's
         ``__parent__`` attribute will be set to the value of the
         ``__parent__`` argument.  If ``__provides__`` is specified, it
@@ -196,7 +196,7 @@ class DummyResource:
         self.subs = {}
 
     def __setitem__(self, name, val):
-        """ When the ``__setitem__`` method is called, the object
+        """When the ``__setitem__`` method is called, the object
         passed in as ``val`` will be decorated with a ``__parent__``
         attribute pointing at the dummy resource and a ``__name__``
         attribute that is the value of ``name``.  The value will then
@@ -243,7 +243,7 @@ class DummyResource:
         return name in self.subs
 
     def clone(self, __name__=_marker, __parent__=_marker, **kw):
-        """ Create a clone of the resource object.  If ``__name__`` or
+        """Create a clone of the resource object.  If ``__name__`` or
         ``__parent__`` arguments are passed, use these values to
         override the existing ``__name__`` or ``__parent__`` of the
         resource.  If any extra keyword args are passed in via the ``kw``
@@ -309,7 +309,7 @@ class DummyRequest(
     AuthorizationAPIMixin,
     ViewMethodsMixin,
 ):
-    """ A DummyRequest object (incompletely) imitates a :term:`request` object.
+    """A DummyRequest object (incompletely) imitates a :term:`request` object.
 
     The ``params``, ``environ``, ``headers``, ``path``, and
     ``cookies`` arguments correspond to their :term:`WebOb`
@@ -584,7 +584,7 @@ def cleanUp(*arg, **kw):
 
 
 class DummyRendererFactory(object):
-    """ Registered by
+    """Registered by
     :meth:`pyramid.config.Configurator.testing_add_renderer` as
     a dummy renderer factory.  The indecision about what to use as a
     key (a spec vs. a relative name) is caused by test suites in the

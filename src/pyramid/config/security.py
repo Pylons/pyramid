@@ -23,7 +23,7 @@ class SecurityConfiguratorMixin(object):
 
     @action_method
     def set_authentication_policy(self, policy):
-        """ Override the :app:`Pyramid` :term:`authentication policy` in the
+        """Override the :app:`Pyramid` :term:`authentication policy` in the
         current configuration.  The ``policy`` argument must be an instance
         of an authentication policy or a :term:`dotted Python name`
         that points at an instance of an authentication policy.
@@ -66,7 +66,7 @@ class SecurityConfiguratorMixin(object):
 
     @action_method
     def set_authorization_policy(self, policy):
-        """ Override the :app:`Pyramid` :term:`authorization policy` in the
+        """Override the :app:`Pyramid` :term:`authorization policy` in the
         current configuration.  The ``policy`` argument must be an instance
         of an authorization policy or a :term:`dotted Python name` that points
         at an instance of an authorization policy.

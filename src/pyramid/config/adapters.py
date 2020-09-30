@@ -165,7 +165,7 @@ class AdaptersConfiguratorMixin(object):
 
     @action_method
     def add_response_adapter(self, adapter, type_or_iface):
-        """ When an object of type (or interface) ``type_or_iface`` is
+        """When an object of type (or interface) ``type_or_iface`` is
         returned from a view callable, Pyramid will use the adapter
         ``adapter`` to convert it into an object which implements the
         :class:`pyramid.interfaces.IResponse` interface.  If ``adapter`` is

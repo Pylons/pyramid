@@ -120,7 +120,7 @@ class Localizer(object):
 
 
 def default_locale_negotiator(request):
-    """ The default :term:`locale negotiator`.  Returns a locale name
+    """The default :term:`locale negotiator`.  Returns a locale name
     or ``None``.
 
     - First, the negotiator looks for the ``_LOCALE_`` attribute of
@@ -147,7 +147,7 @@ def default_locale_negotiator(request):
 
 
 def negotiate_locale_name(request):
-    """ Negotiate and return the :term:`locale name` associated with
+    """Negotiate and return the :term:`locale name` associated with
     the current request."""
     try:
         registry = request.registry
@@ -175,7 +175,7 @@ def get_locale_name(request):
 
 
 def make_localizer(current_locale_name, translation_directories):
-    """ Create a :class:`pyramid.i18n.Localizer` object
+    """Create a :class:`pyramid.i18n.Localizer` object
     corresponding to the provided locale name from the
     translations found in the list of translation directories."""
     translations = Translations()
