@@ -188,7 +188,8 @@ class ActionState(object):
         introspectables=(),
         **extra
     ):
-        """Add an action with the given discriminator, callable and arguments"""
+        """Add an action with the given discriminator, callable, and
+        arguments"""
         if kw is None:
             kw = {}
         action = extra
