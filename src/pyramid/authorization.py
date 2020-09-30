@@ -48,7 +48,7 @@ DENY_ALL = (Deny, Everyone, ALL_PERMISSIONS)  # api
 
 @implementer(IAuthorizationPolicy)
 class ACLAuthorizationPolicy:
-    """ An :term:`authorization policy` which consults an :term:`ACL`
+    """An :term:`authorization policy` which consults an :term:`ACL`
     object attached to a :term:`context` to determine authorization
     information about a :term:`principal` or multiple principals.
     This class is a wrapper around :class:`.ACLHelper`, refer to that class for
@@ -68,14 +68,14 @@ class ACLAuthorizationPolicy:
         self.helper = ACLHelper()
 
     def permits(self, context, principals, permission):
-        """ Return an instance of
+        """Return an instance of
         :class:`pyramid.authorization.ACLAllowed` instance if the policy
         permits access, return an instance of
         :class:`pyramid.authorization.ACLDenied` if not."""
         return self.helper.permits(context, principals, permission)
 
     def principals_allowed_by_permission(self, context, permission):
-        """ Return the set of principals explicitly granted the
+        """Return the set of principals explicitly granted the
         permission named ``permission`` according to the ACL directly
         attached to the ``context`` as well as inherited ACLs based on
         the :term:`lineage`."""
@@ -85,7 +85,7 @@ class ACLAuthorizationPolicy:
 
 
 class ACLHelper:
-    """ A helper for use with constructing a :term:`security policy` which
+    """A helper for use with constructing a :term:`security policy` which
     consults an :term:`ACL` object attached to a :term:`context` to determine
     authorization information about a :term:`principal` or multiple principals.
     If the context is part of a :term:`lineage`, the context's parents are
@@ -94,7 +94,7 @@ class ACLHelper:
     """
 
     def permits(self, context, principals, permission):
-        """ Return an instance of :class:`pyramid.authorization.ACLAllowed` if
+        """Return an instance of :class:`pyramid.authorization.ACLAllowed` if
         the ACL allows access a user with the given principals, return an
         instance of :class:`pyramid.authorization.ACLDenied` if not.
 
@@ -152,7 +152,7 @@ class ACLHelper:
         )
 
     def principals_allowed_by_permission(self, context, permission):
-        """ Return the set of principals explicitly granted the permission
+        """Return the set of principals explicitly granted the permission
         named ``permission`` according to the ACL directly attached to the
         ``context`` as well as inherited ACLs based on the :term:`lineage`.
 

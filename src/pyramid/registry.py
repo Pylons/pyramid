@@ -9,7 +9,7 @@ from pyramid.path import CALLER_PACKAGE, caller_package
 
 
 class Registry(Components, dict):
-    """ A registry object is an :term:`application registry`.
+    """A registry object is an :term:`application registry`.
 
     It is used by the framework itself to perform mappings of URLs to view
     callables, as well as servicing other various framework duties. A registry
@@ -265,7 +265,7 @@ class Introspectable(dict):
 
 
 class Deferred:
-    """ Can be used by a third-party configuration extender to wrap a
+    """Can be used by a third-party configuration extender to wrap a
     :term:`discriminator` during configuration if an immediately hashable
     discriminator cannot be computed because it relies on unresolved values.
     The function should accept no arguments and should return a hashable
@@ -285,7 +285,7 @@ class Deferred:
 
 
 def undefer(v):
-    """ Function which accepts an object and returns it unless it is a
+    """Function which accepts an object and returns it unless it is a
     :class:`pyramid.registry.Deferred` instance.  If it is an instance of
     that class, its ``resolve`` method is called, and the result of the
     method is returned."""

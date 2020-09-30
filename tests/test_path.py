@@ -655,8 +655,7 @@ class DummyPackageOrModule:
 
 
 class DummyNamespacePackage:
-    """Has no __file__ attribute.
-    """
+    """Has no __file__ attribute."""
 
     def __init__(self, real_package_or_module):
         self.__name__ = real_package_or_module.__name__
