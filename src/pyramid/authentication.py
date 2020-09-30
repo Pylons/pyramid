@@ -43,7 +43,7 @@ class CallbackAuthenticationPolicy:
         return princid
 
     def authenticated_userid(self, request):
-        """ Return the authenticated userid or ``None``.
+        """Return the authenticated userid or ``None``.
 
         If no callback is registered, this will be the same as
         ``unauthenticated_userid``.
@@ -95,7 +95,7 @@ class CallbackAuthenticationPolicy:
         )
 
     def effective_principals(self, request):
-        """ A list of effective principals derived from request.
+        """A list of effective principals derived from request.
 
         This will return a list of principals including, at least,
         :data:`pyramid.authorization.Everyone`. If there is no authenticated
@@ -179,7 +179,7 @@ class CallbackAuthenticationPolicy:
 
 @implementer(IAuthenticationPolicy)
 class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
-    """ A :app:`Pyramid` :term:`authentication policy` which
+    """A :app:`Pyramid` :term:`authentication policy` which
     obtains data from the :mod:`repoze.who` 1.X WSGI 'API' (the
     ``repoze.who.identity`` key in the WSGI environment).
 
@@ -218,7 +218,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         return identifier
 
     def authenticated_userid(self, request):
-        """ Return the authenticated userid or ``None``.
+        """Return the authenticated userid or ``None``.
 
         If no callback is registered, this will be the same as
         ``unauthenticated_userid``.
@@ -272,7 +272,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         return identity['repoze.who.userid']
 
     def effective_principals(self, request):
-        """ A list of effective principals derived from the identity.
+        """A list of effective principals derived from the identity.
 
         This will return a list of principals including, at least,
         :data:`pyramid.authorization.Everyone`. If there is no identity, or
@@ -345,7 +345,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         return effective_principals
 
     def remember(self, request, userid, **kw):
-        """ Store the ``userid`` as ``repoze.who.userid``.
+        """Store the ``userid`` as ``repoze.who.userid``.
 
         The identity to authenticated to :mod:`repoze.who`
         will contain the given userid as ``userid``, and
@@ -361,7 +361,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
         return identifier.remember(environ, identity)
 
     def forget(self, request):
-        """ Forget the current authenticated user.
+        """Forget the current authenticated user.
 
         Return headers that, if included in a response, will delete the
         cookie responsible for tracking the current user.
@@ -376,7 +376,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
 
 @implementer(IAuthenticationPolicy)
 class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
-    """ A :app:`Pyramid` :term:`authentication policy` which
+    """A :app:`Pyramid` :term:`authentication policy` which
     obtains data from the ``REMOTE_USER`` WSGI environment variable.
 
     Constructor Arguments
@@ -415,13 +415,13 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
         return request.environ.get(self.environ_key)
 
     def remember(self, request, userid, **kw):
-        """ A no-op. The ``REMOTE_USER`` does not provide a protocol for
+        """A no-op. The ``REMOTE_USER`` does not provide a protocol for
         remembering the user. This will be application-specific and can
         be done somewhere else or in a subclass."""
         return []
 
     def forget(self, request):
-        """ A no-op. The ``REMOTE_USER`` does not provide a protocol for
+        """A no-op. The ``REMOTE_USER`` does not provide a protocol for
         forgetting the user. This will be application-specific and can
         be done somewhere else or in a subclass."""
         return []
@@ -637,7 +637,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
             return result['userid']
 
     def remember(self, request, userid, **kw):
-        """ Accepts the following kw args: ``max_age=<int-seconds>,
+        """Accepts the following kw args: ``max_age=<int-seconds>,
         ``tokens=<sequence-of-ascii-strings>``.
 
         Return a list of headers which will set appropriate cookies on
@@ -1050,7 +1050,7 @@ class AuthTktCookieHelper:
         return headers
 
     def identify(self, request):
-        """ Return a dictionary with authentication information, or ``None``
+        """Return a dictionary with authentication information, or ``None``
         if no valid auth_tkt is attached to ``request``"""
         environ = request.environ
         cookie = request.cookies.get(self.cookie_name)
@@ -1118,13 +1118,13 @@ class AuthTktCookieHelper:
         return identity
 
     def forget(self, request):
-        """ Return a set of expires Set-Cookie headers, which will destroy
+        """Return a set of expires Set-Cookie headers, which will destroy
         any existing auth_tkt cookie when attached to a response"""
         request._authtkt_reissue_revoked = True
         return self._get_cookies(request, None)
 
     def remember(self, request, userid, max_age=None, tokens=()):
-        """ Return a set of Set-Cookie headers; when set into a response,
+        """Return a set of Set-Cookie headers; when set into a response,
         these headers will represent a valid authentication ticket.
 
         ``max_age``
@@ -1204,7 +1204,7 @@ class AuthTktCookieHelper:
 
 @implementer(IAuthenticationPolicy)
 class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
-    """ A :app:`Pyramid` authentication policy which gets its data from the
+    """A :app:`Pyramid` authentication policy which gets its data from the
     configured :term:`session`.  For this authentication policy to work, you
     will have to follow the instructions in the :ref:`sessions_chapter` to
     configure a :term:`session factory`.
@@ -1251,7 +1251,7 @@ class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
 
 
 class SessionAuthenticationHelper:
-    """ A helper for use with a :term:`security policy` which stores user data
+    """A helper for use with a :term:`security policy` which stores user data
     in the configured :term:`session`.
 
     Constructor Arguments
@@ -1284,7 +1284,7 @@ class SessionAuthenticationHelper:
 
 @implementer(IAuthenticationPolicy)
 class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
-    """ A :app:`Pyramid` authentication policy which uses HTTP standard basic
+    """A :app:`Pyramid` authentication policy which uses HTTP standard basic
     authentication protocol to authenticate users.  To use this policy you will
     need to provide a callback which checks the supplied user credentials
     against your source of login data.
@@ -1342,14 +1342,14 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
             return credentials.username
 
     def remember(self, request, userid, **kw):
-        """ A no-op. Basic authentication does not provide a protocol for
+        """A no-op. Basic authentication does not provide a protocol for
         remembering the user. Credentials are sent on every request.
 
         """
         return []
 
     def forget(self, request):
-        """ Returns challenge headers. This should be attached to a response
+        """Returns challenge headers. This should be attached to a response
         to indicate that credentials are required."""
         return [('WWW-Authenticate', 'Basic realm="%s"' % self.realm)]
 
@@ -1370,7 +1370,7 @@ HTTPBasicCredentials = namedtuple(
 
 
 def extract_http_basic_credentials(request):
-    """ A helper function for extraction of HTTP Basic credentials
+    """A helper function for extraction of HTTP Basic credentials
     from a given :term:`request`.
 
     Returns a :class:`.HTTPBasicCredentials` 2-tuple with ``username`` and

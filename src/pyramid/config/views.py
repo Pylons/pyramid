@@ -204,7 +204,7 @@ def predicated_view(view, info):
 
 
 def viewdefaults(wrapped):
-    """ Decorator for add_view-like methods which takes into account
+    """Decorator for add_view-like methods which takes into account
     __view_defaults__ attached to view it is passed.  Not a documented API but
     used by some external systems."""
 
@@ -266,7 +266,7 @@ class ViewsConfiguratorMixin:
         exception_only=False,
         **view_options
     ):
-        """ Add a :term:`view configuration` to the current
+        """Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
         down below into *predicate* arguments and *non-predicate*
         arguments.  Predicate arguments narrow the circumstances in
@@ -1518,7 +1518,7 @@ class ViewsConfiguratorMixin:
         a :term:`renderer` to convert the user-supplied view result to
         a :term:`response` object.  If a ``renderer`` argument is not
         supplied, the user-supplied view must itself return a
-        :term:`response` object.  """
+        :term:`response` object."""
         return self._derive_view(view, attr=attr, renderer=renderer)
 
     # b/w compat
@@ -1613,7 +1613,7 @@ class ViewsConfiguratorMixin:
         match_param=None,
         **view_options
     ):
-        """ Add a forbidden view to the current configuration state.  The
+        """Add a forbidden view to the current configuration state.  The
         view will be called when Pyramid or application code raises a
         :exc:`pyramid.httpexceptions.HTTPForbidden` exception and the set of
         circumstances implied by the predicates provided are matched.  The
@@ -1714,7 +1714,7 @@ class ViewsConfiguratorMixin:
         append_slash=False,
         **view_options
     ):
-        """ Add a default :term:`Not Found View` to the current configuration
+        """Add a default :term:`Not Found View` to the current configuration
         state. The view will be called when Pyramid or application code raises
         an :exc:`pyramid.httpexceptions.HTTPNotFound` exception (e.g., when a
         view cannot be found for the request).  The simplest example is:
@@ -1852,7 +1852,7 @@ class ViewsConfiguratorMixin:
         # force all other arguments to be specified as key=value
         **view_options
     ):
-        """ Add an :term:`exception view` for the specified ``exception`` to
+        """Add an :term:`exception view` for the specified ``exception`` to
         the current configuration state. The view will be called when Pyramid
         or application code raises the given exception.
 
@@ -1938,7 +1938,7 @@ class ViewsConfiguratorMixin:
 
     @action_method
     def add_static_view(self, name, path, **kw):
-        """ Add a view used to render static assets such as images
+        """Add a view used to render static assets such as images
         and CSS files.
 
         The ``name`` argument is a string representing an

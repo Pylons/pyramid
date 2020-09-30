@@ -300,7 +300,9 @@ class TestDummyRequest(unittest.TestCase):
 
 
 class TestDummyTemplateRenderer(unittest.TestCase):
-    def _getTargetClass(self,):
+    def _getTargetClass(
+        self,
+    ):
         from pyramid.testing import DummyTemplateRenderer
 
         return DummyTemplateRenderer

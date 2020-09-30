@@ -122,7 +122,7 @@ deprecated(
 
 
 def view_execution_permitted(context, request, name=''):
-    """ If the view specified by ``context`` and ``name`` is protected
+    """If the view specified by ``context`` and ``name`` is protected
     by a :term:`permission`, check the permission associated with the
     view using the effective authentication/authorization policies and
     the ``request``.  Return a boolean result.  If no
@@ -250,7 +250,7 @@ class SecurityAPIMixin:
         return self.authenticated_identity is not None
 
     def has_permission(self, permission, context=None):
-        """ Given a permission and an optional context, returns an instance of
+        """Given a permission and an optional context, returns an instance of
         :data:`pyramid.security.Allowed` if the permission is granted to this
         request with the provided context, or the context already associated
         with the request.  Otherwise, returns an instance of

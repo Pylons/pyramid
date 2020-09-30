@@ -13,7 +13,7 @@ from pyramid.traversal import traversal_path_info
 
 
 class static_view:
-    """ An instance of this class is a callable which can act as a
+    """An instance of this class is a callable which can act as a
     :app:`Pyramid` :term:`view callable`; this view will serve
     static files from a directory on disk based on the ``root_dir``
     you provide to its constructor.
@@ -211,7 +211,8 @@ class static_view:
         # identity is acceptable
         if not request.accept_encoding:
             identity_path = next(
-                (path for path, encoding in files if encoding is None), None,
+                (path for path, encoding in files if encoding is None),
+                None,
             )
             return identity_path, None
 

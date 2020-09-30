@@ -12,7 +12,7 @@ from pyramid.util import bytes_, text_
 
 
 def manage_accessed(wrapped):
-    """ Decorator which causes a cookie to be renewed when an accessor
+    """Decorator which causes a cookie to be renewed when an accessor
     method is called."""
 
     def accessed(session, *arg, **kw):
@@ -27,7 +27,7 @@ def manage_accessed(wrapped):
 
 
 def manage_changed(wrapped):
-    """ Decorator which causes a cookie to be set when a setter method
+    """Decorator which causes a cookie to be set when a setter method
     is called."""
 
     def changed(session, *arg, **kw):

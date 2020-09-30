@@ -40,7 +40,7 @@ class RoutesConfiguratorMixin:
         inherit_slash=None,
         **predicates
     ):
-        """ Add a :term:`route configuration` to the current configuration
+        """Add a :term:`route configuration` to the current configuration
         state.  Arguments to ``add_route`` are divided into *predicate*
         and *non-predicate* types.  :term:`Route predicate` arguments
         narrow the circumstances in which a route will match a
@@ -517,7 +517,7 @@ class RoutesConfiguratorMixin:
     def add_route_predicate(
         self, name, factory, weighs_more_than=None, weighs_less_than=None
     ):
-        """ Adds a route predicate factory.  The view predicate can later be
+        """Adds a route predicate factory.  The view predicate can later be
         named as a keyword argument to
         :meth:`pyramid.config.Configurator.add_route`.
 
@@ -557,7 +557,7 @@ class RoutesConfiguratorMixin:
             self.add_route_predicate(name, factory)
 
     def get_routes_mapper(self):
-        """ Return the :term:`routes mapper` object associated with
+        """Return the :term:`routes mapper` object associated with
         this configurator's :term:`registry`."""
         mapper = self.registry.queryUtility(IRoutesMapper)
         if mapper is None:

@@ -25,7 +25,7 @@ def caller_module(level=2, sys=sys):
 
 
 def package_name(pkg_or_module):
-    """ If this function is passed a module, return the dotted Python
+    """If this function is passed a module, return the dotted Python
     package name of the package in which the module lives.  If this
     function is passed a package, return the dotted Python package
     name of the package itself."""
@@ -119,7 +119,7 @@ class Resolver:
 
 
 class AssetResolver(Resolver):
-    """ A class used to resolve an :term:`asset specification` to an
+    """A class used to resolve an :term:`asset specification` to an
     :term:`asset descriptor`.
 
     .. versionadded:: 1.3
@@ -215,7 +215,7 @@ class AssetResolver(Resolver):
 
 
 class DottedNameResolver(Resolver):
-    """ A class used to resolve a :term:`dotted Python name` to a package or
+    """A class used to resolve a :term:`dotted Python name` to a package or
     module object.
 
     .. versionadded:: 1.3

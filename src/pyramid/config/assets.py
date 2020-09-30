@@ -20,7 +20,7 @@ class OverrideProvider(pkg_resources.DefaultProvider):
         return overrides
 
     def get_resource_filename(self, manager, resource_name):
-        """ Return a true filesystem path for resource_name,
+        """Return a true filesystem path for resource_name,
         co-ordinating the extraction with manager, if the resource
         must be unpacked to the filesystem.
         """
@@ -164,23 +164,19 @@ class PackageOverrides:
         return self._real_loader
 
     def get_data(self, path):
-        """ See IPEP302Loader.
-        """
+        """See IPEP302Loader."""
         return self.real_loader.get_data(path)
 
     def is_package(self, fullname):
-        """ See IPEP302Loader.
-        """
+        """See IPEP302Loader."""
         return self.real_loader.is_package(fullname)
 
     def get_code(self, fullname):
-        """ See IPEP302Loader.
-        """
+        """See IPEP302Loader."""
         return self.real_loader.get_code(fullname)
 
     def get_source(self, fullname):
-        """ See IPEP302Loader.
-        """
+        """See IPEP302Loader."""
         return self.real_loader.get_source(fullname)
 
 
@@ -321,7 +317,7 @@ class AssetsConfiguratorMixin:
 
     @action_method
     def override_asset(self, to_override, override_with, _override=None):
-        """ Add a :app:`Pyramid` asset override to the current
+        """Add a :app:`Pyramid` asset override to the current
         configuration state.
 
         ``to_override`` is an :term:`asset specification` to the

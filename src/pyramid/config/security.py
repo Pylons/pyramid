@@ -24,7 +24,7 @@ class SecurityConfiguratorMixin:
 
     @action_method
     def set_security_policy(self, policy):
-        """ Override the :app:`Pyramid` :term:`security policy` in the current
+        """Override the :app:`Pyramid` :term:`security policy` in the current
         configuration.  The ``policy`` argument must be an instance
         of a security policy or a :term:`dotted Python name`
         that points at an instance of a security policy.

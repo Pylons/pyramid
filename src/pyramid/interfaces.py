@@ -4,7 +4,7 @@ from zope.interface import Attribute, Interface
 
 
 class IContextFound(Interface):
-    """ An event type that is emitted after :app:`Pyramid` finds a
+    """An event type that is emitted after :app:`Pyramid` finds a
     :term:`context` object but before it calls any view code.  See the
     documentation attached to :class:`pyramid.events.ContextFound`
     for more information.
@@ -33,7 +33,7 @@ class IBeforeTraversal(Interface):
 
 
 class INewRequest(Interface):
-    """ An event type that is emitted whenever :app:`Pyramid`
+    """An event type that is emitted whenever :app:`Pyramid`
     begins to process a new request.  See the documentation attached
     to :class:`pyramid.events.NewRequest` for more information."""
 
@@ -41,7 +41,7 @@ class INewRequest(Interface):
 
 
 class INewResponse(Interface):
-    """ An event type that is emitted whenever any :app:`Pyramid`
+    """An event type that is emitted whenever any :app:`Pyramid`
     view returns a response. See the
     documentation attached to :class:`pyramid.events.NewResponse`
     for more information."""
@@ -51,7 +51,7 @@ class INewResponse(Interface):
 
 
 class IApplicationCreated(Interface):
-    """ Event issued when the
+    """Event issued when the
     :meth:`pyramid.config.Configurator.make_wsgi_app` method
     is called.  See the documentation attached to
     :class:`pyramid.events.ApplicationCreated` for more
@@ -71,7 +71,7 @@ IWSGIApplicationCreatedEvent = IApplicationCreated  # b /c
 
 
 class IResponse(Interface):
-    """ Represents a WSGI response using the WebOb response interface.
+    """Represents a WSGI response using the WebOb response interface.
     Some attribute and method documentation of this interface references
     :rfc:`2616`.
 
@@ -84,7 +84,7 @@ class IResponse(Interface):
     )
 
     def __call__(environ, start_response):
-        """ :term:`WSGI` call interface, should call the start_response
+        """:term:`WSGI` call interface, should call the start_response
         callback and should return an iterable"""
 
     accept_ranges = Attribute(
@@ -110,8 +110,8 @@ class IResponse(Interface):
     )
 
     def app_iter_range(start, stop):
-        """ Return a new app_iter built from the response app_iter that
-        serves up only the given start:stop range. """
+        """Return a new app_iter built from the response app_iter that
+        serves up only the given start:stop range."""
 
     authenticated_identity = Attribute(
         """An object representing the authenticated user, as determined by
@@ -145,7 +145,7 @@ class IResponse(Interface):
     charset = Attribute("""Get/set the charset (in the Content-Type)""")
 
     def conditional_response_app(environ, start_response):
-        """ Like the normal __call__ interface, but checks conditional
+        """Like the normal __call__ interface, but checks conditional
         headers:
 
         - If-Modified-Since (304 Not Modified; only on GET, HEAD)
@@ -215,12 +215,12 @@ class IResponse(Interface):
     )
 
     def delete_cookie(name, path='/', domain=None):
-        """ Delete a cookie from the client. Note that path and domain must
+        """Delete a cookie from the client. Note that path and domain must
         match how the cookie was originally set.  This sets the cookie to the
-        empty string, and max_age=0 so that it should expire immediately. """
+        empty string, and max_age=0 so that it should expire immediately."""
 
     def encode_content(encoding='gzip', lazy=False):
-        """ Encode the content with the given encoding (only gzip and
+        """Encode the content with the given encoding (only gzip and
         identity are supported)."""
 
     environ = Attribute(
@@ -260,15 +260,15 @@ class IResponse(Interface):
     )
 
     def md5_etag(body=None, set_content_md5=False):
-        """ Generate an etag for the response object using an MD5 hash of the
+        """Generate an etag for the response object using an MD5 hash of the
         body (the body parameter, or self.body if not given).  Sets self.etag.
-        If set_content_md5 is True sets self.content_md5 as well """
+        If set_content_md5 is True sets self.content_md5 as well"""
 
     def merge_cookies(resp):
-        """ Merge the cookies that were set on this response with the given
+        """Merge the cookies that were set on this response with the given
         resp object (which can be any WSGI application).  If the resp is a
         webob.Response object, then the other object will be modified
-        in-place. """
+        in-place."""
 
     pragma = Attribute(
         """ Gets and sets and deletes the Pragma header. For more information
@@ -314,7 +314,7 @@ class IResponse(Interface):
     )
 
     def unset_cookie(name, strict=True):
-        """ Unset a cookie with the given name (remove it from the
+        """Unset a cookie with the given name (remove it from the
         response)."""
 
     vary = Attribute(
@@ -334,7 +334,7 @@ class IException(Interface):  # not an API
 
 
 class IExceptionResponse(IException, IResponse):
-    """ An interface representing a WSGI response which is also an exception
+    """An interface representing a WSGI response which is also an exception
     object.  Register an exception view using this interface as a ``context``
     to apply the registered view for all exception types raised by
     :app:`Pyramid` internally (any exception that inherits from
@@ -356,18 +356,18 @@ class IDict(Interface):
         """ Set a key/value pair into the dictionary"""
 
     def __delitem__(k):
-        """ Delete an item from the dictionary which is passed to the
+        """Delete an item from the dictionary which is passed to the
         renderer as the renderer globals dictionary."""
 
     def __getitem__(k):
-        """ Return the value for key ``k`` from the dictionary or raise a
+        """Return the value for key ``k`` from the dictionary or raise a
         KeyError if the key doesn't exist"""
 
     def __iter__():
         """ Return an iterator over the keys of this dictionary """
 
     def get(k, default=None):
-        """ Return the value for key ``k`` from the renderer dictionary, or
+        """Return the value for key ``k`` from the renderer dictionary, or
         the default if no such value exists."""
 
     def items():
@@ -380,20 +380,20 @@ class IDict(Interface):
         """ Return a list of values from the dictionary """
 
     def pop(k, default=None):
-        """ Pop the key k from the dictionary and return its value.  If k
+        """Pop the key k from the dictionary and return its value.  If k
         doesn't exist, and default is provided, return the default.  If k
         doesn't exist and default is not provided, raise a KeyError."""
 
     def popitem():
-        """ Pop the item with key k from the dictionary and return it as a
+        """Pop the item with key k from the dictionary and return it as a
         two-tuple (k, v).  If k doesn't exist, raise a KeyError."""
 
     def setdefault(k, default=None):
-        """ Return the existing value for key ``k`` in the dictionary.  If no
-         value with ``k`` exists in the dictionary, set the ``default``
-         value into the dictionary under the k name passed.  If a value already
-         existed in the dictionary, return it.  If a value did not exist in
-         the dictionary, return the default"""
+        """Return the existing value for key ``k`` in the dictionary.  If no
+        value with ``k`` exists in the dictionary, set the ``default``
+        value into the dictionary under the k name passed.  If a value already
+        existed in the dictionary, return it.  If a value did not exist in
+        the dictionary, return the default"""
 
     def update(d):
         """ Update the renderer dictionary with another dictionary ``d``."""
@@ -430,7 +430,7 @@ class IBeforeRender(IDict):
 
 
 class IRendererInfo(Interface):
-    """ An object implementing this interface is passed to every
+    """An object implementing this interface is passed to every
     :term:`renderer factory` constructor as its only argument (conventionally
     named ``info``)"""
 
@@ -454,7 +454,7 @@ class IRendererInfo(Interface):
 
 class IRendererFactory(Interface):
     def __call__(info):
-        """ Return an object that implements
+        """Return an object that implements
         :class:`pyramid.interfaces.IRenderer`. ``info`` is an
         object that implements :class:`pyramid.interfaces.IRendererInfo`.
         """
@@ -462,7 +462,7 @@ class IRendererFactory(Interface):
 
 class IRenderer(Interface):
     def __call__(value, system):
-        """ Call the renderer with the result of the
+        """Call the renderer with the result of the
         view (``value``) passed in and return a result (a string or
         unicode object useful as a response body).  Values computed by
         the system are passed by the system in the ``system``
@@ -476,7 +476,7 @@ class IRenderer(Interface):
 
 class IViewMapper(Interface):
     def __call__(self, object):
-        """ Provided with an arbitrary object (a function, class, or
+        """Provided with an arbitrary object (a function, class, or
         instance), returns a callable with the call signature ``(context,
         request)``.  The callable returned should itself return a Response
         object.  An IViewMapper is returned by
@@ -499,38 +499,38 @@ class IViewMapperFactory(Interface):
 
 class ISecurityPolicy(Interface):
     def authenticated_identity(request):
-        """ Return the :term:`identity` of the current user.  The object can be
+        """Return the :term:`identity` of the current user.  The object can be
         of any shape, such as a simple ID string or an ORM object.
         """
 
     def authenticated_userid(request):
-        """ Return a :term:`userid` string identifying the trusted and
+        """Return a :term:`userid` string identifying the trusted and
         verified user, or ``None`` if unauthenticated.
         """
 
     def permits(request, context, permission):
-        """ Return an instance of :class:`pyramid.security.Allowed` if a user
+        """Return an instance of :class:`pyramid.security.Allowed` if a user
         of the given identity is allowed the ``permission`` in the current
         ``context``, else return an instance of
         :class:`pyramid.security.Denied`.
         """
 
     def remember(request, userid, **kw):
-        """ Return a set of headers suitable for 'remembering' the
+        """Return a set of headers suitable for 'remembering' the
         :term:`userid` named ``userid`` when set in a response.  An individual
         security policy and its consumers can decide on the composition and
         meaning of ``**kw``.
         """
 
     def forget(request, **kw):
-        """ Return a set of headers suitable for 'forgetting' the
+        """Return a set of headers suitable for 'forgetting' the
         current user on subsequent requests.  An individual security policy and
         its consumers can decide on the composition and meaning of ``**kw``.
         """
 
 
 class IAuthenticationPolicy(Interface):
-    """ An object representing a Pyramid authentication policy.
+    """An object representing a Pyramid authentication policy.
 
     .. deprecated:: 2.0
 
@@ -540,7 +540,7 @@ class IAuthenticationPolicy(Interface):
     """
 
     def authenticated_userid(request):
-        """ Return the authenticated :term:`userid` or ``None`` if
+        """Return the authenticated :term:`userid` or ``None`` if
         no authenticated userid can be found. This method of the
         policy should ensure that a record exists in whatever
         persistent store is used related to the user (the user
@@ -551,7 +551,7 @@ class IAuthenticationPolicy(Interface):
         """
 
     def unauthenticated_userid(request):
-        """ Return the *unauthenticated* userid.  This method
+        """Return the *unauthenticated* userid.  This method
         performs the same duty as ``authenticated_userid`` but is
         permitted to return the userid based only on data present
         in the request; it needn't (and shouldn't) check any
@@ -566,7 +566,7 @@ class IAuthenticationPolicy(Interface):
         """
 
     def effective_principals(request):
-        """ Return a sequence representing the effective principals
+        """Return a sequence representing the effective principals
         typically including the :term:`userid` and any groups belonged
         to by the current user, always including 'system' groups such
         as ``pyramid.authorization.Everyone`` and
@@ -575,7 +575,7 @@ class IAuthenticationPolicy(Interface):
         """
 
     def remember(request, userid, **kw):
-        """ Return a set of headers suitable for 'remembering' the
+        """Return a set of headers suitable for 'remembering' the
         :term:`userid` named ``userid`` when set in a response.  An
         individual authentication policy and its consumers can
         decide on the composition and meaning of ``**kw``.
@@ -583,14 +583,14 @@ class IAuthenticationPolicy(Interface):
         """
 
     def forget(request):
-        """ Return a set of headers suitable for 'forgetting' the
+        """Return a set of headers suitable for 'forgetting' the
         current user on subsequent requests.
 
         """
 
 
 class IAuthorizationPolicy(Interface):
-    """ An object representing a Pyramid authorization policy.
+    """An object representing a Pyramid authorization policy.
 
     .. deprecated:: 2.0
 
@@ -600,14 +600,14 @@ class IAuthorizationPolicy(Interface):
     """
 
     def permits(context, principals, permission):
-        """ Return an instance of :class:`pyramid.security.Allowed` if any
+        """Return an instance of :class:`pyramid.security.Allowed` if any
         of the ``principals`` is allowed the ``permission`` in the current
         ``context``, else return an instance of
         :class:`pyramid.security.Denied`.
         """
 
     def principals_allowed_by_permission(context, permission):
-        """ Return a set of principal identifiers allowed by the
+        """Return a set of principal identifiers allowed by the
         ``permission`` in ``context``.  This behavior is optional; if you
         choose to not implement it you should define this method as
         something which raises a ``NotImplementedError``.  This method
@@ -635,24 +635,24 @@ class IMultiDict(IDict):  # docs-only interface
         """
 
     def extend(other=None, **kwargs):
-        """ Add a set of keys and values, not overwriting any previous
+        """Add a set of keys and values, not overwriting any previous
         values.  The ``other`` structure may be a list of two-tuples or a
         dictionary.  If ``**kwargs`` is passed, its value *will* overwrite
         existing values."""
 
     def getall(key):
-        """ Return a list of all values matching the key (may be an empty
-        list) """
+        """Return a list of all values matching the key (may be an empty
+        list)"""
 
     def getone(key):
-        """ Get one value matching the key, raising a KeyError if multiple
-        values were found. """
+        """Get one value matching the key, raising a KeyError if multiple
+        values were found."""
 
     def mixed():
-        """ Returns a dictionary where the values are either single values,
+        """Returns a dictionary where the values are either single values,
         or a list of values when a key/value appears more than once in this
         dictionary. This is similar to the kind of dictionary often used to
-        represent the variables in a web request. """
+        represent the variables in a web request."""
 
 
 # internal interfaces
@@ -663,7 +663,7 @@ class IRequest(Interface):
 
 
 class ITweens(Interface):
-    """ Marker interface for utility registration representing the ordered
+    """Marker interface for utility registration representing the ordered
     set of a configuration's tween factories"""
 
 
@@ -671,7 +671,7 @@ class IRequestHandler(Interface):
     """ """
 
     def __call__(self, request):
-        """ Must return a tuple of IReqest, IResponse or raise an exception.
+        """Must return a tuple of IReqest, IResponse or raise an exception.
         The ``request`` argument will be an instance of an object that
         provides IRequest."""
 
@@ -680,7 +680,7 @@ IRequest.combined = IRequest  # for exception view lookups
 
 
 class IRequestExtensions(Interface):
-    """ Marker interface for storing request extensions (properties and
+    """Marker interface for storing request extensions (properties and
     methods) which will be added to the request object."""
 
     descriptors = Attribute(
@@ -690,7 +690,7 @@ class IRequestExtensions(Interface):
 
 
 class IRouteRequest(Interface):
-    """ *internal only* interface used as in a utility lookup to find
+    """*internal only* interface used as in a utility lookup to find
     route-specific interfaces.  Not an API."""
 
 
@@ -719,7 +719,7 @@ class IResponseFactory(Interface):
     """ A utility which generates a response """
 
     def __call__(request):
-        """ Return a response object implementing IResponse,
+        """Return a response object implementing IResponse,
         e.g. :class:`pyramid.response.Response`). It should handle the
         case when ``request`` is ``None``."""
 
@@ -731,7 +731,7 @@ class IRequestFactory(Interface):
         """ Return an instance of ``pyramid.request.Request``"""
 
     def blank(path):
-        """ Return an empty request object (see
+        """Return an empty request object (see
         :meth:`pyramid.request.Request.blank`)"""
 
 
@@ -755,12 +755,12 @@ class ISecuredView(IView):
         """ Guaranteed-permissive version of __call__ """
 
     def __permitted__(context, request):
-        """ Return True if view execution will be permitted using the
+        """Return True if view execution will be permitted using the
         context and request, False otherwise"""
 
 
 class IMultiView(ISecuredView):
-    """ *internal only*.  A multiview is a secured view that is a
+    """*internal only*.  A multiview is a secured view that is a
     collection of other views.  Each of the views is associated with
     zero or more predicates.  Not an API."""
 
@@ -780,7 +780,7 @@ class IDefaultRootFactory(Interface):
 
 class ITraverser(Interface):
     def __call__(request):
-        """ Return a dictionary with (at least) the keys ``root``,
+        """Return a dictionary with (at least) the keys ``root``,
         ``context``, ``view_name``, ``subpath``, ``traversed``,
         ``virtual_root``, and ``virtual_root_path``.  These values are
         typically the result of an object graph traversal.  ``root`` is the
@@ -808,8 +808,7 @@ ITraverserFactory = ITraverser  # b / c for 1.0 code
 
 class IViewPermission(Interface):
     def __call__(context, request):
-        """ Return True if the permission allows, return False if it denies.
-        """
+        """Return True if the permission allows, return False if it denies."""
 
 
 class IRouter(Interface):
@@ -894,7 +893,7 @@ class IExecutionPolicy(Interface):
 
 
 class ISettings(IDict):
-    """ Runtime settings utility for pyramid; represents the
+    """Runtime settings utility for pyramid; represents the
     deployment settings for the application.  Implements a mapping
     interface."""
 
@@ -918,7 +917,7 @@ ILogger = IDebugLogger  # b/c
 class IRoutePregenerator(Interface):
     def __call__(request, elements, kw):
 
-        """ A pregenerator is a function associated by a developer with a
+        """A pregenerator is a function associated by a developer with a
         :term:`route`. The pregenerator for a route is called by
         :meth:`pyramid.request.Request.route_url` in order to adjust the set
         of arguments passed to it by the user for special purposes, such as
@@ -942,7 +941,7 @@ class IRoutePregenerator(Interface):
 
 
 class IRoute(Interface):
-    """ Interface representing the type of object returned from
+    """Interface representing the type of object returned from
     ``IRoutesMapper.get_route``"""
 
     name = Attribute('The route name')
@@ -985,14 +984,14 @@ class IRoutesMapper(Interface):
     """ Interface representing a Routes ``Mapper`` object """
 
     def get_routes():
-        """ Return a sequence of Route objects registered in the mapper.
+        """Return a sequence of Route objects registered in the mapper.
         Static routes will not be returned in this sequence."""
 
     def has_routes():
         """ Returns ``True`` if any route has been registered. """
 
     def get_route(name):
-        """ Returns an ``IRoute`` object if a route with the name ``name``
+        """Returns an ``IRoute`` object if a route with the name ``name``
         was registered, otherwise return ``None``."""
 
     def connect(
@@ -1006,15 +1005,15 @@ class IRoutesMapper(Interface):
         """ Add a new route. """
 
     def generate(name, kw):
-        """ Generate a URL using the route named ``name`` with the
+        """Generate a URL using the route named ``name`` with the
         keywords implied by kw"""
 
     def __call__(request):
-        """ Return a dictionary containing matching information for
+        """Return a dictionary containing matching information for
         the request; the ``route`` key of this dictionary will either
         be a Route object or ``None`` if no route matched; the
         ``match`` key will be the matchdict or ``None`` if no route
-        matched.  Static routes will not be considered for matching.  """
+        matched.  Static routes will not be considered for matching."""
 
 
 class IResourceURL(Interface):
@@ -1033,11 +1032,10 @@ class IResourceURL(Interface):
 
 
 class IPEP302Loader(Interface):
-    """ See http://www.python.org/dev/peps/pep-0302/#id30.
-    """
+    """See http://www.python.org/dev/peps/pep-0302/#id30."""
 
     def get_data(path):
-        """ Retrieve data for and arbitrary "files" from storage backend.
+        """Retrieve data for and arbitrary "files" from storage backend.
 
         Raise IOError for not found.
 
@@ -1045,11 +1043,10 @@ class IPEP302Loader(Interface):
         """
 
     def is_package(fullname):
-        """ Return True if the module specified by 'fullname' is a package.
-        """
+        """Return True if the module specified by 'fullname' is a package."""
 
     def get_code(fullname):
-        """ Return the code object for the module identified by 'fullname'.
+        """Return the code object for the module identified by 'fullname'.
 
         Return 'None' if it's a built-in or extension module.
 
@@ -1060,7 +1057,7 @@ class IPEP302Loader(Interface):
         """
 
     def get_source(fullname):
-        """ Return the source code for the module identified by 'fullname'.
+        """Return the source code for the module identified by 'fullname'.
 
         Return a string, using newline characters for line endings, or None
         if the source is not available.
@@ -1069,7 +1066,7 @@ class IPEP302Loader(Interface):
         """
 
     def get_filename(fullname):
-        """ Return the value of '__file__' if the named module was loaded.
+        """Return the value of '__file__' if the named module was loaded.
 
         If the module is not found, raise ImportError.
         """
@@ -1094,18 +1091,18 @@ class ILocaleNegotiator(Interface):
 
 
 class ITranslationDirectories(Interface):
-    """ A list object representing all known translation directories
+    """A list object representing all known translation directories
     for an application"""
 
 
 class IDefaultPermission(Interface):
-    """ A string object representing the default permission to be used
+    """A string object representing the default permission to be used
     for all view configurations which do not explicitly declare their
     own."""
 
 
 class IDefaultCSRFOptions(Interface):
-    """ An object representing the default CSRF settings to be used for
+    """An object representing the default CSRF settings to be used for
     all view configurations which do not explicitly declare their own."""
 
     require_csrf = Attribute(
@@ -1123,15 +1120,15 @@ class IDefaultCSRFOptions(Interface):
 
 
 class ISessionFactory(Interface):
-    """ An interface representing a factory which accepts a request object and
-    returns an ISession object """
+    """An interface representing a factory which accepts a request object and
+    returns an ISession object"""
 
     def __call__(request):
         """ Return an ISession object """
 
 
 class ISession(IDict):
-    """ An interface representing a session (a web session object,
+    """An interface representing a session (a web session object,
     usually accessed via ``request.session``.
 
     Keys and values of a session must be JSON-serializable.
@@ -1166,7 +1163,7 @@ class ISession(IDict):
     # special methods
 
     def invalidate():
-        """ Invalidate the session.  The action caused by
+        """Invalidate the session.  The action caused by
         ``invalidate`` is implementation-dependent, but it should have
         the effect of completely dissociating any data stored in the
         session with the current request.  It might set response
@@ -1179,7 +1176,7 @@ class ISession(IDict):
         """
 
     def changed():
-        """ Mark the session as changed. A user of a session should
+        """Mark the session as changed. A user of a session should
         call this method after he or she mutates a mutable object that
         is *a value of the session* (it should not be required after
         mutating the session itself).  For example, if the user has
@@ -1191,20 +1188,20 @@ class ISession(IDict):
         internal dictionary."""
 
     def flash(msg, queue='', allow_duplicate=True):
-        """ Push a flash message onto the end of the flash queue represented
+        """Push a flash message onto the end of the flash queue represented
         by ``queue``.  An alternate flash message queue can used by passing
         an optional ``queue``, which must be a string.  If
         ``allow_duplicate`` is false, if the ``msg`` already exists in the
         queue, it will not be re-added."""
 
     def pop_flash(queue=''):
-        """ Pop a queue from the flash storage.  The queue is removed from
+        """Pop a queue from the flash storage.  The queue is removed from
         flash storage after this message is called.  The queue is returned;
         it is a list of flash messages added by
         :meth:`pyramid.interfaces.ISession.flash`"""
 
     def peek_flash(queue=''):
-        """ Peek at a queue in the flash storage.  The queue remains in
+        """Peek at a queue in the flash storage.  The queue remains in
         flash storage after this message is called.  The queue is returned;
         it is a list of flash messages added by
         :meth:`pyramid.interfaces.ISession.flash`
@@ -1212,18 +1209,18 @@ class ISession(IDict):
 
 
 class ICSRFStoragePolicy(Interface):
-    """ An object that offers the ability to verify CSRF tokens and generate
+    """An object that offers the ability to verify CSRF tokens and generate
     new ones."""
 
     def new_csrf_token(request):
-        """ Create and return a new, random cross-site request forgery
+        """Create and return a new, random cross-site request forgery
         protection token. The token will be an ascii-compatible unicode
         string.
 
         """
 
     def get_csrf_token(request):
-        """ Return a cross-site request forgery protection token.  It
+        """Return a cross-site request forgery protection token.  It
         will be an ascii-compatible unicode string.  If a token was previously
         set for this user via ``new_csrf_token``, that token will be returned.
         If no CSRF token was previously set, ``new_csrf_token`` will be
@@ -1233,7 +1230,7 @@ class ICSRFStoragePolicy(Interface):
         """
 
     def check_csrf_token(request, token):
-        """ Determine if the supplied ``token`` is valid. Most implementations
+        """Determine if the supplied ``token`` is valid. Most implementations
         should simply compare the ``token`` to the current value of
         ``get_csrf_token`` but it is possible to verify the token using
         any mechanism necessary using this method.
@@ -1245,12 +1242,12 @@ class ICSRFStoragePolicy(Interface):
 
 class IIntrospector(Interface):
     def get(category_name, discriminator, default=None):
-        """ Get the IIntrospectable related to the category_name and the
+        """Get the IIntrospectable related to the category_name and the
         discriminator (or discriminator hash) ``discriminator``.  If it does
-        not exist in the introspector, return the value of ``default`` """
+        not exist in the introspector, return the value of ``default``"""
 
     def get_category(category_name, default=None, sort_key=None):
-        """ Get a sequence of dictionaries in the form
+        """Get a sequence of dictionaries in the form
         ``[{'introspectable':IIntrospectable, 'related':[sequence of related
         IIntrospectables]}, ...]`` where each introspectable is part of the
         category associated with ``category_name`` .
@@ -1265,11 +1262,11 @@ class IIntrospector(Interface):
         ``sorted`` callable)."""
 
     def categories():
-        """ Return a sorted sequence of category names known by
-         this introspector """
+        """Return a sorted sequence of category names known by
+        this introspector"""
 
     def categorized(sort_key=None):
-        """ Get a sequence of tuples in the form ``[(category_name,
+        """Get a sequence of tuples in the form ``[(category_name,
         [{'introspectable':IIntrospectable, 'related':[sequence of related
         IIntrospectables]}, ...])]`` representing all known
         introspectables.  If ``sort_key`` is ``None``, each introspectables
@@ -1279,19 +1276,19 @@ class IIntrospector(Interface):
         ``key`` function of Python's ``sorted`` callable)."""
 
     def remove(category_name, discriminator):
-        """ Remove the IIntrospectable related to ``category_name`` and
+        """Remove the IIntrospectable related to ``category_name`` and
         ``discriminator`` from the introspector, and fix up any relations
         that the introspectable participates in. This method will not raise
         an error if an introspectable related to the category name and
         discriminator does not exist."""
 
     def related(intr):
-        """ Return a sequence of IIntrospectables related to the
+        """Return a sequence of IIntrospectables related to the
         IIntrospectable ``intr``. Return the empty sequence if no relations
         for exist."""
 
     def add(intr):
-        """ Add the IIntrospectable ``intr`` (use instead of
+        """Add the IIntrospectable ``intr`` (use instead of
         :meth:`pyramid.interfaces.IIntrospector.add` when you have a custom
         IIntrospectable). Replaces any existing introspectable registered
         using the same category/discriminator.
@@ -1300,7 +1297,7 @@ class IIntrospector(Interface):
         indirectly by :meth:`pyramid.interfaces.IIntrospector.register`"""
 
     def relate(*pairs):
-        """ Given any number of ``(category_name, discriminator)`` pairs
+        """Given any number of ``(category_name, discriminator)`` pairs
         passed as positional arguments, relate the associated introspectables
         to each other. The introspectable related to each pair must have
         already been added via ``.add`` or ``.add_intr``; a :exc:`KeyError`
@@ -1312,7 +1309,7 @@ class IIntrospector(Interface):
         """
 
     def unrelate(*pairs):
-        """ Given any number of ``(category_name, discriminator)`` pairs
+        """Given any number of ``(category_name, discriminator)`` pairs
         passed as positional arguments, unrelate the associated introspectables
         from each other. The introspectable related to each pair must have
         already been added via ``.add`` or ``.add_intr``; a :exc:`KeyError`
@@ -1325,7 +1322,7 @@ class IIntrospector(Interface):
 
 
 class IIntrospectable(Interface):
-    """ An introspectable object used for configuration introspection.  In
+    """An introspectable object used for configuration introspection.  In
     addition to the methods below, objects which implement this interface
     must also implement all the methods of Python's
     ``collections.MutableMapping`` (the "dictionary interface"), and must be
@@ -1350,19 +1347,19 @@ class IIntrospectable(Interface):
     )
 
     def relate(category_name, discriminator):
-        """ Indicate an intent to relate this IIntrospectable with another
+        """Indicate an intent to relate this IIntrospectable with another
         IIntrospectable (the one associated with the ``category_name`` and
         ``discriminator``) during action execution.
         """
 
     def unrelate(category_name, discriminator):
-        """ Indicate an intent to break the relationship between this
+        """Indicate an intent to break the relationship between this
         IIntrospectable with another IIntrospectable (the one associated with
         the ``category_name`` and ``discriminator``) during action execution.
         """
 
     def register(introspector, action_info):
-        """ Register this IIntrospectable with an introspector.  This method
+        """Register this IIntrospectable with an introspector.  This method
         is invoked during action execution.  Adds the introspectable and its
         relations to the introspector.  ``introspector`` should be an object
         implementing IIntrospector.  ``action_info`` should be a object
@@ -1383,7 +1380,7 @@ class IIntrospectable(Interface):
 
     def __hash__():
 
-        """ Introspectables must be hashable.  The typical implementation of
+        """Introspectables must be hashable.  The typical implementation of
         an introsepectable's __hash__ is::
 
           return hash((self.category_name,) + (self.discriminator,))
@@ -1391,7 +1388,7 @@ class IIntrospectable(Interface):
 
 
 class IActionInfo(Interface):
-    """ Class which provides code introspection capability associated with an
+    """Class which provides code introspection capability associated with an
     action.  The ParserInfo class used by ZCML implements the same interface.
     """
 
@@ -1402,8 +1399,8 @@ class IActionInfo(Interface):
     )
 
     def __str__():
-        """ Return a representation of the action information (including
-        source code from file, if possible) """
+        """Return a representation of the action information (including
+        source code from file, if possible)"""
 
 
 class IAssetDescriptor(Interface):
@@ -1470,7 +1467,7 @@ class IPredicateInfo(Interface):
     )
 
     def maybe_dotted(value):
-        """ Resolve the :term:`dotted Python name` ``dotted`` to a
+        """Resolve the :term:`dotted Python name` ``dotted`` to a
         global Python object.  If ``dotted`` is not a string, return
         it without attempting to do any name resolution.  If
         ``dotted`` is a relative dotted name (e.g. ``.foo.bar``,
@@ -1561,7 +1558,7 @@ class IViewDeriver(Interface):
 
 
 class IViewDeriverInfo(Interface):
-    """ An object implementing this interface is passed to every
+    """An object implementing this interface is passed to every
     :term:`view deriver` during configuration."""
 
     registry = Attribute(

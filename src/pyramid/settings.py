@@ -3,7 +3,7 @@ falsey = frozenset(('f', 'false', 'n', 'no', 'off', '0'))
 
 
 def asbool(s):
-    """ Return the boolean value ``True`` if the case-lowered value of string
+    """Return the boolean value ``True`` if the case-lowered value of string
     input ``s`` is a :term:`truthy string`. If ``s`` is already one of the
     boolean values ``True`` or ``False``, return it."""
     if s is None:
@@ -21,7 +21,7 @@ def aslist_cronly(value):
 
 
 def aslist(value, flatten=True):
-    """ Return a list, separating the input based on newlines.
+    """Return a list, separating the input based on newlines.
     Also if ``flatten`` is ``True`` (the default), and if the line
     is a string, then the line will be split on spaces.
     """

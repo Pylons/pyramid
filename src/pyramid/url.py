@@ -57,8 +57,8 @@ def parse_url_overrides(request, kw):
 
 
 class URLMethodsMixin:
-    """ Request methods mixin for BaseRequest having to do with URL
-    generation """
+    """Request methods mixin for BaseRequest having to do with URL
+    generation"""
 
     def _partial_application_url(self, scheme=None, host=None, port=None):
         """

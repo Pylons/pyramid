@@ -18,9 +18,9 @@ def resolve_asset_spec(spec, pname='__main__'):
 
 
 def asset_spec_from_abspath(abspath, package):
-    """ Try to convert an absolute path to a resource in a package to
+    """Try to convert an absolute path to a resource in a package to
     a resource specification if possible; otherwise return the
-    absolute path.  """
+    absolute path."""
     if getattr(package, '__name__', None) == '__main__':
         return abspath
     pp = package_path(package) + os.path.sep
