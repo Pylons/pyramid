@@ -20,7 +20,7 @@ def _error_handler(request, exc):
 
 
 def excview_tween_factory(handler, registry):
-    """ A :term:`tween` factory which produces a tween that catches an
+    """A :term:`tween` factory which produces a tween that catches an
     exception raised by downstream tweens (or the main Pyramid request
     handler) and, if possible, converts it into a Response using an
     :term:`exception view`.

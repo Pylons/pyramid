@@ -134,7 +134,7 @@ class Test_InstancePropertyHelper(unittest.TestCase):
         self.assertEqual(2, foo.x)
 
     def test_reset_reify(self):
-        """ This is questionable behavior, but may as well get notified
+        """This is questionable behavior, but may as well get notified
         if it changes."""
         foo = Dummy()
         helper = self._getTargetClass()
@@ -333,7 +333,7 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         self.assertEqual(2, foo.x)
 
     def test_reset_reify(self):
-        """ This is questionable behavior, but may as well get notified
+        """This is questionable behavior, but may as well get notified
         if it changes."""
         foo = self._makeOne()
         foo.set_property(lambda _: 1, name='x', reify=True)

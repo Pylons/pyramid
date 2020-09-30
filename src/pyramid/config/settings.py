@@ -46,12 +46,12 @@ class SettingsConfiguratorMixin(object):
 
         .. note:: the :attr:`pyramid.registry.Registry.settings` API
            performs the same duty.
-           """
+        """
         return self.registry.settings
 
 
 def Settings(d=None, _environ_=os.environ, **kw):
-    """ Deployment settings.  Update application settings (usually
+    """Deployment settings.  Update application settings (usually
     from PasteDeploy keywords) with framework-specific key/value pairs
     (e.g. find ``PYRAMID_DEBUG_AUTHORIZATION`` in os.environ and jam into
     keyword args)."""

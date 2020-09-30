@@ -19,7 +19,7 @@ from pyramid.util import strings_differ
 
 
 def manage_accessed(wrapped):
-    """ Decorator which causes a cookie to be renewed when an accessor
+    """Decorator which causes a cookie to be renewed when an accessor
     method is called."""
 
     def accessed(session, *arg, **kw):
@@ -34,7 +34,7 @@ def manage_accessed(wrapped):
 
 
 def manage_changed(wrapped):
-    """ Decorator which causes a cookie to be set when a setter method
+    """Decorator which causes a cookie to be set when a setter method
     is called."""
 
     def changed(session, *arg, **kw):
@@ -47,7 +47,7 @@ def manage_changed(wrapped):
 
 
 def signed_serialize(data, secret):
-    """ Serialize any pickleable structure (``data``) and sign it
+    """Serialize any pickleable structure (``data``) and sign it
     using the ``secret`` (must be a string).  Return the
     serialization, which includes the signature as its first 40 bytes.
     The ``signed_deserialize`` method will deserialize such a value.
@@ -86,7 +86,7 @@ deprecated(
 
 
 def signed_deserialize(serialized, secret, hmac=hmac):
-    """ Deserialize the value returned from ``signed_serialize``.  If
+    """Deserialize the value returned from ``signed_serialize``.  If
     the value cannot be deserialized for any reason, a
     :exc:`ValueError` exception will be raised.
 
@@ -139,7 +139,7 @@ deprecated(
 
 
 class PickleSerializer(object):
-    """ A serializer that uses the pickle protocol to dump Python
+    """A serializer that uses the pickle protocol to dump Python
     data to bytes.
 
     This is the default serializer used by Pyramid.

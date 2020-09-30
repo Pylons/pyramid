@@ -186,7 +186,7 @@ class Request(
 
     @reify
     def session(self):
-        """ Obtain the :term:`session` object associated with this
+        """Obtain the :term:`session` object associated with this
         request.  If a :term:`session factory` has not been registered
         during application configuration, a
         :class:`pyramid.exceptions.ConfigurationError` will be raised"""
@@ -216,7 +216,7 @@ class Request(
         return response_factory(self)
 
     def is_response(self, ob):
-        """ Return ``True`` if the object passed as ``ob`` is a valid
+        """Return ``True`` if the object passed as ``ob`` is a valid
         response object, ``False`` otherwise."""
         if ob.__class__ is Response:
             return True

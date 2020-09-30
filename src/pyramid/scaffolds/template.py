@@ -14,7 +14,7 @@ fsenc = sys.getfilesystemencoding()
 
 
 class Template(object):
-    """ Inherit from this base class and override methods to use the Pyramid
+    """Inherit from this base class and override methods to use the Pyramid
     scaffolding system."""
 
     copydir = copydir  # for testing
@@ -24,7 +24,7 @@ class Template(object):
         self.name = name
 
     def render_template(self, content, vars, filename=None):
-        """ Return a bytestring representing a templated file based on the
+        """Return a bytestring representing a templated file based on the
         input (content) and the variable names defined (vars).  ``filename``
         is used for exception reporting."""
         # this method must not be named "template_renderer" fbo of extension
@@ -48,7 +48,7 @@ class Template(object):
         return os.path.dirname(mod.__file__)
 
     def template_dir(self):
-        """ Return the template directory of the scaffold.  By default, it
+        """Return the template directory of the scaffold.  By default, it
         returns the value of ``os.path.join(self.module_dir(),
         self._template_dir)`` (``self.module_dir()`` returns the module in
         which your subclass has been defined).  If ``self._template_dir`` is

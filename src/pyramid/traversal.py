@@ -33,7 +33,7 @@ empty = text_('')
 
 
 def find_root(resource):
-    """ Find the root node in the resource tree to which ``resource``
+    """Find the root node in the resource tree to which ``resource``
     belongs. Note that ``resource`` should be :term:`location`-aware.
     Note that the root resource is available in the request object by
     accessing the ``request.root`` attribute.
@@ -46,7 +46,7 @@ def find_root(resource):
 
 
 def find_resource(resource, path):
-    """ Given a resource object and a string or tuple representing a path
+    """Given a resource object and a string or tuple representing a path
     (such as the return value of :func:`pyramid.traversal.resource_path` or
     :func:`pyramid.traversal.resource_path_tuple`), return a resource in this
     application's resource tree at the specified path.  The resource passed
@@ -127,7 +127,7 @@ def find_interface(resource, class_or_interface):
 
 
 def resource_path(resource, *elements):
-    """ Return a string object representing the absolute physical path of the
+    """Return a string object representing the absolute physical path of the
     resource object based on its position in the resource tree, e.g
     ``/foo/bar``.  Any positional arguments passed in as ``elements`` will be
     appended as path segments to the end of the resource path.  For instance,
@@ -379,7 +379,7 @@ model_path_tuple = resource_path_tuple  # b/w compat (forever)
 
 
 def _resource_path_list(resource, *elements):
-    """ Implementation detail shared by resource_path and
+    """Implementation detail shared by resource_path and
     resource_path_tuple"""
     path = [loc.__name__ or '' for loc in lineage(resource)]
     path.reverse()
@@ -436,7 +436,7 @@ def virtual_root(resource, request):
 
 
 def traversal_path(path):
-    """ Variant of :func:`pyramid.traversal.traversal_path_info` suitable for
+    """Variant of :func:`pyramid.traversal.traversal_path_info` suitable for
     decoding paths that are URL-encoded.
 
     If this function is passed a Unicode object instead of a sequence of
@@ -456,7 +456,7 @@ def traversal_path(path):
 
 @lru_cache(1000)
 def traversal_path_info(path):
-    """ Given``path``, return a tuple representing that path which can be
+    """Given``path``, return a tuple representing that path which can be
     used to traverse a resource tree.  ``path`` is assumed to be an
     already-URL-decoded ``str`` type as if it had come to us from an upstream
     WSGI server as the ``PATH_INFO`` environ variable.
@@ -630,7 +630,7 @@ slash = text_('/')
 
 @implementer(ITraverser)
 class ResourceTreeTraverser(object):
-    """ A resource tree traverser that should be used (for speed) when
+    """A resource tree traverser that should be used (for speed) when
     every resource in the tree supplies a ``__name__`` and
     ``__parent__`` attribute (ie. every resource in the tree is
     :term:`location` aware) ."""

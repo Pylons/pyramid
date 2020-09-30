@@ -85,7 +85,7 @@ class FileResponse(Response):
 
 
 class FileIter(object):
-    """ A fixed-block-size iterator for use as a WSGI app_iter.
+    """A fixed-block-size iterator for use as a WSGI app_iter.
 
     ``file`` is a Python file pointer (or at least an object with a ``read``
     method that takes a size hint).
@@ -113,7 +113,7 @@ class FileIter(object):
 
 
 class response_adapter(object):
-    """ Decorator activated via a :term:`scan` which treats the function
+    """Decorator activated via a :term:`scan` which treats the function
     being decorated as a :term:`response adapter` for the set of types or
     interfaces passed as ``*types_or_ifaces`` to the decorator constructor.
 
@@ -200,7 +200,7 @@ class response_adapter(object):
 
 
 def _get_response_factory(registry):
-    """ Obtain a :class: `pyramid.response.Response` using the
+    """Obtain a :class: `pyramid.response.Response` using the
     `pyramid.interfaces.IResponseFactory`.
     """
     response_factory = registry.queryUtility(

@@ -10,7 +10,7 @@ from pyramid.traversal import DefaultRootFactory
 
 
 def get_root(app, request=None):
-    """ Return a tuple composed of ``(root, closer)`` when provided a
+    """Return a tuple composed of ``(root, closer)`` when provided a
     :term:`router` instance as the ``app`` argument.  The ``root``
     returned is the application root object.  The ``closer`` returned
     is a callable (accepting no arguments) that should be called when
@@ -36,7 +36,7 @@ def get_root(app, request=None):
 
 
 def prepare(request=None, registry=None):
-    """ This function pushes data onto the Pyramid threadlocal stack
+    """This function pushes data onto the Pyramid threadlocal stack
     (request and registry), making those objects 'current'.  It
     returns a dictionary useful for bootstrapping a Pyramid
     application in a scripting environment.
@@ -123,7 +123,7 @@ class AppEnvironment(dict):
 
 
 def _make_request(path, registry=None):
-    """ Return a :meth:`pyramid.request.Request` object anchored at a
+    """Return a :meth:`pyramid.request.Request` object anchored at a
     given path. The object returned will be generated from the supplied
     registry's :term:`Request Factory` using the
     :meth:`pyramid.interfaces.IRequestFactory.blank` method.

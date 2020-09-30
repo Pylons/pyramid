@@ -22,7 +22,7 @@ slash = text_('/')
 
 
 class static_view(object):
-    """ An instance of this class is a callable which can act as a
+    """An instance of this class is a callable which can act as a
     :app:`Pyramid` :term:`view callable`; this view will serve
     static files from a directory on disk based on the ``root_dir``
     you provide to its constructor.

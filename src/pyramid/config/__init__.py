@@ -345,7 +345,7 @@ class Configurator(
         default_view_mapper=None,
         exceptionresponse_view=default_exceptionresponse_view,
     ):
-        """ When you pass a non-``None`` ``registry`` argument to the
+        """When you pass a non-``None`` ``registry`` argument to the
         :term:`Configurator` constructor, no initial setup is performed
         against the registry.  This is because the registry you pass in may
         have already been initialized for use under :app:`Pyramid` via a
@@ -458,7 +458,7 @@ class Configurator(
         return '%s:%s' % (package, filename)
 
     def _fix_registry(self):
-        """ Fix up a ZCA component registry that is not a
+        """Fix up a ZCA component registry that is not a
         pyramid.registry.Registry by adding analogues of ``has_listeners``,
         ``notify``, ``queryAdapterOrSelf``, and ``registerSelfAdapter``
         through monkey-patching."""
@@ -723,7 +723,7 @@ class Configurator(
         return m
 
     def with_package(self, package):
-        """ Return a new Configurator instance with the same registry
+        """Return a new Configurator instance with the same registry
         as this configurator. ``package`` may be an actual Python package
         object or a :term:`dotted Python name` representing a package."""
         configurator = self.__class__(
@@ -740,7 +740,7 @@ class Configurator(
         return configurator
 
     def maybe_dotted(self, dotted):
-        """ Resolve the :term:`dotted Python name` ``dotted`` to a
+        """Resolve the :term:`dotted Python name` ``dotted`` to a
         global Python object.  If ``dotted`` is not a string, return
         it without attempting to do any name resolution.  If
         ``dotted`` is a relative dotted name (e.g. ``.foo.bar``,
@@ -749,7 +749,7 @@ class Configurator(
         return self.name_resolver.maybe_resolve(dotted)
 
     def absolute_asset_spec(self, relative_spec):
-        """ Resolve the potentially relative :term:`asset
+        """Resolve the potentially relative :term:`asset
         specification` string passed as ``relative_spec`` into an
         absolute asset specification string and return the string.
         Use the ``package`` of this configurator as the package to
@@ -764,7 +764,7 @@ class Configurator(
     absolute_resource_spec = absolute_asset_spec  # b/w compat forever
 
     def begin(self, request=_marker):
-        """ Indicate that application or test configuration has begun.
+        """Indicate that application or test configuration has begun.
         This pushes a dictionary containing the :term:`application
         registry` implied by ``registry`` attribute of this
         configurator and the :term:`request` implied by the
@@ -790,7 +790,7 @@ class Configurator(
         self.manager.push({'registry': self.registry, 'request': request})
 
     def end(self):
-        """ Indicate that application or test configuration has ended.
+        """Indicate that application or test configuration has ended.
         This pops the last value pushed onto the :term:`thread local`
         stack (usually by the ``begin`` method) and returns that
         value.
@@ -882,7 +882,7 @@ class Configurator(
         )
 
     def make_wsgi_app(self):
-        """ Commits any pending configuration statements, sends a
+        """Commits any pending configuration statements, sends a
         :class:`pyramid.events.ApplicationCreated` event to all listeners,
         adds this configuration's registry to
         :attr:`pyramid.config.global_registries`, and returns a

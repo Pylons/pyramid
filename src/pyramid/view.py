@@ -35,7 +35,7 @@ _marker = object()
 
 
 def render_view_to_response(context, request, name='', secure=True):
-    """ Call the :term:`view callable` configured with a :term:`view
+    """Call the :term:`view callable` configured with a :term:`view
     configuration` that matches the :term:`view name` ``name``
     registered against the specified ``context`` and ``request`` and
     return a :term:`response` object.  This function will return
@@ -86,7 +86,7 @@ def render_view_to_response(context, request, name='', secure=True):
 
 
 def render_view_to_iterable(context, request, name='', secure=True):
-    """ Call the :term:`view callable` configured with a :term:`view
+    """Call the :term:`view callable` configured with a :term:`view
     configuration` that matches the :term:`view name` ``name``
     registered against the specified ``context`` and ``request`` and
     return an iterable object which represents the body of a response.
@@ -117,7 +117,7 @@ def render_view_to_iterable(context, request, name='', secure=True):
 
 
 def render_view(context, request, name='', secure=True):
-    """ Call the :term:`view callable` configured with a :term:`view
+    """Call the :term:`view callable` configured with a :term:`view
     configuration` that matches the :term:`view name` ``name``
     registered against the specified ``context`` and ``request``
     and unwind the view response's ``app_iter`` (see
@@ -145,7 +145,7 @@ def render_view(context, request, name='', secure=True):
 
 
 class view_config(object):
-    """ A function, class or method :term:`decorator` which allows a
+    """A function, class or method :term:`decorator` which allows a
     developer to create view registrations nearer to a :term:`view
     callable` definition than use :term:`imperative
     configuration` to do the same.
@@ -271,7 +271,7 @@ bfg_view = view_config  # bw compat (forever)
 
 
 def view_defaults(**settings):
-    """ A class :term:`decorator` which, when applied to a class, will
+    """A class :term:`decorator` which, when applied to a class, will
     provide defaults for all view configurations that use the class.  This
     decorator accepts all the arguments accepted by
     :meth:`pyramid.view.view_config`, and each has the same meaning.
@@ -287,7 +287,7 @@ def view_defaults(**settings):
 
 
 class AppendSlashNotFoundViewFactory(object):
-    """ There can only be one :term:`Not Found view` in any
+    """There can only be one :term:`Not Found view` in any
     :app:`Pyramid` application.  Even if you use
     :func:`pyramid.view.append_slash_notfound_view` as the Not
     Found view, :app:`Pyramid` still must generate a ``404 Not
@@ -692,13 +692,13 @@ def _call_view(
 
 
 class ViewMethodsMixin(object):
-    """ Request methods mixin for BaseRequest having to do with executing
-    views """
+    """Request methods mixin for BaseRequest having to do with executing
+    views"""
 
     def invoke_exception_view(
         self, exc_info=None, request=None, secure=True, reraise=False
     ):
-        """ Executes an exception view related to the request it's called upon.
+        """Executes an exception view related to the request it's called upon.
         The arguments it takes are these:
 
         ``exc_info``

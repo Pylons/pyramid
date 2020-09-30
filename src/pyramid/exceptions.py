@@ -77,12 +77,12 @@ class URLDecodeError(UnicodeDecodeError):
 
 
 class ConfigurationError(Exception):
-    """ Raised when inappropriate input values are supplied to an API
+    """Raised when inappropriate input values are supplied to an API
     method of a :term:`Configurator`"""
 
 
 class ConfigurationConflictError(ConfigurationError):
-    """ Raised when a configuration conflict is detected during action
+    """Raised when a configuration conflict is detected during action
     processing"""
 
     def __init__(self, conflicts):
@@ -100,8 +100,7 @@ class ConfigurationConflictError(ConfigurationError):
 
 
 class ConfigurationExecutionError(ConfigurationError):
-    """An error occurred during execution of a configuration action
-    """
+    """An error occurred during execution of a configuration action"""
 
     def __init__(self, etype, evalue, info):
         self.etype, self.evalue, self.info = etype, evalue, info
@@ -111,7 +110,7 @@ class ConfigurationExecutionError(ConfigurationError):
 
 
 class CyclicDependencyError(Exception):
-    """ The exception raised when the Pyramid topological sorter detects a
+    """The exception raised when the Pyramid topological sorter detects a
     cyclic dependency."""
 
     def __init__(self, cycles):

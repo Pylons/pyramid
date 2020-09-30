@@ -42,7 +42,7 @@ class RoutesConfiguratorMixin(object):
         static=False,
         **predicates
     ):
-        """ Add a :term:`route configuration` to the current
+        """Add a :term:`route configuration` to the current
         configuration state, as well as possibly a :term:`view
         configuration` to be used to specify a :term:`view callable`
         that will be invoked when this route matches.  The arguments
@@ -474,7 +474,7 @@ class RoutesConfiguratorMixin(object):
     def add_route_predicate(
         self, name, factory, weighs_more_than=None, weighs_less_than=None
     ):
-        """ Adds a route predicate factory.  The view predicate can later be
+        """Adds a route predicate factory.  The view predicate can later be
         named as a keyword argument to
         :meth:`pyramid.config.Configurator.add_route`.
 
@@ -513,7 +513,7 @@ class RoutesConfiguratorMixin(object):
             self.add_route_predicate(name, factory)
 
     def get_routes_mapper(self):
-        """ Return the :term:`routes mapper` object associated with
+        """Return the :term:`routes mapper` object associated with
         this configurator's :term:`registry`."""
         mapper = self.registry.queryUtility(IRoutesMapper)
         if mapper is None:
@@ -523,7 +523,7 @@ class RoutesConfiguratorMixin(object):
 
     @contextlib.contextmanager
     def route_prefix_context(self, route_prefix):
-        """ Return this configurator with the
+        """Return this configurator with the
         :attr:`pyramid.config.Configurator.route_prefix` attribute mutated to
         include the new ``route_prefix``.
 

@@ -13,7 +13,7 @@ from pyramid.interfaces import (
 
 
 class subscriber(object):
-    """ Decorator activated via a :term:`scan` which treats the function
+    """Decorator activated via a :term:`scan` which treats the function
     being decorated as an event subscriber for the set of interfaces passed
     as ``*ifaces`` and the set of predicate terms passed as ``**predicates``
     to the decorator constructor.
@@ -113,7 +113,7 @@ class subscriber(object):
 
 @implementer(INewRequest)
 class NewRequest(object):
-    """ An instance of this class is emitted as an :term:`event`
+    """An instance of this class is emitted as an :term:`event`
     whenever :app:`Pyramid` begins to process a new request.  The
     event instance has an attribute, ``request``, which is a
     :term:`request` object.  This event class implements the
@@ -125,7 +125,7 @@ class NewRequest(object):
 
 @implementer(INewResponse)
 class NewResponse(object):
-    """ An instance of this class is emitted as an :term:`event`
+    """An instance of this class is emitted as an :term:`event`
     whenever any :app:`Pyramid` :term:`view` or :term:`exception
     view` returns a :term:`response`.
 
@@ -184,7 +184,7 @@ class BeforeTraversal(object):
 
 @implementer(IContextFound)
 class ContextFound(object):
-    """ An instance of this class is emitted as an :term:`event` after
+    """An instance of this class is emitted as an :term:`event` after
     the :app:`Pyramid` :term:`router` finds a :term:`context`
     object (after it performs traversal) but before any view code is
     executed.  The instance has an attribute, ``request``, which is
@@ -213,7 +213,7 @@ AfterTraversal = ContextFound  # b/c as of 1.0
 
 @implementer(IApplicationCreated)
 class ApplicationCreated(object):
-    """ An instance of this class is emitted as an :term:`event` when
+    """An instance of this class is emitted as an :term:`event` when
     the :meth:`pyramid.config.Configurator.make_wsgi_app` is
     called.  The instance has an attribute, ``app``, which is an
     instance of the :term:`router` that will handle WSGI requests.
