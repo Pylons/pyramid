@@ -1,0 +1,8 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+-   repo: https://github.com/python/black
+    rev: 20.8b1
+    hooks:
+    -   id: black
+

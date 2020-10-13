@@ -42,6 +42,24 @@ tox on PyPI: https://pypi.org/project/tox/
   available to `tox`. Setting up that environment is outside the scope of this
   document.
 
+- Optional: check that `pre-commit` is installed, either in your path, or locally.
+
+    $ pre-commit --version
+
+  If not installed, you can install it using `pip`
+
+    $ pip3 install pre-commit
+    $ pip3 install --user pre-commit
+
+  Next, run `pre-commit install` to set up the git hook scripts in your checkout:
+
+    $ pre-commit install
+    pre-commit installed at .git/hooks/pre-commit
+
+  Now you're good to go! `pre-commit` will automatically run any hooks the
+  project maintainers need before reviewing your Pull Request, and will alert you
+  to several issues that could cause Continuous Integration tests to fail.
+
 Adding Features
 ---------------
 
