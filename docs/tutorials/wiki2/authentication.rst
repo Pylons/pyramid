@@ -64,7 +64,7 @@ Identifying the current user is done in a few steps:
 
 #. The result is stored in the ``identity_cache`` which ensures that subsequent invocations return the same identity object for the request.
 
-Finally, :attr:`pyramid.request.Request.authenticated_identity` contains either ``None`` or a ``tutorial.models.User`` instance and that value is aliased to ``request.user`` for convenience in our application.
+Finally, :attr:`pyramid.request.Request.identity` contains either ``None`` or a ``tutorial.models.User`` instance and that value is aliased to ``request.user`` for convenience in our application.
 
 Note the usage of the ``identity_cache`` is optional, but it has several advantages in most scenarios:
 

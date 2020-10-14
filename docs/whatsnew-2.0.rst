@@ -47,7 +47,7 @@ signature.
 
 The new security policy adds the concept of an :term:`identity`, which is an
 object representing the user associated with the current request.  The identity
-can be accessed via :attr:`pyramid.request.Request.authenticated_identity`.
+can be accessed via :attr:`pyramid.request.Request.identity`.
 The object can be of any shape, such as a simple ID string or an ORM object.
 
 The concept of :term:`principals <principal>` has been removed; the
@@ -89,10 +89,8 @@ For further documentation on implementing security policies, see
 Behavior of the Legacy System
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Legacy authentication and authorization policies will continue to function as
-normal, as well as all related :class:`pyramid.request.Request` properties.
-The new :attr:`pyramid.request.Request.authenticated_identity` property will
-output the same result as :attr:`pyramid.request.Request.authenticated_userid`.
+Legacy authentication and authorization policies will continue to function as normal, as well as all related :class:`pyramid.request.Request` properties.
+The new :attr:`pyramid.request.Request.identity` property will output the same result as :attr:`pyramid.request.Request.authenticated_userid`.
 
 If using a security policy, :attr:`pyramid.request.Request.unauthenticated_userid` will return the same value as :attr:`pyramid.request.Request.authenticated_userid`.
 :attr:`pyramid.request.Request.effective_principals` will always return a one-element list containing the :data:`pyramid.authorization.Everyone` principal, as there is no equivalent in the new security policy.

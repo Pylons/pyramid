@@ -377,7 +377,7 @@ class RequestLocalCache:
                 result = ...  # do some expensive computations
                 return result
 
-            def authenticated_identity(self, request):
+            def identity(self, request):
                 return self.identity_cache.get_or_create(request)
 
     The cache maintains a weakref to each request and will release the cached

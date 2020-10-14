@@ -32,10 +32,9 @@ class TestingConfiguratorMixin:
             :attr:`pyramid.request.Request.authenticated_userid` will have this
             value as well.
         :type userid:  str
-        :param identity:  If provided, the policy's ``authenticated_identity``
-            method will return this value.  As a result,
-            :attr:`pyramid.request.Request.authenticated_identity`` will have
-            this value.
+        :param identity:  If provided, the policy's ``identity`` method will
+            return this value.  As a result,
+            :attr:`pyramid.request.Request.identity`` will have this value.
         :type identity:  object
         :param permissive:  If true, the policy will allow access to any user
             for any permission.  If false, the policy will deny all access.

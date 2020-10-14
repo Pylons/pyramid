@@ -317,7 +317,7 @@ class TestViewExecutionPermitted(unittest.TestCase):
         self.assertTrue(result)
 
 
-class TestAuthenticatedIdentity(unittest.TestCase):
+class TestIdentity(unittest.TestCase):
     def setUp(self):
         testing.setUp()
 
@@ -326,12 +326,12 @@ class TestAuthenticatedIdentity(unittest.TestCase):
 
     def test_identity_no_security_policy(self):
         request = _makeRequest()
-        self.assertEqual(request.authenticated_identity, None)
+        self.assertEqual(request.identity, None)
 
     def test_identity(self):
         request = _makeRequest()
         _registerSecurityPolicy(request.registry, 'yo')
-        self.assertEqual(request.authenticated_identity, 'yo')
+        self.assertEqual(request.identity, 'yo')
 
 
 class TestAuthenticatedUserId(unittest.TestCase):
@@ -501,7 +501,7 @@ class TestLegacySecurityPolicy(unittest.TestCase):
         policy = LegacySecurityPolicy()
         _registerAuthenticationPolicy(request.registry, 'userid')
 
-        self.assertEqual(policy.authenticated_identity(request), 'userid')
+        self.assertEqual(policy.identity(request), 'userid')
 
     def test_remember(self):
         from pyramid.security import LegacySecurityPolicy
@@ -554,7 +554,7 @@ class DummySecurityPolicy:
     def __init__(self, result):
         self.result = result
 
-    def authenticated_identity(self, request):
+    def identity(self, request):
         return self.result
 
     def authenticated_userid(self, request):

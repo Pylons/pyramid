@@ -215,7 +215,7 @@ class SecurityAPIMixin:
     """ Mixin for Request class providing auth-related properties. """
 
     @property
-    def authenticated_identity(self):
+    def identity(self):
         """
         Return an opaque object identifying the current user or ``None`` if no
         user is authenticated or there is no :term:`security policy` in effect.
@@ -224,7 +224,7 @@ class SecurityAPIMixin:
         policy = _get_security_policy(self)
         if policy is None:
             return None
-        return policy.authenticated_identity(self)
+        return policy.identity(self)
 
     @property
     def authenticated_userid(self):
@@ -247,7 +247,7 @@ class SecurityAPIMixin:
     @property
     def is_authenticated(self):
         """Return ``True`` if a user is authenticated for this request."""
-        return self.authenticated_identity is not None
+        return self.authenticated_userid is not None
 
     def has_permission(self, permission, context=None):
         """Given a permission and an optional context, returns an instance of
@@ -287,8 +287,8 @@ class AuthenticationAPIMixin:
 
             ``unauthenticated_userid`` does not have an equivalent in the new
             security system.  Use :attr:`.authenticated_userid` or
-            :attr:`.authenticated_identity` instead.
-            See :ref:`upgrading_auth` for more information.
+            :attr:`.identity` instead.  See :ref:`upgrading_auth` for more
+            information.
 
         Return an object which represents the *claimed* (not verified) user
         id of the credentials present in the request. ``None`` if there is no
@@ -362,7 +362,7 @@ class LegacySecurityPolicy:
     def _get_authz_policy(self, request):
         return request.registry.getUtility(IAuthorizationPolicy)
 
-    def authenticated_identity(self, request):
+    def identity(self, request):
         return self.authenticated_userid(request)
 
     def authenticated_userid(self, request):

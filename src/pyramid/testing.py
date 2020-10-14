@@ -42,7 +42,7 @@ class DummySecurityPolicy:
         forget_result=None,
     ):
         self.userid = userid
-        self.identity = identity
+        self._identity = identity
         self.permissive = permissive
         if remember_result is None:
             remember_result = []
@@ -51,8 +51,8 @@ class DummySecurityPolicy:
         self.remember_result = remember_result
         self.forget_result = forget_result
 
-    def authenticated_identity(self, request):
-        return self.identity
+    def identity(self, request):
+        return self._identity
 
     def authenticated_userid(self, request):
         return self.userid

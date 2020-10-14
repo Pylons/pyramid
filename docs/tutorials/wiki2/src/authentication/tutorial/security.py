@@ -19,11 +19,11 @@ class MySecurityPolicy:
         user = request.dbsession.query(models.User).get(userid)
         return user
 
-    def authenticated_identity(self, request):
+    def identity(self, request):
         return self.identity_cache.get_or_create(request)
 
     def authenticated_userid(self, request):
-        user = self.authenticated_identity(request)
+        user = self.identity(request)
         if user is not None:
             return user.id
 
@@ -41,4 +41,4 @@ def includeme(config):
 
     config.set_security_policy(MySecurityPolicy(settings['auth.secret']))
     config.add_request_method(
-        lambda request: request.authenticated_identity, 'user', property=True)
+        lambda request: request.identity, 'user', property=True)

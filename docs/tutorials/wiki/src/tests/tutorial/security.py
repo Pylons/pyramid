@@ -28,13 +28,13 @@ class MySecurityPolicy:
         self.authtkt = AuthTktCookieHelper(secret)
         self.acl = ACLHelper()
 
-    def authenticated_identity(self, request):
+    def identity(self, request):
         identity = self.authtkt.identify(request)
         if identity is not None and identity['userid'] in USERS:
             return identity
 
     def authenticated_userid(self, request):
-        identity = self.authenticated_identity(request)
+        identity = self.identity(request)
         if identity is not None:
             return identity['userid']
 
@@ -50,7 +50,7 @@ class MySecurityPolicy:
 
     def effective_principals(self, request):
         principals = [Everyone]
-        identity = self.authenticated_identity(request)
+        identity = self.identity(request)
         if identity is not None:
             principals.append(Authenticated)
             principals.append('u:' + identity['userid'])
