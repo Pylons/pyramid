@@ -114,9 +114,9 @@ class IResponse(Interface):
         serves up only the given start:stop range."""
 
     identity = Attribute(
-        """An object representing the authenticated user, as determined by
-        the security policy in use, or ``None`` for unauthenticated requests.
-        The object's class and meaning is defined by the security policy."""
+        """An object containing authentication information related to the
+        current request. The object's type and meaning is defined by the
+        configured security policy."""
     )
 
     authenticated_userid = Attribute(
