@@ -94,7 +94,7 @@ setup(
         'Changelog': '{}whatsnew-{}.html'.format(docs_url, branch_version),
         'Issue Tracker': 'https://github.com/Pylons/pyramid/issues',
     },
-    license="BSD-derived (http://www.repoze.org/LICENSE.txt)",
+    license="BSD-derived (Repoze)",
     packages=find_packages('src', exclude=['tests']),
     package_dir={'': 'src'},
     include_package_data=True,
