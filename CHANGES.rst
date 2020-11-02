@@ -261,6 +261,17 @@ Backward Incompatibilities
   ``require_csrf`` view option to enable automatic CSRF checking.
   See https://github.com/Pylons/pyramid/pull/3521
 
+- Update the default behavior of
+  ``pyramid.authenticationAuthTktAuthenticationPolicy`` and
+  ``pyramid.authentication.AuthTktCookieHelper`` to only set a single cookie
+  without a domain parameter when no other domain constraints are specified.
+  Prior to this change, ``wild_domain=False`` (the default) was effectively
+  treated the same as ``wild_domain=True``, in which a cookie was defined
+  such that browsers would use it both for the request's domain, as well as
+  any subdomain. In the new behavior, cookies will only affect the current
+  domain, and not subdomains, by default.
+  See https://github.com/Pylons/pyramid/pull/3587
+
 Documentation Changes
 ---------------------
 
