@@ -88,7 +88,7 @@ The security policy controls several aspects of authentication and authorization
 Identifying logged-in users
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``MySecurityPolicy.authenticated_identity`` method inspects the ``request`` and determines if it came from an authenticated user.
+The ``MySecurityPolicy.identity`` method inspects the ``request`` and determines if it came from an authenticated user.
 It does this by utilizing the :class:`pyramid.authentication.AuthTktCookieHelper` class which stores the :term:`identity` in a cryptographically-signed cookie.
 If a ``request`` does contain an identity, then we perform a final check to determine if the user is valid in our current ``USERS`` store.
 

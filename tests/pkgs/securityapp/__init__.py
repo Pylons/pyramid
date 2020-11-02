@@ -3,7 +3,7 @@ from pyramid.security import Allowed, Denied
 
 
 class SecurityPolicy:
-    def authenticated_identity(self, request):
+    def identity(self, request):
         raise NotImplementedError()  # pragma: no cover
 
     def authenticated_userid(self, request):

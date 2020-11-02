@@ -113,10 +113,10 @@ class IResponse(Interface):
         """Return a new app_iter built from the response app_iter that
         serves up only the given start:stop range."""
 
-    authenticated_identity = Attribute(
-        """An object representing the authenticated user, as determined by
-        the security policy in use, or ``None`` for unauthenticated requests.
-        The object's class and meaning is defined by the security policy."""
+    identity = Attribute(
+        """An object containing authentication information related to the
+        current request. The object's type and meaning is defined by the
+        configured security policy."""
     )
 
     authenticated_userid = Attribute(
@@ -498,7 +498,7 @@ class IViewMapperFactory(Interface):
 
 
 class ISecurityPolicy(Interface):
-    def authenticated_identity(request):
+    def identity(request):
         """Return the :term:`identity` of the current user.  The object can be
         of any shape, such as a simple ID string or an ORM object.
         """

@@ -24,7 +24,7 @@ class TestingConfiguratorMixinTests(unittest.TestCase):
         policy = config.registry.getUtility(ISecurityPolicy)
         self.assertTrue(isinstance(policy, DummySecurityPolicy))
         self.assertEqual(policy.userid, 'userid')
-        self.assertEqual(policy.identity, 'identity')
+        self.assertEqual(policy._identity, 'identity')
         self.assertEqual(policy.permissive, False)
 
     def test_testing_securitypolicy_remember_result(self):

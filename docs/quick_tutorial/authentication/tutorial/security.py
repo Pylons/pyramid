@@ -19,13 +19,13 @@ class SecurityPolicy:
     def __init__(self, secret):
         self.authtkt = AuthTktCookieHelper(secret=secret)
 
-    def authenticated_identity(self, request):
+    def identity(self, request):
         identity = self.authtkt.identify(request)
         if identity is not None and identity['userid'] in USERS:
             return identity
 
     def authenticated_userid(self, request):
-        identity = self.authenticated_identity(request)
+        identity = self.identity(request)
         if identity is not None:
             return identity['userid']
 

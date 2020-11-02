@@ -175,8 +175,8 @@
       .. deprecated:: 2.0
 
           ``unauthenticated_userid`` has been deprecated in version 2.0.  Use
-          :attr:`authenticated_userid` or :attr:`authenticated_identity`
-          instead.  See :ref:`upgrading_auth` for more information.
+          :attr:`authenticated_userid` or :attr:`identity` instead.  See
+          :ref:`upgrading_auth` for more information.
 
       A property which returns a value which represents the *claimed* (not
       verified) :term:`userid` of the credentials present in the
