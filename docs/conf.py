@@ -61,27 +61,21 @@ extensions = [
 
 # Looks for objects in external projects
 intersphinx_mapping = {
-    'colander': ('https://docs.pylonsproject.org/projects/colander/en/latest', None),
+    'colander': ('https://docs.pylonsproject.org/projects/colander/en/latest/', None),
     'cookbook': ('https://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/', None),
-    'deform': ('https://docs.pylonsproject.org/projects/deform/en/latest', None),
+    'deform': ('https://docs.pylonsproject.org/projects/deform/en/latest/', None),
     'jinja2': ('https://docs.pylonsproject.org/projects/pyramid-jinja2/en/latest/', None),
-    'plaster': ('https://docs.pylonsproject.org/projects/plaster/en/latest/', None),
     'pylonswebframework': ('https://docs.pylonsproject.org/projects/pylons-webframework/en/latest/', None),
-    'python': ('https://docs.python.org/3', None),
+    'python': ('https://docs.python.org/3/', None),
     'pytest': ('https://docs.pytest.org/en/latest/', None),
-    'sphinx': ('http://www.sphinx-doc.org/en/latest', None),
-    'sqla': ('https://docs.sqlalchemy.org/en/latest', None),
+    'sqla': ('https://docs.sqlalchemy.org/en/latest/', None),
     'tm': ('https://docs.pylonsproject.org/projects/pyramid-tm/en/latest/', None),
-    'toolbar': ('https://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest', None),
-    'tstring': ('https://docs.pylonsproject.org/projects/translationstring/en/latest', None),
+    'toolbar': ('https://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest/', None),
     'tutorials': ('https://docs.pylonsproject.org/projects/pyramid-tutorials/en/latest/', None),
-    'venusian': ('https://docs.pylonsproject.org/projects/venusian/en/latest', None),
-    'webob': ('https://docs.pylonsproject.org/projects/webob/en/latest/', None),
-    'webtest': ('https://docs.pylonsproject.org/projects/webtest/en/latest/', None),
-    'who': ('https://repozewho.readthedocs.io/en/latest', None),
-    'zcml': ('https://docs.pylonsproject.org/projects/pyramid-zcml/en/latest', None),
-    'zcomponent': ('https://zopecomponent.readthedocs.io/en/latest/', None),
-    'zinterface': ('https://zopeinterface.readthedocs.io/en/latest/', None),
+    'venusian': ('https://docs.pylonsproject.org/projects/venusian/en/latest/', None),
+    'zcml': (
+        'https://docs.pylonsproject.org/projects/pyramid-zcml/en/latest/',
+        None),
 }
 
 
