@@ -5,7 +5,7 @@ Adding authorization
 ====================
 
 In the last chapter we built :term:`authentication` into our wiki. We also
-went one step further and used the ``request.user`` object to perform some
+went one step further and used the ``request.identity`` object to perform some
 explicit :term:`authorization` checks. This is fine for a lot of applications,
 but :app:`Pyramid` provides some facilities for cleaning this up and decoupling
 the constraints from the view function itself.
@@ -24,7 +24,7 @@ We will implement access control with the following steps:
 Add ACL support
 ---------------
 
-A :term:`principal` is a level of abstraction on top of the raw :term:`userid`
+A :term:`principal` is a level of abstraction on top of the raw :term:`identity`
 that describes the user in terms of its capabilities, roles, or other
 identifiers that are easier to generalize. The permissions are then written
 against the principals without focusing on the exact user involved.

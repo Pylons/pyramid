@@ -33,13 +33,13 @@
           </div>
           <div class="col-md-10">
             <div class="content">
-            {% if request.user is none %}
+            {% if request.identity is none %}
             <p class="pull-right">
               <a href="{{ request.route_url('login') }}">Login</a>
             </p>
             {% else %}
             <form class="pull-right" action="{{ request.route_url('logout') }}" method="post">
-              {{request.user.name}}
+              {{request.identity.name}}
               <input type="hidden" name="csrf_token" value="{{ get_csrf_token() }}">
               <button class="btn btn-link" type="submit">Logout</button>
             </form>
