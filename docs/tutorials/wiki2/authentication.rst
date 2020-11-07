@@ -10,8 +10,7 @@ APIs to add login and logout functionality to our wiki.
 
 We will implement authentication with the following steps:
 
-* Add a :term:`security policy` and a ``request.user`` computed property
-  (``security.py``).
+* Add a :term:`security policy` (``security.py``).
 * Add routes for ``/login`` and ``/logout`` (``routes.py``).
 * Add login and logout views (``views/auth.py``).
 * Add a login template (``login.jinja2``).
@@ -41,10 +40,8 @@ Update ``tutorial/security.py`` with the following content:
    :linenos:
    :language: python
 
-Here we've defined:
-
-* A new security policy named ``MySecurityPolicy``, which is implementing most of the :class:`pyramid.interfaces.ISecurityPolicy` interface by tracking a :term:`identity` using a signed cookie implemented by :class:`pyramid.authentication.AuthTktCookieHelper` (lines 8-34).
-* The ``request.user`` computed property is registered for use throughout our application as the authenticated ``tutorial.models.User`` object for the logged-in user (line 42-44).
+Here we've defined a new security policy named ``MySecurityPolicy``, which is implementing most of the :class:`pyramid.interfaces.ISecurityPolicy` interface by tracking a :term:`identity` using a signed cookie implemented by :class:`pyramid.authentication.AuthTktCookieHelper` (lines 8-34).
+The security policy outputs the authenticated ``tutorial.models.User`` object for the logged-in user as the :term:`identity`, which is available as ``request.identity``.
 
 Our new :term:`security policy` defines how our application will remember, forget, and identify users.
 It also handles authorization, which we'll cover in the next chapter (if you're wondering why we didn't implement the ``permits`` method yet).
@@ -64,7 +61,7 @@ Identifying the current user is done in a few steps:
 
 #. The result is stored in the ``identity_cache`` which ensures that subsequent invocations return the same identity object for the request.
 
-Finally, :attr:`pyramid.request.Request.identity` contains either ``None`` or a ``tutorial.models.User`` instance and that value is aliased to ``request.user`` for convenience in our application.
+Finally, :attr:`pyramid.request.Request.identity` contains either ``None`` or a ``tutorial.models.User`` instance.
 
 Note the usage of the ``identity_cache`` is optional, but it has several advantages in most scenarios:
 
@@ -156,7 +153,7 @@ Only the highlighted lines need to be changed.
 
 If the user either is not logged in or is not in the ``basic`` or ``editor`` roles, then we raise ``HTTPForbidden``, which will trigger our forbidden view to compute a response.
 However, we will hook this later to redirect to the login page.
-Also, now that we have ``request.user``, we no longer have to hard-code the creator as the ``editor`` user, so we can finally drop that hack.
+Also, now that we have ``request.identity``, we no longer have to hard-code the creator as the ``editor`` user, so we can finally drop that hack.
 
 These simple checks should protect our views.
 
@@ -266,7 +263,7 @@ indicated by the highlighted lines.
    :emphasize-lines: 2-12
    :language: html
 
-The ``request.user`` will be ``None`` if the user is not authenticated, or a
+The ``request.identity`` will be ``None`` if the user is not authenticated, or a
 ``tutorial.models.User`` object if the user is authenticated. This check will
 make the logout link shown only when the user is logged in, and conversely the
 login link is only shown when the user is logged out.
