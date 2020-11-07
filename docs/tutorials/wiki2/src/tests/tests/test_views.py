@@ -57,7 +57,7 @@ class Test_add_page:
         return NewPage(pagename)
 
     def test_get(self, dummy_request, dbsession):
-        dummy_request.user = makeUser('foo', 'editor')
+        dummy_request.identity = makeUser('foo', 'editor')
         dummy_request.context = self._makeContext('AnotherPage')
         info = self._callFUT(dummy_request)
         assert info['pagedata'] == ''
@@ -67,7 +67,7 @@ class Test_add_page:
         dummy_request.method = 'POST'
         dummy_request.POST['body'] = 'Hello yo!'
         dummy_request.context = self._makeContext('AnotherPage')
-        dummy_request.user = makeUser('foo', 'editor')
+        dummy_request.identity = makeUser('foo', 'editor')
         self._callFUT(dummy_request)
         page = (
             dbsession.query(models.Page)
@@ -102,7 +102,7 @@ class Test_edit_page:
 
         dummy_request.method = 'POST'
         dummy_request.POST['body'] = 'Hello yo!'
-        dummy_request.user = user
+        dummy_request.identity = user
         dummy_request.context = self._makeContext(page)
         response = self._callFUT(dummy_request)
         assert response.location == 'http://example.com/abc'

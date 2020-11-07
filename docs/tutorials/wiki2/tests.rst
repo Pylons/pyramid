@@ -110,7 +110,7 @@ Integration tests
 
 We can directly execute the view code, bypassing :app:`Pyramid` and testing just the code that we've written.
 These tests use dummy requests that we'll prepare appropriately to set the conditions each view expects.
-For example, setting ``request.user``, or adding some dummy data to the session.
+For example, setting ``request.identity``, or adding some dummy data to the session.
 
 Update ``tests/test_views.py`` such that it appears as follows:
 
