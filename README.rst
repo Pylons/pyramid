@@ -1,9 +1,9 @@
 Pyramid
 =======
 
-.. image:: https://travis-ci.org/Pylons/pyramid.png?branch=1.10-branch
-        :target: https://travis-ci.org/Pylons/pyramid
-        :alt: 1.10-branch Travis CI Status
+.. image:: https://github.com/Pylons/Pyramid/workflows/Build%20and%20test/badge.svg?branch=1.10-branch
+           :target: https://github.com/Pylons/Pyramid/actions?query=branch%3A1.10-branch-gh-actions+workflow%3A"Build+and+test"
+           :alt: 1.10-branch CI Status
 
 .. image:: https://readthedocs.org/projects/pyramid/badge/?version=1.10-branch
         :target: https://docs.pylonsproject.org/projects/pyramid/en/1.10-branch

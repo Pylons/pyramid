@@ -3,6 +3,8 @@
 1.10.5 (2020-11-08)
 ===================
 
+- Support Python 3.8 and 3.9.
+
 - Deprecate the default ``hashalg='md5'`` on
   ``pyramid.authentication.AuthTktCookieHelper`` to encourage users to be
   explicit if they want their code to work without changes when upgrading to
