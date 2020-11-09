@@ -37,7 +37,7 @@ In order to add a feature to Pyramid:
 - The feature must work fully on the following CPython versions: 2.7, 3.4, 3.5,
   3.6, 3.7, 3.8 and 3.9 on both UNIX and Windows.
 
-- The feature must work on the latest version of PyPy.
+- The feature must work on the latest version of PyPy and PyPy3.
 
 - The feature must not depend on any particular persistence layer (filesystem,
   SQL, etc).
