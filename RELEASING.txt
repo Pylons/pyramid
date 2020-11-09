@@ -129,7 +129,7 @@ Cookiecutters
 Marketing and communications
 ----------------------------
 
-- Edit Pylons/trypyramid.com/src/templates/documentation.ejs for major
+- Edit Pylons/trypyramid.com/layouts/page/documentation.html for major
   releases, pre-releases, and once pre-releases are final.
 
 - Edit `https://wiki.python.org/moin/WebFrameworks
