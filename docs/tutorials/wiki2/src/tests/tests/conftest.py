@@ -169,5 +169,4 @@ def dummy_request(tm, dbsession):
 @pytest.yield_fixture
 def dummy_config(dummy_request):
     with testConfig(request=dummy_request) as config:
-        config.include('tutorial.routes')  # Current workaround, feels wrong.
         yield config
