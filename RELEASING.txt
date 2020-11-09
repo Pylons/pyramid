@@ -134,8 +134,8 @@ Cookiecutters
 Marketing and communications
 ----------------------------
 
-- Edit Pylons/trypyramid.com/src/templates/resources.html for major releases,
-  pre-releases, and once pre-releases are final.
+- Edit Pylons/trypyramid.com/layouts/page/documentation.html for major
+  releases, pre-releases, and once pre-releases are final.
 
 - Edit `https://wiki.python.org/moin/WebFrameworks
   <https://wiki.python.org/moin/WebFrameworks>`_.
