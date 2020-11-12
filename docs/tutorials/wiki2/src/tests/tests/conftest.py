@@ -143,7 +143,6 @@ def app_request(app, tm, dbsession):
     yield request
     env['closer']()
 
-
 @pytest.fixture
 def dummy_request(tm, dbsession):
     """
@@ -164,7 +163,6 @@ def dummy_request(tm, dbsession):
     request.tm = tm
 
     return request
-
 
 @pytest.yield_fixture
 def dummy_config(dummy_request):

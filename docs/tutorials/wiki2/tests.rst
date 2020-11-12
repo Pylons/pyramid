@@ -69,6 +69,9 @@ Per-test fixtures
 - ``dummy_request`` - a :class:`pyramid.testing.DummyRequest` object that is very lightweight.
   This is a great object to pass to view functions that have minimal side-effects as it'll be fast and simple.
 
+- ``dummy_config`` — a :class:`pyramid.config.Configurator` object used as configuration by ``dummy_request``.
+  Useful for mocking configuration like routes and security policies.
+
 
 Modifying the fixtures
 ----------------------
@@ -109,8 +112,8 @@ Integration tests
 =================
 
 We can directly execute the view code, bypassing :app:`Pyramid` and testing just the code that we've written.
-These tests use dummy requests that we'll prepare appropriately to set the conditions each view expects.
-For example, setting ``request.identity``, or adding some dummy data to the session.
+These tests use dummy requests that we'll prepare appropriately to set the conditions each view expects, such as adding dummy data to the session.
+We'll be using ``dummy_config`` to configure the necessary routes, as well as setting the security policy as :class:`pyramid.testing.DummySecurityPolicy` to mock ``dummy_request.identity``.
 
 Update ``tests/test_views.py`` such that it appears as follows:
 
