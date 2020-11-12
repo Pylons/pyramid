@@ -63,9 +63,6 @@ Per-test fixtures
   The ``testapp`` is able to mutate the request environ such that the ``dbsession`` and ``tm`` fixtures are injected and used by any code that's touching ``request.dbsession`` and ``request.tm``.
   The ``testapp`` maintains a cookiejar, so it can be used to share state across requests, as well as the transaction database connection.
 
-- ``app_request`` - a :class:`pyramid.request.Request` object that can be used for more lightweight tests versus the full ``testapp``.
-  The ``app_request`` can be passed to view functions and other code that need a fully functional request object.
-
 - ``dummy_request`` - a :class:`pyramid.testing.DummyRequest` object that is very lightweight.
   This is a great object to pass to view functions that have minimal side-effects as it'll be fast and simple.
 
