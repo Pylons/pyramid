@@ -4,7 +4,7 @@ import alembic.command
 import os
 from pyramid.paster import get_appsettings
 from pyramid.scripting import prepare
-from pyramid.testing import DummyRequest
+from pyramid.testing import DummyRequest, testConfig
 import pytest
 import transaction
 from webob.cookies import Cookie
@@ -103,7 +103,7 @@ def app_request(app, tm, dbsession):
     env['closer']()
 
 @pytest.fixture
-def dummy_request(app, tm, dbsession):
+def dummy_request(tm, dbsession):
     """
     A lightweight dummy request.
 
@@ -117,9 +117,13 @@ def dummy_request(app, tm, dbsession):
 
     """
     request = DummyRequest()
-    request.registry = app.registry
     request.host = 'example.com'
     request.dbsession = dbsession
     request.tm = tm
 
     return request
+
+@pytest.yield_fixture
+def dummy_config(dummy_request):
+    with testConfig(request=dummy_request) as config:
+        yield config
