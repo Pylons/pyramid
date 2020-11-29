@@ -88,7 +88,7 @@ Glossary
      The project files contain metadata that allow the package(s) to be installed, distributed, and tested.
 
    distribution
-     Setuptools / python packaging terminology.  A file representing an
+     Setuptools / Python packaging terminology.  A file representing an
      installable library or application.  Distributions are usually
      archives that have the suffix of ``.whl``, ``.tar.gz``, or ``.zip``.
      Distributions are the target of packaging-related commands such as ``pip install``.

@@ -5,7 +5,7 @@ Features
 --------
 
 - Add support for Python 3.9.
-  See https://github.com/Pylons/pyramid/issue/3622
+  See https://github.com/Pylons/pyramid/issues/3622
 
 - The ``aslist`` method now handles non-string objects when flattening.
   See https://github.com/Pylons/pyramid/pull/3594

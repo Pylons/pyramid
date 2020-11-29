@@ -144,6 +144,13 @@ Deprecations
 Upgrading Authentication/Authorization
 --------------------------------------
 
+.. note::
+    It's important to note that the principal and ACL features within :app:`Pyramid` are not going away, nor deprecated, nor removed.
+    Most ACL features are deprecated in their current locations and moved into the :mod:`pyramid.authorization` module.
+    The main change is that they are now more optional than before and modifications were made to make the top-level APIs less opinionated as well as simpler.
+
+:app:`Pyramid` provides a simple set of APIs for plugging in allowed/denied semantics in your application.
+
 The authentication and authorization policies of Pyramid 1.x have been merged into a single :term:`security policy` in Pyramid 2.0.
 Authentication and authorization policies can still be used and will continue to function normally, however they have been deprecated and support may be removed in upcoming versions.
 
