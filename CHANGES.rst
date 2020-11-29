@@ -24,7 +24,7 @@ Features
 
   - ``pyramid.config.Configurator.set_security_policy``.
   - ``pyramid.interfaces.ISecurityPolicy``
-  - ``pyramid.request.Request.authenticated_identity``.
+  - ``pyramid.request.Request.identity``.
   - ``pyramid.request.Request.is_authenticated``
   - ``pyramid.authentication.SessionAuthenticationHelper``
   - ``pyramid.authorization.ACLHelper``
