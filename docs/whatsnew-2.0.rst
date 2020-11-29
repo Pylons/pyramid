@@ -22,7 +22,7 @@ The feature additions in Pyramid 2.0 are as follows:
 
   - :meth:`pyramid.config.Configurator.set_security_policy`
   - :class:`pyramid.interfaces.ISecurityPolicy`
-  - :attr:`pyramid.request.Request.authenticated_identity`
+  - :attr:`pyramid.request.Request.identity`
   - :class:`pyramid.authentication.AuthTktCookieHelper` (available in Pyramid 1.x)
   - :class:`pyramid.authentication.SessionAuthenticationHelper`
   - :class:`pyramid.authorization.ACLHelper`

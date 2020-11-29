@@ -116,7 +116,7 @@ class IResponse(Interface):
     identity = Attribute(
         """An object containing authentication information related to the
         current request. The object's type and meaning is defined by the
-        configured security policy."""
+        configured :term:`security policy`."""
     )
 
     authenticated_userid = Attribute(
@@ -245,7 +245,11 @@ class IResponse(Interface):
 
     is_authenticated = Attribute(
         """A boolean indicating whether the request has an authenticated
-        user, as determined by the security policy in use."""
+        user, as determined by the security policy in use.
+
+        The value is determined by the result of
+        :attr:`pyramid.request.Request.authenticated_userid`.
+        """
     )
 
     last_modified = Attribute(
@@ -506,6 +510,9 @@ class ISecurityPolicy(Interface):
     def authenticated_userid(request):
         """Return a :term:`userid` string identifying the trusted and
         verified user, or ``None`` if unauthenticated.
+
+        If the result is ``None``, then
+        :attr:`pyramid.request.Request.is_authenticated` will return ``False``.
         """
 
     def permits(request, context, permission):
