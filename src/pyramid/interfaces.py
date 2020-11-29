@@ -1139,7 +1139,7 @@ class ISession(IDict):
         support types that can be serialized using JSON. It's recommended to
         switch any session implementations to support only JSON and to only
         store primitive types in sessions. See
-        :ref:`pickle_session_deprecation` for more information about why this
+        :ref:`upgrading_session_20` for more information about why this
         change was made.
 
     .. versionchanged:: 1.9

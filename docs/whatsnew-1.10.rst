@@ -26,7 +26,7 @@ Feature Additions
   See https://github.com/Pylons/pyramid/pull/3326
 
 - Added :class:`pyramid.session.JSONSerializer`.
-  See :ref:`pickle_session_deprecation` for more information about this feature.
+  See :ref:`upgrading_session_20` for more information about this feature.
   See https://github.com/Pylons/pyramid/pull/3353
 
 - Modify the builtin session implementations to support ``SameSite`` options on cookies and set the default to ``'Lax'``.
@@ -69,7 +69,7 @@ Feature Additions
 Deprecations
 ------------
 
-- The :class:`pyramid.interfaces.ISession` interface will move to require JSON-serializable objects in :app:`Pyramid` 2.0. See :ref:`pickle_session_deprecation` for more information about this change.
+- The :class:`pyramid.interfaces.ISession` interface will move to require JSON-serializable objects in :app:`Pyramid` 2.0. See :ref:`upgrading_session_20` for more information about this change.
   See https://github.com/Pylons/pyramid/pull/3353
 
 - The :func:`pyramid.session.signed_serialize` and :func:`pyramid.session.signed_deserialize` functions will be removed in :app:`Pyramid` 2.0, along with the removal of :func:`pyramid.session.UnencryptedCookieSessionFactoryConfig` which was deprecated in :app:`Pyramid` 1.5.
