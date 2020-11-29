@@ -1128,15 +1128,6 @@ Glossary
       The :term:`Python Packaging Authority`'s recommended tool for installing
       Python packages.
 
-   pyvenv
-      The :term:`Python Packaging Authority` formerly recommended using the
-      ``pyvenv`` command for `creating virtual environments on Python 3.4 and
-      3.5
-      <https://packaging.python.org/tutorials/installing-packages/#creating-virtual-environments>`_,
-      but it was deprecated in 3.6 in favor of ``python3 -m venv`` on Unix or
-      ``python -m venv`` on Windows, which is backward compatible on Python
-      3.3 and greater.
-
    virtual environment
       An isolated Python environment that allows packages to be installed for
       use by a particular application, rather than being installed system wide.
