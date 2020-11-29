@@ -60,7 +60,7 @@ class ACLAuthorizationPolicy:
     .. deprecated:: 2.0
 
         Authorization policies have been deprecated by the new security system.
-        See :ref:`upgrading_auth` for more information.
+        See :ref:`upgrading_auth_20` for more information.
 
     """
 

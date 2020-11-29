@@ -73,68 +73,6 @@ using the :meth:`pyramid.config.Configurator.set_session_factory` method.
    In short, use a different session factory implementation (preferably one which keeps session data on the server) for anything but the most basic of applications where "session security doesn't matter", you are sure your application has no cross-site scripting vulnerabilities, and you are confident your secret key will not be exposed.
 
 .. index::
-    triple: pickle deprecation; JSON-serializable; ISession interface
-
-.. _pickle_session_deprecation:
-
-Changes to ISession in Pyramid 2.0
-----------------------------------
-
-In :app:`Pyramid` 2.0 the :class:`pyramid.interfaces.ISession` interface was changed to require that session implementations only need to support JSON-serializable data types.
-This is a stricter contract than the previous requirement that all objects be pickleable and it is being done for security purposes.
-This is a backward-incompatible change.
-Previously, if a client-side session implementation was compromised, it left the application vulnerable to remote code execution attacks using specially-crafted sessions that execute code when deserialized.
-
-Please reference the following tickets if detailed information on these changes is needed:
-
-* `2.0 feature request: Require that sessions are JSON serializable #2709 <https://github.com/pylons/pyramid/issues/2709>`_.
-* `deprecate pickleable sessions, recommend json #3353 <https://github.com/pylons/pyramid/pull/3353>`_.
-* `change to use JSONSerializer for SignedCookieSessionFactory #3413 <https://github.com/pylons/pyramid/pull/3413>`_.
-
-For users with compatibility concerns, it's possible to craft a serializer that can handle both formats until you are satisfied that clients have had time to reasonably upgrade.
-Remember that sessions should be short-lived and thus the number of clients affected should be small (no longer than an auth token, at a maximum). An example serializer:
-
-.. code-block:: python
-    :linenos:
-
-    import pickle
-    from pyramid.session import JSONSerializer
-    from pyramid.session import SignedCookieSessionFactory
-
-
-    class JSONSerializerWithPickleFallback(object):
-        def __init__(self):
-            self.json = JSONSerializer()
-
-        def dumps(self, appstruct):
-            """
-            Accept a Python object and return bytes.
-
-            During a migration, you may want to catch serialization errors here,
-            and keep using pickle while finding spots in your app that are not
-            storing JSON-serializable objects. You may also want to integrate
-            a fall-back to pickle serialization here as well.
-            """
-            return self.json.dumps(appstruct)
-
-        def loads(self, bstruct):
-            """Accept bytes and return a Python object."""
-            try:
-                return self.json.loads(bstruct)
-            except ValueError:
-                try:
-                    return pickle.loads(bstruct)
-                except Exception:
-                    # this block should catch at least:
-                    # ValueError, AttributeError, ImportError; but more to be safe
-                    raise ValueError
-
-    # somewhere in your configuration code
-    serializer = JSONSerializerWithPickleFallback()
-    session_factory = SignedCookieSessionFactory(..., serializer=serializer)
-    config.set_session_factory(session_factory)
-
-.. index::
    single: session object
 
 Using a Session Object
@@ -193,7 +131,7 @@ Some gotchas:
 - Keys and values of session data must be JSON-serializable.
   This means, typically, that they are instances of basic types of objects, such as strings, lists, dictionaries, tuples, integers, etc.
   If you place an object in a session data key or value that is not JSON-serializable, an error will be raised when the session is serialized.
-  Please also see :ref:`pickle_session_deprecation`.
+  Please also see :ref:`upgrading_session_20`.
 
 - If you place a mutable value (for example, a list or a dictionary) in a
   session object, and you subsequently mutate that value, you must call the
