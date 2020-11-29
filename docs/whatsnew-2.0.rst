@@ -245,6 +245,8 @@ We can easily write our own :class:`pyramid.interfaces.ISecurityPolicy` implemen
             identity = request.identity
             principals = set([Everyone])
             if identity is not None:
+                principals.add(Authenticated)
+                principals.add(identity['userid'])
                 principals.update(identity['principals'])
             return ACLHelper().permits(context, principals, permission)
 
