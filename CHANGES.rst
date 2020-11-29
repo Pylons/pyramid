@@ -187,6 +187,9 @@ Backward Incompatibilities
 - Drop support for Python 3.4.
   See https://github.com/Pylons/pyramid/pull/3547
 
+- Drop support for Python 3.5.
+  See https://github.com/Pylons/pyramid/pull/3634
+
 - Removed the ``pyramid.compat`` module. Integrators should use the ``six``
   module or vendor shims they are using into their own codebases going forward.
   https://github.com/Pylons/pyramid/pull/3421
