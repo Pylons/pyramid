@@ -1,13 +1,13 @@
 Pyramid
 =======
 
-.. image:: https://github.com/Pylons/Pyramid/workflows/Build%20and%20test/badge.svg?branch=master
+.. image:: https://github.com/Pylons/Pyramid/workflows/Build%20and%20test/badge.svg?branch=2.0-branch
         :target: https://github.com/Pylons/Pyramid/actions?query=workflow%3A%22Build+and+test%22
-        :alt: master Travis CI Status
+        :alt: 2.0-branch Travis CI Status
 
-.. image:: https://readthedocs.org/projects/pyramid/badge/?version=master
-        :target: https://docs.pylonsproject.org/projects/pyramid/en/master
-        :alt: master Documentation Status
+.. image:: https://readthedocs.org/projects/pyramid/badge/?version=2.0-branch
+        :target: https://docs.pylonsproject.org/projects/pyramid/en/2.0-branch
+        :alt: 2.0-branch Documentation Status
 
 .. image:: https://img.shields.io/badge/irc-freenode-blue.svg
         :target: https://webchat.freenode.net/?channels=pyramid
