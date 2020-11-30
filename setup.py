@@ -42,7 +42,7 @@ tests_require = [
 ]
 
 docs_extras = [
-    'Sphinx >= 1.8.1',  # Unicode characters in tree diagrams
+    'Sphinx >= 3.0.0',  # Force RTD to use >= 3.0.0
     'docutils',
     'pylons-sphinx-themes >= 1.0.8',  # Ethical Ads
     'pylons_sphinx_latesturl',
