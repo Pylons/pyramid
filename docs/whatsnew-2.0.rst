@@ -165,7 +165,7 @@ The object can be of any shape, such as a simple ID string or an ORM object.
 
 The concept of :term:`principals <principal>` has been removed from the request object, security policy, and view/route predicates.
 Principals are replaced by ``identity``.
-The :meth:`pyramid.interfaces.ISecurityPolicy.permits` method is provided the ``request``, ``context``, and ``permissions`` and may now use the ``identity`` object, or derive principals, in any way it deems necessary for the application without being restricted to a list of principals represented by strings.
+The :meth:`pyramid.interfaces.ISecurityPolicy.permits` method is provided the ``request``, ``context``, and ``permissions``, and may now use the ``identity`` object, or derive principals, in any way it deems necessary for the application without being restricted to a list of principals represented by strings.
 This change gives much more flexibility in authorization implementations, especially those that do not match the ACL pattern.
 If you were previously using :class:`pyramid.authorization.ACLAuthorizationPolicy`, you can achieve the same results by writing your own ``permits`` method using :class:`pyramid.authorization.ACLHelper`.
 For more details on implementing an ACL, see :ref:`assigning_acls`.
