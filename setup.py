@@ -41,7 +41,6 @@ tests_require = [
     'zope.component >= 4.0',  # py3 compat
 ]
 
-
 docs_extras = [
     'Sphinx >= 1.8.1',  # Unicode characters in tree diagrams
     'docutils',
