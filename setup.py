@@ -46,7 +46,7 @@ tests_require = [
 
 
 docs_extras = [
-    'Sphinx < 3.0.0',
+    'Sphinx >= 3.0.0',  # Force RTD to use >= 3.0.0
     'docutils',
     'repoze.sphinx.autointerface',
     'pylons_sphinx_latesturl',
