@@ -3,6 +3,7 @@ import alembic.config
 import alembic.command
 import os
 from pyramid.paster import get_appsettings
+from pyramid.scripting import prepare
 from pyramid.testing import DummyRequest, testConfig
 import pytest
 import transaction
@@ -119,6 +120,28 @@ def testapp(app, tm, dbsession):
     testapp.set_cookie('csrf_token', 'dummy_csrf_token')
 
     return testapp
+
+@pytest.fixture
+def app_request(app, tm, dbsession):
+    """
+    A real request.
+
+    This request is almost identical to a real request but it has some
+    drawbacks in tests as it's harder to mock data and is heavier.
+
+    """
+    env = prepare(registry=app.registry)
+    request = env['request']
+    request.host = 'example.com'
+
+    # without this, request.dbsession will be joined to the same transaction
+    # manager but it will be using a different sqlalchemy.orm.Session using
+    # a separate database transaction
+    request.dbsession = dbsession
+    request.tm = tm
+
+    yield request
+    env['closer']()
 
 @pytest.fixture
 def dummy_request(tm, dbsession):
