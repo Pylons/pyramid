@@ -119,17 +119,15 @@ Update previous version (final releases only)
 - Configure RTD to point the "latest" alias to the new release version of the
   docs.
 
-
 Cookiecutters
 -------------
 
 - For each cookiecutter, clone the newly released branch to "latest" branch.
 
-
 Marketing and communications
 ----------------------------
 
-- Edit Pylons/trypyramid.com/src/templates/documentation.ejs for major
+- Edit Pylons/trypyramid.com/layouts/page/documentation.html for major
   releases, pre-releases, and once pre-releases are final.
 
 - Edit `https://wiki.python.org/moin/WebFrameworks
@@ -142,17 +140,17 @@ Marketing and communications
 - Announce to Twitter.
 
 ```
-Pyramid 1.x released.
+Pyramid 2.x released.
 
 PyPI
-https://pypi.org/project/pyramid/1.x/
+https://pypi.org/project/pyramid/2.x/
 
 === One time only for new version, first pre-release ===
 What's New
-https://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/whatsnew-1.X.html
+https://docs.pylonsproject.org/projects/pyramid/en/2.X-branch/whatsnew-2.X.html
 === For all subsequent pre-releases ===
 Changes
-https://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/changes.html#version-yyyy-mm-dd
+https://docs.pylonsproject.org/projects/pyramid/en/2.X-branch/changes.html#version-yyyy-mm-dd
 
 Issues
 https://github.com/Pylons/pyramid/issues
@@ -161,21 +159,21 @@ https://github.com/Pylons/pyramid/issues
 - Announce to maillist.
 
 ```
-Pyramid 1.X.X has been released.
+Pyramid 2.X.X has been released.
 
 The full changelog is here:
-https://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/changes.html
+https://docs.pylonsproject.org/projects/pyramid/en/2.X-branch/changes.html
 
-What's New In Pyramid 1.X:
-https://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/whatsnew-1.X.html
+What's New In Pyramid 2.X:
+https://docs.pylonsproject.org/projects/pyramid/en/2.X-branch/whatsnew-2.X.html
 
-1.X release documentation (across all alphas and betas, as well as when it gets
+2.X release documentation (across all alphas and betas, as well as when it gets
 to final release):
-https://docs.pylonsproject.org/projects/pyramid/en/1.X-branch/
+https://docs.pylonsproject.org/projects/pyramid/en/2.X-branch/
 
 You can install it via PyPI:
 
-  pip install Pyramid==1.X
+  pip install Pyramid==2.X
 
 Enjoy, and please report any issues you find to the issue tracker at
 https://github.com/Pylons/pyramid/issues

@@ -41,7 +41,6 @@ tests_require = [
     'zope.component >= 4.0',  # py3 compat
 ]
 
-
 docs_extras = [
     'Sphinx >= 1.8.1',  # Unicode characters in tree diagrams
     'docutils',
@@ -73,10 +72,10 @@ setup(
         "Intended Audience :: Developers",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Framework :: Pyramid",
@@ -98,7 +97,7 @@ setup(
     package_dir={'': 'src'},
     include_package_data=True,
     zip_safe=False,
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     install_requires=install_requires,
     extras_require={'testing': testing_extras, 'docs': docs_extras},
     tests_require=tests_require,

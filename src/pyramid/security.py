@@ -85,7 +85,7 @@ def principals_allowed_by_permission(context, permission):
     .. deprecated:: 2.0
 
         The new security policy has removed the concept of principals.  See
-        :ref:`upgrading_auth` for more information.
+        :ref:`upgrading_auth_20` for more information.
 
     Provided a ``context`` (a resource object), and a ``permission``
     string, if an :term:`authorization policy` is
@@ -286,8 +286,8 @@ class AuthenticationAPIMixin:
         .. deprecated:: 2.0
 
             ``unauthenticated_userid`` does not have an equivalent in the new
-            security system.  Use :attr:`.authenticated_userid` or
-            :attr:`.identity` instead.  See :ref:`upgrading_auth` for more
+            security system. Use :attr:`.authenticated_userid` or
+            :attr:`.identity` instead. See :ref:`upgrading_auth_20` for more
             information.
 
         Return an object which represents the *claimed* (not verified) user
@@ -322,7 +322,7 @@ class AuthenticationAPIMixin:
         .. deprecated:: 2.0
 
             The new security policy has removed the concept of principals.  See
-            :ref:`upgrading_auth` for more information.
+            :ref:`upgrading_auth_20` for more information.
 
         Return the list of 'effective' :term:`principal` identifiers
         for the ``request``. If no :term:`authentication policy` is in effect,

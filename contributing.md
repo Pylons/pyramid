@@ -14,6 +14,8 @@ Git branches and their purpose and status at the time of this writing are listed
 
 * [master](https://github.com/Pylons/pyramid/) - The branch on which further
   development takes place. The default branch on GitHub.
+* [2.0-branch](https://github.com/Pylons/pyramid/tree/2.0-branch) - The branch
+  classified as "alpha".
 * [1.10-branch](https://github.com/Pylons/pyramid/tree/1.10-branch) - The branch
   classified as "stable" or "latest".
 * [1.9-branch](https://github.com/Pylons/pyramid/tree/1.9-branch) - The oldest

@@ -51,7 +51,7 @@ class PickleSerializer:
 
         Pyramid will require JSON-serializable objects in :app:`Pyramid` 2.0.
 
-        Please see :ref:`pickle_session_deprecation`.
+        Please see :ref:`upgrading_session_20`.
 
     A serializer that uses the pickle protocol to dump Python data to bytes.
 
@@ -456,7 +456,7 @@ def SignedCookieSessionFactory(
 
         In :app:`Pyramid` 2.0 the default ``serializer`` option changed to
         use :class:`pyramid.session.JSONSerializer`. See
-        :ref:`pickle_session_deprecation` for more information about why this
+        :ref:`upgrading_session_20` for more information about why this
         change was made.
 
     .. versionadded: 1.5a3

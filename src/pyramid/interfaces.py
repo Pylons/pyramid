@@ -116,7 +116,7 @@ class IResponse(Interface):
     identity = Attribute(
         """An object containing authentication information related to the
         current request. The object's type and meaning is defined by the
-        configured security policy."""
+        configured :term:`security policy`."""
     )
 
     authenticated_userid = Attribute(
@@ -245,7 +245,11 @@ class IResponse(Interface):
 
     is_authenticated = Attribute(
         """A boolean indicating whether the request has an authenticated
-        user, as determined by the security policy in use."""
+        user, as determined by the security policy in use.
+
+        The value is determined by the result of
+        :attr:`pyramid.request.Request.authenticated_userid`.
+        """
     )
 
     last_modified = Attribute(
@@ -506,6 +510,9 @@ class ISecurityPolicy(Interface):
     def authenticated_userid(request):
         """Return a :term:`userid` string identifying the trusted and
         verified user, or ``None`` if unauthenticated.
+
+        If the result is ``None``, then
+        :attr:`pyramid.request.Request.is_authenticated` will return ``False``.
         """
 
     def permits(request, context, permission):
@@ -535,7 +542,7 @@ class IAuthenticationPolicy(Interface):
     .. deprecated:: 2.0
 
         Authentication policies have been removed in favor of security
-        policies.  See :ref:`upgrading_auth` for more information.
+        policies.  See :ref:`upgrading_auth_20` for more information.
 
     """
 
@@ -595,7 +602,7 @@ class IAuthorizationPolicy(Interface):
     .. deprecated:: 2.0
 
         Authentication policies have been removed in favor of security
-        policies.  See :ref:`upgrading_auth` for more information.
+        policies.  See :ref:`upgrading_auth_20` for more information.
 
     """
 
@@ -1139,7 +1146,7 @@ class ISession(IDict):
         support types that can be serialized using JSON. It's recommended to
         switch any session implementations to support only JSON and to only
         store primitive types in sessions. See
-        :ref:`pickle_session_deprecation` for more information about why this
+        :ref:`upgrading_session_20` for more information about why this
         change was made.
 
     .. versionchanged:: 1.9
