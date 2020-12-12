@@ -53,7 +53,7 @@ def logout(request):
 
 @forbidden_view_config(renderer='tutorial:templates/403.jinja2')
 def forbidden_view(exc, request):
-    if request.user is None:
+    if not request.is_authenticated:
         next_url = request.route_url('login', _query={'next': request.url})
         return HTTPSeeOther(location=next_url)
 
