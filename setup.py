@@ -43,7 +43,7 @@ tests_require = [
 
 
 docs_extras = [
-    'Sphinx >= 1.8.1',
+    'Sphinx >= 3.0.0',  # Force RTD to use >= 3.0.0
     'docutils',
     'pylons-sphinx-themes >= 1.0.8',
     'pylons_sphinx_latesturl',
