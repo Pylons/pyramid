@@ -1,4 +1,4 @@
-2.0a1 (2020-12-15)
+2.0b0 (2020-12-15)
 ==================
 
 - Overhaul tutorials and update cookiecutter to de-emphasize ``request.user``

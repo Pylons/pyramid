@@ -22,7 +22,7 @@ def readfile(name):
 README = readfile('README.rst')
 CHANGES = readfile('CHANGES.rst')
 
-VERSION = '2.0.dev0'
+VERSION = '2.0b0'
 
 install_requires = [
     'hupper >= 1.5',  # ignore_files support
