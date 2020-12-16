@@ -45,7 +45,7 @@ def view_page(request):
 def edit_page(request):
     pagename = request.matchdict['pagename']
     page = request.dbsession.query(models.Page).filter_by(name=pagename).one()
-    user = request.user
+    user = request.identity
     if user is None or (user.role != 'editor' and page.creator != user):
         raise HTTPForbidden
     if request.method == 'POST':
@@ -60,7 +60,7 @@ def edit_page(request):
 
 @view_config(route_name='add_page', renderer='tutorial:templates/edit.jinja2')
 def add_page(request):
-    user = request.user
+    user = request.identity
     if user is None or user.role not in ('editor', 'basic'):
         raise HTTPForbidden
     pagename = request.matchdict['pagename']
@@ -70,7 +70,7 @@ def add_page(request):
     if request.method == 'POST':
         body = request.params['body']
         page = models.Page(name=pagename, data=body)
-        page.creator = request.user
+        page.creator = request.identity
         request.dbsession.add(page)
         next_url = request.route_url('view_page', pagename=pagename)
         return HTTPSeeOther(location=next_url)
