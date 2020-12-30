@@ -315,7 +315,7 @@ The feature additions in Pyramid 1.5 follow.
   passing the predicate factory directly, you can pass a dotted name which 
   refers to the factory.
 
-- :func:`pyramid.path.package_name` no longer thows an exception when resolving 
+- :func:`pyramid.path.package_name` no longer throws an exception when resolving 
   the package name for namespace packages that have no ``__file__`` attribute.
 
 - An authorization API has been added as a method of the request:

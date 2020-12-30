@@ -59,5 +59,3 @@ def includeme(config):
     config.set_default_csrf_options(require_csrf=True)
 
     config.set_security_policy(MySecurityPolicy(settings['auth.secret']))
-    config.add_request_method(
-        lambda request: request.identity, 'user', property=True)

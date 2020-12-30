@@ -1,13 +1,24 @@
-unreleased
-==========
+2.0b0 (2020-12-15)
+==================
+
+- Overhaul tutorials and update cookiecutter to de-emphasize ``request.user``
+  in favor of ``request.identity`` for common use cases.
+  See https://github.com/Pylons/pyramid/pull/3629
+
+- Improve documentation and patterns with builtin fixtures shipped in the
+  cookiecutters.
+  See https://github.com/Pylons/pyramid/pull/3629
+
+2.0a0 (2020-11-29)
+==================
 
 Features
 --------
 
 - Add support for Python 3.9.
-  See https://github.com/Pylons/pyramid/issue/3622
+  See https://github.com/Pylons/pyramid/issues/3622
 
-- The ``aslist`` method now handles non-string object when flattening.
+- The ``aslist`` method now handles non-string objects when flattening.
   See https://github.com/Pylons/pyramid/pull/3594
 
 - It is now possible to pass multiple values to the ``header`` predicate
@@ -20,11 +31,11 @@ Features
 - New security APIs have been added to support a massive overhaul of the
   authentication and authorization system. Read
   "Upgrading Authentication/Authorization" in the "What's New in Pyramid 2.0"
-  document for information about using this new system.
+  chapter of the documentation for information about using this new system.
 
   - ``pyramid.config.Configurator.set_security_policy``.
   - ``pyramid.interfaces.ISecurityPolicy``
-  - ``pyramid.request.Request.authenticated_identity``.
+  - ``pyramid.request.Request.identity``.
   - ``pyramid.request.Request.is_authenticated``
   - ``pyramid.authentication.SessionAuthenticationHelper``
   - ``pyramid.authorization.ACLHelper``
@@ -37,8 +48,8 @@ Features
   ``pyramid.session.SignedCookieSessionFactory`` to use
   ``pyramid.session.JSONSerializer`` instead of
   ``pyramid.session.PickleSerializer``. Read
-  "Changes to ISession in Pyramid 2.0" in the "Sessions" chapter of the
-  documentation for more information about why this change was made.
+  "Upgrading Session Serialization" in the "What's New in Pyramid 2.0" chapter
+  of the documentation for more information about why this change was made.
   See https://github.com/Pylons/pyramid/pull/3413
 
 - It is now possible to control whether a route pattern contains a trailing
@@ -134,9 +145,9 @@ Deprecations
 
 - Deprecated the authentication and authorization interfaces and
   principal-based support. See "Upgrading Authentication/Authorization" in
-  the "What's New in Pyramid 2.0" document for information on equivalent APIs
-  and notes on upgrading. The following APIs are deprecated as a result of
-  this change:
+  the "What's New in Pyramid 2.0" chapter of the documentation for information
+  on equivalent APIs and notes on upgrading. The following APIs are deprecated
+  as a result of this change:
 
   - ``pyramid.config.Configurator.set_authentication_policy``
   - ``pyramid.config.Configurator.set_authorization_policy``
@@ -174,18 +185,17 @@ Deprecations
   See https://github.com/Pylons/pyramid/pull/3563
 
 - Deprecated ``pyramid.session.PickleSerializer``.
-  See https://github.com/pylons/pyramid/issues/2709
-  and https://github.com/pylons/pyramid/pull/3353
+  See https://github.com/pylons/pyramid/issues/2709,
+  and https://github.com/pylons/pyramid/pull/3353,
   and https://github.com/pylons/pyramid/pull/3413
 
 Backward Incompatibilities
 --------------------------
 
-- Drop support for Python 2.7.
-  https://github.com/Pylons/pyramid/pull/3421
-
-- Drop support for Python 3.4.
-  See https://github.com/Pylons/pyramid/pull/3547
+- Drop support for Python 2.7, 3.4, and 3.5.
+  See https://github.com/Pylons/pyramid/pull/3421,
+  and https://github.com/Pylons/pyramid/pull/3547,
+  and https://github.com/Pylons/pyramid/pull/3634
 
 - Removed the ``pyramid.compat`` module. Integrators should use the ``six``
   module or vendor shims they are using into their own codebases going forward.
@@ -237,9 +247,9 @@ Backward Incompatibilities
 - Changed the default ``serializer`` on
   ``pyramid.session.SignedCookieSessionFactory`` to use
   ``pyramid.session.JSONSerializer`` instead of
-  ``pyramid.session.PickleSerializer``. Read
-  "Changes to ISession in Pyramid 2.0" in the "Sessions" chapter of the
-  documentation for more information about why this change was made.
+  ``pyramid.session.PickleSerializer``. Read "Upgrading Session Serialization"
+  in the "What's New in Pyramid 2.0" chapter of the documentation for more
+  information about why this change was made.
   See https://github.com/Pylons/pyramid/pull/3413
 
 - ``pyramid.request.Request.invoke_exception_view`` will no longer be called

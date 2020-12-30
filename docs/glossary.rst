@@ -48,12 +48,8 @@ Glossary
      builds on Python's ``distutils`` to provide easier building,
      distribution, and installation of libraries and applications.
 
-   distribute
-     `Distribute <https://pypi.org/project/distribute/>`_ is a fork of :term:`Setuptools` which runs on both Python 2 and Python 3.
-     It is now in legacy state because :term:`Setuptools` now runs on both Python 2 and 3.
-
    pkg_resources
-     A module which ships with :term:`Setuptools` and :term:`distribute` that
+     A module which ships with :term:`Setuptools` that
      provides an API for addressing "asset files" within a Python
      :term:`package`.  Asset files are static files, template files, etc;
      basically anything non-Python-source that lives in a Python package can
@@ -87,23 +83,19 @@ Glossary
      :term:`package`.
 
    project
-     (Setuptools/distutils terminology). A directory on disk which
-     contains a ``setup.py`` file and one or more Python packages.  The
-     ``setup.py`` file contains code that allows the package(s) to be
-     installed, distributed, and tested.
+     Setuptools / Python packaging terminology.
+     A directory on disk which contains a ``setup.py`` and / or ``pyproject.toml`` file and one or more Python packages.
+     The project files contain metadata that allow the package(s) to be installed, distributed, and tested.
 
    distribution
-     (Setuptools/distutils terminology).  A file representing an
+     Setuptools / Python packaging terminology.  A file representing an
      installable library or application.  Distributions are usually
-     files that have the suffix of ``.egg``, ``.tar.gz``, or ``.zip``.
-     Distributions are the target of Setuptools-related commands such as
-     ``easy_install``.
+     archives that have the suffix of ``.whl``, ``.tar.gz``, or ``.zip``.
+     Distributions are the target of packaging-related commands such as ``pip install``.
 
    entry point
-     A :term:`Setuptools` indirection, defined within a Setuptools
-     :term:`distribution` setup.py.  It is usually a name which refers
-     to a function somewhere in a package which is held by the
-     distribution.
+     A :term:`Setuptools` indirection, defined within a Setuptools :term:`distribution` (usually in ``setup.py`` or ``setup.cfg``).
+     It is usually a name which refers to a function somewhere in a package which is held by the distribution.
 
    dotted Python name
      A reference to a Python object by name using a string, in the form
@@ -1083,7 +1075,7 @@ Glossary
       https://docs.pylonsproject.org/projects/waitress/en/latest/ for detailed
       information.
 
-   Green Unicorn
+   gunicorn
       Aka ``gunicorn``, a fast :term:`WSGI` server that runs on Unix under
       Python 2.6+ or Python 3.4+.  See https://gunicorn.org/ for detailed
       information.
@@ -1127,15 +1119,6 @@ Glossary
    pip
       The :term:`Python Packaging Authority`'s recommended tool for installing
       Python packages.
-
-   pyvenv
-      The :term:`Python Packaging Authority` formerly recommended using the
-      ``pyvenv`` command for `creating virtual environments on Python 3.4 and
-      3.5
-      <https://packaging.python.org/tutorials/installing-packages/#creating-virtual-environments>`_,
-      but it was deprecated in 3.6 in favor of ``python3 -m venv`` on Unix or
-      ``python -m venv`` on Windows, which is backward compatible on Python
-      3.3 and greater.
 
    virtual environment
       An isolated Python environment that allows packages to be installed for

@@ -26,7 +26,7 @@ Authentication Policies
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Authentication policies have been deprecated by the new security system.  See
-:ref:`upgrading_auth` for more information.
+:ref:`upgrading_auth_20` for more information.
 
   .. autoclass:: AuthTktAuthenticationPolicy
      :members:
