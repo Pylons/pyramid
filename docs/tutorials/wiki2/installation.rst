@@ -177,18 +177,7 @@ The console will show ``pip`` checking for packages and installing missing packa
 
 .. code-block:: bash
 
-    Successfully installed Jinja2-2.10.3 Mako-1.1.0 MarkupSafe-1.1.1 \
-    PasteDeploy-2.0.1 Pygments-2.5.2 SQLAlchemy-1.3.12 WebTest-2.0.33 \
-    alembic-1.3.2 attrs-19.3.0 beautifulsoup4-4.8.2 coverage-5.0.3 \
-    hupper-1.9.1 importlib-metadata-1.4.0 more-itertools-8.1.0 packaging-20.0 \
-    plaster-1.0 plaster-pastedeploy-0.7 pluggy-0.13.1 py-1.8.1 \
-    pyparsing-2.4.6 pyramid-1.10.4 pyramid-debugtoolbar-4.5.2 \
-    pyramid-jinja2-2.8 pyramid-mako-1.1.0 pyramid-retry-2.1 pyramid-tm-2.4 \
-    pytest-5.3.2 pytest-cov-2.8.1 python-dateutil-2.8.1 python-editor-1.0.4 \
-    repoze.lru-0.7 six-1.13.0 soupsieve-1.9.5 transaction-3.0.0 \
-    translationstring-1.3 tutorial venusian-3.0.0 waitress-1.4.2 \
-    wcwidth-0.1.8 webob-1.8.5 zipp-0.6.0 zope.deprecation-4.4.0 \
-    zope.interface-4.7.1 zope.sqlalchemy-1.2
+    Successfully installed Jinja2-2.11.2 Mako-1.1.3 MarkupSafe-1.1.1 PasteDeploy-2.1.1 Pygments-2.7.3 SQLAlchemy-1.3.22 WebTest-2.0.35 alembic-1.4.3 attrs-20.3.0 beautifulsoup4-4.9.3 coverage-5.3.1 hupper-1.10.2 importlib-metadata-3.3.0 iniconfig-1.1.1 packaging-20.8 plaster-1.0 plaster-pastedeploy-0.7 pluggy-0.13.1 py-1.10.0 pyparsing-2.4.7 pyramid-1.10.5 pyramid-debugtoolbar-4.9 pyramid-jinja2-2.8 pyramid-mako-1.1.0 pyramid-retry-2.1.1 pyramid-tm-2.4 pytest-6.2.1 pytest-cov-2.10.1 python-dateutil-2.8.1 python-editor-1.0.4 repoze.lru-0.7 six-1.15.0 soupsieve-2.1 toml-0.10.2 transaction-3.0.1 translationstring-1.4 tutorial typing-extensions-3.7.4.3 venusian-3.0.0 waitress-1.4.4 webob-1.8.6 zipp-3.4.0 zope.deprecation-4.4.0 zope.interface-5.2.0 zope.sqlalchemy-1.3
 
 Testing requirements are defined in our project's ``setup.py`` file, in the ``tests_require`` and ``extras_require`` stanzas.
 
