@@ -177,7 +177,7 @@ The console will show ``pip`` checking for packages and installing missing packa
 
 .. code-block:: bash
 
-    Successfully installed Jinja2-2.11.2 Mako-1.1.3 MarkupSafe-1.1.1 PasteDeploy-2.1.1 Pygments-2.7.3 SQLAlchemy-1.3.22 WebTest-2.0.35 alembic-1.4.3 attrs-20.3.0 beautifulsoup4-4.9.3 coverage-5.3.1 hupper-1.10.2 importlib-metadata-3.3.0 iniconfig-1.1.1 packaging-20.8 plaster-1.0 plaster-pastedeploy-0.7 pluggy-0.13.1 py-1.10.0 pyparsing-2.4.7 pyramid-1.10.5 pyramid-debugtoolbar-4.9 pyramid-jinja2-2.8 pyramid-mako-1.1.0 pyramid-retry-2.1.1 pyramid-tm-2.4 pytest-6.2.1 pytest-cov-2.10.1 python-dateutil-2.8.1 python-editor-1.0.4 repoze.lru-0.7 six-1.15.0 soupsieve-2.1 toml-0.10.2 transaction-3.0.1 translationstring-1.4 tutorial typing-extensions-3.7.4.3 venusian-3.0.0 waitress-1.4.4 webob-1.8.6 zipp-3.4.0 zope.deprecation-4.4.0 zope.interface-5.2.0 zope.sqlalchemy-1.3
+    Successfully installed Jinja2-2.11.2 Mako-1.1.3 MarkupSafe-1.1.1 PasteDeploy-2.1.1 Pygments-2.7.3 SQLAlchemy-1.3.22 WebTest-2.0.35 alembic-1.4.3 attrs-20.3.0 beautifulsoup4-4.9.3 coverage-5.3.1 hupper-1.10.2 iniconfig-1.1.1 packaging-20.8 plaster-1.0 plaster-pastedeploy-0.7 pluggy-0.13.1 py-1.10.0 pyparsing-2.4.7 pyramid-1.10.5 pyramid-debugtoolbar-4.9 pyramid-jinja2-2.8 pyramid-mako-1.1.0 pyramid-retry-2.1.1 pyramid-tm-2.4 pytest-6.2.1 pytest-cov-2.10.1 python-dateutil-2.8.1 python-editor-1.0.4 repoze.lru-0.7 six-1.15.0 soupsieve-2.1 toml-0.10.2 transaction-3.0.1 translationstring-1.4 tutorial venusian-3.0.0 waitress-1.4.4 webob-1.8.6 zope.deprecation-4.4.0 zope.interface-5.2.0 zope.sqlalchemy-1.3
 
 Testing requirements are defined in our project's ``setup.py`` file, in the ``tests_require`` and ``extras_require`` stanzas.
 
@@ -219,11 +219,11 @@ The output to your console should be something like this:
 
 .. code-block:: text
 
-    2019-12-28 00:46:03,850 INFO  [alembic.runtime.migration:154][MainThread] Context impl SQLiteImpl.
-    2019-12-28 00:46:03,850 INFO  [alembic.runtime.migration:161][MainThread] Will assume non-transactional DDL.
-    2019-12-28 00:46:03,853 INFO  [alembic.autogenerate.compare:134][MainThread] Detected added table 'models'
-    2019-12-28 00:46:03,853 INFO  [alembic.autogenerate.compare:586][MainThread] Detected added index 'my_index' on '['name']'
-      Generating <somepath>/tutorial/tutorial/alembic/versions/20191228_a8e203c3ce9c.py ...  done
+    2021-01-07 05:15:57,709 INFO  [alembic.runtime.migration:155][MainThread] Context impl SQLiteImpl.
+    2021-01-07 05:15:57,709 INFO  [alembic.runtime.migration:162][MainThread] Will assume non-transactional DDL.
+    2021-01-07 05:15:57,712 INFO  [alembic.autogenerate.compare:134][MainThread] Detected added table 'models'
+    2021-01-07 05:15:57,712 INFO  [alembic.autogenerate.compare:588][MainThread] Detected added index 'my_index' on '['name']'
+      Generating <somepath>/tutorial/tutorial/alembic/versions/20210107_d7ab09c3fdec.py ...  done
 
 Upgrade to that revision.
 
@@ -245,9 +245,9 @@ The output to your console should be something like this:
 
 .. code-block:: text
 
-    2019-12-28 00:52:12,158 INFO  [alembic.runtime.migration:154][MainThread] Context impl SQLiteImpl.
-    2019-12-28 00:52:12,158 INFO  [alembic.runtime.migration:161][MainThread] Will assume non-transactional DDL.
-    2019-12-28 00:52:12,160 INFO  [alembic.runtime.migration:513][MainThread] Running upgrade  -> a8e203c3ce9c, init
+    2021-01-07 05:16:21,558 INFO  [alembic.runtime.migration:155][MainThread] Context impl SQLiteImpl.
+    2021-01-07 05:16:21,558 INFO  [alembic.runtime.migration:162][MainThread] Will assume non-transactional DDL.
+    2021-01-07 05:16:21,560 INFO  [alembic.runtime.migration:517][MainThread] Running upgrade  -> d7ab09c3fdec, init
 
 
 .. _load_data_wiki2:
