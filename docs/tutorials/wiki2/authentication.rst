@@ -291,34 +291,29 @@ following URLs, checking that the result is as expected:
   redirects to the ``view_page`` view of the ``FrontPage`` page object.  It
   is executable by any user.
 
-- http://localhost:6543/FrontPage invokes the ``view_page`` view of the
-  ``FrontPage`` page object. There is a "Login" link in the upper right corner
-  while the user is not authenticated, else it is a "Logout" link when the user
-  is authenticated.
+- http://localhost:6543/login invokes the ``login`` view, and a login form will be displayed.
+  On every page, there is a "Login" link in the upper right corner while the user is not authenticated, else it is a "Logout" link when the user is authenticated.
+
+  Supplying the credentials with either the username ``editor`` and password ``editor``, or username
+  ``basic`` and password ``basic``, will authenticate the user and grant access for that group.
+
+  After logging in (as a result of hitting an edit or add page and submitting valid credentials), we will see a "Logout" link in the upper right hand corner.
+  When we click it, we are logged out, redirected back to the front page, and a "Login" link is shown in the upper right hand corner.
+
+- http://localhost:6543/FrontPage invokes the ``view_page`` view of the ``FrontPage`` page object.
 
 - http://localhost:6543/FrontPage/edit_page invokes the ``edit_page`` view for
   the ``FrontPage`` page object.  It is executable by only the ``editor`` user.
   If a different user invokes it, then the "403 Forbidden" page will be displayed.
   If an anonymous user invokes it, then a login form will be displayed.
-  Supplying the credentials with the username ``editor`` and password ``editor`` will display the edit page form.
 
-- http://localhost:6543/add_page/SomePageName invokes the ``add_page`` view for
-  a page. If the page already exists, then it redirects the user to the
-  ``edit_page`` view for the page object. It is executable by either the
-  ``editor`` or ``basic`` user.
+- http://localhost:6543/add_page/SomePageName invokes the ``add_page`` view for a page.
+  If the page already exists, then it redirects the user to the ``edit_page`` view for the page object.
+  It is executable by either the ``editor`` or ``basic`` user.
   If an anonymous user invokes it, then a login form will be displayed.
-  Supplying the credentials
-  with either the username ``editor`` and password ``editor``, or username
-  ``basic`` and password ``basic``, will display the edit page form.
 
 - http://localhost:6543/SomePageName/edit_page invokes the ``edit_page`` view
   for an existing page, or generates an error if the page does not exist. It is
   editable by the ``basic`` user if the page was created by that user in the
-  previous step. If, instead, the page was created by the ``editor`` user, then
+  previous step. If instead the page was created by the ``editor`` user, then
   the login page should be shown for the ``basic`` user.
-
-- After logging in (as a result of hitting an edit or add page and submitting
-  the login form with the ``editor`` credentials), we'll see a "Logout" link in
-  the upper right hand corner.  When we click it, we're logged out, redirected
-  back to the front page, and a "Login" link is shown in the upper right hand
-  corner.

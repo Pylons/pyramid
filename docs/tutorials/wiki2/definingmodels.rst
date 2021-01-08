@@ -75,7 +75,7 @@ like the following.
 
 .. code-block:: text
 
-    Successfully installed bcrypt-3.1.7 cffi-1.13.2 pycparser-2.19 tutorial
+    Successfully installed bcrypt-3.2.0 cffi-1.14.4 pycparser-2.20 tutorial
 
 
 Remove ``mymodel.py``
@@ -190,19 +190,19 @@ Success executing these commands will generate output similar to the following.
 
 .. code-block:: text
 
-    2019-12-28 02:02:31,841 INFO  [alembic.runtime.migration:154][MainThread] Context impl SQLiteImpl.
-    2019-12-28 02:02:31,841 INFO  [alembic.runtime.migration:161][MainThread] Will assume non-transactional DDL.
-    2019-12-28 02:02:31,844 INFO  [alembic.autogenerate.compare:134][MainThread] Detected added table 'users'
-    2019-12-28 02:02:31,845 INFO  [alembic.autogenerate.compare:134][MainThread] Detected added table 'pages'
-    2019-12-28 02:02:31,853 INFO  [alembic.autogenerate.compare:621][MainThread] Detected removed index 'my_index' on 'models'
-    2019-12-28 02:02:31,853 INFO  [alembic.autogenerate.compare:176][MainThread] Detected removed table 'models'
-      Generating <somepath>/tutorial/tutorial/alembic/versions/20191228_226a73ffaeef.py ...  done
+    2021-01-07 08:00:14,550 INFO  [alembic.runtime.migration:155][MainThread] Context impl SQLiteImpl.
+    2021-01-07 08:00:14,551 INFO  [alembic.runtime.migration:158][MainThread] Will assume non-transactional DDL.
+    2021-01-07 08:00:14,553 INFO  [alembic.autogenerate.compare:134][MainThread] Detected added table 'users'
+    2021-01-07 08:00:14,553 INFO  [alembic.autogenerate.compare:134][MainThread] Detected added table 'pages'
+    2021-01-07 08:00:14,558 INFO  [alembic.autogenerate.compare:622][MainThread] Detected removed index 'my_index' on 'models'
+    2021-01-07 08:00:14,558 INFO  [alembic.autogenerate.compare:176][MainThread] Detected removed table 'models'
+      Generating <somepath>/tutorial/tutorial/alembic/versions/20210107_bc9a3dead43a.py ...  done
 
 .. code-block:: text
 
-    2019-12-28 02:03:15,390 INFO  [alembic.runtime.migration:154][MainThread] Context impl SQLiteImpl.
-    2019-12-28 02:03:15,391 INFO  [alembic.runtime.migration:161][MainThread] Will assume non-transactional DDL.
-    2019-12-28 02:03:15,393 INFO  [alembic.runtime.migration:513][MainThread] Running upgrade a8e203c3ce9c -> 226a73ffaeef, use new models Page and User
+    2021-01-07 08:00:21,318 INFO  [alembic.runtime.migration:155][MainThread] Context impl SQLiteImpl.
+    2021-01-07 08:00:21,318 INFO  [alembic.runtime.migration:158][MainThread] Will assume non-transactional DDL.
+    2021-01-07 08:00:21,320 INFO  [alembic.runtime.migration:517][MainThread] Running upgrade 90658c4a9673 -> bc9a3dead43a, use new models Page and User
 
 
 .. _wiki2_alembic_overview:
