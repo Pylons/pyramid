@@ -708,29 +708,34 @@ This yields the following output.
 .. code-block:: text
 
     =========================== test session starts ===========================
-    platform darwin -- Python 3.7.3, pytest-5.3.2, py-1.8.1, pluggy-0.13.1
-    rootdir: /<somepath>/hello_world, inifile: pytest.ini, testpaths: hello_world, tests
-    plugins: cov-2.8.1
+    platform darwin -- Python 3.9.0, pytest-6.2.1, py-1.10.0, pluggy-0.13.1
+    rootdir: /<somepath>/hello_world, configfile: pytest.ini, testpaths: hello_world, tests
+    plugins: cov-2.10.1
     collected 4 items
 
-    tests/test_it.py ....                                                [100%]
+    tests/test_functional.py ..                                          [ 50%]
+    tests/test_views.py ..                                               [100%]
 
-    ---------- coverage: platform darwin, python 3.7.3-final-0 -----------
+    ---------- coverage: platform darwin, python 3.9.0-final-0 -----------
     Name                            Stmts   Miss  Cover   Missing
     -------------------------------------------------------------
     hello_world/__init__.py             7      0   100%
     hello_world/routes.py               3      0   100%
     hello_world/views/__init__.py       0      0   100%
-    hello_world/views/default.py        3      0   100%
-    hello_world/views/notfound.py       4      0   100%
+    hello_world/views/default.py        4      0   100%
+    hello_world/views/notfound.py       5      0   100%
     -------------------------------------------------------------
-    TOTAL                              17      0   100%
+    TOTAL                              19      0   100%
 
     ======================== 4 passed in 0.65 seconds =========================
 
-Our tests passed, and its coverage is complete. What did our test look like?
+Our tests passed, and its coverage is complete. What did our tests look like?
 
-.. literalinclude:: quick_tour/package/tests/test_it.py
+.. literalinclude:: quick_tour/package/tests/test_functional.py
+    :language: python
+    :linenos:
+
+.. literalinclude:: quick_tour/package/tests/test_views.py
     :language: python
     :linenos:
 
