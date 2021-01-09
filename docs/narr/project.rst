@@ -562,8 +562,8 @@ The ``myproject`` project we've generated has the following directory structure:
 .. index::
    single: tests
 
-``test_it.py``
-~~~~~~~~~~~~~~
+``tests`` package
+~~~~~~~~~~~~~~~~~
 
 The ``conftest.py``, ``test_functional.py``, and ``test_views.py`` modules in the ``tests`` package includes tests for your application.
 

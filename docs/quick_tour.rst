@@ -682,7 +682,7 @@ Yikes! We got this far and we haven't yet discussed tests. This is particularly
 egregious, as Pyramid has had a deep commitment to full test coverage since
 before its release.
 
-Our ``pyramid-cookiecutter-starter`` cookiecutter generated a ``test_it.py`` module inside the ``tests`` package with two unit tests and two functional tests in it.
+Our ``pyramid-cookiecutter-starter`` cookiecutter generated ``conftest.py``, ``test_functional.py``, and ``test_views.py`` modules inside the ``tests`` package with two unit tests and two functional tests in it.
 It also configured ``setup.py`` with test requirements:
 ``pytest`` as the test runner, ``WebTest`` for running view tests, and the
 ``pytest-cov`` tool which yells at us for code that isn't tested:
