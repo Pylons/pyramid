@@ -208,12 +208,7 @@ Elided output from a run of this command on Unix is shown below:
 .. code-block:: bash
 
     Running setup.py develop for myproject
-    Successfully installed Jinja2-2.10.3 Mako-1.1.0 MarkupSafe-1.1.1 \
-    PasteDeploy-2.0.1 Pygments-2.5.2 hupper-1.9.1 myproject plaster-1.0 \
-    plaster-pastedeploy-0.7 pyramid-1.10.4 pyramid-debugtoolbar-4.5.2 \
-    pyramid-jinja2-2.8 pyramid-mako-1.1.0 repoze.lru-0.7 \
-    translationstring-1.3 venusian-3.0.0 waitress-1.4.2 webob-1.8.5 \
-    zope.deprecation-4.4.0 zope.interface-4.7.1
+    Successfully installed Jinja2-2.11.2 Mako-1.1.3 MarkupSafe-1.1.1 PasteDeploy-2.1.1 Pygments-2.7.3 hupper-1.10.2 myproject plaster-1.0 plaster-pastedeploy-0.7 pyramid-1.10.5 pyramid-debugtoolbar-4.9 pyramid-jinja2-2.8 pyramid-mako-1.1.0 repoze.lru-0.7 translationstring-1.4 venusian-3.0.0 waitress-1.4.4 webob-1.8.6 zope.deprecation-4.4.0 zope.interface-5.2.0
 
 This will install a :term:`distribution` representing your project into the
 virtual environment interpreter's library set so it can be found by ``import``
@@ -555,6 +550,7 @@ The ``myproject`` project we've generated has the following directory structure:
     │       └── notfound.py
     ├── production.ini
     ├── pytest.ini
+    ├── setup.py
     ├── testing.ini
     └── tests
         ├── __init__.py
