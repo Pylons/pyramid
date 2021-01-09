@@ -760,7 +760,7 @@ logging for you to some reasonable defaults. You then see messages sent by
 Pyramid (for example, when a new request comes in).
 
 Maybe you would like to log messages in your code? In your Python module,
-import and set up the logging in your ``views.py``:
+import and set up the logging in your ``views/default.py``:
 
 .. literalinclude:: quick_tour/logging/hello_world/views/default.py
     :language: python
