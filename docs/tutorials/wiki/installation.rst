@@ -185,20 +185,7 @@ The console will show ``pip`` checking for packages and installing missing packa
 
 .. code-block:: bash
 
-    Successfully installed BTrees-4.6.1 Chameleon-3.6.2 Mako-1.1.0 \
-    MarkupSafe-1.1.1 PasteDeploy-2.0.1 Pygments-2.5.2 WebTest-2.0.33 \
-    ZConfig-3.5.0 ZEO-5.2.1 ZODB-5.5.1 ZODB3-3.11.0 attrs-19.3.0 \
-    beautifulsoup4-4.8.2 cffi-1.13.2 coverage-5.0.3 hupper-1.9.1 \
-    importlib-metadata-1.4.0 more-itertools-8.1.0 packaging-20.0 \
-    persistent-4.5.1 plaster-1.0 plaster-pastedeploy-0.7 pluggy-0.13.1 \
-    py-1.8.1 pycparser-2.19 pyparsing-2.4.6 pyramid-1.10.4 \
-    pyramid-chameleon-0.3 pyramid-debugtoolbar-4.5.2 pyramid-mako-1.1.0 \
-    pyramid-retry-2.1 pyramid-tm-2.4 pyramid-zodbconn-0.8.1 pytest-5.3.2 \
-    pytest-cov-2.8.1 repoze.lru-0.7 six-1.13.0 soupsieve-1.9.5 \
-    transaction-3.0.0 translationstring-1.3 tutorial venusian-3.0.0 \
-    waitress-1.4.2 wcwidth-0.1.8 webob-1.8.5 zc.lockfile-2.0 zdaemon-4.3 \
-    zipp-0.6.0 zodbpickle-2.0.0 zodburi-2.4.0 zope.deprecation-4.4.0 \
-    zope.interface-4.7.1
+    Successfully installed BTrees-4.7.2 Chameleon-3.8.1 Mako-1.1.3 MarkupSafe-1.1.1 PasteDeploy-2.1.1 Pygments-2.7.3 WebTest-2.0.35 ZConfig-3.5.0 ZEO-5.2.2 ZODB-5.6.0 ZODB3-3.11.0 attrs-20.3.0 beautifulsoup4-4.9.3 cffi-1.14.4 coverage-5.3.1 def hupper-1.10.2 iniconfig-1.1.1 packaging-20.8 persistent-4.6.4 plaster-1.0 plaster-pastedeploy-0.7 pluggy-0.13.1 py-1.10.0 pycparser-2.20 pyparsing-2.4.7 pyramid-1.10.5 pyramid-chameleon-0.3 pyramid-debugtoolbar-4.9 pyramid-mako-1.1.0 pyramid-retry-2.1.1 pyramid-tm-2.4 pyramid-zodbconn-0.8.1 pytest-6.2.1 pytest-cov-2.10.1 repoze.lru-0.7 six-1.15.0 soupsieve-2.1 toml-0.10.2 transaction-3.0.1 translationstring-1.4 venusian-3.0.0 waitress-1.4.4 webob-1.8.6 zc.lockfile-2.0 zdaemon-4.3 zodbpickle-2.0.0 zodburi-2.4.0 zope.deprecation-4.4.0 zope.interface-5.2.0
 
 Testing requirements are defined in our project's ``setup.py`` file, in the ``tests_require`` and ``extras_require`` stanzas.
 
@@ -276,9 +263,9 @@ If successful, you will see output something like this:
 .. code-block:: bash
 
     ======================== test session starts =========================
-    platform darwin -- Python 3.7.3, pytest-5.3.2, py-1.8.1, pluggy-0.13.1
+    platform darwin -- Python 3.9.0, pytest-6.2.1, py-1.10.0, pluggy-0.13.1
     rootdir: /filepath/tutorial, inifile: pytest.ini, testpaths: tutorial
-    plugins: cov-2.8.1
+    plugins: cov-2.10.1
     collected 4 items
 
     tests/test_functional.py ..                                     [ 50%]
