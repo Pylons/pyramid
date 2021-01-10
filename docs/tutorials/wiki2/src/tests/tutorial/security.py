@@ -33,11 +33,11 @@ class MySecurityPolicy:
         if user is not None:
             return user.id
 
-    def remember(self, request, userid):
-        return self.authtkt.remember(request, userid)
+    def remember(self, request, userid, **kw):
+        return self.authtkt.remember(request, userid, **kw)
 
-    def forget(self, request):
-        return self.authtkt.forget(request)
+    def forget(self, request, **kw):
+        return self.authtkt.forget(request, **kw)
 
     def permits(self, request, context, permission):
         principals = self.effective_principals(request)
