@@ -40,7 +40,7 @@ Update ``tutorial/security.py`` with the following content:
    :linenos:
    :language: python
 
-Here we've defined a new security policy named ``MySecurityPolicy``, which is implementing most of the :class:`pyramid.interfaces.ISecurityPolicy` interface by tracking a :term:`identity` using a signed cookie implemented by :class:`pyramid.authentication.AuthTktCookieHelper` (lines 8-34).
+Here we've defined a new security policy named ``MySecurityPolicy``, which is implementing most of the :class:`pyramid.interfaces.ISecurityPolicy` interface by tracking an :term:`identity` using a signed cookie implemented by :class:`pyramid.authentication.AuthTktCookieHelper` (lines 8-34).
 The security policy outputs the authenticated ``tutorial.models.User`` object for the logged-in user as the :term:`identity`, which is available as ``request.identity``.
 
 Our new :term:`security policy` defines how our application will remember, forget, and identify users.
