@@ -634,7 +634,7 @@ class TestRouter(unittest.TestCase):
         router(environ, start_response)
         self.assertEqual(response.called_back, True)
 
-    def test_call_request_has_finished_callbacks_when_view_succeeds(self):
+    def test_finish_request_when_view_succeeds(self):
         from zope.interface import Interface, directlyProvides
 
         class IContext(Interface):
@@ -652,6 +652,7 @@ class TestRouter(unittest.TestCase):
                 request.environ['called_back'] = True
 
             request.add_finished_callback(callback)
+            request.environ['request'] = request
             return response
 
         environ = self._makeEnviron()
@@ -660,8 +661,9 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         router(environ, start_response)
         self.assertEqual(environ['called_back'], True)
+        self.assertFalse(hasattr(environ['request'], 'context'))
 
-    def test_call_request_has_finished_callbacks_when_view_raises(self):
+    def test_finish_request_when_view_raises(self):
         from zope.interface import Interface, directlyProvides
 
         class IContext(Interface):
@@ -678,6 +680,7 @@ class TestRouter(unittest.TestCase):
                 request.environ['called_back'] = True
 
             request.add_finished_callback(callback)
+            request.environ['request'] = request
             raise NotImplementedError
 
         environ = self._makeEnviron()
@@ -686,6 +689,7 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         exc_raised(NotImplementedError, router, environ, start_response)
         self.assertEqual(environ['called_back'], True)
+        self.assertFalse(hasattr(environ['request'], 'context'))
 
     def test_call_request_factory_raises(self):
         # making sure finally doesnt barf when a request cannot be created
