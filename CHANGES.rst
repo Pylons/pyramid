@@ -1,7 +1,7 @@
 Unreleased
 ==========
 
-- Break potential reference cycle between `request` and `context`.
+- Break potential reference cycle between ``request`` and ``context``.
   See https://github.com/Pylons/pyramid/pull/3649
 
 2.0b0 (2020-12-15)
