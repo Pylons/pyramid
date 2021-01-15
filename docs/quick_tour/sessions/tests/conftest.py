@@ -3,10 +3,9 @@ from pyramid.paster import get_appsettings
 from pyramid.scripting import prepare
 from pyramid.testing import DummyRequest, testConfig
 import pytest
-import transaction
 import webtest
 
-from tutorial import main
+from hello_world import main
 
 
 def pytest_addoption(parser):
@@ -26,27 +25,15 @@ def app(app_settings):
     return main({}, **app_settings)
 
 @pytest.fixture
-def tm():
-    tm = transaction.manager
-    tm.begin()
-    tm.doom()
-
-    yield tm
-
-    tm.abort()
-
-@pytest.fixture
-def testapp(app, tm):
+def testapp(app):
     testapp = webtest.TestApp(app, extra_environ={
         'HTTP_HOST': 'example.com',
-        'tm.active': True,
-        'tm.manager': tm,
     })
 
     return testapp
 
 @pytest.fixture
-def app_request(app, tm):
+def app_request(app):
     """
     A real request.
 
@@ -60,7 +47,7 @@ def app_request(app, tm):
         yield request
 
 @pytest.fixture
-def dummy_request(tm):
+def dummy_request():
     """
     A lightweight dummy request.
 
@@ -74,7 +61,6 @@ def dummy_request(tm):
     """
     request = DummyRequest()
     request.host = 'example.com'
-    request.tm = tm
 
     return request
 

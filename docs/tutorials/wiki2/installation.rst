@@ -338,15 +338,15 @@ If successful, you will see output something like this:
 .. code-block:: bash
 
     ======================== test session starts ========================
-    platform -- Python 3.7.3, pytest-5.3.2, py-1.8.1, pluggy-0.13.1
+    platform darwin -- Python 3.9.0, pytest-6.2.1, py-1.10.0, pluggy-0.13.1
     rootdir: <somepath>/tutorial, inifile: pytest.ini, testpaths: tutorial, tests
-    plugins: cov-2.8.1
+    plugins: cov-2.10.1
     collected 5 items
 
-    tests/test_functional.py ..
-    tests/test_views.py ...
+    tests/test_functional.py ..                                                           [ 40%]
+    tests/test_views.py ...                                                               [100%]
     
-    ---------- coverage: platform darwin, python 3.7.4-final-0 -----------
+    ---------- coverage: platform darwin, python 3.9.0-final-0 -----------
     Name                                                 Stmts   Miss  Cover   Missing
     ----------------------------------------------------------------------------------
     tutorial/__init__.py                                     8      0   100%
@@ -360,10 +360,10 @@ If successful, you will see output something like this:
     tutorial/scripts/__init__.py                             0      0   100%
     tutorial/scripts/initialize_db.py                       22     14    36%   15-16, 20-25, 29-38
     tutorial/views/__init__.py                               0      0   100%
-    tutorial/views/default.py                               12      0   100%
-    tutorial/views/notfound.py                               4      0   100%
+    tutorial/views/default.py                               13      0   100%
+    tutorial/views/notfound.py                               5      0   100%
     ----------------------------------------------------------------------------------
-    TOTAL                                                  136     27    80%
+    TOTAL                                                  138     27    80%
 
     ===================== 5 passed in 0.77 seconds ======================
 

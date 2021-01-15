@@ -1,7 +1,6 @@
 from pyramid.view import view_config
 from pyramid.response import Response
-
-from sqlalchemy.exc import DBAPIError
+from sqlalchemy.exc import SQLAlchemyError
 
 from .. import models
 
@@ -10,8 +9,8 @@ from .. import models
 def my_view(request):
     try:
         query = request.dbsession.query(models.MyModel)
-        one = query.filter(models.MyModel.name == 'one').first()
-    except DBAPIError:
+        one = query.filter(models.MyModel.name == 'one').one()
+    except SQLAlchemyError:
         return Response(db_err_msg, content_type='text/plain', status=500)
     return {'one': one, 'project': 'sqla_demo'}
 
