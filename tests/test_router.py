@@ -124,6 +124,19 @@ class TestRouter(unittest.TestCase):
         klass = self._getTargetClass()
         return klass(self.registry)
 
+    def _mockFinishRequest(self, router):
+        """
+        Mock :meth:`pyramid.router.Router.finish_request` to be a no-op.  This
+        prevents :prop:`pyramid.request.Request.context` from being removed, so
+        we can write assertions against it.
+
+        """
+
+        def mock_finish_request(request):
+            pass
+
+        router.finish_request = mock_finish_request
+
     def _makeEnviron(self, **extras):
         environ = {
             'wsgi.url_scheme': 'http',
@@ -422,6 +435,7 @@ class TestRouter(unittest.TestCase):
         )
         self._registerRootFactory(context)
         router = self._makeOne()
+        self._mockFinishRequest(router)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ['Hello world'])
@@ -449,6 +463,7 @@ class TestRouter(unittest.TestCase):
         environ = self._makeEnviron()
         self._registerView(view, 'foo', IViewClassifier, None, None)
         router = self._makeOne()
+        self._mockFinishRequest(router)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ['Hello world'])
@@ -480,6 +495,7 @@ class TestRouter(unittest.TestCase):
         environ = self._makeEnviron()
         self._registerView(view, '', IViewClassifier, IRequest, IContext)
         router = self._makeOne()
+        self._mockFinishRequest(router)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ['Hello world'])
@@ -627,7 +643,7 @@ class TestRouter(unittest.TestCase):
         router(environ, start_response)
         self.assertEqual(response.called_back, True)
 
-    def test_call_request_has_finished_callbacks_when_view_succeeds(self):
+    def test_finish_request_when_view_succeeds(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
 
@@ -647,6 +663,7 @@ class TestRouter(unittest.TestCase):
                 request.environ['called_back'] = True
 
             request.add_finished_callback(callback)
+            request.environ['request'] = request
             return response
 
         environ = self._makeEnviron()
@@ -655,8 +672,9 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         router(environ, start_response)
         self.assertEqual(environ['called_back'], True)
+        self.assertFalse(hasattr(environ['request'], 'context'))
 
-    def test_call_request_has_finished_callbacks_when_view_raises(self):
+    def test_finish_request_when_view_raises(self):
         from zope.interface import Interface
         from zope.interface import directlyProvides
 
@@ -675,6 +693,7 @@ class TestRouter(unittest.TestCase):
                 request.environ['called_back'] = True
 
             request.add_finished_callback(callback)
+            request.environ['request'] = request
             raise NotImplementedError
 
         environ = self._makeEnviron()
@@ -683,6 +702,7 @@ class TestRouter(unittest.TestCase):
         start_response = DummyStartResponse()
         exc_raised(NotImplementedError, router, environ, start_response)
         self.assertEqual(environ['called_back'], True)
+        self.assertFalse(hasattr(environ['request'], 'context'))
 
     def test_call_request_factory_raises(self):
         # making sure finally doesnt barf when a request cannot be created
@@ -715,6 +735,7 @@ class TestRouter(unittest.TestCase):
         context_found_events = self._registerEventListener(IContextFound)
         response_events = self._registerEventListener(INewResponse)
         router = self._makeOne()
+        self._mockFinishRequest(router)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(len(request_events), 1)
@@ -776,6 +797,7 @@ class TestRouter(unittest.TestCase):
         self._registerView(view, '', IViewClassifier, None, None)
         self._registerRootFactory(context)
         router = self._makeOne()
+        self._mockFinishRequest(router)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ['Hello world'])
@@ -851,6 +873,7 @@ class TestRouter(unittest.TestCase):
         self._registerView(view, '', IViewClassifier, None, None)
         self._registerRootFactory(context)
         router = self._makeOne()
+        self._mockFinishRequest(router)
         start_response = DummyStartResponse()
         result = router(environ, start_response)
         self.assertEqual(result, ['Hello world'])
