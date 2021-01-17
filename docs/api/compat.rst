@@ -3,6 +3,10 @@
 :mod:`pyramid.compat`
 ----------------------
 
+.. deprecated:: 1.10
+   ``pyramid.compat`` will be removed in Pyramid 2.0.
+   The functionality is no longer necessary, as Pyramid 2.0 drops support for Python 2.
+
 The ``pyramid.compat`` module provides platform and version compatibility for
 Pyramid and its add-ons across Python platform and version differences.  APIs
 will be removed from this module over time as Pyramid ceases to support
