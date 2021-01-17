@@ -7,4 +7,5 @@ warnings.warn(
     'functionality is no longer necessary, as Pyramid 2.0 drops support for '
     'Python 2.',
     DeprecationWarning,
+    stacklevel=2,
 )
