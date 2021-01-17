@@ -8,7 +8,7 @@ from zope.interface import implementer, alsoProvides
 
 from pyramid.interfaces import IRequest, ISession
 
-from pyramid.compat import PY3, PYPY, class_types, text_
+from pyramid._compat import PY3, PYPY, class_types, text_
 
 from pyramid.config import Configurator
 from pyramid.decorator import reify

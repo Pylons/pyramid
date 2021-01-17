@@ -11,7 +11,7 @@ from zope.interface import implementer
 
 from webob.cookies import JSONSerializer, SignedSerializer
 
-from pyramid.compat import pickle, PY2, text_, bytes_, native_
+from pyramid._compat import pickle, PY2, text_, bytes_, native_
 from pyramid.csrf import check_csrf_origin, check_csrf_token
 
 from pyramid.interfaces import ISession

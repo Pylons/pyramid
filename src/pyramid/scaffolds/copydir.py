@@ -6,7 +6,7 @@ import os
 import sys
 import pkg_resources
 
-from pyramid.compat import (
+from pyramid._compat import (
     input_,
     native_,
     url_quote as compat_url_quote,

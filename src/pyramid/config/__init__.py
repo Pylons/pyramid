@@ -19,7 +19,7 @@ from pyramid.asset import resolve_asset_spec
 
 from pyramid.authorization import ACLAuthorizationPolicy
 
-from pyramid.compat import text_, string_types
+from pyramid._compat import text_, string_types
 
 from pyramid.events import ApplicationCreated
 

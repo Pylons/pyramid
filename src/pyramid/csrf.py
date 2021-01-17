@@ -4,7 +4,7 @@ from webob.cookies import CookieProfile
 from zope.interface import implementer
 
 
-from pyramid.compat import bytes_, urlparse, text_
+from pyramid._compat import bytes_, urlparse, text_
 from pyramid.exceptions import BadCSRFOrigin, BadCSRFToken
 from pyramid.interfaces import ICSRFStoragePolicy
 from pyramid.settings import aslist

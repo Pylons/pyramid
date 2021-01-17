@@ -8,7 +8,7 @@ from zope.interface.registry import Components
 
 from pyramid.interfaces import IJSONAdapter, IRendererFactory, IRendererInfo
 
-from pyramid.compat import string_types, text_type
+from pyramid._compat import string_types, text_type
 
 from pyramid.csrf import get_csrf_token
 from pyramid.decorator import reify

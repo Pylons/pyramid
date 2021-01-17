@@ -8,7 +8,7 @@ from translationstring import (
     TranslationStringFactory,  # API
 )
 
-from pyramid.compat import PY2
+from pyramid._compat import PY2
 from pyramid.decorator import reify
 
 from pyramid.interfaces import (

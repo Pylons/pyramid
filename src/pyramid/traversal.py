@@ -8,7 +8,7 @@ from pyramid.interfaces import (
     VH_ROOT_KEY,
 )
 
-from pyramid.compat import (
+from pyramid._compat import (
     PY2,
     native_,
     text_,

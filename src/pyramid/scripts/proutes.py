@@ -7,7 +7,7 @@ import re
 from zope.interface import Interface
 
 from pyramid.paster import bootstrap
-from pyramid.compat import string_types
+from pyramid._compat import string_types
 from pyramid.interfaces import IRouteRequest
 from pyramid.config import not_
 

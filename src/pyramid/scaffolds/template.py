@@ -6,7 +6,7 @@ import re
 import sys
 import os
 
-from pyramid.compat import native_, bytes_
+from pyramid._compat import native_, bytes_
 
 from pyramid.scaffolds import copydir
 

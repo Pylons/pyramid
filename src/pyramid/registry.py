@@ -4,7 +4,7 @@ import threading
 from zope.interface import implementer
 from zope.interface.registry import Components
 
-from pyramid.compat import text_
+from pyramid._compat import text_
 from pyramid.decorator import reify
 
 from pyramid.interfaces import IIntrospector, IIntrospectable, ISettings

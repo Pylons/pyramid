@@ -1,4 +1,4 @@
-from pyramid.compat import string_types
+from pyramid._compat import string_types
 
 truthy = frozenset(('t', 'true', 'y', 'yes', 'on', '1'))
 falsey = frozenset(('f', 'false', 'n', 'no', 'off', '0'))

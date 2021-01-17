@@ -3,7 +3,7 @@ import argparse
 import sys
 import textwrap
 
-from pyramid.compat import url_unquote
+from pyramid._compat import url_unquote
 from pyramid.request import Request
 from pyramid.scripts.common import get_config_loader
 from pyramid.scripts.common import parse_vars

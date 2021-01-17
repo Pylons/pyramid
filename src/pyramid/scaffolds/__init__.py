@@ -2,7 +2,7 @@ import binascii
 import os
 from textwrap import dedent
 
-from pyramid.compat import native_
+from pyramid._compat import native_
 
 from pyramid.scaffolds.template import Template  # API
 

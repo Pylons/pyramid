@@ -2,7 +2,7 @@ from zope.deprecation import deprecated
 
 from zope.interface import Attribute, Interface
 
-from pyramid.compat import PY2
+from pyramid._compat import PY2
 
 # public API interfaces
 

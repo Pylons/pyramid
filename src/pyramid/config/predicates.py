@@ -1,7 +1,7 @@
 from hashlib import md5
 from webob.acceptparse import Accept
 
-from pyramid.compat import bytes_, is_nonstr_iter
+from pyramid._compat import bytes_, is_nonstr_iter
 from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import IPredicateList, PHASE1_CONFIG
 from pyramid.predicates import Notted

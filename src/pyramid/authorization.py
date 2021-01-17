@@ -4,7 +4,7 @@ from pyramid.interfaces import IAuthorizationPolicy
 
 from pyramid.location import lineage
 
-from pyramid.compat import is_nonstr_iter
+from pyramid._compat import is_nonstr_iter
 
 from pyramid.security import ACLAllowed, ACLDenied, Allow, Deny, Everyone
 

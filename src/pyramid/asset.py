@@ -1,7 +1,7 @@
 import os
 import pkg_resources
 
-from pyramid.compat import string_types
+from pyramid._compat import string_types
 
 from pyramid.path import package_path, package_name
 

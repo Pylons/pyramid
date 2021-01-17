@@ -13,7 +13,7 @@ from pyramid.interfaces import (
     ISessionFactory,
 )
 
-from pyramid.compat import text_, bytes_, native_, iteritems_
+from pyramid._compat import text_, bytes_, native_, iteritems_
 
 from pyramid.decorator import reify
 from pyramid.i18n import LocalizerRequestMixin

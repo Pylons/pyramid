@@ -8,7 +8,7 @@ import os.path
 import pkg_resources
 import re
 import sys
-from pyramid.compat import input_
+from pyramid._compat import input_
 
 _bad_chars_re = re.compile('[^a-zA-Z0-9_]')
 

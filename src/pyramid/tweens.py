@@ -1,6 +1,6 @@
 import sys
 
-from pyramid.compat import reraise
+from pyramid._compat import reraise
 from pyramid.httpexceptions import HTTPNotFound
 
 
