@@ -9,7 +9,7 @@ from pyramid.interfaces import (
     IViewClassifier,
 )
 
-from pyramid.compat import map_
+from pyramid._compat import map_
 from pyramid.threadlocal import get_current_registry
 
 Everyone = 'system.Everyone'

@@ -4,7 +4,7 @@ import os
 
 from pyramid.interfaces import IResourceURL, IRoutesMapper, IStaticURLInfo
 
-from pyramid.compat import bytes_, lru_cache, string_types
+from pyramid._compat import bytes_, lru_cache, string_types
 from pyramid.encode import url_quote, urlencode
 from pyramid.path import caller_package
 from pyramid.threadlocal import get_current_registry

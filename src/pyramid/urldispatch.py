@@ -3,7 +3,7 @@ from zope.interface import implementer
 
 from pyramid.interfaces import IRoutesMapper, IRoute
 
-from pyramid.compat import (
+from pyramid._compat import (
     PY2,
     native_,
     text_,

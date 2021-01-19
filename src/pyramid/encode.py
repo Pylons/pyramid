@@ -1,4 +1,4 @@
-from pyramid.compat import (
+from pyramid._compat import (
     text_type,
     binary_type,
     is_nonstr_iter,

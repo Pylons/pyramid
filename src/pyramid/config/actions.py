@@ -5,7 +5,7 @@ import sys
 import traceback
 from zope.interface import implementer
 
-from pyramid.compat import reraise
+from pyramid._compat import reraise
 from pyramid.exceptions import (
     ConfigurationConflictError,
     ConfigurationError,

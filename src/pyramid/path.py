@@ -7,7 +7,7 @@ from zope.interface import implementer
 
 from pyramid.interfaces import IAssetDescriptor
 
-from pyramid.compat import string_types
+from pyramid._compat import string_types
 
 ignore_types = [imp.C_EXTENSION, imp.C_BUILTIN]
 init_names = [

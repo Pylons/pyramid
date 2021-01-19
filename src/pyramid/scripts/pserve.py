@@ -19,7 +19,7 @@ import webbrowser
 
 import hupper
 
-from pyramid.compat import PY2
+from pyramid._compat import PY2
 
 from pyramid.scripts.common import get_config_loader
 from pyramid.scripts.common import parse_vars

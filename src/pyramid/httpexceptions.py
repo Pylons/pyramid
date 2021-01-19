@@ -137,7 +137,7 @@ from zope.interface import implementer
 from webob import html_escape as _html_escape
 from webob.acceptparse import create_accept_header
 
-from pyramid.compat import class_types, text_type, binary_type, text_
+from pyramid._compat import class_types, text_type, binary_type, text_
 
 from pyramid.interfaces import IExceptionResponse
 from pyramid.response import Response

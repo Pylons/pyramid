@@ -11,7 +11,7 @@ import weakref
 
 from pyramid.exceptions import ConfigurationError, CyclicDependencyError
 
-from pyramid.compat import (
+from pyramid._compat import (
     getargspec,
     im_func,
     is_nonstr_iter,

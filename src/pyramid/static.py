@@ -8,7 +8,7 @@ from pkg_resources import resource_exists, resource_filename, resource_isdir
 
 from pyramid.asset import abspath_from_asset_spec, resolve_asset_spec
 
-from pyramid.compat import lru_cache, text_
+from pyramid._compat import lru_cache, text_
 
 from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently
 

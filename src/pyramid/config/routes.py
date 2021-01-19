@@ -1,7 +1,7 @@
 import contextlib
 import warnings
 
-from pyramid.compat import urlparse
+from pyramid._compat import urlparse
 from pyramid.interfaces import (
     IRequest,
     IRouteRequest,

@@ -12,7 +12,7 @@ from zope.interface import implementer
 
 from webob.cookies import CookieProfile
 
-from pyramid.compat import (
+from pyramid._compat import (
     long,
     text_type,
     binary_type,

@@ -2,7 +2,7 @@ from zope.interface import implementer
 
 from pyramid.interfaces import ITweens
 
-from pyramid.compat import string_types, is_nonstr_iter
+from pyramid._compat import string_types, is_nonstr_iter
 
 from pyramid.exceptions import ConfigurationError
 

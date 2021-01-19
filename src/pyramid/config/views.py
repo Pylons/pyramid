@@ -32,7 +32,7 @@ from pyramid.interfaces import (
 from pyramid import renderers
 
 from pyramid.asset import resolve_asset_spec
-from pyramid.compat import (
+from pyramid._compat import (
     string_types,
     urlparse,
     url_quote,

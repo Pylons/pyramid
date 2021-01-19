@@ -2,7 +2,7 @@ import re
 
 from pyramid.exceptions import ConfigurationError
 
-from pyramid.compat import is_nonstr_iter
+from pyramid._compat import is_nonstr_iter
 
 from pyramid.csrf import check_csrf_token
 from pyramid.traversal import (

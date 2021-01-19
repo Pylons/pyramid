@@ -16,8 +16,8 @@ from pyramid.interfaces import (
     IExceptionViewClassifier,
 )
 
-from pyramid.compat import decode_path_info
-from pyramid.compat import reraise as reraise_
+from pyramid._compat import decode_path_info
+from pyramid._compat import reraise as reraise_
 
 from pyramid.exceptions import ConfigurationError, PredicateMismatch
 

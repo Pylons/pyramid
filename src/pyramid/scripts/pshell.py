@@ -6,7 +6,7 @@ import sys
 import textwrap
 import pkg_resources
 
-from pyramid.compat import exec_
+from pyramid._compat import exec_
 from pyramid.util import DottedNameResolver
 from pyramid.util import make_contextmanager
 from pyramid.paster import bootstrap
