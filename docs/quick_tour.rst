@@ -938,7 +938,7 @@ system, can then easily get at the data thanks to SQLAlchemy:
 .. literalinclude:: quick_tour/sqla_demo/sqla_demo/views/default.py
     :language: python
     :lineno-match:
-    :lines: 13
+    :pyobject: my_view
 
 .. seealso:: See also:
     :ref:`Quick Tutorial Databases <qtut_databases>`, `SQLAlchemy
