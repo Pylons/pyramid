@@ -46,7 +46,7 @@ class TestReify(unittest.TestCase):
             return 'a'  # pragma: no cover
 
         decorator = self._makeOne(wrapped)
-        assert not inspect.isfunction(inspect.unwrap(decorator))
+        assert not inspect.isfunction(decorator)
 
 
 class Dummy:
