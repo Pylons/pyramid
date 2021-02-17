@@ -1,3 +1,4 @@
+import inspect
 import unittest
 
 
@@ -24,6 +25,28 @@ class TestReify(unittest.TestCase):
         decorator = self._makeOne(wrapped)
         result = decorator.__get__(None)
         self.assertEqual(result, decorator)
+
+    def test_copy_docstring(self):
+        def wrapped(inst):
+            """Test doc"""
+            return 'a'  # pragma: no cover
+
+        decorator = self._makeOne(wrapped)
+        assert decorator.__doc__ == 'Test doc'
+
+    def test_not_function(self):
+        """
+        Because reify'd methods act as attributes, it's important that they
+        aren't recognized as a function.  Otherwise tools like Sphinx may
+        misbehave, like in https://github.com/Pylons/pyramid/issues/3655
+
+        """
+
+        def wrapped(inst):
+            return 'a'  # pragma: no cover
+
+        decorator = self._makeOne(wrapped)
+        assert not inspect.isfunction(inspect.unwrap(decorator))
 
 
 class Dummy:
