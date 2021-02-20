@@ -1,5 +1,7 @@
-Unreleased
-==========
+.. _changes_1.10.7:
+
+1.10.7 (2021-02-20)
+===================
 
 - Remove ``update_wrapper`` from ``pyramid.decorator.reify``.
   See https://github.com/Pylons/pyramid/pull/3658
