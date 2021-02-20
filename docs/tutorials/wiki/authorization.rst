@@ -164,7 +164,7 @@ Add an ACL
 Open ``tutorial/models/__init__.py`` and add the following import statement near the top:
 
 .. literalinclude:: src/authorization/tutorial/models/__init__.py
-    :lines: 4-7
+    :lines: 3-6
     :lineno-match:
     :language: python
 
@@ -315,6 +315,14 @@ Launch a browser and visit each of the following URLs, checking that the result 
     This always redirects to the ``view_page`` view of the ``FrontPage`` Page resource.
     It is executable by any user.
 
+-   http://localhost:6543/login invokes the ``login`` view, and a login form will be displayed.
+    On every page, there is a "Login" link in the upper right corner while the user is not authenticated, else it is a "Logout" link when the user is authenticated.
+
+    Supplying the credentials with either the username ``editor`` and password ``editor`` will authenticate the user and grant access for that group.
+
+    After logging in (as a result of hitting an edit or add page and submitting valid credentials), we will see a "Logout" link in the upper right hand corner.
+    When we click it, we are logged out, redirected back to the front page, and a "Login" link is shown in the upper right hand corner.
+
 -   http://localhost:6543/FrontPage invokes the ``view_page`` view of the ``FrontPage`` Page resource.
     This is because it is the :term:`default view` (a view without a ``name``) for ``Page`` resources.
     It is executable by any user.
@@ -322,14 +330,11 @@ Launch a browser and visit each of the following URLs, checking that the result 
 -   http://localhost:6543/FrontPage/edit_page invokes the edit view for the FrontPage object.
     It is executable by only the ``editor`` user.
     If a different user (or the anonymous user) invokes it, then a login form will be displayed.
-    Supplying the credentials with the username ``editor`` and password ``editor`` will display the edit page form.
+    The ``editor`` user will see the edit page form.
 
 -   http://localhost:6543/add_page/SomePageName invokes the add view for a page.
     It is executable by only the ``editor`` user.
     If a different user (or the anonymous user) invokes it, a login form will be displayed.
-    Supplying the credentials with the username ``editor``, password ``editor`` will display the edit page form.
-
--   After logging in (as a result of hitting an edit or add page and submitting the login form with the ``editor`` credentials), we will see a Logout link in the upper right hand corner.
-    When we click it, we are logged out, and redirected back to the front page.
+    The ``editor`` user will see the edit page form.
 
 -   To generate a not found error, visit http://localhost:6543/wakawaka which will invoke the ``notfound_view`` view provided by the cookiecutter.

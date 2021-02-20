@@ -177,18 +177,7 @@ The console will show ``pip`` checking for packages and installing missing packa
 
 .. code-block:: bash
 
-    Successfully installed Jinja2-2.10.3 Mako-1.1.0 MarkupSafe-1.1.1 \
-    PasteDeploy-2.0.1 Pygments-2.5.2 SQLAlchemy-1.3.12 WebTest-2.0.33 \
-    alembic-1.3.2 attrs-19.3.0 beautifulsoup4-4.8.2 coverage-5.0.3 \
-    hupper-1.9.1 importlib-metadata-1.4.0 more-itertools-8.1.0 packaging-20.0 \
-    plaster-1.0 plaster-pastedeploy-0.7 pluggy-0.13.1 py-1.8.1 \
-    pyparsing-2.4.6 pyramid-1.10.4 pyramid-debugtoolbar-4.5.2 \
-    pyramid-jinja2-2.8 pyramid-mako-1.1.0 pyramid-retry-2.1 pyramid-tm-2.4 \
-    pytest-5.3.2 pytest-cov-2.8.1 python-dateutil-2.8.1 python-editor-1.0.4 \
-    repoze.lru-0.7 six-1.13.0 soupsieve-1.9.5 transaction-3.0.0 \
-    translationstring-1.3 tutorial venusian-3.0.0 waitress-1.4.2 \
-    wcwidth-0.1.8 webob-1.8.5 zipp-0.6.0 zope.deprecation-4.4.0 \
-    zope.interface-4.7.1 zope.sqlalchemy-1.2
+    Successfully installed Jinja2-2.11.2 Mako-1.1.3 MarkupSafe-1.1.1 PasteDeploy-2.1.1 Pygments-2.7.3 SQLAlchemy-1.3.22 WebTest-2.0.35 alembic-1.4.3 attrs-20.3.0 beautifulsoup4-4.9.3 coverage-5.3.1 hupper-1.10.2 iniconfig-1.1.1 packaging-20.8 plaster-1.0 plaster-pastedeploy-0.7 pluggy-0.13.1 py-1.10.0 pyparsing-2.4.7 pyramid-1.10.5 pyramid-debugtoolbar-4.9 pyramid-jinja2-2.8 pyramid-mako-1.1.0 pyramid-retry-2.1.1 pyramid-tm-2.4 pytest-6.2.1 pytest-cov-2.10.1 python-dateutil-2.8.1 python-editor-1.0.4 repoze.lru-0.7 six-1.15.0 soupsieve-2.1 toml-0.10.2 transaction-3.0.1 translationstring-1.4 tutorial venusian-3.0.0 waitress-1.4.4 webob-1.8.6 zope.deprecation-4.4.0 zope.interface-5.2.0 zope.sqlalchemy-1.3
 
 Testing requirements are defined in our project's ``setup.py`` file, in the ``tests_require`` and ``extras_require`` stanzas.
 
@@ -230,11 +219,11 @@ The output to your console should be something like this:
 
 .. code-block:: text
 
-    2019-12-28 00:46:03,850 INFO  [alembic.runtime.migration:154][MainThread] Context impl SQLiteImpl.
-    2019-12-28 00:46:03,850 INFO  [alembic.runtime.migration:161][MainThread] Will assume non-transactional DDL.
-    2019-12-28 00:46:03,853 INFO  [alembic.autogenerate.compare:134][MainThread] Detected added table 'models'
-    2019-12-28 00:46:03,853 INFO  [alembic.autogenerate.compare:586][MainThread] Detected added index 'my_index' on '['name']'
-      Generating <somepath>/tutorial/tutorial/alembic/versions/20191228_a8e203c3ce9c.py ...  done
+    2021-01-07 05:15:57,709 INFO  [alembic.runtime.migration:155][MainThread] Context impl SQLiteImpl.
+    2021-01-07 05:15:57,709 INFO  [alembic.runtime.migration:162][MainThread] Will assume non-transactional DDL.
+    2021-01-07 05:15:57,712 INFO  [alembic.autogenerate.compare:134][MainThread] Detected added table 'models'
+    2021-01-07 05:15:57,712 INFO  [alembic.autogenerate.compare:588][MainThread] Detected added index 'my_index' on '['name']'
+      Generating <somepath>/tutorial/tutorial/alembic/versions/20210107_d7ab09c3fdec.py ...  done
 
 Upgrade to that revision.
 
@@ -256,9 +245,9 @@ The output to your console should be something like this:
 
 .. code-block:: text
 
-    2019-12-28 00:52:12,158 INFO  [alembic.runtime.migration:154][MainThread] Context impl SQLiteImpl.
-    2019-12-28 00:52:12,158 INFO  [alembic.runtime.migration:161][MainThread] Will assume non-transactional DDL.
-    2019-12-28 00:52:12,160 INFO  [alembic.runtime.migration:513][MainThread] Running upgrade  -> a8e203c3ce9c, init
+    2021-01-07 05:16:21,558 INFO  [alembic.runtime.migration:155][MainThread] Context impl SQLiteImpl.
+    2021-01-07 05:16:21,558 INFO  [alembic.runtime.migration:162][MainThread] Will assume non-transactional DDL.
+    2021-01-07 05:16:21,560 INFO  [alembic.runtime.migration:517][MainThread] Running upgrade  -> d7ab09c3fdec, init
 
 
 .. _load_data_wiki2:
@@ -349,15 +338,15 @@ If successful, you will see output something like this:
 .. code-block:: bash
 
     ======================== test session starts ========================
-    platform -- Python 3.7.3, pytest-5.3.2, py-1.8.1, pluggy-0.13.1
+    platform darwin -- Python 3.9.0, pytest-6.2.1, py-1.10.0, pluggy-0.13.1
     rootdir: <somepath>/tutorial, inifile: pytest.ini, testpaths: tutorial, tests
-    plugins: cov-2.8.1
+    plugins: cov-2.10.1
     collected 5 items
 
-    tests/test_functional.py ..
-    tests/test_views.py ...
+    tests/test_functional.py ..                                                           [ 40%]
+    tests/test_views.py ...                                                               [100%]
     
-    ---------- coverage: platform darwin, python 3.7.4-final-0 -----------
+    ---------- coverage: platform darwin, python 3.9.0-final-0 -----------
     Name                                                 Stmts   Miss  Cover   Missing
     ----------------------------------------------------------------------------------
     tutorial/__init__.py                                     8      0   100%
@@ -371,10 +360,10 @@ If successful, you will see output something like this:
     tutorial/scripts/__init__.py                             0      0   100%
     tutorial/scripts/initialize_db.py                       22     14    36%   15-16, 20-25, 29-38
     tutorial/views/__init__.py                               0      0   100%
-    tutorial/views/default.py                               12      0   100%
-    tutorial/views/notfound.py                               4      0   100%
+    tutorial/views/default.py                               13      0   100%
+    tutorial/views/notfound.py                               5      0   100%
     ----------------------------------------------------------------------------------
-    TOTAL                                                  136     27    80%
+    TOTAL                                                  138     27    80%
 
     ===================== 5 passed in 0.77 seconds ======================
 

@@ -252,8 +252,12 @@ class Router:
             return response
 
         finally:
-            if request.finished_callbacks:
-                request._process_finished_callbacks()
+            self.finish_request(request)
+
+    def finish_request(self, request):
+        if request.finished_callbacks:
+            request._process_finished_callbacks()
+        request.__dict__.pop('context', None)  # Break potential ref cycle
 
     def __call__(self, environ, start_response):
         """

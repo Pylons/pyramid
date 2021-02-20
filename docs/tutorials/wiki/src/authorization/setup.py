@@ -20,7 +20,7 @@ requires = [
     'pyramid_tm',
     'pyramid_zodbconn',
     'transaction',
-    'ZODB3',
+    'ZODB',
 ]
 
 tests_require = [
