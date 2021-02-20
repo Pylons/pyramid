@@ -4203,21 +4203,6 @@ class Test_view_description(unittest.TestCase):
         self.assertEqual(result, 'function tests.test_config.test_views.view')
 
 
-class Test_viewdefaults(unittest.TestCase):
-    def _makeOne(self, wrapped):
-        from pyramid.decorator import reify
-
-        return reify(wrapped)
-
-    def test_dunder_attrs_copied(self):
-        from pyramid.config.views import viewdefaults
-
-        decorator = self._makeOne(viewdefaults)
-        self.assertEqual(decorator.__doc__, viewdefaults.__doc__)
-        self.assertEqual(decorator.__name__, viewdefaults.__name__)
-        self.assertEqual(decorator.__module__, viewdefaults.__module__)
-
-
 class DummyRegistry:
     utility = None
 
