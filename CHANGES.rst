@@ -1,8 +1,11 @@
-Unreleased
-==========
+.. _changes_1.10.6:
+
+1.10.6 (2021-02-20)
+===================
 
 - Break potential reference cycle between ``request`` and ``context``.
   See https://github.com/Pylons/pyramid/pull/3650
+
 - Deprecate ``pyramid.compat``.
   See https://github.com/Pylons/pyramid/pull/3652
 
