@@ -1,5 +1,5 @@
-Unreleased
-==========
+2.0b1 (2021-02-20)
+==================
 
 - Break potential reference cycle between ``request`` and ``context``.
   See https://github.com/Pylons/pyramid/pull/3649
