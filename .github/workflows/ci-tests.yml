@@ -16,7 +16,6 @@ jobs:
             matrix:
                 py:
                     - "2.7"
-                    - "3.4"
                     - "3.5"
                     - "3.6"
                     - "3.7"
@@ -32,22 +31,25 @@ jobs:
                     - x64
                     - x86
 
+                include:
+                    - os: "ubuntu-18.04"
+                      architecture: x64
+                      py: "3.4"
+                    - os: "ubuntu-18.04"
+                      architecture: x86
+                      py: "3.4"
+
                 exclude:
                     # Linux and macOS don't have x86 python
                     - os: "ubuntu-latest"
                       architecture: x86
                     - os: "macos-latest"
                       architecture: x86
-                    # Python 3.4 on macOS doesn't seem to work
-                    - os: "macos-latest"
-                      py: "3.4"
                     # PyPy and Python 3.4 on Windows doesn't seem to work
                     - os: "windows-latest"
                       py: "pypy3"
                     - os: "windows-latest"
                       py: "pypy2"
-                    - os: "windows-latest"
-                      py: "3.4"
 
         name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
