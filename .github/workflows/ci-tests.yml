@@ -35,9 +35,6 @@ jobs:
                     - os: "ubuntu-18.04"
                       architecture: x64
                       py: "3.4"
-                    - os: "ubuntu-18.04"
-                      architecture: x86
-                      py: "3.4"
 
                 exclude:
                     # Linux and macOS don't have x86 python
