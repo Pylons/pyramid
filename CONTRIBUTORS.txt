@@ -338,3 +338,5 @@ Contributors
 - Eric Atkin, 2019/02/15
 
 - Behzod Saidov, 2019/12/05
+
+- Leonardo Rochael Almeida, 2021/02/25
