@@ -1,3 +1,12 @@
+.. _changes_1.10.8:
+
+1.10.8 (2021-02-28)
+===================
+
+- Fix warnings caused by usage of the ``imp`` module on newer versions
+  of Python.
+  See https://github.com/Pylons/pyramid/pull/3659
+
 .. _changes_1.10.7:
 
 1.10.7 (2021-02-20)
