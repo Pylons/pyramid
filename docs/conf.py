@@ -57,7 +57,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinxcontrib.autoprogram',
     # enable pylons_sphinx_latesturl when this branch is no longer "latest"
-    # 'pylons_sphinx_latesturl',
+    'pylons_sphinx_latesturl',
     ]
 
 # Looks for objects in external projects
