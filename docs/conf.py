@@ -153,7 +153,7 @@ html_theme_options = dict(
     github_url='https://github.com/Pylons/pyramid',
     # On master branch and new branch still in
     # pre-release status: true; else: false.
-    in_progress='true',
+    in_progress='false',
     # On branches previous to "latest": true; else: false.
     outdated='false',
     )
