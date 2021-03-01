@@ -68,8 +68,8 @@ path, which refers to a callable in our ``myproject`` package's ``__init__.py``
 module.
 
 The ``egg:`` prefix in ``egg:myproject`` indicates that this is an entry point
-*URI* specifier, where the "scheme" is "egg".  An "egg" is created when you run
-``setup.py install`` or ``setup.py develop`` within your project.
+*URI* specifier, where the "scheme" is "egg".
+An "egg" is created when you install your project.
 
 In English, this entry point can thus be referred to as a "PasteDeploy
 application factory in the ``myproject`` project which has the entry point
