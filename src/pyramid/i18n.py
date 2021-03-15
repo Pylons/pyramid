@@ -50,7 +50,7 @@ class Localizer:
 
         Example::
 
-           from pyramid.18n import TranslationString
+           from pyramid.i18n import TranslationString
            ts = TranslationString('Add ${item}', domain='mypackage',
                                   mapping={'item':'Item'})
            translated = localizer.translate(ts)

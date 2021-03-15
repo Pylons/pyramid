@@ -1,3 +1,28 @@
+2.0 (2021-02-28)
+================
+
+- No changes from 2.0b1.
+
+2.0b1 (2021-02-20)
+==================
+
+- Break potential reference cycle between ``request`` and ``context``.
+  See https://github.com/Pylons/pyramid/pull/3649
+
+- Remove ``update_wrapper`` from ``pyramid.decorator.reify``.
+  See https://github.com/Pylons/pyramid/pull/3657
+
+2.0b0 (2020-12-15)
+==================
+
+- Overhaul tutorials and update cookiecutter to de-emphasize ``request.user``
+  in favor of ``request.identity`` for common use cases.
+  See https://github.com/Pylons/pyramid/pull/3629
+
+- Improve documentation and patterns with builtin fixtures shipped in the
+  cookiecutters.
+  See https://github.com/Pylons/pyramid/pull/3629
+
 2.0a0 (2020-11-29)
 ==================
 

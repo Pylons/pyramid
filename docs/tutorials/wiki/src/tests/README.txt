@@ -4,15 +4,16 @@ myproj
 Getting Started
 ---------------
 
-- Change directory into your newly created project.
+- Change directory into your newly created project if not already there. Your
+  current directory should be the same as this README.txt file and setup.py.
 
     cd tutorial
 
-- Create a Python virtual environment.
+- Create a Python virtual environment, if not already created.
 
     python3 -m venv env
 
-- Upgrade packaging tools.
+- Upgrade packaging tools, if necessary.
 
     env/bin/pip install --upgrade pip setuptools
 

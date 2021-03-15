@@ -56,6 +56,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
     'sphinxcontrib.autoprogram',
+    'sphinx_copybutton',
     # enable pylons_sphinx_latesturl when this branch is no longer "latest"
     # 'pylons_sphinx_latesturl',
     ]
@@ -141,6 +142,7 @@ if book:
 #     'whatsnew-1.8': 'index',
 #     'whatsnew-1.9': 'index',
 #     'whatsnew-1.10': 'index',
+#     'whatsnew-2.0': 'index',
 #     'tutorials/gae/index': 'index',
 #     'api/chameleon_text': 'api',
 #     'api/chameleon_zpt': 'api',
@@ -152,7 +154,7 @@ html_theme_options = dict(
     github_url='https://github.com/Pylons/pyramid',
     # On master branch and new branch still in
     # pre-release status: true; else: false.
-    in_progress='true',
+    in_progress='false',
     # On branches previous to "latest": true; else: false.
     outdated='false',
     )

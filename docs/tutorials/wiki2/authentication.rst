@@ -10,8 +10,7 @@ APIs to add login and logout functionality to our wiki.
 
 We will implement authentication with the following steps:
 
-* Add a :term:`security policy` and a ``request.user`` computed property
-  (``security.py``).
+* Add a :term:`security policy` (``security.py``).
 * Add routes for ``/login`` and ``/logout`` (``routes.py``).
 * Add login and logout views (``views/auth.py``).
 * Add a login template (``login.jinja2``).
@@ -41,10 +40,8 @@ Update ``tutorial/security.py`` with the following content:
    :linenos:
    :language: python
 
-Here we've defined:
-
-* A new security policy named ``MySecurityPolicy``, which is implementing most of the :class:`pyramid.interfaces.ISecurityPolicy` interface by tracking a :term:`identity` using a signed cookie implemented by :class:`pyramid.authentication.AuthTktCookieHelper` (lines 8-34).
-* The ``request.user`` computed property is registered for use throughout our application as the authenticated ``tutorial.models.User`` object for the logged-in user (line 42-44).
+Here we've defined a new security policy named ``MySecurityPolicy``, which is implementing most of the :class:`pyramid.interfaces.ISecurityPolicy` interface by tracking an :term:`identity` using a signed cookie implemented by :class:`pyramid.authentication.AuthTktCookieHelper` (lines 8-34).
+The security policy outputs the authenticated ``tutorial.models.User`` object for the logged-in user as the :term:`identity`, which is available as ``request.identity``.
 
 Our new :term:`security policy` defines how our application will remember, forget, and identify users.
 It also handles authorization, which we'll cover in the next chapter (if you're wondering why we didn't implement the ``permits`` method yet).
@@ -64,7 +61,7 @@ Identifying the current user is done in a few steps:
 
 #. The result is stored in the ``identity_cache`` which ensures that subsequent invocations return the same identity object for the request.
 
-Finally, :attr:`pyramid.request.Request.identity` contains either ``None`` or a ``tutorial.models.User`` instance and that value is aliased to ``request.user`` for convenience in our application.
+Finally, :attr:`pyramid.request.Request.identity` contains either ``None`` or a ``tutorial.models.User`` instance.
 
 Note the usage of the ``identity_cache`` is optional, but it has several advantages in most scenarios:
 
@@ -156,7 +153,7 @@ Only the highlighted lines need to be changed.
 
 If the user either is not logged in or is not in the ``basic`` or ``editor`` roles, then we raise ``HTTPForbidden``, which will trigger our forbidden view to compute a response.
 However, we will hook this later to redirect to the login page.
-Also, now that we have ``request.user``, we no longer have to hard-code the creator as the ``editor`` user, so we can finally drop that hack.
+Also, now that we have ``request.identity``, we no longer have to hard-code the creator as the ``editor`` user, so we can finally drop that hack.
 
 These simple checks should protect our views.
 
@@ -266,7 +263,7 @@ indicated by the highlighted lines.
    :emphasize-lines: 2-12
    :language: html
 
-The ``request.user`` will be ``None`` if the user is not authenticated, or a
+The ``request.identity`` will be ``None`` if the user is not authenticated, or a
 ``tutorial.models.User`` object if the user is authenticated. This check will
 make the logout link shown only when the user is logged in, and conversely the
 login link is only shown when the user is logged out.
@@ -294,34 +291,29 @@ following URLs, checking that the result is as expected:
   redirects to the ``view_page`` view of the ``FrontPage`` page object.  It
   is executable by any user.
 
-- http://localhost:6543/FrontPage invokes the ``view_page`` view of the
-  ``FrontPage`` page object. There is a "Login" link in the upper right corner
-  while the user is not authenticated, else it is a "Logout" link when the user
-  is authenticated.
+- http://localhost:6543/login invokes the ``login`` view, and a login form will be displayed.
+  On every page, there is a "Login" link in the upper right corner while the user is not authenticated, else it is a "Logout" link when the user is authenticated.
+
+  Supplying the credentials with either the username ``editor`` and password ``editor``, or username
+  ``basic`` and password ``basic``, will authenticate the user and grant access for that group.
+
+  After logging in (as a result of hitting an edit or add page and submitting valid credentials), we will see a "Logout" link in the upper right hand corner.
+  When we click it, we are logged out, redirected back to the front page, and a "Login" link is shown in the upper right hand corner.
+
+- http://localhost:6543/FrontPage invokes the ``view_page`` view of the ``FrontPage`` page object.
 
 - http://localhost:6543/FrontPage/edit_page invokes the ``edit_page`` view for
   the ``FrontPage`` page object.  It is executable by only the ``editor`` user.
   If a different user invokes it, then the "403 Forbidden" page will be displayed.
   If an anonymous user invokes it, then a login form will be displayed.
-  Supplying the credentials with the username ``editor`` and password ``editor`` will display the edit page form.
 
-- http://localhost:6543/add_page/SomePageName invokes the ``add_page`` view for
-  a page. If the page already exists, then it redirects the user to the
-  ``edit_page`` view for the page object. It is executable by either the
-  ``editor`` or ``basic`` user.
+- http://localhost:6543/add_page/SomePageName invokes the ``add_page`` view for a page.
+  If the page already exists, then it redirects the user to the ``edit_page`` view for the page object.
+  It is executable by either the ``editor`` or ``basic`` user.
   If an anonymous user invokes it, then a login form will be displayed.
-  Supplying the credentials
-  with either the username ``editor`` and password ``editor``, or username
-  ``basic`` and password ``basic``, will display the edit page form.
 
 - http://localhost:6543/SomePageName/edit_page invokes the ``edit_page`` view
   for an existing page, or generates an error if the page does not exist. It is
   editable by the ``basic`` user if the page was created by that user in the
-  previous step. If, instead, the page was created by the ``editor`` user, then
+  previous step. If instead the page was created by the ``editor`` user, then
   the login page should be shown for the ``basic`` user.
-
-- After logging in (as a result of hitting an edit or add page and submitting
-  the login form with the ``editor`` credentials), we'll see a "Logout" link in
-  the upper right hand corner.  When we click it, we're logged out, redirected
-  back to the front page, and a "Login" link is shown in the upper right hand
-  corner.

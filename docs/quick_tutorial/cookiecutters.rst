@@ -28,7 +28,7 @@ Steps
 
     .. code-block:: bash
 
-        $VENV/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
+        $VENV/bin/cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout 2.0-branch
 
     If prompted for the first item, accept the default ``yes`` by hitting return.
 

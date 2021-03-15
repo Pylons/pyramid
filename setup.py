@@ -22,7 +22,7 @@ def readfile(name):
 README = readfile('README.rst')
 CHANGES = readfile('CHANGES.rst')
 
-VERSION = '2.0a0'
+VERSION = '2.0'
 
 install_requires = [
     'hupper >= 1.5',  # ignore_files support
@@ -47,6 +47,7 @@ docs_extras = [
     'pylons-sphinx-themes >= 1.0.8',  # Ethical Ads
     'pylons_sphinx_latesturl',
     'repoze.sphinx.autointerface',
+    'sphinx-copybutton',
     'sphinxcontrib-autoprogram',
 ]
 

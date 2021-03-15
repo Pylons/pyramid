@@ -39,7 +39,7 @@ specific path information for commands and files.
     .. code-block:: bash
 
         cd ~
-        cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
+        cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout 2.0-branch
 
     If prompted for the first item, accept the default ``yes`` by hitting return.
 
