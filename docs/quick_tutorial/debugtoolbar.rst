@@ -65,7 +65,8 @@ Steps
         $VENV/bin/pserve development.ini --reload
 
 #.  Open http://localhost:6543/ in your browser.
-    See the handy toolbar on the right.
+    See the handy toolbar on the right. ``note: the Response object should contain <body> html or it won't be shown unless an error is introduced.``
+    
 
 
 Analysis
