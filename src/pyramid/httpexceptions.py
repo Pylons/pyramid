@@ -214,7 +214,7 @@ ${body}'''
 </html>'''
     )
 
-    # Set this to True for responses that should have no request body
+    # Set this to True for responses that should have no response body
     empty_body = False
 
     def __init__(
