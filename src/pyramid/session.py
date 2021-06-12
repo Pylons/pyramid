@@ -250,7 +250,7 @@ def BaseCookieSessionFactory(
             dict.__init__(self, state)
 
         # ISession methods
-        def changed(self):
+        def changed(self, key=None):
             if not self._dirty:
                 self._dirty = True
 

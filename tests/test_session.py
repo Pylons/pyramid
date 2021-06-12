@@ -90,6 +90,12 @@ class SharedCookieSessionTests:
         self.assertEqual(session.changed(), None)
         self.assertTrue(session._dirty)
 
+    def test_changed_scoped(self):
+        request = testing.DummyRequest()
+        session = self._makeOne(request)
+        self.assertEqual(session.changed("some_scope"), None)
+        self.assertTrue(session._dirty)
+
     def test_invalidate(self):
         request = testing.DummyRequest()
         session = self._makeOne(request)

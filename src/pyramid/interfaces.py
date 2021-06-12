@@ -1182,7 +1182,7 @@ class ISession(IDict):
         case of changing privilege levels or preventing fixation attacks.
         """
 
-    def changed():
+    def changed(key=None):
         """Mark the session as changed. A user of a session should
         call this method after he or she mutates a mutable object that
         is *a value of the session* (it should not be required after
@@ -1192,7 +1192,9 @@ class ISession(IDict):
         be called.  However, if subsequently he or she does
         ``session['foo']['a'] = 1``, ``changed()`` must be called for
         the sessioning machinery to notice the mutation of the
-        internal dictionary."""
+        internal dictionary.  The ``key`` argument can be used to notify
+        the sessioning machinery of which keys have been changed.
+        """
 
     def flash(msg, queue='', allow_duplicate=True):
         """Push a flash message onto the end of the flash queue represented

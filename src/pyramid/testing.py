@@ -238,7 +238,7 @@ class DummySession(dict):
     created = None
     new = True
 
-    def changed(self):
+    def changed(self, key=None):
         pass
 
     def invalidate(self):
