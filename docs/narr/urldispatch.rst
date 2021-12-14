@@ -1109,7 +1109,7 @@ See this code:
     class AnyOfPredicate:
         def __init__(self, val, info):
             self.segment_name = val[0]
-            self.allowed = tuple(val[0:])
+            self.allowed = tuple(val[1:])
 
         def text(self):
             args = (self.segment_name,) + self.allowed
