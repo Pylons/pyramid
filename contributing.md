@@ -6,7 +6,7 @@ You can contribute to this project in several ways.
 
 * [File an Issue on GitHub](https://github.com/Pylons/pyramid/issues)
 * Fork this project and create a branch with your suggested change. When ready, submit a pull request for consideration. [GitHub Flow](https://guides.github.com/introduction/flow/index.html) describes the workflow process and why it's a good practice. When submitting a pull request, sign [CONTRIBUTORS.txt](https://github.com/Pylons/pyramid/blob/master/CONTRIBUTORS.txt) if you have not yet done so.
-* Join the [IRC channel #pyramid on irc.freenode.net](https://webchat.freenode.net/?channels=pyramid).
+* Join the [IRC channel #pyramid on irc.libera.chat](https://web.libera.chat/#pyramid).
 
 ## Git Branches
 
