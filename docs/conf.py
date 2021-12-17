@@ -451,5 +451,5 @@ epub_tocdepth = 3
 linkcheck_ignore = [
     r'http://localhost:\d+',
     r'http://localhost',
-    r'https://webchat.freenode.net/#pyramid',  # JavaScript "anchor"
+    r'https://web.libera.chat/#pyramid',  # JavaScript "anchor"
 ]
