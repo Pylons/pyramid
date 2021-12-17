@@ -70,7 +70,7 @@ You can get help quickly with :app:`Pyramid`. It's our goal that no :app:`Pyrami
 
 .. seealso::
 
-    See also our `#pyramid IRC channel <https://webchat.freenode.net/?channels=pyramid>`_, our `pylons-discuss mailing list <https://groups.google.com/forum/#!forum/pylons-discuss>`_, and :ref:`support-and-development`.
+    See also our `#pyramid IRC channel <https://web.libera.chat/#pyramid>`_, our `pylons-discuss mailing list <https://groups.google.com/forum/#!forum/pylons-discuss>`_, and :ref:`support-and-development`.
 
 .. _what_makes_pyramid_unique:
 
