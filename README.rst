@@ -9,9 +9,9 @@ Pyramid
         :target: https://docs.pylonsproject.org/projects/pyramid/en/2.0-branch
         :alt: 2.0-branch Documentation Status
 
-.. image:: https://img.shields.io/badge/irc-freenode-blue.svg
-        :target: https://webchat.freenode.net/?channels=pyramid
-        :alt: IRC Freenode
+.. image:: https://img.shields.io/badge/IRC-Libera.Chat-blue.svg
+        :target: https://web.libera.chat/#pyramid
+        :alt: IRC Libera.Chat
 
 `Pyramid <https://trypyramid.com/>`_ is a small, fast, down-to-earth, open
 source Python web framework. It makes real-world web application development
