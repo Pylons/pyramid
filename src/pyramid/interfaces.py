@@ -207,7 +207,7 @@ class IResponse(Interface):
     )
 
     def copy():
-        """ Makes a copy of the response and returns the copy. """
+        """Makes a copy of the response and returns the copy."""
 
     date = Attribute(
         """Gets and sets and deletes the Date header. For more information on
@@ -306,7 +306,7 @@ class IResponse(Interface):
         expires=None,
         overwrite=False,
     ):
-        """ Set (add) a cookie for the response """
+        """Set (add) a cookie for the response"""
 
     status = Attribute(""" The status string. """)
 
@@ -334,7 +334,7 @@ class IResponse(Interface):
 
 
 class IException(Interface):  # not an API
-    """ An interface representing a generic exception """
+    """An interface representing a generic exception"""
 
 
 class IExceptionResponse(IException, IResponse):
@@ -347,17 +347,17 @@ class IExceptionResponse(IException, IResponse):
     :class:`pyramid.httpexceptions.HTTPForbidden`)."""
 
     def prepare(environ):
-        """ Prepares the response for being called as a WSGI application """
+        """Prepares the response for being called as a WSGI application"""
 
 
 class IDict(Interface):
     # Documentation-only interface
 
     def __contains__(k):
-        """ Return ``True`` if key ``k`` exists in the dictionary."""
+        """Return ``True`` if key ``k`` exists in the dictionary."""
 
     def __setitem__(k, value):
-        """ Set a key/value pair into the dictionary"""
+        """Set a key/value pair into the dictionary"""
 
     def __delitem__(k):
         """Delete an item from the dictionary which is passed to the
@@ -368,20 +368,20 @@ class IDict(Interface):
         KeyError if the key doesn't exist"""
 
     def __iter__():
-        """ Return an iterator over the keys of this dictionary """
+        """Return an iterator over the keys of this dictionary"""
 
     def get(k, default=None):
         """Return the value for key ``k`` from the renderer dictionary, or
         the default if no such value exists."""
 
     def items():
-        """ Return a list of [(k,v)] pairs from the dictionary """
+        """Return a list of [(k,v)] pairs from the dictionary"""
 
     def keys():
-        """ Return a list of keys from the dictionary """
+        """Return a list of keys from the dictionary"""
 
     def values():
-        """ Return a list of values from the dictionary """
+        """Return a list of values from the dictionary"""
 
     def pop(k, default=None):
         """Pop the key k from the dictionary and return its value.  If k
@@ -400,10 +400,10 @@ class IDict(Interface):
         the dictionary, return the default"""
 
     def update(d):
-        """ Update the renderer dictionary with another dictionary ``d``."""
+        """Update the renderer dictionary with another dictionary ``d``."""
 
     def clear():
-        """ Clear all values from the dictionary """
+        """Clear all values from the dictionary"""
 
 
 class IBeforeRender(IDict):
@@ -453,7 +453,7 @@ class IRendererInfo(Interface):
     )
 
     def clone():
-        """ Return a shallow copy that does not share any mutable state."""
+        """Return a shallow copy that does not share any mutable state."""
 
 
 class IRendererFactory(Interface):
@@ -633,7 +633,7 @@ class IMultiDict(IDict):  # docs-only interface
     """
 
     def add(key, value):
-        """ Add the key and value, not overwriting any previous value. """
+        """Add the key and value, not overwriting any previous value."""
 
     def dict_of_lists():
         """
@@ -666,7 +666,7 @@ class IMultiDict(IDict):  # docs-only interface
 
 
 class IRequest(Interface):
-    """ Request type interface attached to all request objects """
+    """Request type interface attached to all request objects"""
 
 
 class ITweens(Interface):
@@ -710,20 +710,20 @@ class IAcceptOrder(Interface):
 
 
 class IStaticURLInfo(Interface):
-    """ A policy for generating URLs to static assets """
+    """A policy for generating URLs to static assets"""
 
     def add(config, name, spec, **extra):
-        """ Add a new static info registration """
+        """Add a new static info registration"""
 
     def generate(path, request, **kw):
-        """ Generate a URL for the given path """
+        """Generate a URL for the given path"""
 
     def add_cache_buster(config, spec, cache_buster):
-        """ Add a new cache buster to a particular set of assets """
+        """Add a new cache buster to a particular set of assets"""
 
 
 class IResponseFactory(Interface):
-    """ A utility which generates a response """
+    """A utility which generates a response"""
 
     def __call__(request):
         """Return a response object implementing IResponse,
@@ -732,10 +732,10 @@ class IResponseFactory(Interface):
 
 
 class IRequestFactory(Interface):
-    """ A utility which generates a request """
+    """A utility which generates a request"""
 
     def __call__(environ):
-        """ Return an instance of ``pyramid.request.Request``"""
+        """Return an instance of ``pyramid.request.Request``"""
 
     def blank(path):
         """Return an empty request object (see
@@ -743,23 +743,23 @@ class IRequestFactory(Interface):
 
 
 class IViewClassifier(Interface):
-    """ *Internal only* marker interface for views."""
+    """*Internal only* marker interface for views."""
 
 
 class IExceptionViewClassifier(Interface):
-    """ *Internal only* marker interface for exception views."""
+    """*Internal only* marker interface for exception views."""
 
 
 class IView(Interface):
     def __call__(context, request):
-        """ Must return an object that implements IResponse. """
+        """Must return an object that implements IResponse."""
 
 
 class ISecuredView(IView):
-    """ *Internal only* interface.  Not an API. """
+    """*Internal only* interface.  Not an API."""
 
     def __call_permissive__(context, request):
-        """ Guaranteed-permissive version of __call__ """
+        """Guaranteed-permissive version of __call__"""
 
     def __permitted__(context, request):
         """Return True if view execution will be permitted using the
@@ -772,17 +772,17 @@ class IMultiView(ISecuredView):
     zero or more predicates.  Not an API."""
 
     def add(view, predicates, order, accept=None, phash=None):
-        """ Add a view to the multiview. """
+        """Add a view to the multiview."""
 
 
 class IRootFactory(Interface):
     def __call__(request):
-        """ Return a root object based on the request """
+        """Return a root object based on the request"""
 
 
 class IDefaultRootFactory(Interface):
     def __call__(request):
-        """ Return the *default* root object for an application """
+        """Return the *default* root object for an application"""
 
 
 class ITraverser(Interface):
@@ -915,7 +915,7 @@ class ILocation(Interface):
 
 
 class IDebugLogger(Interface):
-    """ Interface representing a PEP 282 logger """
+    """Interface representing a PEP 282 logger"""
 
 
 ILogger = IDebugLogger  # b/c
@@ -988,14 +988,14 @@ class IRoute(Interface):
 
 
 class IRoutesMapper(Interface):
-    """ Interface representing a Routes ``Mapper`` object """
+    """Interface representing a Routes ``Mapper`` object"""
 
     def get_routes():
         """Return a sequence of Route objects registered in the mapper.
         Static routes will not be returned in this sequence."""
 
     def has_routes():
-        """ Returns ``True`` if any route has been registered. """
+        """Returns ``True`` if any route has been registered."""
 
     def get_route(name):
         """Returns an ``IRoute`` object if a route with the name ``name``
@@ -1009,7 +1009,7 @@ class IRoutesMapper(Interface):
         pregenerator=None,
         static=True,
     ):
-        """ Add a new route. """
+        """Add a new route."""
 
     def generate(name, kw):
         """Generate a URL using the route named ``name`` with the
@@ -1080,7 +1080,7 @@ class IPEP302Loader(Interface):
 
 
 class IPackageOverrides(IPEP302Loader):
-    """ Utility for pkg_resources overrides """
+    """Utility for pkg_resources overrides"""
 
 
 # VH_ROOT_KEY is an interface; its imported from other packages (e.g.
@@ -1089,12 +1089,12 @@ VH_ROOT_KEY = 'HTTP_X_VHM_ROOT'
 
 
 class ILocalizer(Interface):
-    """ Localizer for a specific language """
+    """Localizer for a specific language"""
 
 
 class ILocaleNegotiator(Interface):
     def __call__(request):
-        """ Return a locale name """
+        """Return a locale name"""
 
 
 class ITranslationDirectories(Interface):
@@ -1131,7 +1131,7 @@ class ISessionFactory(Interface):
     returns an ISession object"""
 
     def __call__(request):
-        """ Return an ISession object """
+        """Return an ISession object"""
 
 
 class ISession(IDict):
@@ -1457,7 +1457,7 @@ class IJSONAdapter(Interface):
 
 
 class IPredicateList(Interface):
-    """ Interface representing a predicate list """
+    """Interface representing a predicate list"""
 
 
 class IPredicateInfo(Interface):
@@ -1589,7 +1589,7 @@ class IViewDeriverInfo(Interface):
 
 
 class IViewDerivers(Interface):
-    """ Interface for view derivers list """
+    """Interface for view derivers list"""
 
 
 class ICacheBuster(Interface):
