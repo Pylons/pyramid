@@ -74,6 +74,8 @@ Coding Style
 
     $ $TOX -e lint
 
+Black, isort, and flake8 versions are pinned for stability and reproducibility.
+
 Running Tests
 -------------
 
