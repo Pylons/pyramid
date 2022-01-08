@@ -69,6 +69,10 @@ Coding Style
 
     $ $TOX -e format
 
+- Pyramid uses flake8 (https://pypi.org/project/flake8/) to enforce PEP8 style guidelines.
+  To run flake8, as well as running checks for Black and isort:
+
+    $ $TOX -e lint
 
 Running Tests
 -------------
