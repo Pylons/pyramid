@@ -79,9 +79,7 @@ class IResponse(Interface):
     :class:`pyramid.response.Response` and the HTTP exception classes in
     :mod:`pyramid.httpexceptions`."""
 
-    RequestClass = Attribute(
-        """ Alias for :class:`pyramid.request.Request` """
-    )
+    RequestClass = Attribute("""Alias for :class:`pyramid.request.Request`""")
 
     def __call__(environ, start_response):
         """:term:`WSGI` call interface, should call the start_response
@@ -138,8 +136,8 @@ class IResponse(Interface):
     )
 
     cache_expires = Attribute(
-        """ Get/set the Cache-Control and Expires headers. This sets the
-            response to expire in the number of seconds passed when set. """
+        """Get/set the Cache-Control and Expires headers. This sets the
+            response to expire in the number of seconds passed when set."""
     )
 
     charset = Attribute("""Get/set the charset (in the Content-Type)""")
@@ -174,7 +172,7 @@ class IResponse(Interface):
     content_length = Attribute(
         """Gets and sets and deletes the Content-Length header. For more
         information on Content-Length see RFC 2616 section 14.17.
-        Converts using int. """
+        Converts using int."""
     )
 
     content_location = Attribute(
@@ -229,19 +227,19 @@ class IResponse(Interface):
     )
 
     etag = Attribute(
-        """ Gets and sets and deletes the ETag header. For more information
+        """Gets and sets and deletes the ETag header. For more information
         on ETag see RFC 2616 section 14.19. Converts using Entity tag."""
     )
 
     expires = Attribute(
-        """ Gets and sets and deletes the Expires header. For more
+        """Gets and sets and deletes the Expires header. For more
         information on Expires see RFC 2616 section 14.21. Converts using
         HTTP date."""
     )
 
-    headerlist = Attribute(""" The list of response headers. """)
+    headerlist = Attribute("""The list of response headers.""")
 
-    headers = Attribute(""" The headers in a dictionary-like object """)
+    headers = Attribute("""The headers in a dictionary-like object""")
 
     is_authenticated = Attribute(
         """A boolean indicating whether the request has an authenticated
@@ -253,13 +251,13 @@ class IResponse(Interface):
     )
 
     last_modified = Attribute(
-        """ Gets and sets and deletes the Last-Modified header. For more
+        """Gets and sets and deletes the Last-Modified header. For more
         information on Last-Modified see RFC 2616 section 14.29. Converts
         using HTTP date."""
     )
 
     location = Attribute(
-        """ Gets and sets and deletes the Location header. For more
+        """Gets and sets and deletes the Location header. For more
         information on Location see RFC 2616 section 14.30."""
     )
 
@@ -275,23 +273,23 @@ class IResponse(Interface):
         in-place."""
 
     pragma = Attribute(
-        """ Gets and sets and deletes the Pragma header. For more information
-        on Pragma see RFC 2616 section 14.32. """
+        """Gets and sets and deletes the Pragma header. For more information
+        on Pragma see RFC 2616 section 14.32."""
     )
 
     request = Attribute(
-        """ Return the request associated with this response if any. """
+        """Return the request associated with this response if any."""
     )
 
     retry_after = Attribute(
-        """ Gets and sets and deletes the Retry-After header. For more
+        """Gets and sets and deletes the Retry-After header. For more
         information on Retry-After see RFC 2616 section 14.37. Converts
         using HTTP date or delta seconds."""
     )
 
     server = Attribute(
-        """ Gets and sets and deletes the Server header. For more information
-        on Server see RFC216 section 14.38. """
+        """Gets and sets and deletes the Server header. For more information
+        on Server see RFC216 section 14.38."""
     )
 
     def set_cookie(
@@ -308,12 +306,12 @@ class IResponse(Interface):
     ):
         """Set (add) a cookie for the response"""
 
-    status = Attribute(""" The status string. """)
+    status = Attribute("""The status string.""")
 
-    status_int = Attribute(""" The status as an integer """)
+    status_int = Attribute("""The status as an integer""")
 
     unicode_body = Attribute(
-        """ Get/set the unicode value of the body (using the charset of
+        """Get/set the unicode value of the body (using the charset of
         the Content-Type)"""
     )
 
@@ -327,9 +325,9 @@ class IResponse(Interface):
     )
 
     www_authenticate = Attribute(
-        """ Gets and sets and deletes the WWW-Authenticate header. For more
+        """Gets and sets and deletes the WWW-Authenticate header. For more
         information on WWW-Authenticate see RFC 2616 section 14.47. Converts
-        using 'parse_auth' and 'serialize_auth'. """
+        using 'parse_auth' and 'serialize_auth'."""
     )
 
 
