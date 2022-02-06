@@ -50,6 +50,7 @@ Exception
         * 415 - HTTPUnsupportedMediaType
         * 416 - HTTPRequestRangeNotSatisfiable
         * 417 - HTTPExpectationFailed
+        * 418 - HTTPImATeapot
         * 422 - HTTPUnprocessableEntity
         * 423 - HTTPLocked
         * 424 - HTTPFailedDependency
@@ -1043,6 +1044,24 @@ class HTTPExpectationFailed(HTTPClientError):
     code = 417
     title = 'Expectation Failed'
     explanation = 'Expectation failed.'
+
+
+class HTTPImATeapot(HTTPClientError):
+    """
+    subclass of :class:`~HTTPClientError`
+
+    This indicates that the server refuses to brew coffee because
+    it is, in fact and permanently, a teapot. The resulting entity
+    body may be short and stout.
+
+    See RFC2324 and RFC7168 for more information.
+
+    code: 418, title: I'm a teapot
+    """
+
+    code = 418
+    title = "I'm a teapot"
+    explanation = "Refusing to brew coffee because I'm a teapot."
 
 
 class HTTPUnprocessableEntity(HTTPClientError):
