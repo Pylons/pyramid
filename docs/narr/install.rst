@@ -5,7 +5,7 @@ Installing :app:`Pyramid`
 
 .. note::
 
-    This installation guide emphasizes the use of Python 3.6 and greater for
+    This installation guide emphasizes the use of Python 3.7 and greater for
     simplicity.
 
 
@@ -15,13 +15,14 @@ Installing :app:`Pyramid`
 Before You Install Pyramid
 --------------------------
 
-Install Python version 3.6 or greater for your operating system, and satisfy
+Install Python version 3.7 or greater for your operating system, and satisfy
 the :ref:`requirements-for-installing-packages`, as described in
 the following sections.
 
 .. sidebar:: Python Versions
 
-    As of this writing, :app:`Pyramid` is tested against Python 3.7, 3.8, 3.9, and 3.10 and PyPy3.
+    As of this writing, :app:`Pyramid` is tested against Python 3.7, 3.8, 3.9,
+    and 3.10 and PyPy (matches CPython version 3.8).
 
 :app:`Pyramid` is known to run on all popular Unix-like systems such as Linux,
 macOS, and FreeBSD, as well as on Windows platforms.  It is also known to
