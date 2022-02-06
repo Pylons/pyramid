@@ -42,9 +42,6 @@ jobs:
                       architecture: x86
                     - os: "macos-latest"
                       architecture: x86
-                    # PyPy3 on Windows doesn't seem to work
-                    - os: "windows-latest"
-                      py: "pypy-3.8"
 
         name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
