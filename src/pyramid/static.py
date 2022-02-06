@@ -171,7 +171,7 @@ class static_view:
             return name
 
     def get_possible_files(self, resource_name):
-        """ Return a sorted list of ``(size, encoding, path)`` entries."""
+        """Return a sorted list of ``(size, encoding, path)`` entries."""
         result = self.filemap.get(resource_name)
         if result is not None:
             return result
@@ -206,7 +206,7 @@ class static_view:
         return result
 
     def find_best_match(self, request, files):
-        """ Return ``(path | None, encoding)``."""
+        """Return ``(path | None, encoding)``."""
         # if the client did not specify encodings then assume only the
         # identity is acceptable
         if not request.accept_encoding:
@@ -408,7 +408,7 @@ class ManifestCacheBuster:
 
     @property
     def manifest(self):
-        """ The current manifest dictionary."""
+        """The current manifest dictionary."""
         if self.reload:
             if not self.exists(self.manifest_path):
                 return {}
