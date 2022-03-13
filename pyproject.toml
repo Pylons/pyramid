@@ -5,7 +5,8 @@ build-backend = "setuptools.build_meta"
 [tool.black]
 line-length = 79
 skip-string-normalization = true
-py36 = false
+# do not set target-version as black doesn't have one for py27
+# target-version = ['py27', 'py34', 'py36', 'py37', 'py38', 'py39']
 exclude = '''
 /(
     \.git
