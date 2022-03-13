@@ -171,7 +171,7 @@ class PermitsResult(int):
 
     @property
     def msg(self):
-        """ A string indicating why the result was generated."""
+        """A string indicating why the result was generated."""
         return self.s % self.args
 
     def __str__(self):
@@ -212,7 +212,7 @@ class Allowed(PermitsResult):
 
 
 class SecurityAPIMixin:
-    """ Mixin for Request class providing auth-related properties. """
+    """Mixin for Request class providing auth-related properties."""
 
     @property
     def identity(self):
@@ -278,7 +278,7 @@ class SecurityAPIMixin:
 
 
 class AuthenticationAPIMixin:
-    """ Mixin for Request class providing compatibility properties. """
+    """Mixin for Request class providing compatibility properties."""
 
     @property
     def unauthenticated_userid(self):
@@ -396,7 +396,7 @@ Deny = 'Deny'
 
 
 class AllPermissionsList:
-    """ Stand in 'permission list' to represent all permissions """
+    """Stand in 'permission list' to represent all permissions"""
 
     def __iter__(self):
         return iter(())

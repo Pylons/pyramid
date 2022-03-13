@@ -45,7 +45,7 @@ def package_name(pkg_or_module):
 
 
 def package_of(pkg_or_module):
-    """ Return the package of a module or return the package itself """
+    """Return the package of a module or return the package itself"""
     pkg_name = package_name(pkg_or_module)
     __import__(pkg_name)
     return sys.modules[pkg_name]
@@ -334,7 +334,7 @@ class DottedNameResolver(Resolver):
             return self._zope_dottedname_style(dotted, package)
 
     def _pkg_resources_style(self, value, package):
-        """ package.module:attr style """
+        """package.module:attr style"""
         if value.startswith(('.', ':')):
             if not package:
                 raise ValueError(
@@ -354,7 +354,7 @@ class DottedNameResolver(Resolver):
             return ep.load(False)  # pragma: NO COVER
 
     def _zope_dottedname_style(self, value, package):
-        """ package.module.attr style """
+        """package.module.attr style"""
         module = getattr(package, '__name__', None)  # package may be None
         if not module:
             module = None

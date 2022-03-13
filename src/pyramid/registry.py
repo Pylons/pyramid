@@ -295,7 +295,7 @@ def undefer(v):
 
 
 class predvalseq(tuple):
-    """ A subtype of tuple used to represent a sequence of predicate values """
+    """A subtype of tuple used to represent a sequence of predicate values"""
 
 
 global_registry = Registry('global')

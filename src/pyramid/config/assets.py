@@ -34,7 +34,7 @@ class OverrideProvider(pkg_resources.DefaultProvider):
         )
 
     def get_resource_stream(self, manager, resource_name):
-        """ Return a readable file-like object for resource_name."""
+        """Return a readable file-like object for resource_name."""
         overrides = self._get_overrides()
         if overrides is not None:
             stream = overrides.get_stream(resource_name)
@@ -45,7 +45,7 @@ class OverrideProvider(pkg_resources.DefaultProvider):
         )
 
     def get_resource_string(self, manager, resource_name):
-        """ Return a string containing the contents of resource_name."""
+        """Return a string containing the contents of resource_name."""
         overrides = self._get_overrides()
         if overrides is not None:
             string = overrides.get_string(resource_name)
