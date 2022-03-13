@@ -21,29 +21,29 @@ jobs:
                     - "3.9"
                     - "pypy-3.8"
                 os:
-                    - "ubuntu-latest"
-                    - "windows-latest"
-                    - "macos-latest"
+                    - "ubuntu-20.04"
+                    - "windows-2022"
+                    - "macos-11"
                 architecture:
                     - x64
                     - x86
 
                 include:
-                    # Only run coverage on ubuntu-latest, except on pypy3
-                    - os: "ubuntu-latest"
+                    # Only run coverage on ubuntu-20.04, except on pypy3
+                    - os: "ubuntu-20.04"
                       pytest-args: "--cov"
-                    - os: "ubuntu-latest"
+                    - os: "ubuntu-20.04"
                       py: "pypy-3.8"
                       pytest-args: ""
 
                 exclude:
                     # Linux and macOS don't have x86 python
-                    - os: "ubuntu-latest"
+                    - os: "ubuntu-20.04"
                       architecture: x86
-                    - os: "macos-latest"
+                    - os: "macos-11"
                       architecture: x86
                     # PyPy3 on Windows doesn't seem to work
-                    - os: "windows-latest"
+                    - os: "windows-2022"
                       py: "pypy-3.8"
 
         name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
@@ -59,7 +59,7 @@ jobs:
             - name: Running tox
               run: tox -e py -- ${{ matrix.pytest-args }}
     coverage:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         name: Validate coverage
         steps:
             - uses: actions/checkout@v2
@@ -71,7 +71,7 @@ jobs:
             - run: pip install tox
             - run: tox -e py38-cover,coverage
     docs:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         name: Build the documentation
         steps:
             - uses: actions/checkout@v2
@@ -83,7 +83,7 @@ jobs:
             - run: pip install tox
             - run: tox -e docs
     lint:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         name: Lint the package
         steps:
             - uses: actions/checkout@v2
