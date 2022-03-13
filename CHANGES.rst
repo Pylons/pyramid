@@ -5,6 +5,11 @@ unreleased
   ``pyramid.decorator.reify``.
   See https://github.com/Pylons/pyramid/pull/3660
 
+- Fix method signatures in docs for
+  ``pyramid.config.Configurator.add_static_view`` and
+  ``pyramid.config.Configurator.override_asset``.
+  See https://github.com/Pylons/pyramid/pull/3699
+
 2.0 (2021-02-28)
 ================
 
