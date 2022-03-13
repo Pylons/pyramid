@@ -19,7 +19,7 @@ jobs:
                     - "3.7"
                     - "3.8"
                     - "3.9"
-                    - "pypy3"
+                    - "pypy3-3.8"
                 os:
                     - "ubuntu-latest"
                     - "windows-latest"
@@ -66,7 +66,7 @@ jobs:
             - name: Setup python
               uses: actions/setup-python@v1
               with:
-                  python-version: 3.8
+                  python-version: "3.8"
                   architecture: x64
             - run: pip install tox
             - run: tox -e py38-cover,coverage
@@ -78,7 +78,7 @@ jobs:
             - name: Setup python
               uses: actions/setup-python@v2
               with:
-                  python-version: 3.8
+                  python-version: "3.8"
                   architecture: x64
             - run: pip install tox
             - run: tox -e docs
@@ -90,7 +90,7 @@ jobs:
             - name: Setup python
               uses: actions/setup-python@v2
               with:
-                  python-version: 3.8
+                  python-version: "3.8"
                   architecture: x64
             - run: pip install tox
             - run: tox -e lint
