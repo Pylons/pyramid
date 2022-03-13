@@ -393,10 +393,10 @@ def resig(app, what, name, obj, options, signature, return_annotation):
     in configurator """
     docobj = getattr(obj, '__docobj__', None)
     if docobj is not None:
-        argspec = inspect.getargspec(docobj)
-        if argspec[0] and argspec[0][0] in ('cls', 'self'):
-            del argspec[0][0]
-        signature = inspect.formatargspec(*argspec)
+        params = list(inspect.signature(docobj).parameters.values())
+        if params and params[0].name in ('cls', 'self'):
+            del params[0]
+        signature = str(inspect.Signature(params))
     return signature, return_annotation
 
 # turn off all line numbers in latex formatting
