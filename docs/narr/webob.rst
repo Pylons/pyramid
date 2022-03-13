@@ -14,10 +14,10 @@ Request and Response Objects
 :term:`request` and :term:`response` object implementations.  The
 :term:`request` object that is passed to a :app:`Pyramid` :term:`view` is an
 instance of the :class:`pyramid.request.Request` class, which is a subclass of
-:class:`webob.Request`.  The :term:`response` returned from a :app:`Pyramid`
+:class:`webob.request.Request`.  The :term:`response` returned from a :app:`Pyramid`
 :term:`view` :term:`renderer` is an instance of the
 :mod:`pyramid.response.Response` class, which is a subclass of the
-:class:`webob.Response` class.  Users can also return an instance of
+:class:`webob.response.Response` class.  Users can also return an instance of
 :class:`pyramid.response.Response` directly from a view as necessary.
 
 WebOb is a project separate from :app:`Pyramid` with a separate set of authors
@@ -369,7 +369,7 @@ Response
 
 The :app:`Pyramid` response object can be imported as
 :class:`pyramid.response.Response`.  This class is a subclass of the
-``webob.Response`` class.  The subclass does not add or change any
+``webob.reponse.Response`` class.  The subclass does not add or change any
 functionality, so the WebOb Response documentation will be completely relevant
 for this class as well.
 
