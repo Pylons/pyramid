@@ -38,7 +38,7 @@ class RoutesConfiguratorMixin:
         pregenerator=None,
         static=False,
         inherit_slash=None,
-        **predicates
+        **predicates,
     ):
         """Add a :term:`route configuration` to the current configuration
         state.  Arguments to ``add_route`` are divided into *predicate*

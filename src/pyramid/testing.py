@@ -327,7 +327,7 @@ class DummyRequest(
         cookies=None,
         post=None,
         accept=None,
-        **kw
+        **kw,
     ):
         if environ is None:
             environ = {}
