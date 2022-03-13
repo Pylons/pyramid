@@ -160,9 +160,9 @@ class SharedCookieSessionTests:
         response = Response()
         self.assertEqual(session._set_cookie(response), True)
         cookieval = response.headerlist[-1][1]
-        val, domain, path, secure, httponly, samesite = [
+        val, domain, path, secure, httponly, samesite = (
             x.strip() for x in cookieval.split(';')
-        ]
+        )
         self.assertTrue(val.startswith('abc='))
         self.assertEqual(domain, 'Domain=localhost')
         self.assertEqual(path, 'Path=/foo')

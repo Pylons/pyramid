@@ -52,7 +52,7 @@ class PathInfoPredicate:
         self.val = val
 
     def text(self):
-        return 'path_info = %s' % (self.orig,)
+        return f'path_info = {self.orig}'
 
     phash = text
 
@@ -81,7 +81,7 @@ class RequestParamPredicate:
 
     def text(self):
         return 'request_param %s' % ','.join(
-            ['%s=%s' % (x, y) if y else x for x, y in self.reqs]
+            [f'{x}={y}' if y else x for x, y in self.reqs]
         )
 
     phash = text
@@ -116,7 +116,7 @@ class HeaderPredicate:
 
     def text(self):
         return 'header %s' % ', '.join(
-            '%s=%s' % (name, val_str) if val_str else name
+            f'{name}={val_str}' if val_str else name
             for name, _, val_str in self.val
         )
 
@@ -144,7 +144,7 @@ class AcceptPredicate:
         self.values = values
 
     def text(self):
-        return 'accept = %s' % (', '.join(self.values),)
+        return 'accept = {}'.format(', '.join(self.values))
 
     phash = text
 
@@ -157,7 +157,7 @@ class ContainmentPredicate:
         self.val = config.maybe_dotted(val)
 
     def text(self):
-        return 'containment = %s' % (self.val,)
+        return f'containment = {self.val}'
 
     phash = text
 
@@ -171,7 +171,7 @@ class RequestTypePredicate:
         self.val = val
 
     def text(self):
-        return 'request_type = %s' % (self.val,)
+        return f'request_type = {self.val}'
 
     phash = text
 
@@ -187,9 +187,7 @@ class MatchParamPredicate:
         self.reqs = [(x.strip(), y.strip()) for x, y in reqs]
 
     def text(self):
-        return 'match_param %s' % ','.join(
-            ['%s=%s' % (x, y) for x, y in self.reqs]
-        )
+        return 'match_param %s' % ','.join([f'{x}={y}' for x, y in self.reqs])
 
     phash = text
 
@@ -266,7 +264,7 @@ class PhysicalPathPredicate:
             self.val = ('',) + val
 
     def text(self):
-        return 'physical_path = %s' % (self.val,)
+        return f'physical_path = {self.val}'
 
     phash = text
 
@@ -281,7 +279,7 @@ class IsAuthenticatedPredicate:
         self.val = val
 
     def text(self):
-        return "is_authenticated = %r" % (self.val,)
+        return f"is_authenticated = {self.val!r}"
 
     phash = text
 

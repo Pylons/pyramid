@@ -227,7 +227,7 @@ ${body}'''
         json_formatter=None,
         **kw,
     ):
-        status = '%s %s' % (self.code, self.title)
+        status = f'{self.code} {self.title}'
         Response.__init__(self, status=status, **kw)
         Exception.__init__(self, detail)
         self.detail = self.message = detail

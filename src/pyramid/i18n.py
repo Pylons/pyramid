@@ -273,7 +273,7 @@ class Translations(gettext.GNUTranslations):
             return cls(fileobj=fp, domain=domain)
 
     def __repr__(self):
-        return '<%s: "%s">' % (
+        return '<{}: "{}">'.format(
             type(self).__name__,
             self._info.get('project-id-version'),
         )

@@ -138,11 +138,11 @@ class static_view:
 
         # normalize asset spec or fs path into resource_path
         if self.package_name:  # package resource
-            resource_path = '%s/%s' % (self.docroot.rstrip('/'), path)
+            resource_path = '{}/{}'.format(self.docroot.rstrip('/'), path)
             if resource_isdir(self.package_name, resource_path):
                 if not request.path_url.endswith('/'):
                     raise self.add_slash_redirect(request)
-                resource_path = '%s/%s' % (
+                resource_path = '{}/{}'.format(
                     resource_path.rstrip('/'),
                     self.index,
                 )

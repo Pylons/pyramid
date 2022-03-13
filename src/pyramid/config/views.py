@@ -904,7 +904,7 @@ class ViewsConfiguratorMixin:
         discriminator = Deferred(discrim_func)
 
         if inspect.isclass(view) and attr:
-            view_desc = 'method %r of %s' % (
+            view_desc = 'method {!r} of {}'.format(
                 attr,
                 self.object_description(view),
             )
@@ -1160,7 +1160,7 @@ class ViewsConfiguratorMixin:
             for opt in getattr(deriver, 'options', []):
                 kw.pop(opt, None)
         if kw:
-            raise ConfigurationError('Unknown view options: %s' % (kw,))
+            raise ConfigurationError(f'Unknown view options: {kw}')
 
     def _apply_view_derivers(self, info):
         # These derivers are not really derivers and so have fixed order
@@ -2248,7 +2248,7 @@ class StaticURLInfo:
             # pattern, plus any extras passed to us via add_static_view
             pattern = "%s*subpath" % name  # name already ends with slash
             if config.route_prefix:
-                route_name = '__%s/%s' % (config.route_prefix, name)
+                route_name = f'__{config.route_prefix}/{name}'
             else:
                 route_name = '__%s' % name
             config.add_route(route_name, pattern, **extra)
@@ -2335,7 +2335,7 @@ class StaticURLInfo:
         rawspec = None
 
         if pkg_name is not None:
-            pathspec = '{}:{}{}'.format(pkg_name, pkg_subpath, subpath)
+            pathspec = f'{pkg_name}:{pkg_subpath}{subpath}'
             overrides = registry.queryUtility(IPackageOverrides, name=pkg_name)
             if overrides is not None:
                 resource_name = posixpath.join(pkg_subpath, subpath)
@@ -2343,7 +2343,7 @@ class StaticURLInfo:
                 for source, filtered_path in sources:
                     rawspec = source.get_path(filtered_path)
                     if hasattr(source, 'pkg_name'):
-                        rawspec = '{}:{}'.format(source.pkg_name, rawspec)
+                        rawspec = f'{source.pkg_name}:{rawspec}'
                     break
 
         else:

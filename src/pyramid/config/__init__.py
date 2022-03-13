@@ -447,7 +447,7 @@ class Configurator(
         package, filename = resolve_asset_spec(path_or_spec, self.package_name)
         if package is None:
             return filename  # absolute filename
-        return '%s:%s' % (package, filename)
+        return f'{package}:{filename}'
 
     def _fix_registry(self):
         """Fix up a ZCA component registry that is not a

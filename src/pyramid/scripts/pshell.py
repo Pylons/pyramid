@@ -19,7 +19,7 @@ def main(argv=sys.argv, quiet=False):
 
 def python_shell_runner(env, help, interact=interact):
     cprt = 'Type "help" for more information.'
-    banner = "Python %s on %s\n%s" % (sys.version, sys.platform, cprt)
+    banner = f"Python {sys.version} on {sys.platform}\n{cprt}"
     banner += '\n\n' + help + '\n'
     interact(banner, local=env)
 
@@ -222,7 +222,7 @@ class PShellCommand:
 
         self.out('Available shells:')
         for name in sorted_names:
-            self.out('  %s' % (name,))
+            self.out(f'  {name}')
         return 0
 
     def find_all_shells(self):

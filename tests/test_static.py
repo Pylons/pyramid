@@ -97,7 +97,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         inst = self._makeOne('tests:fixtures/static')
         dds = '..' + os.sep
         request = self._makeRequest(
-            {'PATH_INFO': '/subdir/%s%sminimal.pt' % (dds, dds)}
+            {'PATH_INFO': f'/subdir/{dds}{dds}minimal.pt'}
         )
         context = DummyContext()
         from pyramid.httpexceptions import HTTPNotFound

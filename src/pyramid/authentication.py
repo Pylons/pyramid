@@ -74,7 +74,7 @@ class CallbackAuthenticationPolicy:
 
         if self.callback is None:
             debug and self._log(
-                'there was no groupfinder callback; returning %r' % (userid,),
+                f'there was no groupfinder callback; returning {userid!r}',
                 'authenticated_userid',
                 request,
             )
@@ -152,14 +152,14 @@ class CallbackAuthenticationPolicy:
         else:
             groups = self.callback(userid, request)
             debug and self._log(
-                'groupfinder callback returned %r as groups' % (groups,),
+                f'groupfinder callback returned {groups!r} as groups',
                 'effective_principals',
                 request,
             )
 
         if groups is None:  # is None!
             debug and self._log(
-                'returning effective principals: %r' % (effective_principals,),
+                f'returning effective principals: {effective_principals!r}',
                 'effective_principals',
                 request,
             )
@@ -170,7 +170,7 @@ class CallbackAuthenticationPolicy:
         effective_principals.extend(groups)
 
         debug and self._log(
-            'returning effective principals: %r' % (effective_principals,),
+            f'returning effective principals: {effective_principals!r}',
             'effective_principals',
             request,
         )
@@ -717,7 +717,7 @@ class AuthTicket:
         )
 
     def cookie_value(self):
-        v = '%s%08x%s!' % (self.digest(), int(self.time), quote(self.userid))
+        v = f'{self.digest()}{int(self.time):08x}{quote(self.userid)}!'
         if self.tokens:
             v += self.tokens + '!'
         v += self.user_data
@@ -1174,9 +1174,9 @@ class AuthTktCookieHelper:
                 try:
                     token = ascii_(token)
                 except UnicodeEncodeError:
-                    raise ValueError("Invalid token %r" % (token,))
+                    raise ValueError(f"Invalid token {token!r}")
             if not (isinstance(token, str) and VALID_TOKEN.match(token)):
-                raise ValueError("Invalid token %r" % (token,))
+                raise ValueError(f"Invalid token {token!r}")
             new_tokens.append(token)
         tokens = tuple(new_tokens)
 

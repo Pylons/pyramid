@@ -33,7 +33,7 @@ class TestFileResponse(unittest.TestCase):
 
     def _getPath(self, suffix='txt'):
         here = os.path.dirname(__file__)
-        return os.path.join(here, 'fixtures', 'minimal.%s' % (suffix,))
+        return os.path.join(here, 'fixtures', f'minimal.{suffix}')
 
     def test_with_image_content_type(self):
         path = self._getPath('jpg')

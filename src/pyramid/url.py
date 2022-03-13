@@ -634,7 +634,7 @@ class URLMethodsMixin:
                 # /absolute/path it's a relative/path; this means its relative
                 # to the package in which the caller's module is defined.
                 package = caller_package()
-                path = '%s:%s' % (package.__name__, path)
+                path = f'{package.__name__}:{path}'
 
         try:
             reg = self.registry
@@ -679,7 +679,7 @@ class URLMethodsMixin:
                 # /absolute/path it's a relative/path; this means its relative
                 # to the package in which the caller's module is defined.
                 package = caller_package()
-                path = '%s:%s' % (package.__name__, path)
+                path = f'{package.__name__}:{path}'
 
         kw['_app_url'] = self.script_name
         return self.static_url(path, **kw)
@@ -834,7 +834,7 @@ def static_url(path, request, **kw):
             # /absolute/path it's a relative/path; this means its relative
             # to the package in which the caller's module is defined.
             package = caller_package()
-            path = '%s:%s' % (package.__name__, path)
+            path = f'{package.__name__}:{path}'
     return request.static_url(path, **kw)
 
 
@@ -853,7 +853,7 @@ def static_path(path, request, **kw):
             # /absolute/path it's a relative/path; this means its relative
             # to the package in which the caller's module is defined.
             package = caller_package()
-            path = '%s:%s' % (package.__name__, path)
+            path = f'{package.__name__}:{path}'
     return request.static_path(path, **kw)
 
 

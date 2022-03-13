@@ -447,7 +447,7 @@ class TestForbiddenAppHasResult(IntegrationBase, unittest.TestCase):
 
     def test_it(self):
         res = self.testapp.get('/x', status=403)
-        message, result = [x.strip() for x in res.body.split(b'\n')]
+        message, result = (x.strip() for x in res.body.split(b'\n'))
         self.assertTrue(message.endswith(b'failed permission check'))
         self.assertTrue(
             result.startswith(

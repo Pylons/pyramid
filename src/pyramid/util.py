@@ -388,17 +388,17 @@ def object_description(object):
         return 'module %s' % modulename
     if inspect.ismethod(object):
         oself = getattr(object, '__self__', None)
-        return 'method %s of class %s.%s' % (
+        return 'method {} of class {}.{}'.format(
             object.__name__,
             modulename,
             oself.__class__.__name__,
         )
 
     if inspect.isclass(object):
-        dottedname = '%s.%s' % (modulename, object.__name__)
+        dottedname = f'{modulename}.{object.__name__}'
         return 'class %s' % dottedname
     if inspect.isfunction(object):
-        dottedname = '%s.%s' % (modulename, object.__name__)
+        dottedname = f'{modulename}.{object.__name__}'
         return 'function %s' % dottedname
     return 'object %s' % str(object)
 

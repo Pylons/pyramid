@@ -320,7 +320,7 @@ class TestPRoutesCommand(unittest.TestCase):
         compare_to = L[-1].split()[:3]
         view_module = 'tests.test_scripts.dummy'
         view_str = '<tests.test_scripts.dummy.DummyMultiView'
-        final = '%s.%s' % (view_module, view_str)
+        final = f'{view_module}.{view_str}'
 
         self.assertEqual(compare_to, ['a', '/a', final])
 

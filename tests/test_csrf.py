@@ -128,7 +128,7 @@ class TestCookieCSRFStoragePolicy(unittest.TestCase):
             [
                 (
                     'Set-Cookie',
-                    'csrf_token={}; Path=/; SameSite=Lax'.format(token),
+                    f'csrf_token={token}; Path=/; SameSite=Lax',
                 )
             ],
         )
@@ -142,7 +142,7 @@ class TestCookieCSRFStoragePolicy(unittest.TestCase):
         request.response_callback(request, response)
         self.assertEqual(
             response.headerlist,
-            [('Set-Cookie', 'csrf_token={}; Path=/'.format(token))],
+            [('Set-Cookie', f'csrf_token={token}; Path=/')],
         )
 
     def test_existing_cookie_csrf_does_not_set_cookie(self):
@@ -169,7 +169,7 @@ class TestCookieCSRFStoragePolicy(unittest.TestCase):
             [
                 (
                     'Set-Cookie',
-                    'csrf_token={}; Path=/; SameSite=Lax'.format(token),
+                    f'csrf_token={token}; Path=/; SameSite=Lax',
                 )
             ],
         )

@@ -62,7 +62,7 @@ class DefaultViewMapper:
             mapped_view = self.map_class_requestonly(view)
         else:
             mapped_view = self.map_class_native(view)
-        mapped_view.__text__ = 'method %s of %s' % (
+        mapped_view.__text__ = 'method {} of {}'.format(
             self.attr or '__call__',
             object_description(view),
         )
@@ -92,7 +92,7 @@ class DefaultViewMapper:
                     return _mapped_view(context, request)
 
             if self.attr is not None:
-                mapped_view.__text__ = 'attr %s of %s' % (
+                mapped_view.__text__ = 'attr {} of {}'.format(
                     self.attr,
                     object_description(view),
                 )

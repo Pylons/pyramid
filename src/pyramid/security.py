@@ -178,7 +178,7 @@ class PermitsResult(int):
         return self.msg
 
     def __repr__(self):
-        return '<%s instance at %s with msg %r>' % (
+        return '<{} instance at {} with msg {!r}>'.format(
             self.__class__.__name__,
             id(self),
             self.msg,

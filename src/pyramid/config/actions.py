@@ -537,7 +537,7 @@ class ActionInfo:
     def __str__(self):
         srclines = self.src.split('\n')
         src = '\n'.join('    %s' % x for x in srclines)
-        return 'Line %s of file %s:\n%s' % (self.line, self.file, src)
+        return f'Line {self.line} of file {self.file}:\n{src}'
 
 
 def action_method(wrapped):
