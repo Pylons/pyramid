@@ -8,7 +8,7 @@ class BaseRESTView(object):
 
 
 class PetRESTView(BaseRESTView):
-    """ REST Controller to control action of an avatar """
+    """REST Controller to control action of an avatar"""
 
     def __init__(self, context, request):
         super(PetRESTView, self).__init__(context, request)

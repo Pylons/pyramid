@@ -268,7 +268,7 @@ def BaseCookieSessionFactory(
 
     @implementer(ISession)
     class CookieSession(dict):
-        """ Dictionary-like session object """
+        """Dictionary-like session object"""
 
         # configuration parameters
         _cookie_name = cookie_name

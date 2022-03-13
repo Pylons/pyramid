@@ -229,7 +229,7 @@ def get_localizer(request):
 
 
 class Translations(gettext.GNUTranslations, object):
-    """An extended translation catalog class (ripped off from Babel) """
+    """An extended translation catalog class (ripped off from Babel)"""
 
     DEFAULT_DOMAIN = 'messages'
 
@@ -387,7 +387,7 @@ class Translations(gettext.GNUTranslations, object):
 class LocalizerRequestMixin(object):
     @reify
     def localizer(self):
-        """ Convenience property to return a localizer """
+        """Convenience property to return a localizer"""
         registry = self.registry
 
         current_locale_name = self.locale_name

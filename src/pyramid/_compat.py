@@ -66,7 +66,6 @@ if PY2:
             s = s.encode('ascii')
         return str(s)
 
-
 else:
 
     def ascii_native_(s):
@@ -92,7 +91,6 @@ if PY2:
         if isinstance(s, text_type):
             return s.encode(encoding, errors)
         return str(s)
-
 
 else:
 
@@ -130,7 +128,6 @@ if PY2:
         v, encoding='utf-8', errors='replace'
     ):  # pragma: no cover
         return native_(url_unquote_text(v, encoding, errors))
-
 
 else:
     from urllib import parse
@@ -192,7 +189,6 @@ if PY2:  # pragma: no cover
     def iterkeys_(d):
         return d.iterkeys()
 
-
 else:  # pragma: no cover
 
     def iteritems_(d):
@@ -217,7 +213,6 @@ if PY2:
 
     def is_nonstr_iter(v):
         return hasattr(v, '__iter__')
-
 
 else:
 
@@ -268,7 +263,6 @@ if PY2:
     def decode_path_info(path):
         return path.decode('utf-8')
 
-
 else:
     # see PEP 3333 for why we encode WSGI PATH_INFO to latin-1 before
     # decoding it to utf-8
@@ -281,7 +275,6 @@ if PY2:
 
     def unquote_bytes_to_wsgi(bytestring):
         return unquote_to_bytes(bytestring)
-
 
 else:
     # see PEP 3333 for why we decode the path to latin-1

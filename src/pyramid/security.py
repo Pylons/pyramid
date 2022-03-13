@@ -19,7 +19,7 @@ Deny = 'Deny'
 
 
 class AllPermissionsList(object):
-    """ Stand in 'permission list' to represent all permissions """
+    """Stand in 'permission list' to represent all permissions"""
 
     def __iter__(self):
         return iter(())
@@ -266,7 +266,7 @@ class PermitsResult(int):
 
     @property
     def msg(self):
-        """ A string indicating why the result was generated."""
+        """A string indicating why the result was generated."""
         return self.s % self.args
 
     def __str__(self):
