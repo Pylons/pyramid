@@ -10,6 +10,10 @@ unreleased
   ``pyramid.config.Configurator.override_asset``.
   See https://github.com/Pylons/pyramid/pull/3699
 
+- Remove obsolete stackframe hack used in Python 3.5.0 when showing
+  configurator conflict errors.
+  See https://github.com/Pylons/pyramid/pull/3700
+
 2.0 (2021-02-28)
 ================
 
