@@ -45,7 +45,7 @@ class DummyRootFactory(object):
 
 
 class DummySecurityPolicy(object):
-    """ A standin for both an IAuthentication and IAuthorization policy """
+    """A standin for both an IAuthentication and IAuthorization policy"""
 
     def __init__(
         self,
@@ -133,7 +133,7 @@ class DummyTemplateRenderer(object):
         return self.string_response
 
     def __getattr__(self, k):
-        """ Backwards compatibility """
+        """Backwards compatibility"""
         val = self._received.get(k, _marker)
         if val is _marker:
             val = self._implementation._received.get(k, _marker)
@@ -168,7 +168,7 @@ class DummyTemplateRenderer(object):
 
 
 class DummyResource:
-    """ A dummy :app:`Pyramid` :term:`resource` object."""
+    """A dummy :app:`Pyramid` :term:`resource` object."""
 
     def __init__(
         self, __name__=None, __parent__=None, __provides__=None, **kw
@@ -207,7 +207,7 @@ class DummyResource:
         self.subs[name] = val
 
     def __getitem__(self, name):
-        """ Return a named subobject (see ``__setitem__``)"""
+        """Return a named subobject (see ``__setitem__``)"""
         ob = self.subs[name]
         return ob
 
@@ -218,15 +218,15 @@ class DummyResource:
         return self.subs.get(name, default)
 
     def values(self):
-        """ Return the values set by __setitem__ """
+        """Return the values set by __setitem__"""
         return self.subs.values()
 
     def items(self):
-        """ Return the items set by __setitem__ """
+        """Return the items set by __setitem__"""
         return self.subs.items()
 
     def keys(self):
-        """ Return the keys set by __setitem__ """
+        """Return the keys set by __setitem__"""
         return self.subs.keys()
 
     __iter__ = keys
@@ -575,7 +575,7 @@ def tearDown(unhook_zca=True):
 
 
 def cleanUp(*arg, **kw):
-    """ An alias for :func:`pyramid.testing.setUp`. """
+    """An alias for :func:`pyramid.testing.setUp`."""
     package = kw.get('package', None)
     if package is None:
         package = caller_package()

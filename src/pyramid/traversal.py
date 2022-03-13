@@ -603,7 +603,6 @@ if PY2:
             _segment_cache[(segment, safe)] = result
             return result
 
-
 else:
 
     def quote_path_segment(segment, safe=PATH_SEGMENT_SAFE):

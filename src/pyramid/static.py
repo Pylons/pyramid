@@ -287,7 +287,7 @@ class ManifestCacheBuster(object):
 
     @property
     def manifest(self):
-        """ The current manifest dictionary."""
+        """The current manifest dictionary."""
         if self.reload:
             if not self.exists(self.manifest_path):
                 return {}

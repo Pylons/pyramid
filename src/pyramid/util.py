@@ -142,7 +142,7 @@ class InstancePropertyHelper(object):
         self.properties[name] = fn
 
     def apply(self, target):
-        """ Apply all configured properties to the ``target`` instance."""
+        """Apply all configured properties to the ``target`` instance."""
         if self.properties:
             self.apply_properties(target, self.properties)
 
@@ -235,7 +235,7 @@ class WeakOrderedSet(object):
         self._order = []
 
     def add(self, item):
-        """ Add an item to the set."""
+        """Add an item to the set."""
         oid = id(item)
         if oid in self._items:
             self._order.remove(oid)
@@ -246,17 +246,17 @@ class WeakOrderedSet(object):
         self._order.append(oid)
 
     def _remove_by_id(self, oid):
-        """ Remove an item from the set."""
+        """Remove an item from the set."""
         if oid in self._items:
             del self._items[oid]
             self._order.remove(oid)
 
     def remove(self, item):
-        """ Remove an item from the set."""
+        """Remove an item from the set."""
         self._remove_by_id(id(item))
 
     def empty(self):
-        """ Clear all objects from the set."""
+        """Clear all objects from the set."""
         self._items = {}
         self._order = []
 
@@ -413,7 +413,7 @@ class TopologicalSorter(object):
         return self.name2val.values()
 
     def remove(self, name):
-        """ Remove a node from the sort input """
+        """Remove a node from the sort input"""
         self.names.remove(name)
         del self.name2val[name]
         after = self.name2after.pop(name, [])
@@ -467,7 +467,7 @@ class TopologicalSorter(object):
             self.req_before.add(name)
 
     def sorted(self):
-        """ Returns the sort input values in topologically sorted order"""
+        """Returns the sort input values in topologically sorted order"""
         order = [(self.first, self.last)]
         roots = []
         graph = {}

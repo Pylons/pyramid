@@ -34,7 +34,7 @@ VALID_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9+_-]*$")
 
 
 class CallbackAuthenticationPolicy(object):
-    """ Abstract class """
+    """Abstract class"""
 
     debug = False
     callback = None
@@ -274,7 +274,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
             return userid
 
     def unauthenticated_userid(self, request):
-        """ Return the ``repoze.who.userid`` key from the detected identity."""
+        """Return the ``repoze.who.userid`` key from the detected identity."""
         identity = self._get_identity(request)
         if identity is None:
             return None
@@ -419,7 +419,7 @@ class RemoteUserAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.debug = debug
 
     def unauthenticated_userid(self, request):
-        """ The ``REMOTE_USER`` value found within the ``environ``."""
+        """The ``REMOTE_USER`` value found within the ``environ``."""
         return request.environ.get(self.environ_key)
 
     def remember(self, request, userid, **kw):
@@ -641,7 +641,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.debug = debug
 
     def unauthenticated_userid(self, request):
-        """ The userid key within the auth_tkt cookie."""
+        """The userid key within the auth_tkt cookie."""
         result = self.cookie.identify(request)
         if result:
             return result['userid']
@@ -657,7 +657,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
         return self.cookie.remember(request, userid, **kw)
 
     def forget(self, request):
-        """ A list of headers which will delete appropriate cookies."""
+        """A list of headers which will delete appropriate cookies."""
         return self.cookie.forget(request)
 
 
@@ -1137,12 +1137,12 @@ class SessionAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.debug = debug
 
     def remember(self, request, userid, **kw):
-        """ Store a userid in the session."""
+        """Store a userid in the session."""
         request.session[self.userid_key] = userid
         return []
 
     def forget(self, request):
-        """ Remove the stored userid from the session."""
+        """Remove the stored userid from the session."""
         if self.userid_key in request.session:
             del request.session[self.userid_key]
         return []
@@ -1205,7 +1205,7 @@ class BasicAuthAuthenticationPolicy(CallbackAuthenticationPolicy):
         self.debug = debug
 
     def unauthenticated_userid(self, request):
-        """ The userid parsed from the ``Authorization`` request header."""
+        """The userid parsed from the ``Authorization`` request header."""
         credentials = extract_http_basic_credentials(request)
         if credentials:
             return credentials.username

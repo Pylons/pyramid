@@ -21,8 +21,7 @@ jobs:
                     - "3.7"
                     - "3.8"
                     - "3.9"
-                    - "pypy2"
-                    - "pypy3"
+                    - "pypy-3.8"
                 os:
                     - "ubuntu-latest"
                     - "windows-latest"
@@ -44,9 +43,7 @@ jobs:
                       architecture: x86
                     # PyPy and Python 3.4 on Windows doesn't seem to work
                     - os: "windows-latest"
-                      py: "pypy3"
-                    - os: "windows-latest"
-                      py: "pypy2"
+                      py: "pypy-3.8"
 
         name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
@@ -68,12 +65,12 @@ jobs:
             - name: Setup python 2.7
               uses: actions/setup-python@v2
               with:
-                  python-version: 2.7
+                  python-version: "2.7"
                   architecture: x64
             - name: Setup python 3.6
               uses: actions/setup-python@v2
               with:
-                  python-version: 3.6
+                  python-version: "3.6"
                   architecture: x64
             - run: pip install tox
             - run: tox -e py27-cover,py36-cover,coverage
@@ -85,7 +82,7 @@ jobs:
             - name: Setup python
               uses: actions/setup-python@v2
               with:
-                  python-version: 3.8
+                  python-version: "3.8"
                   architecture: x64
             - run: pip install tox
             - run: tox -e docs
@@ -97,7 +94,7 @@ jobs:
             - name: Setup python
               uses: actions/setup-python@v2
               with:
-                  python-version: 3.8
+                  python-version: "3.8"
                   architecture: x64
             - run: pip install tox
             - run: tox -e lint
