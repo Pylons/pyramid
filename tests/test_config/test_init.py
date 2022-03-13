@@ -1349,7 +1349,7 @@ class TestConfigurator__add_predicate(unittest.TestCase):
             kw=None,
             order=0,
             introspectables=(),
-            **extra
+            **extra,
         ):
             self.assertEqual(len(introspectables), 1)
             self.assertEqual(introspectables[0]['name'], 'testing')
@@ -1368,7 +1368,7 @@ class TestConfigurator__add_predicate(unittest.TestCase):
             kw=None,
             order=0,
             introspectables=(),
-            **extra
+            **extra,
         ):
             self.assertEqual(len(introspectables), 1)
             self.assertEqual(introspectables[0]['name'], 'testing')

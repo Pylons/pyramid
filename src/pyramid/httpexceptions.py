@@ -224,7 +224,7 @@ ${body}'''
         comment=None,
         body_template=None,
         json_formatter=None,
-        **kw
+        **kw,
     ):
         status = '%s %s' % (self.code, self.title)
         Response.__init__(self, status=status, **kw)
@@ -528,7 +528,7 @@ ${html_comment}'''
         headers=None,
         comment=None,
         body_template=None,
-        **kw
+        **kw,
     ):
         if location is None:
             raise ValueError("HTTP redirects need a location to redirect to.")
@@ -538,7 +538,7 @@ ${html_comment}'''
             comment=comment,
             body_template=body_template,
             location=location,
-            **kw
+            **kw,
         )
 
 
@@ -786,7 +786,7 @@ class HTTPForbidden(HTTPClientError):
         comment=None,
         body_template=None,
         result=None,
-        **kw
+        **kw,
     ):
         HTTPClientError.__init__(
             self,
@@ -794,7 +794,7 @@ class HTTPForbidden(HTTPClientError):
             headers=headers,
             comment=comment,
             body_template=body_template,
-            **kw
+            **kw,
         )
         self.result = result
 

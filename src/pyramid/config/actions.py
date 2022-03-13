@@ -35,7 +35,7 @@ class ActionConfiguratorMixin:
         kw=None,
         order=0,
         introspectables=(),
-        **extra
+        **extra,
     ):
         """Register an action which will be executed when
         :meth:`pyramid.config.Configurator.commit` is called (or executed
@@ -185,7 +185,7 @@ class ActionState:
         includepath=(),
         info=None,
         introspectables=(),
-        **extra
+        **extra,
     ):
         """Add an action with the given discriminator, callable, and
         arguments"""

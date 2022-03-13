@@ -805,7 +805,7 @@ class Configurator(
         categories=('pyramid',),
         onerror=None,
         ignore=None,
-        **kw
+        **kw,
     ):
         """Scan a Python package and any of its subpackages for objects
         marked with :term:`configuration decoration` such as

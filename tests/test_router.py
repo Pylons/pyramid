@@ -56,7 +56,7 @@ class TestRouter(unittest.TestCase):
         virtual_root=None,
         virtual_root_path=None,
         raise_error=None,
-        **kw
+        **kw,
     ):
         from pyramid.interfaces import ITraverser
 
