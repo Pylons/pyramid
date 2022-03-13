@@ -68,6 +68,7 @@ setup(
     version=VERSION,
     description='The Pyramid Web Framework, a Pylons project',
     long_description=README + '\n\n' + CHANGES,
+    long_description_content_type='text/x-rst',
     classifiers=[
         "Development Status :: 6 - Mature",
         "Intended Audience :: Developers",
