@@ -557,13 +557,6 @@ def action_method(wrapped):
         if info is None:
             try:
                 f = traceback.extract_stack(limit=4)
-
-                # Work around a Python 3.5 issue whereby it would insert an
-                # extra stack frame. This should no longer be necessary in
-                # Python 3.5.1
-                last_frame = ActionInfo(*f[-1])
-                if last_frame.function == 'extract_stack':  # pragma: no cover
-                    f.pop()
                 info = ActionInfo(*f[-backframes])
             except Exception:  # pragma: no cover
                 info = ActionInfo(None, 0, '', '')
