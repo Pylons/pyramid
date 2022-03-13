@@ -1,3 +1,10 @@
+unreleased
+==========
+
+- Copy ``__name__`` from decorated attribute when using
+  ``pyramid.decorator.reify``.
+  See https://github.com/Pylons/pyramid/pull/3660
+
 2.0 (2021-02-28)
 ================
 
