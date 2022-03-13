@@ -33,7 +33,7 @@ jobs:
                     - os: "ubuntu-latest"
                       pytest-args: "--cov"
                     - os: "ubuntu-latest"
-                      py: "pypy3"
+                      py: "pypy-3.8"
                       pytest-args: ""
 
                 exclude:
@@ -44,7 +44,7 @@ jobs:
                       architecture: x86
                     # PyPy3 on Windows doesn't seem to work
                     - os: "windows-latest"
-                      py: "pypy3"
+                      py: "pypy-3.8"
 
         name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
