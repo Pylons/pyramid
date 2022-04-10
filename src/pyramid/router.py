@@ -234,10 +234,6 @@ class Router:
         return the generated response.
 
         """
-        registry = self.registry
-        has_listeners = registry.has_listeners
-        notify = registry.notify
-
         if _use_tweens:
             handle_request = self.handle_request
         else:
