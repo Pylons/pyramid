@@ -168,6 +168,8 @@ class Router:
                 msg = request.path_info
             raise HTTPNotFound(msg)
 
+        has_listeners and notify(NewResponse(request, response))
+
         return response
 
     def invoke_subrequest(self, request, use_tweens=False):
@@ -246,8 +248,6 @@ class Router:
 
             if request.response_callbacks:
                 request._process_response_callbacks(response)
-
-            has_listeners and notify(NewResponse(request, response))
 
             return response
 
