@@ -50,6 +50,7 @@ Exception
         * 415 - HTTPUnsupportedMediaType
         * 416 - HTTPRequestRangeNotSatisfiable
         * 417 - HTTPExpectationFailed
+        * 418 - HTTPImATeapot
         * 422 - HTTPUnprocessableEntity
         * 423 - HTTPLocked
         * 424 - HTTPFailedDependency
@@ -214,7 +215,7 @@ ${body}'''
 </html>'''
     )
 
-    # Set this to True for responses that should have no request body
+    # Set this to True for responses that should have no response body
     empty_body = False
 
     def __init__(
@@ -224,7 +225,7 @@ ${body}'''
         comment=None,
         body_template=None,
         json_formatter=None,
-        **kw
+        **kw,
     ):
         status = '%s %s' % (self.code, self.title)
         Response.__init__(self, status=status, **kw)
@@ -528,7 +529,7 @@ ${html_comment}'''
         headers=None,
         comment=None,
         body_template=None,
-        **kw
+        **kw,
     ):
         if location is None:
             raise ValueError("HTTP redirects need a location to redirect to.")
@@ -538,7 +539,7 @@ ${html_comment}'''
             comment=comment,
             body_template=body_template,
             location=location,
-            **kw
+            **kw,
         )
 
 
@@ -786,7 +787,7 @@ class HTTPForbidden(HTTPClientError):
         comment=None,
         body_template=None,
         result=None,
-        **kw
+        **kw,
     ):
         HTTPClientError.__init__(
             self,
@@ -794,7 +795,7 @@ class HTTPForbidden(HTTPClientError):
             headers=headers,
             comment=comment,
             body_template=body_template,
-            **kw
+            **kw,
         )
         self.result = result
 
@@ -1043,6 +1044,24 @@ class HTTPExpectationFailed(HTTPClientError):
     code = 417
     title = 'Expectation Failed'
     explanation = 'Expectation failed.'
+
+
+class HTTPImATeapot(HTTPClientError):
+    """
+    subclass of :class:`~HTTPClientError`
+
+    This indicates that the server refuses to brew coffee because
+    it is, in fact and permanently, a teapot. The resulting entity
+    body may be short and stout.
+
+    See RFC2324 and RFC7168 for more information.
+
+    code: 418, title: I'm a teapot
+    """
+
+    code = 418
+    title = "I'm a teapot"
+    explanation = "Refusing to brew coffee because I'm a teapot."
 
 
 class HTTPUnprocessableEntity(HTTPClientError):

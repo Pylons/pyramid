@@ -248,7 +248,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.renderers import null_renderer
 
         def view(request):
-            """ ABC """
+            """ABC"""
             return 'OK'
 
         def view_wrapper(fn):
@@ -271,7 +271,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.renderers import null_renderer
 
         def view(request):
-            """ ABC """
+            """ABC"""
             return 'OK'
 
         def view_wrapper1(fn):
@@ -306,7 +306,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         response = Response('OK')
 
         def view(request):
-            """ ABC """
+            """ABC"""
             return response
 
         config = self._makeOne(autocommit=True)
@@ -3790,7 +3790,7 @@ class Test_preserve_view_attrs(unittest.TestCase):
 
     def test_it_different(self):
         class DummyView1:
-            """ 1 """
+            """1"""
 
             __name__ = '1'
             __module__ = '1'
@@ -3808,7 +3808,7 @@ class Test_preserve_view_attrs(unittest.TestCase):
                 """ """
 
         class DummyView2:
-            """ 2 """
+            """2"""
 
             __name__ = '2'
             __module__ = '2'

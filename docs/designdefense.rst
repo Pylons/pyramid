@@ -1656,8 +1656,8 @@ If you can understand this "hello world" program, you can use Pyramid:
 Pyramid has over 1200 pages of documentation (printed), covering topics from
 the very basic to the most advanced. *Nothing* is left undocumented, quite
 literally.  It also has an *awesome*, very helpful community.  Visit the
-`#pyramid IRC channel on freenode.net
-<https://webchat.freenode.net/#pyramid>`_ and see.
+`#pyramid IRC channel on Libera.Chat
+<https://web.libera.chat/#pyramid>`_ and see.
 
 Hate Zope
 +++++++++

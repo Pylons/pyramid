@@ -32,7 +32,7 @@ class LegacySessionCSRFStoragePolicy:
     """
 
     def new_csrf_token(self, request):
-        """ Sets a new CSRF token into the session and returns it. """
+        """Sets a new CSRF token into the session and returns it."""
         return request.session.new_csrf_token()
 
     def get_csrf_token(self, request):
@@ -41,7 +41,7 @@ class LegacySessionCSRFStoragePolicy:
         return request.session.get_csrf_token()
 
     def check_csrf_token(self, request, supplied_token):
-        """ Returns ``True`` if the ``supplied_token`` is valid."""
+        """Returns ``True`` if the ``supplied_token`` is valid."""
         expected_token = self.get_csrf_token(request)
         return not strings_differ(
             bytes_(expected_token), bytes_(supplied_token)
@@ -70,7 +70,7 @@ class SessionCSRFStoragePolicy:
         self.key = key
 
     def new_csrf_token(self, request):
-        """ Sets a new CSRF token into the session and returns it. """
+        """Sets a new CSRF token into the session and returns it."""
         token = self._token_factory()
         request.session[self.key] = token
         return token
@@ -84,7 +84,7 @@ class SessionCSRFStoragePolicy:
         return token
 
     def check_csrf_token(self, request, supplied_token):
-        """ Returns ``True`` if the ``supplied_token`` is valid."""
+        """Returns ``True`` if the ``supplied_token`` is valid."""
         expected_token = self.get_csrf_token(request)
         return not strings_differ(
             bytes_(expected_token), bytes_(supplied_token)
@@ -134,7 +134,7 @@ class CookieCSRFStoragePolicy:
         self.cookie_name = cookie_name
 
     def new_csrf_token(self, request):
-        """ Sets a new CSRF token into the request and returns it. """
+        """Sets a new CSRF token into the request and returns it."""
         token = self._token_factory()
         request.cookies[self.cookie_name] = token
 
@@ -154,7 +154,7 @@ class CookieCSRFStoragePolicy:
         return token
 
     def check_csrf_token(self, request, supplied_token):
-        """ Returns ``True`` if the ``supplied_token`` is valid."""
+        """Returns ``True`` if the ``supplied_token`` is valid."""
         expected_token = self.get_csrf_token(request)
         return not strings_differ(
             bytes_(expected_token), bytes_(supplied_token)

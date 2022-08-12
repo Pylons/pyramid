@@ -231,7 +231,7 @@ class PServeCommand:
                     webbrowser.open(url)
 
                 t = threading.Thread(target=open_browser)
-                t.setDaemon(True)
+                t.daemon = True
                 t.start()
 
         if self.args.reload and not hupper.is_active():

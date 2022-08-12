@@ -264,7 +264,7 @@ class ViewsConfiguratorMixin:
         match_param=None,
         require_csrf=None,
         exception_only=False,
-        **view_options
+        **view_options,
     ):
         """Add a :term:`view configuration` to the current
         configuration state.  Arguments to ``add_view`` are broken
@@ -1611,7 +1611,7 @@ class ViewsConfiguratorMixin:
         decorator=None,
         mapper=None,
         match_param=None,
-        **view_options
+        **view_options,
     ):
         """Add a forbidden view to the current configuration state.  The
         view will be called when Pyramid or application code raises a
@@ -1712,7 +1712,7 @@ class ViewsConfiguratorMixin:
         mapper=None,
         match_param=None,
         append_slash=False,
-        **view_options
+        **view_options,
     ):
         """Add a default :term:`Not Found View` to the current configuration
         state. The view will be called when Pyramid or application code raises
@@ -1850,7 +1850,7 @@ class ViewsConfiguratorMixin:
         view=None,
         context=None,
         # force all other arguments to be specified as key=value
-        **view_options
+        **view_options,
     ):
         """Add an :term:`exception view` for the specified ``exception`` to
         the current configuration state. The view will be called when Pyramid
