@@ -87,13 +87,13 @@ Steps
 
         $VENV/bin/initialize_tutorial_db development.ini
 
-        2016-04-16 13:01:33,055 INFO  [sqlalchemy.engine.base.Engine][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
-        2016-04-16 13:01:33,055 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-        2016-04-16 13:01:33,056 INFO  [sqlalchemy.engine.base.Engine][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
-        2016-04-16 13:01:33,056 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-        2016-04-16 13:01:33,057 INFO  [sqlalchemy.engine.base.Engine][MainThread] PRAGMA table_info("wikipages")
-        2016-04-16 13:01:33,057 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-        2016-04-16 13:01:33,058 INFO  [sqlalchemy.engine.base.Engine][MainThread]
+        2016-04-16 13:01:33,055 INFO  [sqlalchemy.engine.Engine][MainThread] SELECT CAST('test plain returns' AS VARCHAR(60)) AS anon_1
+        2016-04-16 13:01:33,055 INFO  [sqlalchemy.engine.Engine][MainThread] ()
+        2016-04-16 13:01:33,056 INFO  [sqlalchemy.engine.Engine][MainThread] SELECT CAST('test unicode returns' AS VARCHAR(60)) AS anon_1
+        2016-04-16 13:01:33,056 INFO  [sqlalchemy.engine.Engine][MainThread] ()
+        2016-04-16 13:01:33,057 INFO  [sqlalchemy.engine.Engine][MainThread] PRAGMA table_info("wikipages")
+        2016-04-16 13:01:33,057 INFO  [sqlalchemy.engine.Engine][MainThread] ()
+        2016-04-16 13:01:33,058 INFO  [sqlalchemy.engine.Engine][MainThread]
         CREATE TABLE wikipages (
                uid INTEGER NOT NULL,
                title TEXT,
@@ -103,12 +103,12 @@ Steps
         )
 
 
-        2016-04-16 13:01:33,058 INFO  [sqlalchemy.engine.base.Engine][MainThread] ()
-        2016-04-16 13:01:33,059 INFO  [sqlalchemy.engine.base.Engine][MainThread] COMMIT
-        2016-04-16 13:01:33,062 INFO  [sqlalchemy.engine.base.Engine][MainThread] BEGIN (implicit)
-        2016-04-16 13:01:33,062 INFO  [sqlalchemy.engine.base.Engine][MainThread] INSERT INTO wikipages (title, body) VALUES (?, ?)
-        2016-04-16 13:01:33,063 INFO  [sqlalchemy.engine.base.Engine][MainThread] ('Root', '<p>Root</p>')
-        2016-04-16 13:01:33,063 INFO  [sqlalchemy.engine.base.Engine][MainThread] COMMIT
+        2016-04-16 13:01:33,058 INFO  [sqlalchemy.engine.Engine][MainThread] ()
+        2016-04-16 13:01:33,059 INFO  [sqlalchemy.engine.Engine][MainThread] COMMIT
+        2016-04-16 13:01:33,062 INFO  [sqlalchemy.engine.Engine][MainThread] BEGIN (implicit)
+        2016-04-16 13:01:33,062 INFO  [sqlalchemy.engine.Engine][MainThread] INSERT INTO wikipages (title, body) VALUES (?, ?)
+        2016-04-16 13:01:33,063 INFO  [sqlalchemy.engine.Engine][MainThread] ('Root', '<p>Root</p>')
+        2016-04-16 13:01:33,063 INFO  [sqlalchemy.engine.Engine][MainThread] COMMIT
 
 #.  With our data now driven by SQLAlchemy queries, we need to update our ``databases/tutorial/views.py``:
 
