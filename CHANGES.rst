@@ -14,6 +14,10 @@ unreleased
   configurator conflict errors.
   See https://github.com/Pylons/pyramid/pull/3700
 
+- Fix an error when injecting certain objects into the ``pshell`` env due to
+  the use of ``!=``.
+  See https://github.com/Pylons/pyramid/pull/3704
+
 2.0 (2021-02-28)
 ================
 
