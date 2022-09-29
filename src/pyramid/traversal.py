@@ -82,7 +82,7 @@ def find_resource(resource, path):
     view_name = D['view_name']
     context = D['context']
     if view_name:
-        raise KeyError('%r has no subelement %s' % (context, view_name))
+        raise KeyError(f'{context!r} has no subelement {view_name}')
     return context
 
 

@@ -287,7 +287,7 @@ class JSON:
                 (obj_iface,), IJSONAdapter, default=_marker
             )
             if result is _marker:
-                raise TypeError('%r is not JSON serializable' % (obj,))
+                raise TypeError(f'{obj!r} is not JSON serializable')
             return result(obj, request)
 
         return default
@@ -387,7 +387,7 @@ class JSONP(JSON):
                         )
 
                     ct = 'application/javascript'
-                    body = '/**/{}({});'.format(callback, val)
+                    body = f'/**/{callback}({val});'
                 response = request.response
                 if response.content_type == response.default_content_type:
                     response.content_type = ct

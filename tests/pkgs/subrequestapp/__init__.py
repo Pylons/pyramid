@@ -10,7 +10,7 @@ def view_one(request):
 
 def view_two(request):
     # check that request.foo is valid for a subrequest
-    return 'This came from view_two, foo=%s' % (request.foo,)
+    return f'This came from view_two, foo={request.foo}'
 
 
 def view_three(request):

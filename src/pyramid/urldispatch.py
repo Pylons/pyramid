@@ -162,7 +162,7 @@ def _compile_route(route):
         else:
             reg = '[^/]+'
         gen.append('%%(%s)s' % name)  # native
-        name = '(?P<%s>%s)' % (name, reg)  # unicode
+        name = f'(?P<{name}>{reg})'  # unicode
         rpat.append(name)
         s = pat.pop()  # unicode
         if s:

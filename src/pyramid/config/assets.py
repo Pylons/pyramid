@@ -221,7 +221,7 @@ class PackageAssetSource:
         self.prefix = prefix
 
     def get_path(self, resource_name):
-        return '%s%s' % (self.prefix, resource_name)
+        return f'{self.prefix}{resource_name}'
 
     def get_filename(self, resource_name):
         path = self.get_path(resource_name)
@@ -388,7 +388,7 @@ class AssetsConfiguratorMixin:
         intr = self.introspectable(
             'asset overrides',
             (package, override_package, path, override_prefix),
-            '%s -> %s' % (to_override, override_with),
+            f'{to_override} -> {override_with}',
             'asset override',
         )
         intr['to_override'] = to_override

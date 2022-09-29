@@ -27,7 +27,7 @@ class PredicateConfiguratorMixin:
         intr = self.introspectable(
             '%s predicates' % type,
             discriminator,
-            '%s predicate named %s' % (type, name),
+            f'{type} predicate named {name}',
             '%s predicate' % type,
         )
         intr['name'] = name

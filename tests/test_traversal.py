@@ -1264,7 +1264,7 @@ class DummyContext:
         return self.next
 
     def __repr__(self):
-        return '<DummyContext with name %s at id %s>' % (
+        return '<DummyContext with name {} at id {}>'.format(
             self.__name__,
             id(self),
         )

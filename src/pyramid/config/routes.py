@@ -401,7 +401,7 @@ class RoutesConfiguratorMixin:
                     scheme = parsed.scheme
                 else:
                     scheme = request.scheme
-                kw['_app_url'] = '{}://{}'.format(scheme, parsed.netloc)
+                kw['_app_url'] = f'{scheme}://{parsed.netloc}'
 
                 if original_pregenerator:
                     elements, kw = original_pregenerator(request, elements, kw)
@@ -423,7 +423,7 @@ class RoutesConfiguratorMixin:
         introspectables = []
 
         intr = self.introspectable(
-            'routes', name, '%s (pattern: %r)' % (name, pattern), 'route'
+            'routes', name, f'{name} (pattern: {pattern!r})', 'route'
         )
         intr['name'] = name
         intr['pattern'] = pattern

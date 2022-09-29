@@ -26,7 +26,7 @@ def asset_spec_from_abspath(abspath, package):
     pp = package_path(package) + os.path.sep
     if abspath.startswith(pp):
         relpath = abspath[len(pp) :]
-        return '%s:%s' % (
+        return '{}:{}'.format(
             package_name(package),
             relpath.replace(os.path.sep, '/'),
         )

@@ -1946,7 +1946,7 @@ class DummyAuthTktModule:
                     if isinstance(v, bytes):
                         v = text_(v)
                     new_items.append((k, v))
-                result = '/'.join(['%s=%s' % (k, v) for k, v in new_items])
+                result = '/'.join([f'{k}={v}' for k, v in new_items])
                 return result
 
         self.AuthTicket = AuthTicket

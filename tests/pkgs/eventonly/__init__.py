@@ -7,7 +7,7 @@ class Yup:
         self.val = val
 
     def text(self):
-        return 'path_startswith = %s' % (self.val,)
+        return f'path_startswith = {self.val}'
 
     phash = text
 

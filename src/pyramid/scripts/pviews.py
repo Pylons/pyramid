@@ -199,13 +199,13 @@ class PViewsCommand:
 
     def output_route_attrs(self, attrs, indent):
         route = attrs['matched_route']
-        self.out("%sroute name: %s" % (indent, route.name))
-        self.out("%sroute pattern: %s" % (indent, route.pattern))
-        self.out("%sroute path: %s" % (indent, route.path))
-        self.out("%ssubpath: %s" % (indent, '/'.join(attrs['subpath'])))
+        self.out(f"{indent}route name: {route.name}")
+        self.out(f"{indent}route pattern: {route.pattern}")
+        self.out(f"{indent}route path: {route.path}")
+        self.out("{}subpath: {}".format(indent, '/'.join(attrs['subpath'])))
         predicates = ', '.join([p.text() for p in route.predicates])
         if predicates != '':
-            self.out("%sroute predicates (%s)" % (indent, predicates))
+            self.out(f"{indent}route predicates ({predicates})")
 
     def output_view_info(self, view_wrapper, level=1):
         indent = "    " * level
@@ -214,12 +214,12 @@ class PViewsCommand:
         attr = getattr(view_wrapper, '__view_attr__', None)
         request_attrs = getattr(view_wrapper, '__request_attrs__', {})
         if attr is not None:
-            view_callable = "%s.%s.%s" % (module, name, attr)
+            view_callable = f"{module}.{name}.{attr}"
         else:
             attr = view_wrapper.__class__.__name__
             if attr == 'function':
                 attr = name
-            view_callable = "%s.%s" % (module, attr)
+            view_callable = f"{module}.{attr}"
         self.out('')
         if 'matched_route' in request_attrs:
             self.out("%sRoute:" % indent)
@@ -233,14 +233,14 @@ class PViewsCommand:
         else:
             self.out("%sView:" % indent)
             self.out("%s-----" % indent)
-            self.out("%s%s" % (indent, view_callable))
+            self.out(f"{indent}{view_callable}")
             permission = getattr(view_wrapper, '__permission__', None)
             if permission is not None:
-                self.out("%srequired permission = %s" % (indent, permission))
+                self.out(f"{indent}required permission = {permission}")
             predicates = getattr(view_wrapper, '__predicates__', None)
             if predicates is not None:
                 predicate_text = ', '.join([p.text() for p in predicates])
-                self.out("%sview predicates (%s)" % (indent, predicate_text))
+                self.out(f"{indent}view predicates ({predicate_text})")
 
     def run(self):
         if not self.args.config_uri or not self.args.url:

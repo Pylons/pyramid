@@ -121,7 +121,7 @@ class TweensConfiguratorMixin:
             if p is not None:
                 if not is_string_or_iterable(p):
                     raise ConfigurationError(
-                        '"%s" must be a string or iterable, not %s' % (t, p)
+                        f'"{t}" must be a string or iterable, not {p}'
                     )
 
         if over is INGRESS or is_nonstr_iter(over) and INGRESS in over:

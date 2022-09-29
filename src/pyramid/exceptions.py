@@ -91,7 +91,7 @@ class ConfigurationConflictError(ConfigurationError):
     def __str__(self):
         r = ["Conflicting configuration actions"]
         for discriminator, infos in self._conflicts.items():
-            r.append("  For: %s" % (discriminator,))
+            r.append(f"  For: {discriminator}")
             for info in infos:
                 for line in str(info).rstrip().split('\n'):
                     r.append("    " + line)
@@ -106,7 +106,7 @@ class ConfigurationExecutionError(ConfigurationError):
         self.etype, self.evalue, self.info = etype, evalue, info
 
     def __str__(self):
-        return "%s: %s\n  in:\n  %s" % (self.etype, self.evalue, self.info)
+        return f"{self.etype}: {self.evalue}\n  in:\n  {self.info}"
 
 
 class CyclicDependencyError(Exception):
@@ -122,6 +122,6 @@ class CyclicDependencyError(Exception):
         for cycle in cycles:
             dependent = cycle
             dependees = cycles[cycle]
-            L.append('%r sorts before %r' % (dependent, dependees))
+            L.append(f'{dependent!r} sorts before {dependees!r}')
         msg = 'Implicit ordering cycle:' + '; '.join(L)
         return msg
