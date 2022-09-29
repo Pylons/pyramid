@@ -188,7 +188,7 @@ class PShellCommand:
         with setup_manager(env):
             # remove any objects from default help that were overidden
             for k, v in env.items():
-                if k not in orig_env or v != orig_env[k]:
+                if k not in orig_env or v is not orig_env[k]:
                     if getattr(v, '__doc__', False):
                         env_help[k] = v.__doc__.replace("\n", " ")
                     else:
