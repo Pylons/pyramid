@@ -62,9 +62,9 @@ class PTweensCommand:
         config = Configurator(registry=registry)
         return config.registry.queryUtility(ITweens)
 
-    def out(self, msg):  # pragma: no cover
+    def out(self, msg, file=sys.stdout):  # pragma: no cover
         if not self.quiet:
-            print(msg)
+            print(msg, file=file)
 
     def show_chain(self, chain):
         fmt = '%-10s  %-65s'
@@ -77,7 +77,7 @@ class PTweensCommand:
 
     def run(self):
         if not self.args.config_uri:
-            self.out('Requires a config file argument')
+            self.out('Requires a config file argument', sys.stderr)
             return 2
         config_uri = self.args.config_uri
         config_vars = parse_vars(self.args.config_vars)

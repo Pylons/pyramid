@@ -1,4 +1,5 @@
 import os
+import sys
 import unittest
 
 from . import dummy
@@ -25,6 +26,9 @@ class TestPRoutesCommand(unittest.TestCase):
         cmd.get_config_loader = dummy.DummyLoader()
         cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
 
+        self._out_calls = []
+        cmd.out = self._out
+
         return cmd
 
     def _makeRegistry(self):
@@ -40,52 +44,47 @@ class TestPRoutesCommand(unittest.TestCase):
         config = Configurator(*arg, **kw)
         return config
 
+    def _out(self, msg, file=sys.stdout):  # pragma: no cover
+        self._out_calls.append((msg, file))
+
     def test_good_args(self):
-        cmd = self._getTargetClass()([])
-        cmd.bootstrap = dummy.DummyBootstrap()
-        cmd.get_config_loader = dummy.DummyLoader()
-        cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
-        cmd.args.config_args = ('a=1',)
+        command = self._makeOne()
+        command.args.config_args = ('a=1',)
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
-        cmd._get_mapper = lambda *arg: mapper
+        command._get_mapper = lambda *arg: mapper
         registry = self._makeRegistry()
-        cmd.bootstrap = dummy.DummyBootstrap(registry=registry)
-        L = []
-        cmd.out = lambda msg: L.append(msg)
-        cmd.run()
-        self.assertTrue('<unknown>' in ''.join(L))
+        command.bootstrap = dummy.DummyBootstrap(registry=registry)
+        command.run()
+
+        self.assertTrue(
+            '<unknown>' in ''.join(msg for msg, file in self._out_calls)
+        )
 
     def test_bad_args(self):
-        cmd = self._getTargetClass()([])
-        cmd.bootstrap = dummy.DummyBootstrap()
-        cmd.get_config_loader = dummy.DummyLoader()
-        cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
-        cmd.args.config_vars = ('a',)
+        command = self._makeOne()
+        command.args.config_uri = '/foo/bar/myapp.ini#myapp'
+        command.args.config_vars = ('a',)
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
-        cmd._get_mapper = lambda *arg: mapper
+        command._get_mapper = lambda *arg: mapper
 
-        self.assertRaises(ValueError, cmd.run)
+        self.assertRaises(ValueError, command.run)
 
     def test_no_routes(self):
         command = self._makeOne()
         mapper = dummy.DummyMapper()
         command._get_mapper = lambda *arg: mapper
-        L = []
-        command.out = L.append
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(L, [])
+        self.assertEqual(self._out_calls, [])
 
     def test_no_mapper(self):
         command = self._makeOne()
         command._get_mapper = lambda *arg: None
-        L = []
-        command.out = L.append
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(L, [])
+        self.assertEqual(self._out_calls, [])
 
     def test_single_route_no_route_registered(self):
         command = self._makeOne()
@@ -95,26 +94,26 @@ class TestPRoutesCommand(unittest.TestCase):
         registry = self._makeRegistry()
         command.bootstrap = dummy.DummyBootstrap(registry=registry)
 
-        L = []
-        command.out = L.append
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>', '*'])
+        self.assertEqual(len(self._out_calls), 3)
+        self.assertEqual(
+            self._out_calls[-1][0].split(), ['a', '/a', '<unknown>', '*']
+        )
 
     def test_route_with_no_slash_prefix(self):
         command = self._makeOne()
         route = dummy.DummyRoute('a', 'a')
         mapper = dummy.DummyMapper(route)
         command._get_mapper = lambda *arg: mapper
-        L = []
-        command.out = L.append
         registry = self._makeRegistry()
         command.bootstrap = dummy.DummyBootstrap(registry=registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        self.assertEqual(L[-1].split(), ['a', '/a', '<unknown>', '*'])
+        self.assertEqual(len(self._out_calls), 3)
+        self.assertEqual(
+            self._out_calls[-1][0].split(), ['a', '/a', '<unknown>', '*']
+        )
 
     def test_single_route_no_views_registered(self):
         from zope.interface import Interface
@@ -134,13 +133,13 @@ class TestPRoutesCommand(unittest.TestCase):
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
         command._get_mapper = lambda *arg: mapper
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        self.assertEqual(L[-1].split()[:3], ['a', '/a', '<unknown>'])
+        self.assertEqual(len(self._out_calls), 3)
+        self.assertEqual(
+            self._out_calls[-1][0].split(), ['a', '/a', '<unknown>', '*']
+        )
 
     def test_single_route_one_view_registered(self):
         from zope.interface import Interface
@@ -163,13 +162,11 @@ class TestPRoutesCommand(unittest.TestCase):
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
         command._get_mapper = lambda *arg: mapper
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()[:3]
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()[:3]
         self.assertEqual(
             compare_to, ['a', '/a', 'tests.test_scripts.test_proutes.view']
         )
@@ -201,13 +198,11 @@ class TestPRoutesCommand(unittest.TestCase):
         )
         mapper = dummy.DummyMapper(route)
         command._get_mapper = lambda *arg: mapper
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()[:3]
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()[:3]
         self.assertEqual(
             compare_to,
             [
@@ -231,13 +226,11 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()
         expected = [
             'foo',
             '/a/b',
@@ -274,13 +267,13 @@ class TestPRoutesCommand(unittest.TestCase):
         route = dummy.DummyRoute('a', '/a', factory=factory)
         mapper = dummy.DummyMapper(route)
         command._get_mapper = lambda *arg: mapper
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        self.assertEqual(L[-1].split()[:3], ['a', '/a', '<unknown>'])
+        self.assertEqual(len(self._out_calls), 3)
+        self.assertEqual(
+            self._out_calls[-1][0].split()[:3], ['a', '/a', '<unknown>']
+        )
 
     def test_single_route_multiview_registered(self):
         from zope.interface import Interface
@@ -311,13 +304,11 @@ class TestPRoutesCommand(unittest.TestCase):
         route = dummy.DummyRoute('a', '/a')
         mapper = dummy.DummyMapper(route)
         command._get_mapper = lambda *arg: mapper
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()[:3]
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()[:3]
         view_module = 'tests.test_scripts.dummy'
         view_str = '<tests.test_scripts.dummy.DummyMultiView'
         final = f'{view_module}.{view_str}'
@@ -346,13 +337,11 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()
         expected = [
             'foo',
             '/a/b',
@@ -372,13 +361,11 @@ class TestPRoutesCommand(unittest.TestCase):
         config.add_view(route_name='foo', view=view1, renderer=nr)
 
         command = self._makeOne()
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()
         expected = [
             'foo',
             '/a/b',
@@ -403,13 +390,11 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()
         expected = [
             'foo',
             '/a/b',
@@ -431,13 +416,11 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()
         expected = [
             'foo',
             '/a/b',
@@ -458,12 +441,10 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 5)
+        self.assertEqual(len(self._out_calls), 5)
 
         expected = [
             [
@@ -481,7 +462,7 @@ class TestPRoutesCommand(unittest.TestCase):
             ],
         ]
 
-        for index, line in enumerate(L[2:]):
+        for index, (line, file) in enumerate(self._out_calls[2:]):
             data = line.split()
             self.assertEqual(data, expected[index])
 
@@ -490,13 +471,11 @@ class TestPRoutesCommand(unittest.TestCase):
         config.add_route('foo', '/a/b', request_method='POST')
 
         command = self._makeOne()
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()
         expected = ['foo', '/a/b', '<unknown>', 'POST']
         self.assertEqual(compare_to, expected)
 
@@ -516,13 +495,11 @@ class TestPRoutesCommand(unittest.TestCase):
         config2.add_view(wsgiapp2(config1.make_wsgi_app()), route_name='foo')
 
         command = self._makeOne()
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config2.registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()
         expected = ['foo', '/a/b', '<wsgiapp>', 'POST']
         self.assertEqual(compare_to, expected)
 
@@ -543,13 +520,11 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()
         expected = [
             'foo',
             '/a/b',
@@ -575,13 +550,11 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()
         expected = [
             'foo',
             '/a/b',
@@ -619,14 +592,11 @@ class TestPRoutesCommand(unittest.TestCase):
 
         command = self._makeOne()
         command.args.glob = '*foo*'
-
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()
         expected = [
             'foo',
             '/a/b',
@@ -654,17 +624,15 @@ class TestPRoutesCommand(unittest.TestCase):
         command = self._makeOne()
         command.args.glob = '*foo*'
         command.args.format = 'method,name'
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()
         expected = ['!POST,*', 'foo']
 
         self.assertEqual(compare_to, expected)
-        self.assertEqual(L[0].split(), ['Method', 'Name'])
+        self.assertEqual(self._out_calls[0][0].split(), ['Method', 'Name'])
 
     def test_bad_format(self):
         from pyramid.config import not_
@@ -685,16 +653,15 @@ class TestPRoutesCommand(unittest.TestCase):
         command = self._makeOne()
         command.args.glob = '*foo*'
         command.args.format = 'predicates,name,pattern'
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         expected = (
             "You provided invalid formats ['predicates']. "
-            "Available formats are ['name', 'pattern', 'view', 'method']"
+            "Available formats are ['name', 'pattern', 'view', 'method']",
+            sys.stderr,
         )
         result = command.run()
         self.assertEqual(result, 2)
-        self.assertEqual(L[0], expected)
+        self.assertEqual(self._out_calls[0], expected)
 
     def test_config_format_ini_newlines(self):
         from pyramid.config import not_
@@ -713,9 +680,6 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         command.get_config_loader = dummy.DummyLoader(
             {'proutes': {'format': 'method\nname'}}
@@ -723,12 +687,12 @@ class TestPRoutesCommand(unittest.TestCase):
 
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()
         expected = ['!POST,*', 'foo']
 
         self.assertEqual(compare_to, expected)
-        self.assertEqual(L[0].split(), ['Method', 'Name'])
+        self.assertEqual(self._out_calls[0][0].split(), ['Method', 'Name'])
 
     def test_config_format_ini_spaces(self):
         from pyramid.config import not_
@@ -747,9 +711,6 @@ class TestPRoutesCommand(unittest.TestCase):
         )
 
         command = self._makeOne()
-
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         command.get_config_loader = dummy.DummyLoader(
             {'proutes': {'format': 'method name'}}
@@ -757,12 +718,12 @@ class TestPRoutesCommand(unittest.TestCase):
 
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()
         expected = ['!POST,*', 'foo']
 
         self.assertEqual(compare_to, expected)
-        self.assertEqual(L[0].split(), ['Method', 'Name'])
+        self.assertEqual(self._out_calls[0][0].split(), ['Method', 'Name'])
 
     def test_config_format_ini_commas(self):
         from pyramid.config import not_
@@ -782,8 +743,6 @@ class TestPRoutesCommand(unittest.TestCase):
 
         command = self._makeOne()
 
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         command.get_config_loader = dummy.DummyLoader(
             {'proutes': {'format': 'method,name'}}
@@ -791,25 +750,23 @@ class TestPRoutesCommand(unittest.TestCase):
 
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()
         expected = ['!POST,*', 'foo']
 
         self.assertEqual(compare_to, expected)
-        self.assertEqual(L[0].split(), ['Method', 'Name'])
+        self.assertEqual(self._out_calls[0][0].split(), ['Method', 'Name'])
 
     def test_static_routes_included_in_list(self):
         config = self._makeConfig(autocommit=True)
         config.add_route('foo', 'http://example.com/bar.aspx', static=True)
 
         command = self._makeOne()
-        L = []
-        command.out = L.append
         command.bootstrap = dummy.DummyBootstrap(registry=config.registry)
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(len(L), 3)
-        compare_to = L[-1].split()
+        self.assertEqual(len(self._out_calls), 3)
+        compare_to = self._out_calls[-1][0].split()
         expected = ['foo', 'http://example.com/bar.aspx', '<unknown>', '*']
         self.assertEqual(compare_to, expected)
 

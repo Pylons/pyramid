@@ -126,13 +126,13 @@ class PRequestCommand:
         self.quiet = quiet
         self.args = self.parser.parse_args(argv[1:])
 
-    def out(self, msg):  # pragma: no cover
+    def out(self, msg, file=sys.stdout):  # pragma: no cover
         if not self.quiet:
-            print(msg)
+            print(msg, file=file)
 
     def run(self):
         if not self.args.config_uri or not self.args.path_info:
-            self.out('You must provide at least two arguments')
+            self.out('You must provide at least two arguments', sys.stderr)
             return 2
         config_uri = self.args.config_uri
         config_vars = parse_vars(self.args.config_vars)
@@ -163,7 +163,8 @@ class PRequestCommand:
                 if ':' not in item:
                     self.out(
                         "Bad --header=%s option, value must be in the form "
-                        "'name:value'" % item
+                        "'name:value'" % item,
+                        sys.stderr,
                     )
                     return 2
                 name, value = item.split(':', 1)

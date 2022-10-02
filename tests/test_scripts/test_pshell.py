@@ -1,4 +1,5 @@
 import os
+import sys
 import unittest
 
 from . import dummy
@@ -75,12 +76,11 @@ class TestPShellCommand(unittest.TestCase):
 
     def test_command_errors_with_unknown_shell(self):
         command = self._makeOne()
+
         out_calls = []
-
-        def out(msg):
-            out_calls.append(msg)
-
-        command.out = out
+        command.out = lambda msg, file=sys.stdout: out_calls.append(
+            (msg, file)
+        )
 
         shell = dummy.DummyShell()
 
@@ -91,7 +91,11 @@ class TestPShellCommand(unittest.TestCase):
         result = command.run()
         self.assertEqual(result, 1)
         self.assertEqual(
-            out_calls, ['could not find a shell named "unknown_python_shell"']
+            out_calls[0],
+            (
+                'could not find a shell named "unknown_python_shell"',
+                sys.stderr,
+            ),
         )
         self.assertEqual(self.bootstrap.a[0], '/foo/bar/myapp.ini#myapp')
         self.assertTrue(self.bootstrap.closer.called)

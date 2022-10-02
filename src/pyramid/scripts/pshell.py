@@ -117,15 +117,15 @@ class PShellCommand:
                 self.loaded_objects[k] = self.resolver.maybe_resolve(v)
                 self.object_help[k] = v
 
-    def out(self, msg):  # pragma: no cover
+    def out(self, msg, file=sys.stdout):  # pragma: no cover
         if not self.quiet:
-            print(msg)
+            print(msg, file=file)
 
     def run(self, shell=None):
         if self.args.list:
             return self.show_shells()
         if not self.args.config_uri:
-            self.out('Requires a config file argument')
+            self.out('Requires a config file argument', sys.stderr)
             return 2
 
         config_uri = self.args.config_uri
@@ -144,7 +144,7 @@ class PShellCommand:
                 try:
                     shell = self.make_shell()
                 except ValueError as e:
-                    self.out(str(e))
+                    self.out(str(e), sys.stderr)
                     return 1
 
             with self.setup_env():

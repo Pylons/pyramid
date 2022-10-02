@@ -63,9 +63,9 @@ class PViewsCommand:
         self.quiet = quiet
         self.args = self.parser.parse_args(argv[1:])
 
-    def out(self, msg):  # pragma: no cover
+    def out(self, msg, file=sys.stdout):  # pragma: no cover
         if not self.quiet:
-            print(msg)
+            print(msg, file=file)
 
     def _find_multi_routes(self, mapper, request):
         infos = []
@@ -244,7 +244,9 @@ class PViewsCommand:
 
     def run(self):
         if not self.args.config_uri or not self.args.url:
-            self.out('Command requires a config file arg and a url arg')
+            self.out(
+                'Command requires a config file arg and a url arg', sys.stderr
+            )
             return 2
         config_uri = self.args.config_uri
         config_vars = parse_vars(self.args.config_vars)

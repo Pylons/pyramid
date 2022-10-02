@@ -287,7 +287,7 @@ class PRoutesCommand:
 
         if invalid_formats:
             msg = msg % (invalid_formats, self.available_formats)
-            self.out(msg)
+            self.out(msg, sys.stderr)
             return False
 
         return True
@@ -299,9 +299,9 @@ class PRoutesCommand:
             cols = re.split(r'[,|\s\n]+', format)
             self.column_format = [x.strip() for x in cols]
 
-    def out(self, msg):  # pragma: no cover
+    def out(self, msg, file=sys.stdout):  # pragma: no cover
         if not self.quiet:
-            print(msg)
+            print(msg, file=file)
 
     def _get_mapper(self, registry):
         from pyramid.config import Configurator
@@ -311,7 +311,7 @@ class PRoutesCommand:
 
     def run(self, quiet=False):
         if not self.args.config_uri:
-            self.out('requires a config file argument')
+            self.out('requires a config file argument', sys.stderr)
             return 2
 
         config_uri = self.args.config_uri

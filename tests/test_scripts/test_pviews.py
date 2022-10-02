@@ -1,3 +1,4 @@
+import sys
 import unittest
 
 from . import dummy
@@ -14,6 +15,10 @@ class TestPViewsCommand(unittest.TestCase):
         cmd.bootstrap = dummy.DummyBootstrap(registry=registry)
         cmd.setup_logging = dummy.dummy_setup_logging()
         cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
+
+        self._out_calls = []
+        cmd.out = self._out
+
         return cmd
 
     def _makeRequest(self, url, registry):
@@ -28,6 +33,9 @@ class TestPViewsCommand(unittest.TestCase):
 
         mapper = dummy.DummyMapper(*routes)
         registry.registerUtility(mapper, IRoutesMapper)
+
+    def _out(self, msg, file=sys.stdout):
+        self._out_calls.append((msg, file))
 
     def test__find_view_no_match(self):
         from pyramid.registry import Registry
@@ -312,56 +320,53 @@ class TestPViewsCommand(unittest.TestCase):
 
         registry = Registry()
         command = self._makeOne(registry=registry)
-        L = []
-        command.out = L.append
         command._find_view = lambda arg1: None
         command.args.config_uri = '/foo/bar/myapp.ini#myapp'
         command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[3], '    Not found.')
+        self.assertEqual(self._out_calls[1], ('URL = /a', sys.stdout))
+        self.assertEqual(self._out_calls[3], ('    Not found.', sys.stdout))
 
     def test_views_command_not_found_url_starts_without_slash(self):
         from pyramid.registry import Registry
 
         registry = Registry()
         command = self._makeOne(registry=registry)
-        L = []
-        command.out = L.append
         command._find_view = lambda arg1: None
         command.args.config_uri = '/foo/bar/myapp.ini#myapp'
         command.args.url = 'a'
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[3], '    Not found.')
+        self.assertEqual(self._out_calls[1], ('URL = /a', sys.stdout))
+        self.assertEqual(self._out_calls[3], ('    Not found.', sys.stdout))
 
     def test_views_command_single_view_traversal(self):
         from pyramid.registry import Registry
 
         registry = Registry()
         command = self._makeOne(registry=registry)
-        L = []
-        command.out = L.append
         view = dummy.DummyView(context='context', view_name='a')
         command._find_view = lambda arg1: view
         command.args.config_uri = '/foo/bar/myapp.ini#myapp'
         command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[3], '    context: context')
-        self.assertEqual(L[4], '    view name: a')
-        self.assertEqual(L[8], '    tests.test_scripts.dummy.DummyView')
+        self.assertEqual(self._out_calls[1], ('URL = /a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[3], ('    context: context', sys.stdout)
+        )
+        self.assertEqual(self._out_calls[4], ('    view name: a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[8],
+            ('    tests.test_scripts.dummy.DummyView', sys.stdout),
+        )
 
     def test_views_command_single_view_function_traversal(self):
         from pyramid.registry import Registry
 
         registry = Registry()
         command = self._makeOne(registry=registry)
-        L = []
-        command.out = L.append
 
         def view():  # pragma: no cover
             pass
@@ -372,18 +377,21 @@ class TestPViewsCommand(unittest.TestCase):
         command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[3], '    context: context')
-        self.assertEqual(L[4], '    view name: a')
-        self.assertEqual(L[8], '    tests.test_scripts.test_pviews.view')
+        self.assertEqual(self._out_calls[1], ('URL = /a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[3], ('    context: context', sys.stdout)
+        )
+        self.assertEqual(self._out_calls[4], ('    view name: a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[8],
+            ('    tests.test_scripts.test_pviews.view', sys.stdout),
+        )
 
     def test_views_command_single_view_traversal_with_permission(self):
         from pyramid.registry import Registry
 
         registry = Registry()
         command = self._makeOne(registry=registry)
-        L = []
-        command.out = L.append
         view = dummy.DummyView(context='context', view_name='a')
         view.__permission__ = 'test'
         command._find_view = lambda arg1: view
@@ -391,19 +399,24 @@ class TestPViewsCommand(unittest.TestCase):
         command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[3], '    context: context')
-        self.assertEqual(L[4], '    view name: a')
-        self.assertEqual(L[8], '    tests.test_scripts.dummy.DummyView')
-        self.assertEqual(L[9], '    required permission = test')
+        self.assertEqual(self._out_calls[1], ('URL = /a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[3], ('    context: context', sys.stdout)
+        )
+        self.assertEqual(self._out_calls[4], ('    view name: a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[8],
+            ('    tests.test_scripts.dummy.DummyView', sys.stdout),
+        )
+        self.assertEqual(
+            self._out_calls[9], ('    required permission = test', sys.stdout)
+        )
 
     def test_views_command_single_view_traversal_with_predicates(self):
         from pyramid.registry import Registry
 
         registry = Registry()
         command = self._makeOne(registry=registry)
-        L = []
-        command.out = L.append
 
         def predicate():  # pragma: no cover
             pass
@@ -416,19 +429,25 @@ class TestPViewsCommand(unittest.TestCase):
         command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[3], '    context: context')
-        self.assertEqual(L[4], '    view name: a')
-        self.assertEqual(L[8], '    tests.test_scripts.dummy.DummyView')
-        self.assertEqual(L[9], '    view predicates (predicate = x)')
+        self.assertEqual(self._out_calls[1], ('URL = /a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[3], ('    context: context', sys.stdout)
+        )
+        self.assertEqual(self._out_calls[4], ('    view name: a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[8],
+            ('    tests.test_scripts.dummy.DummyView', sys.stdout),
+        )
+        self.assertEqual(
+            self._out_calls[9],
+            ('    view predicates (predicate = x)', sys.stdout),
+        )
 
     def test_views_command_single_view_route(self):
         from pyramid.registry import Registry
 
         registry = Registry()
         command = self._makeOne(registry=registry)
-        L = []
-        command.out = L.append
         route = dummy.DummyRoute('a', '/a', matchdict={})
         view = dummy.DummyView(
             context='context', view_name='a', matched_route=route, subpath=''
@@ -438,23 +457,30 @@ class TestPViewsCommand(unittest.TestCase):
         command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[3], '    context: context')
-        self.assertEqual(L[4], '    view name: a')
-        self.assertEqual(L[6], '    Route:')
-        self.assertEqual(L[8], '    route name: a')
-        self.assertEqual(L[9], '    route pattern: /a')
-        self.assertEqual(L[10], '    route path: /a')
-        self.assertEqual(L[11], '    subpath: ')
-        self.assertEqual(L[15], '        tests.test_scripts.dummy.DummyView')
+        self.assertEqual(self._out_calls[1], ('URL = /a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[3], ('    context: context', sys.stdout)
+        )
+        self.assertEqual(self._out_calls[4], ('    view name: a', sys.stdout))
+        self.assertEqual(self._out_calls[6], ('    Route:', sys.stdout))
+        self.assertEqual(self._out_calls[8], ('    route name: a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[9], ('    route pattern: /a', sys.stdout)
+        )
+        self.assertEqual(
+            self._out_calls[10], ('    route path: /a', sys.stdout)
+        )
+        self.assertEqual(self._out_calls[11], ('    subpath: ', sys.stdout))
+        self.assertEqual(
+            self._out_calls[15],
+            ('        tests.test_scripts.dummy.DummyView', sys.stdout),
+        )
 
     def test_views_command_multi_view_nested(self):
         from pyramid.registry import Registry
 
         registry = Registry()
         command = self._makeOne(registry=registry)
-        L = []
-        command.out = L.append
         view1 = dummy.DummyView(context='context', view_name='a1')
         view1.__name__ = 'view1'
         view1.__view_attr__ = 'call'
@@ -469,19 +495,25 @@ class TestPViewsCommand(unittest.TestCase):
         command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[3], '    context: context')
-        self.assertEqual(L[4], '    view name: a')
-        self.assertEqual(L[8], '    tests.test_scripts.dummy.DummyMultiView')
-        self.assertEqual(L[12], '        tests.test_scripts.dummy.view1.call')
+        self.assertEqual(self._out_calls[1], ('URL = /a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[3], ('    context: context', sys.stdout)
+        )
+        self.assertEqual(self._out_calls[4], ('    view name: a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[8],
+            ('    tests.test_scripts.dummy.DummyMultiView', sys.stdout),
+        )
+        self.assertEqual(
+            self._out_calls[12],
+            ('        tests.test_scripts.dummy.view1.call', sys.stdout),
+        )
 
     def test_views_command_single_view_route_with_route_predicates(self):
         from pyramid.registry import Registry
 
         registry = Registry()
         command = self._makeOne(registry=registry)
-        L = []
-        command.out = L.append
 
         def predicate():  # pragma: no cover
             pass
@@ -496,24 +528,34 @@ class TestPViewsCommand(unittest.TestCase):
         command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[3], '    context: context')
-        self.assertEqual(L[4], '    view name: a')
-        self.assertEqual(L[6], '    Route:')
-        self.assertEqual(L[8], '    route name: a')
-        self.assertEqual(L[9], '    route pattern: /a')
-        self.assertEqual(L[10], '    route path: /a')
-        self.assertEqual(L[11], '    subpath: ')
-        self.assertEqual(L[12], '    route predicates (predicate = x)')
-        self.assertEqual(L[16], '        tests.test_scripts.dummy.DummyView')
+        self.assertEqual(self._out_calls[1], ('URL = /a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[3], ('    context: context', sys.stdout)
+        )
+        self.assertEqual(self._out_calls[4], ('    view name: a', sys.stdout))
+        self.assertEqual(self._out_calls[6], ('    Route:', sys.stdout))
+        self.assertEqual(self._out_calls[8], ('    route name: a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[9], ('    route pattern: /a', sys.stdout)
+        )
+        self.assertEqual(
+            self._out_calls[10], ('    route path: /a', sys.stdout)
+        )
+        self.assertEqual(self._out_calls[11], ('    subpath: ', sys.stdout))
+        self.assertEqual(
+            self._out_calls[12],
+            ('    route predicates (predicate = x)', sys.stdout),
+        )
+        self.assertEqual(
+            self._out_calls[16],
+            ('        tests.test_scripts.dummy.DummyView', sys.stdout),
+        )
 
     def test_views_command_multiview(self):
         from pyramid.registry import Registry
 
         registry = Registry()
         command = self._makeOne(registry=registry)
-        L = []
-        command.out = L.append
         view = dummy.DummyView(context='context')
         view.__name__ = 'view'
         view.__view_attr__ = 'call'
@@ -525,18 +567,21 @@ class TestPViewsCommand(unittest.TestCase):
         command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[3], '    context: context')
-        self.assertEqual(L[4], '    view name: a')
-        self.assertEqual(L[8], '    tests.test_scripts.dummy.view.call')
+        self.assertEqual(self._out_calls[1], ('URL = /a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[3], ('    context: context', sys.stdout)
+        )
+        self.assertEqual(self._out_calls[4], ('    view name: a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[8],
+            ('    tests.test_scripts.dummy.view.call', sys.stdout),
+        )
 
     def test_views_command_multiview_with_permission(self):
         from pyramid.registry import Registry
 
         registry = Registry()
         command = self._makeOne(registry=registry)
-        L = []
-        command.out = L.append
         view = dummy.DummyView(context='context')
         view.__name__ = 'view'
         view.__view_attr__ = 'call'
@@ -549,19 +594,24 @@ class TestPViewsCommand(unittest.TestCase):
         command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[3], '    context: context')
-        self.assertEqual(L[4], '    view name: a')
-        self.assertEqual(L[8], '    tests.test_scripts.dummy.view.call')
-        self.assertEqual(L[9], '    required permission = test')
+        self.assertEqual(self._out_calls[1], ('URL = /a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[3], ('    context: context', sys.stdout)
+        )
+        self.assertEqual(self._out_calls[4], ('    view name: a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[8],
+            ('    tests.test_scripts.dummy.view.call', sys.stdout),
+        )
+        self.assertEqual(
+            self._out_calls[9], ('    required permission = test', sys.stdout)
+        )
 
     def test_views_command_multiview_with_predicates(self):
         from pyramid.registry import Registry
 
         registry = Registry()
         command = self._makeOne(registry=registry)
-        L = []
-        command.out = L.append
 
         def predicate():  # pragma: no cover
             pass
@@ -579,11 +629,19 @@ class TestPViewsCommand(unittest.TestCase):
         command.args.url = '/a'
         result = command.run()
         self.assertEqual(result, 0)
-        self.assertEqual(L[1], 'URL = /a')
-        self.assertEqual(L[3], '    context: context')
-        self.assertEqual(L[4], '    view name: a')
-        self.assertEqual(L[8], '    tests.test_scripts.dummy.view.call')
-        self.assertEqual(L[9], '    view predicates (predicate = x)')
+        self.assertEqual(self._out_calls[1], ('URL = /a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[3], ('    context: context', sys.stdout)
+        )
+        self.assertEqual(self._out_calls[4], ('    view name: a', sys.stdout))
+        self.assertEqual(
+            self._out_calls[8],
+            ('    tests.test_scripts.dummy.view.call', sys.stdout),
+        )
+        self.assertEqual(
+            self._out_calls[9],
+            ('    view predicates (predicate = x)', sys.stdout),
+        )
 
 
 class Test_main(unittest.TestCase):
