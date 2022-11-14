@@ -1,13 +1,13 @@
 Pyramid
 =======
 
-.. image:: https://github.com/Pylons/Pyramid/workflows/Build%20and%20test/badge.svg?branch=master
+.. image:: https://github.com/Pylons/Pyramid/workflows/Build%20and%20test/badge.svg?branch=main
         :target: https://github.com/Pylons/Pyramid/actions?query=workflow%3A%22Build+and+test%22
-        :alt: master CI Status
+        :alt: main CI Status
 
-.. image:: https://readthedocs.org/projects/pyramid/badge/?version=master
-        :target: https://docs.pylonsproject.org/projects/pyramid/en/master
-        :alt: master Documentation Status
+.. image:: https://readthedocs.org/projects/pyramid/badge/?version=main
+        :target: https://docs.pylonsproject.org/projects/pyramid/en/main
+        :alt: main Documentation Status
 
 .. image:: https://img.shields.io/badge/IRC-Libera.Chat-blue.svg
         :target: https://web.libera.chat/#pyramid
@@ -47,8 +47,8 @@ for documentation, reporting bugs, and getting support.
 Developing and Contributing
 ---------------------------
 
-See `HACKING.txt <https://github.com/Pylons/pyramid/blob/master/HACKING.txt>`_ and
-`contributing.md <https://github.com/Pylons/pyramid/blob/master/contributing.md>`_
+See `HACKING.txt <https://github.com/Pylons/pyramid/blob/main/HACKING.txt>`_ and
+`contributing.md <https://github.com/Pylons/pyramid/blob/main/contributing.md>`_
 for guidelines on running tests, adding features, coding style, and updating
 documentation when developing in or contributing to Pyramid.
 

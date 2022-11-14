@@ -43,7 +43,7 @@ On Unix
 .. code-block:: bash
 
     cd ~
-    cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
+    cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout main
 
 On Windows
 ^^^^^^^^^^
@@ -51,7 +51,7 @@ On Windows
 .. code-block:: doscon
 
     cd \
-    cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout master
+    cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout main
 
 On all operating systems
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -273,7 +273,7 @@ On Windows
 
 There should be no output to your console.
 You should now have a ``tutorial.sqlite`` file in your current working directory.
-This is an SQLite database with three tables defined in it, ``alembic_version``, ``models``, and ``master``, where the first two tables each have single record inside of them.
+This is an SQLite database with three tables defined in it, ``alembic_version``, ``models``, and ``main``, where the first two tables each have single record inside of them.
 
 
 .. _sql_running_tests:
