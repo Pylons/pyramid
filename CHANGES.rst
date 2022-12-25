@@ -4,6 +4,8 @@ unreleased
 Features
 --------
 
+- Pyramid adds support for Python 3.11.
+
 Bug Fixes
 ---------
 
