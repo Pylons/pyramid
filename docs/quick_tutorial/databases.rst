@@ -13,8 +13,8 @@ Background
 Our Pyramid-based wiki application now needs database-backed storage of pages.
 This frequently means an SQL database. The Pyramid community strongly supports
 the :ref:`SQLAlchemy <sqla:index_toplevel>` project and its
-:ref:`object-relational mapper (ORM) <sqla:ormtutorial_toplevel>` as a
-convenient, Pythonic way to interface to databases.
+:ref:`object-relational mapper (ORM) <sqla:orm_toplevel>` as a convenient,
+Pythonic way to interface to databases.
 
 In this step we hook up SQLAlchemy to a SQLite database table, providing
 storage and retrieval for the wiki pages in the previous step.
