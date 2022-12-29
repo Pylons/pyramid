@@ -20,6 +20,11 @@ unreleased
   the use of ``!=``.
   See https://github.com/Pylons/pyramid/pull/3704
 
+- Pyramid drops support for ``l*gettext()`` methods in the i18n module.
+  These have been deprecated in Python's gettext module since 3.8, and
+  removed in Python 3.11. They also shouldn't be used at all on Python 3.
+  See https://github.com/Pylons/pyramid/pull/3717
+
 2.0 (2021-02-28)
 ================
 
