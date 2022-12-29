@@ -358,3 +358,5 @@ Contributors
 - Jens Troeger, 2021/04/08
 
 - Karthikeyan Singaravelan, 2021/08/24
+
+- Stefano Rivera, 2022/12/29
