@@ -421,11 +421,6 @@ class TestTranslations(unittest.TestCase):
         self.assertEqual(t.dgettext('messages', 'foo'), 'Voh')
         self.assertEqual(t.dgettext('messages1', 'foo'), 'VohD')
 
-    def test_ldgettext(self):
-        t = self._makeOne()
-        self.assertEqual(t.ldgettext('messages', 'foo'), b'Voh')
-        self.assertEqual(t.ldgettext('messages1', 'foo'), b'VohD')
-
     def test_dugettext(self):
         t = self._makeOne()
         self.assertEqual(t.dugettext('messages', 'foo'), 'Voh')
@@ -435,13 +430,6 @@ class TestTranslations(unittest.TestCase):
         t = self._makeOne()
         self.assertEqual(t.dngettext('messages', 'foo1', 'foos1', 1), 'Voh1')
         self.assertEqual(t.dngettext('messages1', 'foo1', 'foos1', 1), 'VohD1')
-
-    def test_ldngettext(self):
-        t = self._makeOne()
-        self.assertEqual(t.ldngettext('messages', 'foo1', 'foos1', 1), b'Voh1')
-        self.assertEqual(
-            t.ldngettext('messages1', 'foo1', 'foos1', 1), b'VohD1'
-        )
 
     def test_dungettext(self):
         t = self._makeOne()
