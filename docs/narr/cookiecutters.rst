@@ -36,6 +36,6 @@ See `Cookiecutter Installation <https://cookiecutter.readthedocs.io/en/latest/in
 
 Then see the `README <https://github.com/Pylons/pyramid-cookiecutter-starter#pyramid-cookiecutter-starter>`_ of ``pyramid-cookiecutter-starter`` for its usage to generate a starter project.
 
-The ``pyramid-cookiecutter-starter`` on its ``master`` branch is a good starting point to develop your own cookiecutter.
+The ``pyramid-cookiecutter-starter`` on its ``main`` branch is a good starting point to develop your own cookiecutter.
 Development of cookiecutters is documented under `Learn the Basics of Cookiecutter by Creating a Cookiecutter <https://cookiecutter.readthedocs.io/en/latest/first_steps.html>`_.
 See `Cookiecutter Features <https://cookiecutter.readthedocs.io/en/latest/README.html#features>`_ for details of what is possible.
