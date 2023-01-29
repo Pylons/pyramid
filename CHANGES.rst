@@ -1,6 +1,8 @@
 unreleased
 ==========
 
+- Add support for Python 3.10 and 3.11.
+
 - Copy ``__name__`` from decorated attribute when using
   ``pyramid.decorator.reify``.
   See https://github.com/Pylons/pyramid/pull/3660
