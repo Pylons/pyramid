@@ -152,7 +152,7 @@ html_theme = 'pyramid'
 html_theme_path = pylons_sphinx_themes.get_html_themes_path()
 html_theme_options = dict(
     github_url='https://github.com/Pylons/pyramid',
-    # On master branch and new branch still in
+    # On main branch and new branch still in
     # pre-release status: true; else: false.
     in_progress='false',
     # On branches previous to "latest": true; else: false.

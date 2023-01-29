@@ -19,7 +19,7 @@ Prepare new release branch
 
 - Create a new release branch, incrementing the version number.
 
-- Do any necessary branch merges (e.g., master to branch, branch to master).
+- Do any necessary branch merges (e.g., main to branch, branch to main).
 
 - On release branch:
 
@@ -33,7 +33,7 @@ Prepare new release branch
 
 - Run tests on Windows if feasible.
 
-- For each ``pyramid-cookiecutter-*``, make a new branch off "master" with the
+- For each ``pyramid-cookiecutter-*``, make a new branch off "main" with the
   same name to align with the new Pyramid release branch name.
 
 - In the docs, update the ``cookiecutter`` command with the new branch name,
@@ -60,7 +60,7 @@ Prepare new release branch
 - For major version releases, in contributing.md, update branch descriptions.
 
 - For major version releases, in docs/conf.py, update values under
-  html_theme_options for in_progress and outdated across master, releasing
+  html_theme_options for in_progress and outdated across main, releasing
   branch, and previously released branch. Also in the previously released
   branch only, uncomment the sections to enable pylons_sphinx_latesturl.
 
@@ -84,10 +84,10 @@ Prepare new release branch
 
 - Configure RTD to publish the new release version of the docs.
 
-Prepare master for further development (major releases only)
-------------------------------------------------------------
+Prepare main for further development (major releases only)
+----------------------------------------------------------
 
-- Checkout master.
+- Checkout main.
 
 - In CHANGES.rst, preserve headings but clear out content. Add heading
   "unreleased" for the version number.
@@ -103,11 +103,11 @@ Prepare master for further development (major releases only)
 - Change setup.py version to the next version number.
 
 - Update README.rst to use correct versions of badges, URLs, and ALT option
-  for "master" instead of the major release version.
+  for "main" instead of the major release version.
 
-- In the docs, update the ``cookiecutter`` command with ``master``,
+- In the docs, update the ``cookiecutter`` command with ``main``,
   for example, ``cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout
-  master``. A search for ``cookiecutter gh:Pylons/pyramid-cookiecutter-``
+  main``. A search for ``cookiecutter gh:Pylons/pyramid-cookiecutter-``
   should return all instances to be updated.
 
 Update previous version (final releases only)

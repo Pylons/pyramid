@@ -273,7 +273,7 @@ On Windows
 
 There should be no output to your console.
 You should now have a ``tutorial.sqlite`` file in your current working directory.
-This is an SQLite database with three tables defined in it, ``alembic_version``, ``models``, and ``master``, where the first two tables each have single record inside of them.
+This is an SQLite database with two tables defined in it, ``alembic_version`` and ``models``, where each table has a single record.
 
 
 .. _sql_running_tests:
