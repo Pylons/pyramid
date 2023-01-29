@@ -6,6 +6,9 @@ Features
 
 - Pyramid adds support for Python 3.11.
 
+- Added HTTP 418 error code via `pyramid.httpexceptions.HTTPImATeapot`.
+  See https://github.com/Pylons/pyramid/pull/3667
+
 Bug Fixes
 ---------
 
