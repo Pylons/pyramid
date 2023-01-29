@@ -13,9 +13,10 @@ Pyramid
         :target: https://web.libera.chat/#pyramid
         :alt: IRC Libera.Chat
 
-`Pyramid <https://trypyramid.com/>`_ is a small, fast, down-to-earth, open
-source Python web framework. It makes real-world web application development
+Pyramid is a small, fast, down-to-earth, open source Python web framework.
+It makes real-world web application development
 and deployment more fun, more predictable, and more productive.
+`Try Pyramid <https://trypyramid.com/>`_, browse its add-ons and documentation, and get an overview.
 
 .. code-block:: python
 

@@ -335,12 +335,6 @@ class Translations(gettext.GNUTranslations):
         """
         return self._domains.get(domain, self).gettext(message)
 
-    def ldgettext(self, domain, message):
-        """Like ``lgettext()``, but look the message up in the specified
-        domain.
-        """
-        return self._domains.get(domain, self).lgettext(message)
-
     def dugettext(self, domain, message):
         """Like ``ugettext()``, but look the message up in the specified
         domain.
@@ -352,12 +346,6 @@ class Translations(gettext.GNUTranslations):
         domain.
         """
         return self._domains.get(domain, self).ngettext(singular, plural, num)
-
-    def ldngettext(self, domain, singular, plural, num):
-        """Like ``lngettext()``, but look the message up in the specified
-        domain.
-        """
-        return self._domains.get(domain, self).lngettext(singular, plural, num)
 
     def dungettext(self, domain, singular, plural, num):
         """Like ``ungettext()`` but look the message up in the specified

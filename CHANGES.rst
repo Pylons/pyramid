@@ -1,6 +1,8 @@
 unreleased
 ==========
 
+- Add support for Python 3.10 and 3.11.
+
 - Copy ``__name__`` from decorated attribute when using
   ``pyramid.decorator.reify``.
   See https://github.com/Pylons/pyramid/pull/3660
@@ -13,6 +15,15 @@ unreleased
 - Remove obsolete stackframe hack used in Python 3.5.0 when showing
   configurator conflict errors.
   See https://github.com/Pylons/pyramid/pull/3700
+
+- Fix an error when injecting certain objects into the ``pshell`` env due to
+  the use of ``!=``.
+  See https://github.com/Pylons/pyramid/pull/3704
+
+- Pyramid drops support for ``l*gettext()`` methods in the i18n module.
+  These have been deprecated in Python's gettext module since 3.8, and
+  removed in Python 3.11. They also shouldn't be used at all on Python 3.
+  See https://github.com/Pylons/pyramid/pull/3717
 
 2.0 (2021-02-28)
 ================
