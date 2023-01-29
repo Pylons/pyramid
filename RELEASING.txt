@@ -84,10 +84,10 @@ Prepare new release branch
 
 - Configure RTD to publish the new release version of the docs.
 
-Prepare main for further development (major releases only)
-----------------------------------------------------------
+Prepare "main" for further development (major releases only)
+------------------------------------------------------------
 
-- Checkout main.
+- Checkout "main".
 
 - In CHANGES.rst, preserve headings but clear out content. Add heading
   "unreleased" for the version number.
