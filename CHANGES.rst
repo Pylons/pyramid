@@ -25,6 +25,9 @@ unreleased
   removed in Python 3.11. They also shouldn't be used at all on Python 3.
   See https://github.com/Pylons/pyramid/pull/3717
 
+- Avoid ``setDaemon(True)`` deprecation warning by updating threading API usage
+  to ``.daemon = True``.
+
 2.0 (2021-02-28)
 ================
 
