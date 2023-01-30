@@ -8,6 +8,15 @@ It also documents backwards incompatibilities between the two versions and depre
 
     This is the first release of :app:`Pyramid` that does not support Python 2, which is now End-of-Life and no longer receiving critical security updates by the PSF.
 
+Bug Fix Releases
+----------------
+
+Pyramid 2.0 was released on 2021-02-28.
+
+The following bug fix releases were made since then. Bug fix releases also include documentation improvements and other minor feature changes.
+
+- :ref:`changes_2.0.1`
+
 Feature Additions
 -----------------
 
