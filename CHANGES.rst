@@ -1,5 +1,5 @@
-unreleased
-==========
+2.0.1 (2023-01-29)
+==================
 
 - Add support for Python 3.10 and 3.11.
 
