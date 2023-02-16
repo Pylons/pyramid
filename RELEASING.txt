@@ -135,7 +135,12 @@ Marketing and communications
 
 - Edit `https://en.wikipedia.org/wiki/Pylons_project <https://en.wikipedia.org/wiki/Pylons_project>`_.
 
-- Edit `https://en.wikipedia.org/wiki/Comparison_of_web_frameworks <https://en.wikipedia.org/wiki/Comparison_of_web_frameworks>`_.
+- Edit `https://www.wikidata.org/wiki/Q2342759 <https://www.wikidata.org/wiki/Q2342759>`_.
+  Under "software identifier version", click "add value", and enter the current release version.
+  Click "add qualifier", select "publication date" from auto-complete, and enter the publication date.
+  Click "add reference", and add references for "publication date", "reference URL" (the most recent tag on GitHub), "retrieved" as the publication date, and "title" specifying "Release #.#.#" and select the language.
+  Click "publish".
+  The data on this page gets pulled in to `https://en.wikipedia.org/wiki/Comparison_of_server-side_web_frameworks#Python <https://en.wikipedia.org/wiki/Comparison_of_server-side_web_frameworks#Python>`_.
 
 - Announce to Twitter.
 
