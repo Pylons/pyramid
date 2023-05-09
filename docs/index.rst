@@ -38,7 +38,7 @@ speed right away.
 * Like learning by example? Visit the official :ref:`html_tutorials` as well as
   the community-contributed :ref:`Pyramid Tutorials
   <tutorials:pyramid-tutorials>` and :ref:`Pyramid Community Cookbook
-  <cookbook:pyramid-cookbook>`.
+  <cookbook:pyramid_cookbook>`.
 
 * For help getting Pyramid set up, try :ref:`installing_chapter`.
 
