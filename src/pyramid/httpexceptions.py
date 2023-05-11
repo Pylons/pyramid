@@ -680,7 +680,7 @@ class HTTPClientError(HTTPError):
 
     This is an error condition in which the client is presumed to be
     in-error.  This is an expected problem, and thus is not considered
-    a bug.  A server-side traceback is not warranted.  Unless specialized,
+    a bug.  A server-side traceback is not warranted.  Unless specified,
     this is a '400 Bad Request'
     """
 
@@ -1115,7 +1115,7 @@ class HTTPFailedDependency(HTTPClientError):
     title = 'Failed Dependency'
     explanation = (
         'The method could not be performed because the requested '
-        'action dependended on another action and that action failed'
+        'action depended on another action and that action failed'
     )
 
 
@@ -1197,7 +1197,7 @@ class HTTPServerError(HTTPError):
     base class for the 500s, where the server is in-error
 
     This is an error condition in which the server is presumed to be
-    in-error.  Unless specialized, this is a '500 Internal Server Error'.
+    in-error.  Unless specified, this is a '500 Internal Server Error'.
     """
 
     code = 500
