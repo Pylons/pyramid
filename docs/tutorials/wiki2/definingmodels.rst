@@ -239,7 +239,7 @@ command, as we did in the installation step of this tutorial.
 
 Since we've changed our model, we need to make changes to our
 ``initialize_db.py`` script.  In particular, we'll replace our import of
-``MyModel`` with those of ``User`` and ``Page``. We'll also change the the script to create two ``User`` objects (``basic`` and ``editor``) as well
+``MyModel`` with those of ``User`` and ``Page``. We'll also change the script to create two ``User`` objects (``basic`` and ``editor``) as well
 as a ``Page``, rather than a ``MyModel``, and add them to our ``dbsession``.
 
 Open ``tutorial/scripts/initialize_db.py`` and edit it to look like the
