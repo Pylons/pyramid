@@ -3,8 +3,7 @@ import os
 
 def includeme(config):
     here = here = os.path.dirname(__file__)
-    static
     static = os.path.normpath(
-        os.path.join(here, '..', '..', 'fixtures', 'statc')
+        os.path.join(here, '..', '..', 'fixtures', 'static')
     )
     config.add_static_view('/', static)
