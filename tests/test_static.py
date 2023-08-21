@@ -104,6 +104,19 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
 
         self.assertRaises(HTTPNotFound, inst, context, request)
 
+    def test_oob_nul_char(self):
+        import os
+
+        inst = self._makeOne(f'{os.getcwd()}/tests/fixtures/static')
+        dds = '..\x00/'
+        request = self._makeRequest(
+            {'PATH_INFO': f'/{dds}'}
+        )
+        context = DummyContext()
+        from pyramid.httpexceptions import HTTPNotFound
+
+        self.assertRaises(HTTPNotFound, inst, context, request)
+
     def test_resource_doesnt_exist(self):
         inst = self._makeOne('tests:fixtures/static')
         request = self._makeRequest({'PATH_INFO': '/notthere'})
