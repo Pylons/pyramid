@@ -220,10 +220,17 @@ class TestEventOnlySubscribers(IntegrationBase, unittest.TestCase):
 class TestStaticAppUsingAbsPath(StaticAppBase, unittest.TestCase):
     package = 'tests.pkgs.static_abspath'
 
+    def test_nulbyte_chroot(self):
+        super_w_null = '/static/..\x00/'
+        res = self.testapp.get(f'/{super_w_null}', status=404)
+
 
 class TestStaticAppUsingAssetSpec(StaticAppBase, unittest.TestCase):
     package = 'tests.pkgs.static_assetspec'
 
+    def test_nulbyte_chroot(self):
+        super_w_null = 'static/..\x00/'
+        res = self.testapp.get(f'/{super_w_null}', status=404)
 
 class TestStaticAppWithEncodings(IntegrationBase, unittest.TestCase):
     package = 'tests.pkgs.static_encodings'
