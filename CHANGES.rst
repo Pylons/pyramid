@@ -9,6 +9,8 @@ Features
 - Added HTTP 418 error code via `pyramid.httpexceptions.HTTPImATeapot`.
   See https://github.com/Pylons/pyramid/pull/3667
 
+- Coverage reports in tests based on Python 3.11 instead of Python 3.8.
+
 Bug Fixes
 ---------
 
