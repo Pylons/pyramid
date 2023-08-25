@@ -16,6 +16,7 @@ Pyramid 2.0 was released on 2021-02-28.
 The following bug fix releases were made since then. Bug fix releases also include documentation improvements and other minor feature changes.
 
 - :ref:`changes_2.0.1`
+- :ref:`changes_2.0.2`
 
 Feature Additions
 -----------------
