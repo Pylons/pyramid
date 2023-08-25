@@ -6,9 +6,9 @@ build:
     python: '3.11'
 sphinx:
   configuration: docs/conf.py
-  formats:
-    - pdf
-    - epub
+formats:
+  - pdf
+  - epub
 python:
   install:
     - method: pip
