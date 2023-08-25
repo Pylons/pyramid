@@ -260,12 +260,12 @@ def _add_vary(response, option):
     response.vary = vary
 
 
-_seps = {'/', os.sep}
+_invalid_element_chars = {'/', os.sep, '\x00'}
 
 
-def _contains_slash(item):
-    for sep in _seps:
-        if sep in item:
+def _contains_invalid_element_char(item):
+    for invalid_element_char in _invalid_element_chars:
+        if invalid_element_char in item:
             return True
 
 
@@ -279,7 +279,7 @@ def _secure_path(path_tuple):
         # unless someone screws up the traversal_path code
         # (request.subpath is computed via traversal_path too)
         return None
-    if any([_contains_slash(item) for item in path_tuple]):
+    if any([_contains_invalid_element_char(item) for item in path_tuple]):
         return None
     encoded = '/'.join(path_tuple)  # will be unicode
     return encoded
