@@ -27,6 +27,7 @@ class PViewsCommand:
     specifies the path info portion of a URL that will be used to find
     matching views.  Example: 'proutes myapp.ini#main /url'
     """
+    script_name = 'pviews'
     stdout = sys.stdout
 
     parser = argparse.ArgumentParser(
@@ -248,6 +249,9 @@ class PViewsCommand:
             return 2
         config_uri = self.args.config_uri
         config_vars = parse_vars(self.args.config_vars)
+        # bw update 2.1 don't overwrite if set
+        if not '__script__' in config_vars:
+            config_vars['__script__'] = self.script_name
         url = self.args.url
 
         self.setup_logging(config_uri, global_conf=config_vars)

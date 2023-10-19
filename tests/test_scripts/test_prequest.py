@@ -234,9 +234,14 @@ class TestPRequestCommand(unittest.TestCase):
         self.assertEqual(self._out, [b'abc'])
 
     def test_command_method_configures_logging(self):
-        command = self._makeOne(['', 'development.ini', '/'])
+        command = self._makeOne(['', '--method=GET', 'development.ini', '/'])
         command.run()
         self.assertEqual(self.loader.calls[0]['op'], 'logging')
+
+    def test_command_script_name(self):
+        command = self._makeOne(['', '--method=GET', 'development.ini', '/'],)
+        command.run()
+        self.assertEqual(self.loader.calls[0]['defaults']['__script__'], 'prequest')
 
 
 class Test_main(unittest.TestCase):
