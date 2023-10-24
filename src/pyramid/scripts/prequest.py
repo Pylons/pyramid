@@ -138,7 +138,7 @@ class PRequestCommand:
         config_uri = self.args.config_uri
         config_vars = parse_vars(self.args.config_vars)
         # bw update 2.1 don't overwrite if set
-        if not '__script__' in config_vars:
+        if '__script__' not in config_vars:
             config_vars['__script__'] = self.script_name
         path = self.args.path_info
 

@@ -47,7 +47,10 @@ class TestPServeCommand(unittest.TestCase):
         self.loader.server = lambda x: x
 
         inst.run()
-        self.assertEqual(app.global_conf, {'a': '1', 'b': '2', '__script__': 'pserve'})
+        self.assertEqual(
+            app.global_conf,
+            {'a': '1', 'b': '2', '__script__': 'pserve'}
+        )
 
     def test_original_ignore_files(self):
         msg = 'A change to "ignore_files" was detected'

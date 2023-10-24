@@ -241,7 +241,10 @@ class TestPRequestCommand(unittest.TestCase):
     def test_command_script_name(self):
         command = self._makeOne(['', '--method=GET', 'development.ini', '/'],)
         command.run()
-        self.assertEqual(self.loader.calls[0]['defaults']['__script__'], 'prequest')
+        self.assertEqual(
+            self.loader.calls[0]['defaults']['__script__'],
+            'prequest'
+        )
 
 
 class Test_main(unittest.TestCase):
