@@ -48,8 +48,7 @@ class TestPServeCommand(unittest.TestCase):
 
         inst.run()
         self.assertEqual(
-            app.global_conf,
-            {'a': '1', 'b': '2', '__script__': 'pserve'}
+            app.global_conf, {'a': '1', 'b': '2', '__script__': 'pserve'}
         )
 
     def test_original_ignore_files(self):
