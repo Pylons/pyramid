@@ -82,9 +82,7 @@ class PTweensCommand:
             return 2
         config_uri = self.args.config_uri
         config_vars = parse_vars(self.args.config_vars)
-        # bw update 2.1 don't overwrite if set
-        if '__script__' not in config_vars:
-            config_vars['__script__'] = self.script_name
+        config_vars.setdefault('__script__', self.script_name)
         self.setup_logging(config_uri, global_conf=config_vars)
         env = self.bootstrap(config_uri, options=config_vars)
         registry = env['registry']
