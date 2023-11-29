@@ -1271,7 +1271,6 @@ class DummyContext:
 
 
 class DummyRequest:
-
     application_url = (
         'http://example.com:5432'  # app_url never ends with slash
     )

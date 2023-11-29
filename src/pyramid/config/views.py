@@ -886,7 +886,7 @@ class ViewsConfiguratorMixin:
             pvals = {}
             dvals = {}
 
-            for (k, v) in ovals.items():
+            for k, v in ovals.items():
                 if k in valid_predicates:
                     pvals[k] = v
                 else:
@@ -1206,7 +1206,7 @@ class ViewsConfiguratorMixin:
 
     def add_default_view_predicates(self):
         p = pyramid.predicates
-        for (name, factory) in (
+        for name, factory in (
             ('xhr', p.XHRPredicate),
             ('request_method', p.RequestMethodPredicate),
             ('path_info', p.PathInfoPredicate),
@@ -2163,7 +2163,7 @@ class StaticURLInfo:
         self.cache_busters = []
 
     def generate(self, path, request, **kw):
-        for (url, spec, route_name) in self.registrations:
+        for url, spec, route_name in self.registrations:
             if path.startswith(spec):
                 subpath = path[len(spec) :]
                 if WIN:  # pragma: no cover

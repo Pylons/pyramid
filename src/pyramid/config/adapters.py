@@ -76,8 +76,6 @@ class AdaptersConfiguratorMixin:
         return subscriber
 
     def _derive_predicate(self, predicate):
-        derived_predicate = predicate
-
         if eventonly(predicate):
 
             def derived_predicate(*arg):
@@ -85,12 +83,12 @@ class AdaptersConfiguratorMixin:
 
             # seems pointless to try to fix __doc__, __module__, etc as
             # predicate will invariably be an instance
+        else:
+            derived_predicate = predicate
 
         return derived_predicate
 
     def _derive_subscriber(self, subscriber, predicates):
-        derived_subscriber = subscriber
-
         if eventonly(subscriber):
 
             def derived_subscriber(*arg):
@@ -98,6 +96,8 @@ class AdaptersConfiguratorMixin:
 
             if hasattr(subscriber, '__name__'):
                 update_wrapper(derived_subscriber, subscriber)
+        else:
+            derived_subscriber = subscriber
 
         if not predicates:
             return derived_subscriber

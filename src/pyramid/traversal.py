@@ -597,7 +597,6 @@ class ResourceTreeTraverser:
         matchdict = request.matchdict
 
         if matchdict is not None:
-
             path = matchdict.get('traverse', '/') or '/'
             if is_nonstr_iter(path):
                 # this is a *traverse stararg (not a {traverse})

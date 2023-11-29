@@ -683,7 +683,6 @@ def takes_one_arg(callee, attr=None, argname=None):
         return True
 
     if argname:
-
         defaults = argspec[3]
         if defaults is None:
             defaults = ()
