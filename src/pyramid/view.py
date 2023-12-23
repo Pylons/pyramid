@@ -23,6 +23,7 @@ from pyramid.threadlocal import get_current_registry, manager
 from pyramid.util import hide_attrs, reraise as reraise_
 
 _marker = object()
+LIFT = object()
 
 
 def render_view_to_response(context, request, name='', secure=True):

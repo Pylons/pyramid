@@ -56,7 +56,7 @@ from pyramid.util import (
     as_sorted_tuple,
     is_nonstr_iter,
 )
-from pyramid.view import AppendSlashNotFoundViewFactory
+from pyramid.view import LIFT, AppendSlashNotFoundViewFactory
 import pyramid.viewderivers
 from pyramid.viewderivers import (
     INGRESS,
@@ -572,7 +572,9 @@ class ViewsConfiguratorMixin:
         name
 
           The :term:`view name`.  Read :ref:`traversal_chapter` to
-          understand the concept of a view name.
+          understand the concept of a view name. When :term:`view` is a class,
+          the sentinel value view.LIFT will cause the :term:`attr` value to be
+          copied to name (useful with view_defaults to reduce boilerplate).
 
         context
 
@@ -587,6 +589,9 @@ class ViewsConfiguratorMixin:
           to ``add_view`` as ``for_`` (an older, still-supported
           spelling). If the view should *only* match when handling
           exceptions, then set the ``exception_only`` to ``True``.
+          When :term:`view` is a class, the sentinel value view.LIFT here
+          will cause the :term:`context` value to be set at scan time
+          (useful in conjunction with venusian :term:`lift`).
 
         route_name
 
@@ -814,6 +819,14 @@ class ViewsConfiguratorMixin:
         for_ = self.maybe_dotted(for_)
         containment = self.maybe_dotted(containment)
         mapper = self.maybe_dotted(mapper)
+
+        if inspect.isclass(view):
+            if context is LIFT:
+                context = view
+            if name is LIFT:
+                name = attr
+        elif LIFT in (context, name):
+            raise ValueError('LIFT is only allowed when view is a class')
 
         if is_nonstr_iter(decorator):
             decorator = combine_decorators(*map(self.maybe_dotted, decorator))
