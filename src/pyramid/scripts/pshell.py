@@ -162,9 +162,9 @@ class PShellCommand:
         env_help['root'] = 'Root of the default resource tree.'
         env_help['registry'] = 'Active Pyramid registry.'
         env_help['request'] = 'Active request object.'
-        env_help[
-            'root_factory'
-        ] = 'Default root factory used to create `root`.'
+        env_help['root_factory'] = (
+            'Default root factory used to create `root`.'
+        )
 
         # load the pshell section of the ini file
         env.update(self.loaded_objects)

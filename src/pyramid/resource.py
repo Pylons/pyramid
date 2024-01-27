@@ -1,4 +1,5 @@
 """ Backwards compatibility shim module (forever). """
+
 from pyramid.asset import *  # noqa b/w compat
 
 resolve_resource_spec = resolve_asset_spec  # noqa

@@ -129,6 +129,7 @@ redirections that require a ``Location`` field. Reflecting this, these
 subclasses have one additional keyword argument: ``location``,
 which indicates the location to which to redirect.
 """
+
 import json
 from string import Template
 from webob import html_escape as _html_escape
