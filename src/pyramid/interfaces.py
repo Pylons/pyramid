@@ -921,7 +921,6 @@ ILogger = IDebugLogger  # b/c
 
 class IRoutePregenerator(Interface):
     def __call__(request, elements, kw):
-
         """A pregenerator is a function associated by a developer with a
         :term:`route`. The pregenerator for a route is called by
         :meth:`pyramid.request.Request.route_url` in order to adjust the set
@@ -1384,7 +1383,6 @@ class IIntrospectable(Interface):
         """  # noqa: E501
 
     def __hash__():
-
         """Introspectables must be hashable.  The typical implementation of
         an introsepectable's __hash__ is::
 

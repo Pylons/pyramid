@@ -31,7 +31,6 @@ def main(argv=sys.argv, quiet=False, original_ignore_files=None):
 
 
 class PServeCommand:
-
     description = """\
     This command serves a web application that uses a PasteDeploy
     configuration file for the server and application.

@@ -64,7 +64,7 @@ def urlencode(query, doseq=True, quote_via=quote_plus):
     result = ''
     prefix = ''
 
-    for (k, v) in query:
+    for k, v in query:
         k = quote_via(k)
 
         if is_nonstr_iter(v):

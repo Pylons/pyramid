@@ -102,7 +102,6 @@ class TweensConfiguratorMixin:
 
     @action_method
     def _add_tween(self, tween_factory, under=None, over=None, explicit=False):
-
         if not isinstance(tween_factory, str):
             raise ConfigurationError(
                 'The "tween_factory" argument to add_tween must be a '

@@ -208,7 +208,6 @@ class Introspector:
 
 @implementer(IIntrospectable)
 class Introspectable(dict):
-
     order = 0  # mutated by introspector.add
     action_info = None  # mutated by self.register
 

@@ -542,7 +542,7 @@ class RoutesConfiguratorMixin:
 
     def add_default_route_predicates(self):
         p = pyramid.predicates
-        for (name, factory) in (
+        for name, factory in (
             ('xhr', p.XHRPredicate),
             ('request_method', p.RequestMethodPredicate),
             ('path_info', p.PathInfoPredicate),
