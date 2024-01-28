@@ -159,6 +159,7 @@ class Test_bootstrap(unittest.TestCase):
         result = self._callFUT('/foo/bar/myapp.ini', request)
         self.assertEqual(result['app'], self.app)
         self.assertEqual(result['root'], self.root)
+        self.assertEqual(self.get_app.kw['options']['__script__'], 'bootstrap')
         self.assertTrue('closer' in result)
 
 

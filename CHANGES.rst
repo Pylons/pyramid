@@ -11,6 +11,17 @@ Features
 
 - Coverage reports in tests based on Python 3.11 instead of Python 3.8.
 
+- All scripts now pass a new option ``__script__`` when loading the WSGI app.
+  For example, ``pserve`` sets ``__script__ == 'pserve'``. This works for
+  ``pserve``, ``pshell``, ``prequest``, ``proutes``, ``ptweens``, ``pviews``,
+  as well as when using ``pyramid.paster.bootstrap`` directly.
+
+  When using ``plaster-pastedeploy`` to load an INI file, this option will
+  manifest as a new value passed into the ``global_conf`` arg of your
+  application factory, where you can use it as part of initializing your app.
+
+  See https://github.com/Pylons/pyramid/pull/3735
+
 Bug Fixes
 ---------
 
