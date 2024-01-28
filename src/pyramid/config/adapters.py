@@ -45,17 +45,13 @@ class AdaptersConfiguratorMixin:
             predlist = self.get_predlist('subscriber')
             order, preds, phash = predlist.make(self, **predicates)
 
-            derived_predicates = [self._derive_predicate(p) for p in preds]
-            derived_subscriber = self._derive_subscriber(
-                subscriber, derived_predicates
-            )
+            derived_subscriber = self._derive_subscriber(subscriber, preds)
 
             intr.update(
                 {
                     'phash': phash,
                     'order': order,
                     'predicates': preds,
-                    'derived_predicates': derived_predicates,
                     'derived_subscriber': derived_subscriber,
                 }
             )
@@ -74,12 +70,6 @@ class AdaptersConfiguratorMixin:
 
         self.action(None, register, introspectables=(intr,))
         return subscriber
-
-    def _derive_predicate(self, predicate):
-        def derived_predicate(*arg):
-            return predicate(arg[0])
-
-        return derived_predicate
 
     def _derive_subscriber(self, subscriber, predicates):
         if eventonly(subscriber):
@@ -114,7 +104,7 @@ class AdaptersConfiguratorMixin:
             # with all args, the eventonly hack would not have been required.
             # At this point, though, using .subscriptions and manual execution
             # is not possible without badly breaking backwards compatibility.
-            if all(predicate(*arg) for predicate in predicates):
+            if all(predicate(arg[0]) for predicate in predicates):
                 return derived_subscriber(*arg)
 
         if hasattr(subscriber, '__name__'):
