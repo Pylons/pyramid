@@ -15,6 +15,19 @@ class Yup:
         return getattr(event.response, 'yup', False)
 
 
+class YupWithAllArgs:
+    def __init__(self, val, config):
+        self.val = val
+
+    def text(self):
+        return f'yup_with_extra_args = {self.val}'
+
+    phash = text
+
+    def __call__(self, event, *args):
+        return getattr(event.response, 'yup', False)
+
+
 class Foo:
     def __init__(self, response):
         self.response = response
@@ -54,6 +67,11 @@ def foobaryup2(event, context):
     event.response.text += 'foobaryup2 '
 
 
+@subscriber([Foo, Bar], yup=True, yup_with_all_args=True)
+def foobaryup3(event, context):
+    event.response.text += 'foobaryup3 '
+
+
 @view_config(name='sendfoo')
 def sendfoo(request):
     response = request.response
@@ -72,4 +90,5 @@ def sendfoobar(request):
 
 def includeme(config):
     config.add_subscriber_predicate('yup', Yup)
+    config.add_subscriber_predicate('yup_with_all_args', YupWithAllArgs)
     config.scan('tests.pkgs.eventonly')

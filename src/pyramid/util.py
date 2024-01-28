@@ -652,7 +652,7 @@ def make_contextmanager(fn):
     return wrapper
 
 
-def takes_one_arg(callee, attr=None, argname=None):
+def takes_one_arg(callee, attr=None, argname=None, allow_varargs=True):
     ismethod = False
     if attr is None:
         attr = '__call__'
@@ -677,6 +677,9 @@ def takes_one_arg(callee, attr=None, argname=None):
         args = args[1:]
 
     if not args:
+        return False
+
+    if not allow_varargs and argspec.varargs:
         return False
 
     if len(args) == 1:

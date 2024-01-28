@@ -45,13 +45,17 @@ class AdaptersConfiguratorMixin:
             predlist = self.get_predlist('subscriber')
             order, preds, phash = predlist.make(self, **predicates)
 
-            derived_subscriber = self._derive_subscriber(subscriber, preds)
+            derived_predicates = [self._derive_predicate(p) for p in preds]
+            derived_subscriber = self._derive_subscriber(
+                subscriber, derived_predicates
+            )
 
             intr.update(
                 {
                     'phash': phash,
                     'order': order,
                     'predicates': preds,
+                    'derived_predicates': derived_predicates,
                     'derived_subscriber': derived_subscriber,
                 }
             )
@@ -70,6 +74,19 @@ class AdaptersConfiguratorMixin:
 
         self.action(None, register, introspectables=(intr,))
         return subscriber
+
+    def _derive_predicate(self, predicate):
+        if eventonly(predicate):
+
+            def derived_predicate(*arg):
+                return predicate(arg[0])
+
+            # seems pointless to try to fix __doc__, __module__, etc as
+            # predicate will invariably be an instance
+        else:
+            derived_predicate = predicate
+
+        return derived_predicate
 
     def _derive_subscriber(self, subscriber, predicates):
         if eventonly(subscriber):
@@ -104,7 +121,7 @@ class AdaptersConfiguratorMixin:
             # with all args, the eventonly hack would not have been required.
             # At this point, though, using .subscriptions and manual execution
             # is not possible without badly breaking backwards compatibility.
-            if all(predicate(arg[0]) for predicate in predicates):
+            if all(predicate(*arg) for predicate in predicates):
                 return derived_subscriber(*arg)
 
         if hasattr(subscriber, '__name__'):
@@ -309,4 +326,7 @@ class AdaptersConfiguratorMixin:
 
 
 def eventonly(callee):
-    return takes_one_arg(callee, argname='event')
+    # we do not count a function as eventonly if it accepts *args
+    # which will open up the possibility for the function to receive
+    # all of the args
+    return takes_one_arg(callee, argname='event', allow_varargs=False)

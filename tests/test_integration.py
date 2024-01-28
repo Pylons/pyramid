@@ -213,7 +213,13 @@ class TestEventOnlySubscribers(IntegrationBase, unittest.TestCase):
         res = self.testapp.get('/sendfoobar', status=200)
         self.assertEqual(
             sorted(res.body.split()),
-            [b'foobar', b'foobar2', b'foobaryup', b'foobaryup2'],
+            [
+                b'foobar',
+                b'foobar2',
+                b'foobaryup',
+                b'foobaryup2',
+                b'foobaryup3',
+            ],
         )
 
 
