@@ -76,15 +76,8 @@ class AdaptersConfiguratorMixin:
         return subscriber
 
     def _derive_predicate(self, predicate):
-        if eventonly(predicate):
-
-            def derived_predicate(*arg):
-                return predicate(arg[0])
-
-            # seems pointless to try to fix __doc__, __module__, etc as
-            # predicate will invariably be an instance
-        else:
-            derived_predicate = predicate
+        def derived_predicate(*arg):
+            return predicate(arg[0])
 
         return derived_predicate
 
