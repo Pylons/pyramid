@@ -224,6 +224,7 @@ class PRoutesCommand:
     will be assumed.  Example: 'proutes myapp.ini'.
 
     """
+    script_name = 'proutes'
     bootstrap = staticmethod(bootstrap)  # testing
     get_config_loader = staticmethod(get_config_loader)  # testing
     stdout = sys.stdout
@@ -316,6 +317,7 @@ class PRoutesCommand:
 
         config_uri = self.args.config_uri
         config_vars = parse_vars(self.args.config_vars)
+        config_vars.setdefault('__script__', self.script_name)
         loader = self.get_config_loader(config_uri)
         loader.setup_logging(config_vars)
         self.proutes_file_config(loader, config_vars)

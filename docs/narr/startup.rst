@@ -101,7 +101,9 @@ Here's a high-level time-ordered overview of what happens when you press
    Note that the constructor function accepts a ``global_config`` argument,
    which is a dictionary of key/value pairs mentioned in the ``[DEFAULT]``
    section of an ``.ini`` file (if :ref:`[DEFAULT]
-   <defaults_section_of_pastedeploy_file>` is present).  It also accepts a
+   <defaults_section_of_pastedeploy_file>` is present) and the executing
+   script name ``__script__`` like ``pserve``, ``prequest`` or ``pshell``.
+   It also accepts a
    ``**settings`` argument, which collects another set of arbitrary key/value
    pairs.  The arbitrary key/value pairs received by this function in
    ``**settings`` will be composed of all the key/value pairs that are present

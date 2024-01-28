@@ -38,6 +38,7 @@ class PShellCommand:
     than one Pyramid application within it, the loader will use the
     last one.
     """
+    script_name = 'pshell'
     bootstrap = staticmethod(bootstrap)  # for testing
     get_config_loader = staticmethod(get_config_loader)  # for testing
     pkg_resources = pkg_resources  # for testing
@@ -130,6 +131,7 @@ class PShellCommand:
 
         config_uri = self.args.config_uri
         config_vars = parse_vars(self.args.config_vars)
+        config_vars.setdefault('__script__', self.script_name)
         loader = self.get_config_loader(config_uri)
         loader.setup_logging(config_vars)
         self.pshell_file_config(loader, config_vars)

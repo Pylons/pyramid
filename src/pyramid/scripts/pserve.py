@@ -38,6 +38,7 @@ class PServeCommand:
     You can also include variable assignments like 'http_port=8080'
     and then use %(http_port)s in your config files.
     """
+    script_name = 'pserve'
     default_verbosity = 1
 
     parser = argparse.ArgumentParser(
@@ -182,6 +183,7 @@ class PServeCommand:
             return 2
         config_uri = self.args.config_uri
         config_vars = parse_vars(self.args.config_vars)
+        config_vars.setdefault('__script__', self.script_name)
         app_spec = self.args.config_uri
         app_name = self.args.app_name
 

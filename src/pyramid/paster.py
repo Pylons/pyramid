@@ -114,6 +114,8 @@ def bootstrap(config_uri, request=None, options=None):
        by the ``closer``.
 
     """
+    options = dict(options or {})
+    options.setdefault('__script__', 'bootstrap')
     app = get_app(config_uri, options=options)
     env = prepare(request)
     env['app'] = app
