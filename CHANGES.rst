@@ -36,6 +36,13 @@ Bug Fixes
 
   Thanks to Masashi Yamane of LAC Co., Ltd for reporting this issue.
 
+- Applications raising ``pyramid.exceptions.BadCSRFToken`` and
+  ``pyramid.exceptions.BadCSRFOrigin`` were returning invalid HTTP status
+  lines with values like ``400 Bad CSRF Origin`` instead of
+  ``400 Bad Request``.
+
+  See https://github.com/Pylons/pyramid/pull/3742
+
 Backward Incompatibilities
 --------------------------
 
