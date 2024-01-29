@@ -554,7 +554,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(wrapper, view)
 
     def test_add_view_same_phash_overrides_existing_single_view(self):
-        from hashlib import md5
+        from hashlib import sha256
         from zope.interface import Interface
 
         from pyramid.interfaces import (
@@ -565,7 +565,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         )
         from pyramid.renderers import null_renderer
 
-        phash = md5()
+        phash = sha256()
         phash.update(b'xhr = True')
         view = lambda *arg: 'NOT OK'
         view.__phash__ = phash.hexdigest()
@@ -585,7 +585,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertEqual(wrapper(None, request), 'OK')
 
     def test_add_view_exc_same_phash_overrides_existing_single_view(self):
-        from hashlib import md5
+        from hashlib import sha256
         from zope.interface import implementedBy
 
         from pyramid.interfaces import (
@@ -596,7 +596,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         )
         from pyramid.renderers import null_renderer
 
-        phash = md5()
+        phash = sha256()
         phash.update(b'xhr = True')
         view = lambda *arg: 'NOT OK'
         view.__phash__ = phash.hexdigest()

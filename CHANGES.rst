@@ -22,6 +22,10 @@ Features
 
   See https://github.com/Pylons/pyramid/pull/3735
 
+- Replace usage of ``md5`` in the Pyramid view system with ``sha256``. This
+  is not a security-related feature and is considered an implementation detail
+  that should not impact users.
+
 Bug Fixes
 ---------
 
