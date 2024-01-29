@@ -3,6 +3,10 @@
 2.0.2 (2023-08-25)
 ==================
 
+- Replace usage of ``md5`` in the Pyramid view system with ``sha256``. This
+  is not a security-related feature and is considered an implementation detail
+  that should not impact users.
+
 Bug Fixes
 ---------
 

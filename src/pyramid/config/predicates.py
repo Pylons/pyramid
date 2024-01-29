@@ -1,4 +1,4 @@
-from hashlib import md5
+from hashlib import sha256
 from webob.acceptparse import Accept
 
 from pyramid.exceptions import ConfigurationError
@@ -8,7 +8,7 @@ from pyramid.registry import predvalseq
 from pyramid.util import TopologicalSorter, bytes_, is_nonstr_iter
 
 MAX_ORDER = 1 << 30
-DEFAULT_PHASH = md5().hexdigest()
+DEFAULT_PHASH = sha256().hexdigest()
 
 
 class PredicateConfiguratorMixin:
@@ -137,7 +137,7 @@ class PredicateList:
         # phash) that can be used by a caller to identify identical predicate
         # lists.
         ordered = self.sorter.sorted()
-        phash = md5()
+        phash = sha256()
         weights = []
         preds = []
         info = PredicateInfo(
