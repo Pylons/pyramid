@@ -10,12 +10,11 @@ class BadCSRFOrigin(HTTPBadRequest):
     origin validation.
     """
 
-    title = "Bad CSRF Origin"
     explanation = (
-        "Access is denied. This server can not verify that the origin or "
-        "referrer of your request matches the current site. Either your "
-        "browser supplied the wrong Origin or Referrer or it did not supply "
-        "one at all."
+        "Bad CSRF Origin. Access is denied. This server can not verify that "
+        "the origin or referrer of your request matches the current site. "
+        "Either your browser supplied the wrong Origin or Referrer or it did "
+        "not supply one at all."
     )
 
 
@@ -25,14 +24,13 @@ class BadCSRFToken(HTTPBadRequest):
     forgery token validation.
     """
 
-    title = 'Bad CSRF Token'
     explanation = (
-        'Access is denied.  This server can not verify that your cross-site '
-        'request forgery token belongs to your login session.  Either you '
-        'supplied the wrong cross-site request forgery token or your session '
-        'no longer exists.  This may be due to session timeout or because '
-        'browser is not supplying the credentials required, as can happen '
-        'when the browser has cookies turned off.'
+        'Bad CSRF token received. Access is denied. This server can not '
+        'verify that your cross-site request forgery token belongs to your '
+        'login session. Either you supplied the wrong cross-site request '
+        'forgery token or your session no longer exists. This may be due to '
+        'session timeout or because browser is not supplying the credentials '
+        'required, as can happen when the browser has cookies turned off.'
     )
 
 
