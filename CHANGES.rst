@@ -11,6 +11,9 @@ Features
 
 - Coverage reports in tests based on Python 3.11 instead of Python 3.8.
 
+- Added `LIFT` sentinel value that may be used for context and name arguments
+  to view_config on class methods in conjunction with venusian lift.
+
 Bug Fixes
 ---------
 

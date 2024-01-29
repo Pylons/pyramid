@@ -20,10 +20,10 @@ from pyramid.interfaces import (
     IViewClassifier,
 )
 from pyramid.threadlocal import get_current_registry, manager
-from pyramid.util import hide_attrs, reraise as reraise_
+from pyramid.util import Sentinel, hide_attrs, reraise as reraise_
 
 _marker = object()
-LIFT = object()
+LIFT = Sentinel('LIFT')
 
 
 def render_view_to_response(context, request, name='', secure=True):

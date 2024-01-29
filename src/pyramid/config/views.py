@@ -573,8 +573,8 @@ class ViewsConfiguratorMixin:
 
           The :term:`view name`.  Read :ref:`traversal_chapter` to
           understand the concept of a view name. When :term:`view` is a class,
-          the sentinel value view.LIFT will cause the :term:`attr` value to be
-          copied to name (useful with view_defaults to reduce boilerplate).
+          the sentinel value view.LIFT will cause the attr value to be copied
+          to name (useful with view_defaults to reduce boilerplate).
 
         context
 
