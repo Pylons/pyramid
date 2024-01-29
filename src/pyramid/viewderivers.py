@@ -293,9 +293,14 @@ secured_view.options = ('permission',)
 
 
 def _secured_view(view, info):
-    permission = explicit_val = info.options.get('permission')
-    if permission is None:
+    permission = info.options.get('permission')
+
+    if not info.exception_only and permission is None:
+        # no permission is specified on the view so we pull in the default
+        # permission - however if this is an exception view then we do not want
+        # to inherit the default permission by definition
         permission = info.registry.queryUtility(IDefaultPermission)
+
     if permission == NO_PERMISSION_REQUIRED:
         # allow views registered within configurations that have a
         # default permission to explicitly override the default
@@ -303,80 +308,85 @@ def _secured_view(view, info):
         permission = None
 
     policy = info.registry.queryUtility(ISecurityPolicy)
-
-    # no-op on exception-only views without an explicit permission
-    if explicit_val is None and info.exception_only:
+    if policy is None or permission is None:
+        # all security is disabled on this view if no policy or permission
         return view
 
-    if policy and (permission is not None):
+    def permitted(context, request):
+        return policy.permits(request, context, permission)
 
-        def permitted(context, request):
-            return policy.permits(request, context, permission)
+    def secured_view(context, request):
+        result = permitted(context, request)
+        if result:
+            return view(context, request)
+        view_name = getattr(view, '__name__', view)
+        msg = getattr(
+            request,
+            'authdebug_message',
+            'Unauthorized: %s failed permission check' % view_name,
+        )
+        raise HTTPForbidden(msg, result=result)
 
-        def secured_view(context, request):
-            result = permitted(context, request)
-            if result:
-                return view(context, request)
-            view_name = getattr(view, '__name__', view)
-            msg = getattr(
-                request,
-                'authdebug_message',
-                'Unauthorized: %s failed permission check' % view_name,
-            )
-            raise HTTPForbidden(msg, result=result)
-
-        secured_view.__call_permissive__ = view
-        secured_view.__permitted__ = permitted
-        secured_view.__permission__ = permission
-        return secured_view
-    else:
-        return view
+    secured_view.__call_permissive__ = view
+    secured_view.__permitted__ = permitted
+    secured_view.__permission__ = permission
+    return secured_view
 
 
 def _authdebug_view(view, info):
-    wrapped_view = view
+    # XXX this view logic is slightly different from the _secured_view above
+    # because we want it to run in more situations than _secured_view - we are
+    # trying to log helpful info about basically any view that is executed -
+    # basically we only skip it if it's a default exception view with no
+    # special permissions
+
     settings = info.settings
-    permission = explicit_val = info.options.get('permission')
+    if not settings or not settings.get('debug_authorization', False):
+        # no-op if debug_authorization is disabled
+        return view
+
+    permission = info.options.get('permission')
+
+    if info.exception_only and (
+        permission is None or permission == NO_PERMISSION_REQUIRED
+    ):
+        # no logging on any exception views with no permissions (the default)
+        return view
+
     if permission is None:
+        # allow views registered within configurations that have a
+        # default permission to explicitly override the default
+        # permission, replacing it with no permission at all
         permission = info.registry.queryUtility(IDefaultPermission)
+
     policy = info.registry.queryUtility(ISecurityPolicy)
     logger = info.registry.queryUtility(IDebugLogger)
 
-    # no-op on exception-only views without an explicit permission
-    if explicit_val is None and info.exception_only:
-        return view
-
-    if settings and settings.get('debug_authorization', False):
-
-        def authdebug_view(context, request):
-            view_name = getattr(request, 'view_name', None)
-
-            if policy:
-                if permission is NO_PERMISSION_REQUIRED:
-                    msg = 'Allowed (NO_PERMISSION_REQUIRED)'
-                elif permission is None:
-                    msg = 'Allowed (no permission registered)'
-                else:
-                    result = policy.permits(request, context, permission)
-                    msg = str(result)
+    def authdebug_view(context, request):
+        if policy:
+            if permission is NO_PERMISSION_REQUIRED:
+                msg = 'Allowed (NO_PERMISSION_REQUIRED)'
+            elif permission is None:
+                msg = 'Allowed (no permission registered)'
             else:
-                msg = 'Allowed (no security policy in use)'
+                result = policy.permits(request, context, permission)
+                msg = str(result)
+        else:
+            msg = 'Allowed (no security policy in use)'
 
-            view_name = getattr(request, 'view_name', None)
-            url = getattr(request, 'url', None)
-            msg = (
-                'debug_authorization of url %s (view name %r against '
-                'context %r): %s' % (url, view_name, context, msg)
-            )
-            if logger:
-                logger.debug(msg)
-            if request is not None:
-                request.authdebug_message = msg
-            return view(context, request)
+        view_name = getattr(request, 'view_name', None)
+        url = getattr(request, 'url', None)
+        msg = (
+            'debug_authorization of url %s (view name %r against '
+            'context %r): %s' % (url, view_name, context, msg)
+        )
+        if logger:
+            logger.debug(msg)
+        if request is not None:
+            request.authdebug_message = msg
+        return view(context, request)
 
-        wrapped_view = authdebug_view
-
-    return wrapped_view
+    return authdebug_view
 
 
 def rendered_view(view, info):

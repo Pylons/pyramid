@@ -36,6 +36,14 @@ Bug Fixes
 
   Thanks to Masashi Yamane of LAC Co., Ltd for reporting this issue.
 
+- Fix issues where permissions may be checked on exception views. This is not
+  supposed to happen in normal circumstances.
+
+  This also prevents issues where a ``request.url`` fails to be decoded when
+  logging info when ``pyramid.debug_authorization`` is enabled.
+
+  See https://github.com/Pylons/pyramid/pull/3741/files
+
 Backward Incompatibilities
 --------------------------
 
