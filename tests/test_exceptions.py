@@ -16,12 +16,22 @@ class TestBWCompat(unittest.TestCase):
         self.assertTrue(one is two)
 
 
+class TestBadCSRFOrigin(unittest.TestCase):
+    def test_response_equivalence(self):
+        from pyramid.exceptions import BadCSRFOrigin
+        from pyramid.httpexceptions import HTTPBadRequest
+
+        self.assertTrue(isinstance(BadCSRFOrigin(), HTTPBadRequest))
+        self.assertEqual(BadCSRFOrigin().status, HTTPBadRequest().status)
+
+
 class TestBadCSRFToken(unittest.TestCase):
     def test_response_equivalence(self):
         from pyramid.exceptions import BadCSRFToken
         from pyramid.httpexceptions import HTTPBadRequest
 
         self.assertTrue(isinstance(BadCSRFToken(), HTTPBadRequest))
+        self.assertEqual(BadCSRFToken().status, HTTPBadRequest().status)
 
 
 class TestNotFound(unittest.TestCase):
