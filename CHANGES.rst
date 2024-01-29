@@ -54,7 +54,7 @@ Bug Fixes
 Backward Incompatibilities
 --------------------------
 
-- Drop support for Python 3.6.
+- Drop support for Python 3.6 and 3.7.
 
 - Requests to a static_view are no longer allowed to contain a null-byte in any
   part of the path segment.
