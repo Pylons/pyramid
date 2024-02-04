@@ -177,19 +177,14 @@ The console will show ``pip`` checking for packages and installing missing packa
 
 .. code-block:: bash
 
-    Successfully installed Jinja2-2.11.2 Mako-1.1.3 MarkupSafe-1.1.1 PasteDeploy-2.1.1 Pygments-2.7.3 SQLAlchemy-1.3.22 WebTest-2.0.35 alembic-1.4.3 attrs-20.3.0 beautifulsoup4-4.9.3 coverage-5.3.1 hupper-1.10.2 iniconfig-1.1.1 packaging-20.8 plaster-1.0 plaster-pastedeploy-0.7 pluggy-0.13.1 py-1.10.0 pyparsing-2.4.7 pyramid-1.10.5 pyramid-debugtoolbar-4.9 pyramid-jinja2-2.8 pyramid-mako-1.1.0 pyramid-retry-2.1.1 pyramid-tm-2.4 pytest-6.2.1 pytest-cov-2.10.1 python-dateutil-2.8.1 python-editor-1.0.4 repoze.lru-0.7 six-1.15.0 soupsieve-2.1 toml-0.10.2 transaction-3.0.1 translationstring-1.4 tutorial venusian-3.0.0 waitress-1.4.4 webob-1.8.6 zope.deprecation-4.4.0 zope.interface-5.2.0 zope.sqlalchemy-1.3
+    Successfully installed Mako-1.3.2 PasteDeploy-3.1.0 Pygments-2.17.2 SQLAlchemy-2.0.25 WebTest-3.0.0 alembic-1.13.1 beautifulsoup4-4.12.3 coverage-7.4.1 greenlet-3.0.3 hupper-1.12.1 iniconfig-2.0.0 jinja2-3.1.3 markupsafe-2.1.5 packaging-23.2 plaster-1.1.2 plaster-pastedeploy-1.0.1 pluggy-1.4.0 pyramid-2.0.2 pyramid-debugtoolbar-4.12 pyramid-jinja2-2.10 pyramid-mako-1.1.0 pyramid-retry-2.1.1 pyramid-tm-2.5 pytest-8.0.0 pytest-cov-4.1.0 soupsieve-2.5 transaction-4.0 translationstring-1.4 tutorial-0.0 typing-extensions-4.9.0 venusian-3.1.0 waitress-2.1.2 webob-1.8.7 zope.deprecation-5.0 zope.interface-6.1 zope.sqlalchemy-3.1
 
-Testing requirements are defined in our project's ``setup.py`` file, in the ``tests_require`` and ``extras_require`` stanzas.
+Testing requirements are defined in our project's ``pyproject.toml`` file in a ``testing`` optional dependency.
 
-.. literalinclude:: src/installation/setup.py
+.. literalinclude:: src/installation/pyproject.toml
     :language: python
     :lineno-match:
-    :lines: 25-29
-
-.. literalinclude:: src/installation/setup.py
-    :language: python
-    :lineno-match:
-    :lines: 49-51
+    :lines: 34-39
 
 
 .. _initialize_db_wiki2:
@@ -219,11 +214,11 @@ The output to your console should be something like this:
 
 .. code-block:: text
 
-    2021-01-07 05:15:57,709 INFO  [alembic.runtime.migration:155][MainThread] Context impl SQLiteImpl.
-    2021-01-07 05:15:57,709 INFO  [alembic.runtime.migration:162][MainThread] Will assume non-transactional DDL.
-    2021-01-07 05:15:57,712 INFO  [alembic.autogenerate.compare:134][MainThread] Detected added table 'models'
-    2021-01-07 05:15:57,712 INFO  [alembic.autogenerate.compare:588][MainThread] Detected added index 'my_index' on '['name']'
-      Generating <somepath>/tutorial/tutorial/alembic/versions/20210107_d7ab09c3fdec.py ...  done
+    2024-02-04 12:02:28,828 INFO  [alembic.runtime.migration:216][MainThread] Context impl SQLiteImpl.
+    2024-02-04 12:02:28,828 INFO  [alembic.runtime.migration:219][MainThread] Will assume non-transactional DDL.
+    2024-02-04 12:02:28,832 INFO  [alembic.autogenerate.compare:189][MainThread] Detected added table 'models'
+    2024-02-04 12:02:28,832 INFO  [alembic.autogenerate.compare:633][MainThread] Detected added index ''my_index'' on '('name',)'
+      Generating /Users/michael/work/oss/pyramid/tutorial/tutorial/alembic/versions/20240204_4b6614165904.py ...  done
 
 Upgrade to that revision.
 
@@ -245,9 +240,9 @@ The output to your console should be something like this:
 
 .. code-block:: text
 
-    2021-01-07 05:16:21,558 INFO  [alembic.runtime.migration:155][MainThread] Context impl SQLiteImpl.
-    2021-01-07 05:16:21,558 INFO  [alembic.runtime.migration:162][MainThread] Will assume non-transactional DDL.
-    2021-01-07 05:16:21,560 INFO  [alembic.runtime.migration:517][MainThread] Running upgrade  -> d7ab09c3fdec, init
+    2024-02-04 12:03:04,738 INFO  [alembic.runtime.migration:216][MainThread] Context impl SQLiteImpl.
+    2024-02-04 12:03:04,738 INFO  [alembic.runtime.migration:219][MainThread] Will assume non-transactional DDL.
+    2024-02-04 12:03:04,739 INFO  [alembic.runtime.migration:622][MainThread] Running upgrade  -> 4b6614165904, init
 
 
 .. _load_data_wiki2:
@@ -337,24 +332,26 @@ If successful, you will see output something like this:
 
 .. code-block:: bash
 
-    ======================== test session starts ========================
-    platform darwin -- Python 3.9.0, pytest-6.2.1, py-1.10.0, pluggy-0.13.1
-    rootdir: <somepath>/tutorial, inifile: pytest.ini, testpaths: tutorial, tests
-    plugins: cov-2.10.1
+    ====================================== test session starts ======================================
+    platform darwin -- Python 3.11.7, pytest-8.0.0, pluggy-1.4.0
+    rootdir: /Users/michael/work/oss/pyramid/tutorial
+    configfile: pyproject.toml
+    testpaths: tutorial, tests
+    plugins: cov-4.1.0
     collected 5 items
 
-    tests/test_functional.py ..                                                           [ 40%]
-    tests/test_views.py ...                                                               [100%]
-    
-    ---------- coverage: platform darwin, python 3.9.0-final-0 -----------
+    tests/test_functional.py ..                                                               [ 40%]
+    tests/test_views.py ...                                                                   [100%]
+
+    ---------- coverage: platform darwin, python 3.11.7-final-0 ----------
     Name                                                 Stmts   Miss  Cover   Missing
     ----------------------------------------------------------------------------------
     tutorial/__init__.py                                     8      0   100%
     tutorial/alembic/env.py                                 23      4    83%   28-30, 56
-    tutorial/alembic/versions/20200106_8c274fe5f3c4.py      12      2    83%   31-32
-    tutorial/models/__init__.py                             32      2    94%   71, 82
-    tutorial/models/meta.py                                  5      0   100%
-    tutorial/models/mymodel.py                               8      0   100%
+    tutorial/alembic/versions/20240204_4b6614165904.py      12      2    83%   31-32
+    tutorial/models/__init__.py                             32      2    94%   111, 122
+    tutorial/models/meta.py                                  4      0   100%
+    tutorial/models/mymodel.py                              10      0   100%
     tutorial/pshell.py                                       7      5    29%   5-13
     tutorial/routes.py                                       3      0   100%
     tutorial/scripts/__init__.py                             0      0   100%
@@ -363,12 +360,11 @@ If successful, you will see output something like this:
     tutorial/views/default.py                               13      0   100%
     tutorial/views/notfound.py                               5      0   100%
     ----------------------------------------------------------------------------------
-    TOTAL                                                  138     27    80%
+    TOTAL                                                  139     27    81%
 
-    ===================== 5 passed in 0.77 seconds ======================
+    ================================= 5 passed, 6 warnings in 0.54s =================================
 
 Our package doesn't quite have 100% test coverage.
-
 
 .. _test_and_coverage_cookiecutter_defaults_sql:
 
