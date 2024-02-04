@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+version = "0.0"
+name = "tutorial"
+authors = []
+description = "myproj"
+readme = "README.md"
+keywords = ["web", "pyramid", "pylons"]
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Framework :: Pyramid",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "plaster_pastedeploy",
+    "pyramid",
+    "pyramid_jinja2",
+    "pyramid_debugtoolbar",
+    "waitress",
+    "alembic",
+    "pyramid_retry",
+    "pyramid_tm",
+    "SQLAlchemy",
+    "transaction",
+    "zope.sqlalchemy",
+]
+
+[project.optional-dependencies]
+testing = [
+    "WebTest",
+    "pytest",
+    "pytest-cov",
+]
+
+[project.scripts]
+initialize_tutorial_db = "tutorial.scripts.initialize_db:main"
+
+[project.entry-points."paste.app_factory"]
+main = "tutorial:main"
+
+[tool.setuptools.packages.find]
+exclude = ["tests"]
+
+[tool.coverage.run]
+source = "tutorial"
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers"
+testpaths = [
+    "tutorial",
+    "tests",
+]

@@ -218,29 +218,14 @@ following:
     :linenos:
     :language: py
 
-``meta.py`` contains imports and support code for defining the models. We
-create a dictionary ``NAMING_CONVENTION`` as well for consistent naming of
-support objects like indices and constraints.
+``meta.py`` contains imports and support code for defining the models.
 
-.. literalinclude:: src/basiclayout/tutorial/models/meta.py
-    :end-before: metadata
-    :linenos:
-    :language: py
+The core goal of ``meta.py`` is to define a declarative base class (``Base``) that links all of our models together into a shared :class:`sqlalchemy.schema.MetaData`.
 
-Next we create a ``metadata`` object from the class
-:class:`sqlalchemy.schema.MetaData`, using ``NAMING_CONVENTION`` as the value
-for the ``naming_convention`` argument.
+We create the :class:`sqlalchemy.schema.MetaData` with a ``naming_convention`` to support properly naming objects when generating migrations with ``alembic``.
 
-A ``MetaData`` object represents the table and other schema definitions for a
-single database. We also need to create a declarative ``Base`` object to use as
-a base class for our models. Our models will inherit from this ``Base``, which
-will attach the tables to the ``metadata`` we created, and define our
-application's database schema.
-
-.. literalinclude:: src/basiclayout/tutorial/models/meta.py
-    :lines: 15-16
-    :lineno-match:
-    :language: py
+Any object inheriting from the new ``Base`` will be attached to ``metadata`` and
+are able to reference eachother in relationships by name.
 
 Next open ``tutorial/models/mymodel.py``, which should already contain the
 following:
