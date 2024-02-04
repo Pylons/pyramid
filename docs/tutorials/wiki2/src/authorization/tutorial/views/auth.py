@@ -8,6 +8,7 @@ from pyramid.view import (
     forbidden_view_config,
     view_config,
 )
+import sqlalchemy as sa
 
 from .. import models
 
@@ -22,11 +23,9 @@ def login(request):
     if request.method == 'POST':
         login = request.params['login']
         password = request.params['password']
-        user = (
-            request.dbsession.query(models.User)
-            .filter_by(name=login)
-            .first()
-        )
+        user = request.dbsession.scalars(
+            sa.select(models.User).where(models.User.name == login)
+        ).one_or_none()
         if user is not None and user.check_password(password):
             new_csrf_token(request)
             headers = remember(request, user.id)

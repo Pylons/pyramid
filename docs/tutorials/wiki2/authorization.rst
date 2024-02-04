@@ -89,7 +89,7 @@ Open the file ``tutorial/routes.py`` and edit the following lines:
 
 .. literalinclude:: src/authorization/tutorial/routes.py
    :linenos:
-   :emphasize-lines: 1-11,18-
+   :emphasize-lines: 1-11,19-
    :language: python
 
 The highlighted lines need to be edited or added.
@@ -101,7 +101,7 @@ the principals of either ``role:editor`` or ``role:basic`` to have the
 ``create`` permission:
 
 .. literalinclude:: src/authorization/tutorial/routes.py
-   :lines: 31-39
+   :lines: 35-43
    :lineno-match:
    :emphasize-lines: 5-9
    :language: python
@@ -110,7 +110,7 @@ The ``NewPage`` is loaded as the :term:`context` of the ``add_page`` route by
 declaring a ``factory`` on the route:
 
 .. literalinclude:: src/authorization/tutorial/routes.py
-   :lines: 19-20
+   :lines: 20-21
    :lineno-match:
    :emphasize-lines: 1-2
    :language: python
@@ -119,7 +119,7 @@ The ``PageResource`` class defines the :term:`ACL` for a ``Page``. It uses an
 actual ``Page`` object to determine *who* can do *what* to the page.
 
 .. literalinclude:: src/authorization/tutorial/routes.py
-   :lines: 48-
+   :lines: 54-
    :lineno-match:
    :emphasize-lines: 5-10
    :language: python
@@ -128,7 +128,7 @@ The ``PageResource`` is loaded as the :term:`context` of the ``view_page`` and
 ``edit_page`` routes by declaring a ``factory`` on the routes:
 
 .. literalinclude:: src/authorization/tutorial/routes.py
-   :lines: 18-22
+   :lines: 19-23
    :lineno-match:
    :emphasize-lines: 1,4-5
    :language: python
@@ -157,7 +157,7 @@ Edit the ``view_page`` view to declare the ``view`` permission, and remove the
 explicit checks within the view:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 18-23
+   :lines: 19-24
    :lineno-match:
    :emphasize-lines: 1-2,4
    :language: python
@@ -171,7 +171,7 @@ the view logic.
 Edit the ``edit_page`` view to declare the ``edit`` permission:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 38-42
+   :lines: 41-45
    :lineno-match:
    :emphasize-lines: 1-2,4
    :language: python
@@ -179,7 +179,7 @@ Edit the ``edit_page`` view to declare the ``edit`` permission:
 Edit the ``add_page`` view to declare the ``create`` permission:
 
 .. literalinclude:: src/authorization/tutorial/views/default.py
-   :lines: 52-56
+   :lines: 55-59
    :lineno-match:
    :emphasize-lines: 1-2,4
    :language: python
