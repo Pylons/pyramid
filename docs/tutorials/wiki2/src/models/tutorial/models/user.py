@@ -1,9 +1,6 @@
 import bcrypt
-from sqlalchemy import (
-    Column,
-    Integer,
-    Text,
-)
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import Optional
 
 from .meta import Base
 
@@ -11,11 +8,11 @@ from .meta import Base
 class User(Base):
     """ The SQLAlchemy declarative model class for a User object. """
     __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)
-    name = Column(Text, nullable=False, unique=True)
-    role = Column(Text, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
+    role: Mapped[str]
 
-    password_hash = Column(Text)
+    password_hash: Mapped[Optional[str]]
 
     def set_password(self, pw):
         pwhash = bcrypt.hashpw(pw.encode('utf8'), bcrypt.gensalt())
@@ -26,3 +23,5 @@ class User(Base):
             expected_hash = self.password_hash.encode('utf8')
             return bcrypt.checkpw(pw.encode('utf8'), expected_hash)
         return False
+
+    created_pages: Mapped['Page'] = relationship('Page', back_populates='creator')

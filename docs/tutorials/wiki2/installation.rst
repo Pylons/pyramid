@@ -218,7 +218,7 @@ The output to your console should be something like this:
     2024-02-04 12:02:28,828 INFO  [alembic.runtime.migration:219][MainThread] Will assume non-transactional DDL.
     2024-02-04 12:02:28,832 INFO  [alembic.autogenerate.compare:189][MainThread] Detected added table 'models'
     2024-02-04 12:02:28,832 INFO  [alembic.autogenerate.compare:633][MainThread] Detected added index ''my_index'' on '('name',)'
-      Generating /Users/michael/work/oss/pyramid/tutorial/tutorial/alembic/versions/20240204_4b6614165904.py ...  done
+      Generating <somepath>/tutorial/tutorial/alembic/versions/20240204_4b6614165904.py ...  done
 
 Upgrade to that revision.
 
@@ -334,7 +334,7 @@ If successful, you will see output something like this:
 
     ====================================== test session starts ======================================
     platform darwin -- Python 3.11.7, pytest-8.0.0, pluggy-1.4.0
-    rootdir: /Users/michael/work/oss/pyramid/tutorial
+    rootdir: <somepath>/tutorial
     configfile: pyproject.toml
     testpaths: tutorial, tests
     plugins: cov-4.1.0

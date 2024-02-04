@@ -1,4 +1,4 @@
-from sqlalchemy import Index, Integer, Text
+from sqlalchemy import Index
 from sqlalchemy.orm import Mapped, mapped_column
 from typing import Optional
 

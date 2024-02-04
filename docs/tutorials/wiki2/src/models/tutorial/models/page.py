@@ -1,10 +1,6 @@
-from sqlalchemy import (
-    Column,
-    ForeignKey,
-    Integer,
-    Text,
-)
-from sqlalchemy.orm import relationship
+import bcrypt
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .meta import Base
 
@@ -12,9 +8,9 @@ from .meta import Base
 class Page(Base):
     """ The SQLAlchemy declarative model class for a Page object. """
     __tablename__ = 'pages'
-    id = Column(Integer, primary_key=True)
-    name = Column(Text, nullable=False, unique=True)
-    data = Column(Text, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
+    data: Mapped[str]
 
-    creator_id = Column(ForeignKey('users.id'), nullable=False)
-    creator = relationship('User', backref='created_pages')
+    creator_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    creator: Mapped['User'] = relationship('User', back_populates='created_pages')
