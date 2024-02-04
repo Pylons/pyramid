@@ -1,6 +1,6 @@
 import bcrypt
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import Optional
+from typing import List, Optional
 
 from .meta import Base
 
@@ -24,4 +24,4 @@ class User(Base):
             return bcrypt.checkpw(pw.encode('utf8'), expected_hash)
         return False
 
-    created_pages: Mapped['Page'] = relationship('Page', back_populates='creator')
+    created_pages: Mapped[List['Page']] = relationship(back_populates='creator')

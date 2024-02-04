@@ -24,14 +24,13 @@ Remember in the previous chapter we added a new dependency of the ``bcrypt``
 package. Again, the view code in our application will depend on a package which
 is not a dependency of the original "tutorial" application.
 
-We need to add a dependency on the ``docutils`` package to our ``tutorial``
-package's ``setup.py`` file by assigning this dependency to the ``requires``
-list.
+We need to add a dependency on the ``docutils`` package, to our ``tutorial`` package's ``pyproject.toml`` file.
+Dependencies are defined via the ``dependencies`` key in the ``[project]`` section.
 
-Open ``tutorial/setup.py`` and edit it to look like the following:
+Open ``pyproject.toml`` and edit it to look like the following:
 
-.. literalinclude:: src/views/setup.py
-    :lines: 11-25
+.. literalinclude:: src/views/pyproject.toml
+    :lines: 20-34
     :lineno-match:
     :emphasize-lines: 4
     :language: python
@@ -186,7 +185,7 @@ The ``view_wiki`` view function
 Following is the code for the ``view_wiki`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-    :lines: 16-19
+    :lines: 17-20
     :lineno-match:
     :linenos:
     :language: python
@@ -211,7 +210,7 @@ The ``view_page`` view function
 Here is the code for the ``view_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-    :lines: 21-41
+    :lines: 22-46
     :lineno-match:
     :linenos:
     :language: python
@@ -264,7 +263,7 @@ The ``edit_page`` view function
 Here is the code for the ``edit_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-    :lines: 43-55
+    :lines: 48-64
     :lineno-match:
     :linenos:
     :language: python
@@ -301,7 +300,7 @@ The ``add_page`` view function
 Here is the code for the ``add_page`` view function and its decorator:
 
 .. literalinclude:: src/views/tutorial/views/default.py
-    :lines: 57-
+    :lines: 66-
     :lineno-match:
     :linenos:
     :language: python

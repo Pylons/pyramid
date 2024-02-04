@@ -28,7 +28,7 @@ custom application requirements.
 We need to add a dependency, the `bcrypt <https://pypi.org/project/bcrypt/>`_ package, to our ``tutorial`` package's ``pyproject.toml`` file.
 Dependencies are defined via the ``dependencies`` key in the ``[project]`` section.
 
-Open ``tutorial/pyproject.toml`` and edit it to look like the following by adding ``bcrypt`` and sorting the packages:
+Open ``pyproject.toml`` and edit it to look like the following by adding ``bcrypt`` and sorting the packages:
 
 .. literalinclude:: src/models/pyproject.toml
     :lines: 20-33

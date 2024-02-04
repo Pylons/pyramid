@@ -13,4 +13,4 @@ class Page(Base):
     data: Mapped[str]
 
     creator_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    creator: Mapped['User'] = relationship('User', back_populates='created_pages')
+    creator: Mapped['User'] = relationship(back_populates='created_pages')
