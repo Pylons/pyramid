@@ -1,8 +1,8 @@
 import argparse
 from code import interact
 from contextlib import contextmanager
+import importlib.metadata
 import os
-import pkg_resources
 import sys
 import textwrap
 
@@ -41,7 +41,7 @@ class PShellCommand:
     script_name = 'pshell'
     bootstrap = staticmethod(bootstrap)  # for testing
     get_config_loader = staticmethod(get_config_loader)  # for testing
-    pkg_resources = pkg_resources  # for testing
+    importlib_metadata = importlib.metadata  # for testing
 
     parser = argparse.ArgumentParser(
         description=textwrap.dedent(description),
@@ -228,10 +228,16 @@ class PShellCommand:
         return 0
 
     def find_all_shells(self):
-        pkg_resources = self.pkg_resources
+        importlib_metadata = self.importlib_metadata
 
         shells = {}
-        for ep in pkg_resources.iter_entry_points('pyramid.pshell_runner'):
+        eps = importlib_metadata.entry_points()
+        if hasattr(eps, 'select'):
+            eps = eps.select(group='pyramid.pshell_runner')
+        else:  # pragma: no cover
+            # fallback for py38 and py39
+            eps = eps.get('pyramid.pshell_runner')
+        for ep in eps:
             name = ep.name
             shell_factory = ep.load()
             shells[name] = shell_factory

@@ -31,6 +31,9 @@ Features
 - Replace usage of ``pkg_resources`` in ``pyramid.path.DottedNameResolver``.
   See https://github.com/Pylons/pyramid/pull/3748
 
+- Replace usage of ``pkg_resources`` in ``pdistreport`` and ``pshell`` CLI
+  commands. See https://github.com/Pylons/pyramid/pull/3749
+
 Bug Fixes
 ---------
 

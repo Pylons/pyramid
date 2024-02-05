@@ -154,26 +154,6 @@ class DummyBootstrap:
         }
 
 
-class DummyEntryPoint:
-    def __init__(self, name, module):
-        self.name = name
-        self.module = module
-
-    def load(self):
-        return self.module
-
-
-class DummyPkgResources:
-    def __init__(self, entry_point_values):
-        self.entry_points = []
-
-        for name, module in entry_point_values.items():
-            self.entry_points.append(DummyEntryPoint(name, module))
-
-    def iter_entry_points(self, name):
-        return self.entry_points
-
-
 class dummy_setup_logging:
     def __call__(self, config_uri, global_conf):
         self.config_uri = config_uri

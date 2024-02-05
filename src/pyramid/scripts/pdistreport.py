@@ -1,6 +1,6 @@
 import argparse
+import importlib.metadata
 from operator import itemgetter
-import pkg_resources
 import platform
 import sys
 
@@ -21,7 +21,7 @@ def get_parser():
 
 def main(
     argv=sys.argv,
-    pkg_resources=pkg_resources,
+    importlib_metadata=importlib.metadata,
     platform=platform.platform,
     out=out,
 ):
@@ -29,25 +29,25 @@ def main(
     parser = get_parser()
     parser.parse_args(argv[1:])
     packages = []
-    for distribution in pkg_resources.working_set:
-        name = distribution.project_name
+    for distribution in importlib_metadata.distributions():
+        name = distribution.metadata['Name']
         packages.append(
             {
                 'version': distribution.version,
                 'lowername': name.lower(),
                 'name': name,
-                'location': distribution.location,
+                'summary': distribution.metadata.get('Summary'),
             }
         )
     packages = sorted(packages, key=itemgetter('lowername'))
-    pyramid_version = pkg_resources.get_distribution('pyramid').version
+    pyramid_version = importlib_metadata.distribution('pyramid').version
     plat = platform()
     out('Pyramid version:', pyramid_version)
     out('Platform:', plat)
     out('Packages:')
     for package in packages:
         out(' ', package['name'], package['version'])
-        out('   ', package['location'])
+        out('   ', package['summary'])
 
 
 if __name__ == '__main__':  # pragma: no cover
