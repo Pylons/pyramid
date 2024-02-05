@@ -6,6 +6,7 @@ from pyramid.httpexceptions import (
     HTTPNotFound,
     HTTPSeeOther,
 )
+import sqlalchemy as sa
 
 from . import models
 
@@ -23,7 +24,10 @@ def includeme(config):
 
 def new_page_factory(request):
     pagename = request.matchdict['pagename']
-    if request.dbsession.query(models.Page).filter_by(name=pagename).count() > 0:
+    exists = request.dbsession.execute(
+        sa.select(sa.exists(models.Page)).where(models.Page.name == pagename)
+    ).scalar()
+    if exists:
         next_url = request.route_url('edit_page', pagename=pagename)
         raise HTTPSeeOther(location=next_url)
     return NewPage(pagename)
@@ -40,7 +44,9 @@ class NewPage:
 
 def page_factory(request):
     pagename = request.matchdict['pagename']
-    page = request.dbsession.query(models.Page).filter_by(name=pagename).first()
+    page = request.dbsession.scalars(
+        sa.select(models.Page).where(models.Page.name == pagename)
+    ).one_or_none()
     if page is None:
         raise HTTPNotFound
     return PageResource(page)
