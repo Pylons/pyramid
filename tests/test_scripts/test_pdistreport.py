@@ -1,3 +1,4 @@
+import email.message
 import unittest
 
 
@@ -12,14 +13,14 @@ class TestPDistReportCommand(unittest.TestCase):
         def platform():
             return 'myplatform'
 
-        pkg_resources = DummyPkgResources()
+        importlib_metadata = DummyImportlibMetadata()
         L = []
 
         def out(*args):
             L.extend(args)
 
         result = self._callFUT(
-            pkg_resources=pkg_resources, platform=platform, out=out
+            importlib_metadata=importlib_metadata, platform=platform, out=out
         )
         self.assertEqual(result, None)
         self.assertEqual(
@@ -32,14 +33,14 @@ class TestPDistReportCommand(unittest.TestCase):
             return 'myplatform'
 
         working_set = (DummyDistribution('abc'), DummyDistribution('def'))
-        pkg_resources = DummyPkgResources(working_set)
+        importlib_metadata = DummyImportlibMetadata(working_set)
         L = []
 
         def out(*args):
             L.extend(args)
 
         result = self._callFUT(
-            pkg_resources=pkg_resources, platform=platform, out=out
+            importlib_metadata=importlib_metadata, platform=platform, out=out
         )
         self.assertEqual(result, None)
         self.assertEqual(
@@ -54,31 +55,30 @@ class TestPDistReportCommand(unittest.TestCase):
                 'abc',
                 '1',
                 '   ',
-                '/projects/abc',
+                'summary for name=\'abc\'',
                 ' ',
                 'def',
                 '1',
                 '   ',
-                '/projects/def',
+                'summary for name=\'def\'',
             ],
         )
 
 
-class DummyPkgResources:
-    def __init__(self, working_set=()):
-        self.working_set = working_set
+class DummyImportlibMetadata:
+    def __init__(self, distributions=()):
+        self._distributions = distributions
 
-    def get_distribution(self, name):
-        return Version('1')
+    def distribution(self, name):
+        return DummyDistribution(name)
 
-
-class Version:
-    def __init__(self, version):
-        self.version = version
+    def distributions(self):
+        return iter(self._distributions)
 
 
 class DummyDistribution:
     def __init__(self, name):
-        self.project_name = name
         self.version = '1'
-        self.location = '/projects/%s' % name
+        self.metadata = email.message.Message()
+        self.metadata['Name'] = name
+        self.metadata['Summary'] = f'summary for {name=}'
