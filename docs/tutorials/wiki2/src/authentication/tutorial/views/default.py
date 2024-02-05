@@ -81,7 +81,7 @@ def add_page(request):
         return HTTPSeeOther(location=next_url)
     if request.method == 'POST':
         body = request.params['body']
-        page = models.Page(name=pagename, data=body, creator=user)
+        page = models.Page(name=pagename, data=body, creator=request.identity)
         request.dbsession.add(page)
         next_url = request.route_url('view_page', pagename=pagename)
         return HTTPSeeOther(location=next_url)
