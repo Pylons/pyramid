@@ -1,4 +1,5 @@
 from pyramid.testing import DummySecurityPolicy
+import sqlalchemy as sa
 
 from tutorial import models
 
@@ -93,11 +94,9 @@ class Test_add_page:
         setUser(dummy_config, makeUser('foo', 'editor'))
         self._addRoutes(dummy_config)
         self._callFUT(dummy_request)
-        page = (
-            dbsession.query(models.Page)
-            .filter_by(name='AnotherPage')
-            .one()
-        )
+        page = dbsession.scalars(
+            sa.select(models.Page).where(models.Page.name == 'AnotherPage')
+        ).one()
         assert page.data == 'Hello yo!'
 
 class Test_edit_page:
