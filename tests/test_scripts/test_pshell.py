@@ -1,4 +1,5 @@
 import os
+import sys
 import unittest
 
 from . import dummy
@@ -50,7 +51,10 @@ class TestPShellCommand(unittest.TestCase):
         return cmd
 
     def _makeEntryPoints(self, command, shells):
-        command.pkg_resources = dummy.DummyPkgResources(shells)
+        entry_points = [
+            DummyEntryPoint(name, value) for name, value in shells.items()
+        ]
+        command.importlib_metadata = DummyImportlibMetadata(entry_points)
 
     def test_command_loads_default_shell(self):
         command = self._makeOne()
@@ -430,3 +434,35 @@ class Test_main(unittest.TestCase):
     def test_it(self):
         result = self._callFUT(['pshell'])
         self.assertEqual(result, 2)
+
+
+class DummyImportlibMetadata:
+    def __init__(self, entry_points):
+        self._entry_points = entry_points
+
+    def entry_points(self):
+        return DummyEntryPoints(self._entry_points)
+
+
+class DummyEntryPoints:
+    def __init__(self, entry_points):
+        self._entry_points = entry_points
+
+    if sys.version_info >= (3, 10):
+
+        def select(self, **kw):
+            return iter(self._entry_points)
+
+    else:  # pragma no cover
+
+        def get(self, key):
+            return list(self._entry_points)
+
+
+class DummyEntryPoint:
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
+    def load(self):
+        return self.value
