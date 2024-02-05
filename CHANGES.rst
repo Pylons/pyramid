@@ -28,6 +28,9 @@ Features
 
   See https://github.com/Pylons/pyramid/pull/3745
 
+- Replace usage of ``pkg_resources`` in ``pyramid.path.DottedNameResolver``.
+  See https://github.com/Pylons/pyramid/pull/3748
+
 Bug Fixes
 ---------
 

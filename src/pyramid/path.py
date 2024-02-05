@@ -1,3 +1,5 @@
+import functools
+from importlib import import_module
 from importlib.machinery import SOURCE_SUFFIXES
 import os
 import pkg_resources
@@ -344,14 +346,18 @@ class DottedNameResolver(Resolver):
                 value = package.__name__
             else:
                 value = package.__name__ + value
-        # Calling EntryPoint.load with an argument is deprecated.
-        # See https://pythonhosted.org/setuptools/history.html#id8
-        ep = pkg_resources.EntryPoint.parse('x=%s' % value)
-        if hasattr(ep, 'resolve'):
-            # setuptools>=10.2
-            return ep.resolve()  # pragma: NO COVER
-        else:
-            return ep.load(False)  # pragma: NO COVER
+        # logic below is similar to importlib.metadata.EntryPoint.load()
+        module = value
+        attrs = []
+        parts = value.split(':', 1)
+        if len(parts) == 2:
+            module, attrs = parts
+            attrs = attrs.split('.')
+        module = import_module(module)
+        try:
+            return functools.reduce(getattr, attrs, module)
+        except AttributeError as ex:
+            raise ImportError(str(ex))
 
     def _zope_dottedname_style(self, value, package):
         """package.module.attr style"""
