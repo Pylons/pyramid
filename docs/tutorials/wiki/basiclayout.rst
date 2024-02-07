@@ -15,7 +15,7 @@ Even if empty, this marks a directory as a Python package.
 We use ``__init__.py`` both as a marker, indicating the directory in which it is contained is a package, and to contain application configuration code.
 
 When you run the application using the ``pserve`` command using the ``development.ini`` generated configuration file, the application configuration points at a :term:`Setuptools` :term:`entry point` described as ``egg:tutorial``.
-In our application, because the application's ``setup.py`` file says so, this entry point happens to be the ``main`` function within the file named ``__init__.py``.
+In our application, because the application's ``pyproject.toml`` file says so, this entry point happens to be the ``main`` function within the file named ``__init__.py``.
 
 Open ``tutorial/__init__.py``.
 It should already contain the following:

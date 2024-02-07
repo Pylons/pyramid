@@ -28,7 +28,7 @@ The harness consists of the following setup:
 - ``testing.ini`` - a mirror of ``development.ini`` and ``production.ini`` that contains settings used for executing the test suite.
   Most importantly, it contains the database connection information used by tests that require the database.
 
-- ``tests_require`` in ``setup.py`` - controls the dependencies installed when testing.
+- ``project.optional-dependencies`` in ``pyproject.toml`` - controls the dependencies installed when testing.
   When the list is changed, it is necessary to re-run ``$VENV/bin/pip install -e ".[testing]"`` to ensure the new dependencies are installed.
 
 - ``tests/conftest.py`` - the core fixtures available throughout our tests.

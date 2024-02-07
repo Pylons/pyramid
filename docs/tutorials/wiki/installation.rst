@@ -187,17 +187,12 @@ The console will show ``pip`` checking for packages and installing missing packa
 
     Successfully installed BTrees-4.7.2 Chameleon-3.8.1 Mako-1.1.3 MarkupSafe-1.1.1 PasteDeploy-2.1.1 Pygments-2.7.3 WebTest-2.0.35 ZConfig-3.5.0 ZEO-5.2.2 ZODB-5.6.0 attrs-20.3.0 beautifulsoup4-4.9.3 cffi-1.14.4 coverage-5.3.1 hupper-1.10.2 iniconfig-1.1.1 packaging-20.8 persistent-4.6.4 plaster-1.0 plaster-pastedeploy-0.7 pluggy-0.13.1 py-1.10.0 pycparser-2.20 pyparsing-2.4.7 pyramid-1.10.5 pyramid-chameleon-0.3 pyramid-debugtoolbar-4.9 pyramid-mako-1.1.0 pyramid-retry-2.1.1 pyramid-tm-2.4 pyramid-zodbconn-0.8.1 pytest-6.2.1 pytest-cov-2.10.1 repoze.lru-0.7 six-1.15.0 soupsieve-2.1 toml-0.10.2 transaction-3.0.1 translationstring-1.4 tutorial venusian-3.0.0 waitress-1.4.4 webob-1.8.6 zc.lockfile-2.0 zdaemon-4.3 zodbpickle-2.0.0 zodburi-2.4.0 zope.deprecation-4.4.0 zope.interface-5.2.0
 
-Testing requirements are defined in our project's ``setup.py`` file, in the ``tests_require`` and ``extras_require`` stanzas.
+Testing requirements are defined in our project's ``pyproject.toml`` file, in the ``project:optional-dependencies`` stanza:
 
-.. literalinclude:: src/installation/setup.py
+.. literalinclude:: src/installation/pyproject.toml
     :language: python
     :lineno-match:
-    :lines: 24-28
-
-.. literalinclude:: src/installation/setup.py
-    :language: python
-    :lineno-match:
-    :lines: 48-50
+    :lines: 33-38
 
 
 .. _running_tests:
@@ -295,10 +290,22 @@ Test and coverage cookiecutter defaults
 ---------------------------------------
 
 The Pyramid cookiecutter includes configuration defaults for ``pytest`` and test coverage.
-These configuration files are ``pytest.ini`` and ``.coveragerc``, located at the root of your package.
+These configuration optionas are defined in  stanzas of the ``pyroject.toml`` file.
 
-``pytest`` follows :ref:`conventions for Python test discovery <pytest:test discovery>`.
-The configuration defaults from the cookiecutter tell ``pytest`` where to find the module on which we want to run tests and coverage.
+The ``tool.pytest.ini_options`` stanza follows :ref:`conventions for Python test discovery <pytest:test discovery>`.
+The configuration defaults from the cookiecutter tell ``pytest`` where to find the module on which we want to run tests:
+
+.. literalinclude:: src/installation/pyproject.toml
+    :language: python
+    :lineno-match:
+    :lines: 51-56
+
+The ``tool.coverage.run`` stanza defines the code for which we want to collect and report coverage:
+
+.. literalinclude:: src/installation/pyproject.toml
+    :language: python
+    :lineno-match:
+    :lines: 46-49
 
 .. seealso:: See ``pytest``'s documentation for :ref:`pytest:usage` or invoke ``pytest -h`` to see its full set of options.
 
