@@ -18,6 +18,8 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
+    "bcrypt",
+    "docutils",
     "plaster_pastedeploy",
     "pyramid",
     "pyramid_chameleon",
