@@ -472,7 +472,7 @@ class TestPRoutesCommand(unittest.TestCase):
                 'tests.test_scripts:static/',
                 '*',
             ],
-            ['__static2/', '/static2/*subpath', path2 + os.sep, '*'],
+            ['__static2/', '/static2/*subpath', path2, '*'],
             [
                 '__pyramid_scaffold/',
                 '/pyramid_scaffold/*subpath',
