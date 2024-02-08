@@ -372,7 +372,9 @@ Test and coverage cookiecutter defaults
 ---------------------------------------
 
 The Pyramid cookiecutter includes configuration defaults for ``pytest`` and test coverage.
-These configuration files are ``pytest.ini`` and ``.coveragerc``, located at the root of your package.
+The configuration for ``pytest`` is in the ``pyproject.toml`` file in the ``[tool.pytest.ini_options]`` section.
+Coverage is checked using the ``pytest-cov`` plugin, a wrapper around the `Coverage <https://coverage.readthedocs.io/en/latest/index.html>`_ tool.
+Options affecting coverage are defined in ``[tool.coverage.run]``.
 
 ``pytest`` follows :ref:`conventions for Python test discovery <pytest:test discovery>`.
 The configuration defaults from the cookiecutter tell ``pytest`` where to find the module on which we want to run tests and coverage.
