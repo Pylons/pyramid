@@ -38,12 +38,12 @@ Add dependencies
 ~~~~~~~~~~~~~~~~
 
 Just like in :ref:`wiki_defining_views`, we need a new dependency.
-We need to add the `bcrypt <https://pypi.org/project/bcrypt/>`_ package to our tutorial package's ``setup.py`` file by assigning this dependency to the ``requires`` parameter in the ``setup()`` function.
+We need to add the `bcrypt <https://pypi.org/project/bcrypt/>`_ package to our tutorial package's ``pyproject.toml`` file by assigning this dependency to the ``dependencies`` stanza.
 
-Open ``setup.py`` and edit it to look like the following:
+Open ``pyproject.toml`` and edit it to look like the following:
 
-.. literalinclude:: src/authorization/setup.py
-    :lines: 11-30
+.. literalinclude:: src/authorization/pyproject.toml
+    :lines: 20-33
     :lineno-match:
     :emphasize-lines: 2
     :language: python

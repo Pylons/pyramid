@@ -12,7 +12,7 @@ Overall
 
 We choose to use :term:`reStructuredText` markup in the wiki text.
 Conversion from reStructuredText to HTML is provided by the widely used ``docutils`` Python module.
-We will add this module in the dependency list on the project ``setup.py`` file.
+We will add this module in the dependency list on the project's ``pyproject.toml`` file.
 
 
 Models
