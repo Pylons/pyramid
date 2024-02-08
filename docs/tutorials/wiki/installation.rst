@@ -290,9 +290,11 @@ Test and coverage cookiecutter defaults
 ---------------------------------------
 
 The Pyramid cookiecutter includes configuration defaults for ``pytest`` and test coverage.
-These configuration optionas are defined in  stanzas of the ``pyroject.toml`` file.
+The configuration for ``pytest`` is in the ``pyroject.toml`` file in the ``tool.pytest.ini_options`` stanza.
+Coverage is checked using the ``pytest--cov`` plugin, a wrapper around the `Coverage <https://coverage.readthedocs.io/en/latest/index.html>`_ tool.
+Options affecting coverage are defined in the ``[tool.coverage.run]`` stanza of ``pyproject.toml``.
 
-The ``tool.pytest.ini_options`` stanza follows :ref:`conventions for Python test discovery <pytest:test discovery>`.
+``pytest`` follows :ref:`conventions for Python test discovery <pytest:test discovery>`.
 The configuration defaults from the cookiecutter tell ``pytest`` where to find the module on which we want to run tests:
 
 .. literalinclude:: src/installation/pyproject.toml
