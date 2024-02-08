@@ -131,9 +131,9 @@ Insert the highlighted line.
 In the same file, now edit the ``edit_page`` view function:
 
 .. literalinclude:: src/authentication/tutorial/views/default.py
-   :lines: 44-59
+   :lines: 49-68
    :lineno-match:
-   :emphasize-lines: 5-7
+   :emphasize-lines: 9-11
    :language: python
 
 Only the highlighted lines need to be changed.
@@ -144,9 +144,9 @@ If the user either is not logged in or the user is not the page's creator
 In the same file, now edit the ``add_page`` view function:
 
 .. literalinclude:: src/authentication/tutorial/views/default.py
-   :lines: 61-
+   :lines: 70-
    :lineno-match:
-   :emphasize-lines: 3-5,13
+   :emphasize-lines: 3-5,15
    :language: python
 
 Only the highlighted lines need to be changed.

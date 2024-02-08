@@ -3,6 +3,7 @@ from html import escape
 from pyramid.httpexceptions import HTTPSeeOther
 from pyramid.view import view_config
 import re
+import sqlalchemy as sa
 
 from .. import models
 
@@ -22,7 +23,9 @@ def view_page(request):
 
     def add_link(match):
         word = match.group(1)
-        exists = request.dbsession.query(models.Page).filter_by(name=word).all()
+        exists = request.dbsession.execute(
+            sa.select(sa.exists(models.Page)).where(models.Page.name == word)
+        ).scalar()
         if exists:
             view_url = request.route_url('view_page', pagename=word)
             return '<a href="%s">%s</a>' % (view_url, escape(word))
@@ -55,8 +58,7 @@ def add_page(request):
     pagename = request.context.pagename
     if request.method == 'POST':
         body = request.params['body']
-        page = models.Page(name=pagename, data=body)
-        page.creator = request.identity
+        page = models.Page(name=pagename, data=body, creator=request.identity)
         request.dbsession.add(page)
         next_url = request.route_url('view_page', pagename=pagename)
         return HTTPSeeOther(location=next_url)

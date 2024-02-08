@@ -22,7 +22,7 @@ class MySecurityPolicy:
             return None
 
         userid = identity['userid']
-        user = request.dbsession.query(models.User).get(userid)
+        user = request.dbsession.get(models.User, userid)
         return user
 
     def identity(self, request):

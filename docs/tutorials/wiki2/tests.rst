@@ -20,21 +20,21 @@ The test module would have the same name with the prefix ``test_``.
 
 The harness consists of the following setup:
 
-- ``pytest.ini`` - controls basic ``pytest`` config including where to find the tests.
+- The ``project.optional-dependencies`` stanza of ``pyproject.toml`` - controls the dependencies installed when testing.
+  When the list is changed, it is necessary to re-run ``$VENV/bin/pip install -e ".[testing]"`` to ensure the new dependencies are installed.
+
+- The ``tool.pytest.ini_options`` stanza of ``pyproject.toml`` controls basic ``pytest`` configuration, including where to find the tests.
   We have configured ``pytest`` to search for tests in the application package and in the ``tests`` package.
 
-- ``.coveragerc`` - controls coverage config.
+- The ``tool.coverage.run`` stanza of ``pyproject.toml`` controls coverage config.
   In our setup, it works with the ``pytest-cov`` plugin that we use via the ``--cov`` options to the ``pytest`` command.
 
-- ``testing.ini`` - a mirror of ``development.ini`` and ``production.ini`` that contains settings used for executing the test suite.
+- The ``testing.ini`` file is a mirror of ``development.ini`` and ``production.ini`` that contains settings used for executing the test suite.
   Most importantly, it contains the database connection information used by tests that require the database.
 
-- ``tests_require`` in ``setup.py`` - controls the dependencies installed when testing.
-  When the list is changed, it's necessary to re-run ``$VENV/bin/pip install -e ".[testing]"`` to ensure the new dependencies are installed.
-
-- ``tests/conftest.py`` - the core fixtures available throughout our tests.
-  The fixtures are explained in more detail below.
-
+- The ``tests/conftest.py`` file defines the core fixtures available throughout our tests.
+  The fixtures are explained in more detail in the following sections.
+  Open ``tests/conftest.py`` and follow along.
 
 Session-scoped test fixtures
 ----------------------------
