@@ -4,6 +4,7 @@ import mimetypes
 import os
 from os.path import exists, getmtime, getsize, isdir, join, normcase, normpath
 from pkg_resources import resource_exists, resource_filename, resource_isdir
+import warnings
 
 from pyramid.asset import abspath_from_asset_spec, resolve_asset_spec
 from pyramid.httpexceptions import HTTPMovedPermanently, HTTPNotFound
@@ -92,6 +93,19 @@ class static_view:
         if package_name is None:
             package_name = caller_package().__name__
         package_name, docroot = resolve_asset_spec(root_dir, package_name)
+        if package_name:
+            try:
+                __import__(package_name)
+            except ImportError:
+                warnings.warn(
+                    f'A "pyramid.static.static_view" is being created with an'
+                    f' asset spec referencing a package "{package_name}" that'
+                    f' does not exist. This will break in the future.'
+                    f' If this is done to override an asset, you must adjust'
+                    f' this to override a location inside a real package.',
+                    DeprecationWarning,
+                    stacklevel=1,
+                )
         self.use_subpath = use_subpath
         self.package_name = package_name
         self.docroot = docroot
