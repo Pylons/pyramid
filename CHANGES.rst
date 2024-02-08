@@ -63,3 +63,15 @@ Backward Incompatibilities
 
 Documentation Changes
 ---------------------
+
+- Sync the SQLAlchemy Wiki tutorial with changes to the
+  ``pyramid-cookiecutter-starter``. Includes updates to use ``pyproject.toml``
+  to replace separate config files for ``pytest``, ``coverage``, and
+  ``setuptools``. Also upgrades patterns to support SQLAlchemy 2.0.
+  See https://github.com/Pylons/pyramid/pull/3747
+
+- Sync the ZODB Wiki tutorial with changes to the
+  ``pyramid-cookiecutter-starter``. Includes updates to use ``pyproject.toml``
+  to replace separate config files for ``pytest``, ``coverage``, and
+  ``setuptools``.
+  See https://github.com/Pylons/pyramid/pull/3751
