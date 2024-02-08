@@ -104,7 +104,7 @@ class static_view:
                     f' If this is done to override an asset, you must adjust'
                     f' this to override a location inside a real package.',
                     DeprecationWarning,
-                    stacklevel=1,
+                    stacklevel=2,
                 )
         self.use_subpath = use_subpath
         self.package_name = package_name
