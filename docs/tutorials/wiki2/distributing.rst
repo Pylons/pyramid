@@ -29,11 +29,25 @@ On Windows:
     %VENV%\Scripts\pip install build
     %VENV%\Scripts\python -m build
 
-Upon successfull completion, a "sdist" and a "wheel" will be output to the ``dist`` subdirectory.
-These artifacts are uploadable to `PyPI <https://pypi.org/>`_ using a tool like ``twine``.
-You should be able to create a brand new virtualenv and ``pip install`` the sdist or wheel.
-Note that the ``production.ini`` is not part of the distribution.
-This file is considered to be defined by the "user" of your application, not part of the application itself.
-If you'd like to help a user out, consider defining a new CLI script that can render a config file for them!
+The output of such a command will be something like:
+
+.. code-block:: text
+
+    * Creating venv isolated environment...
+    * Installing packages in isolated environment... (setuptools)
+    * Getting build dependencies for sdist...
+    ...
+    removing build/bdist.linux-x86_64/wheel
+    Successfully built tutorial-0.0.tar.gz and tutorial-0.0-py3-none-any.whl
+
+This command creates a subdirectory named ``dist``.
+Inside that is a tarball named ``tutorial-0.0.tar.gz`` (the source :term:`distribution` of your application), as well ass ``tutorial-0.0-py3-none-any.whl`` (the binary :term:`distribution`).
+You can send these files to your friends to show them your cool new application.
+They should be able to install the app by pointing the ``pip install`` command directly at one of them.
+These artifacts are also uploadable to `PyPI <https://pypi.org/>`_, or another package index, using a tool like ``twine``.
+
+Note that the config files, such as ``production.ini`` are not part of the distribution.
+These files are considered to be defined by the "user" of your application and not part of the application itself.
+If you'd like to help a user out, consider defining a new CLI script similar to ``initialize_tutorial_db`` that can render a config file for them!
 
 Please learn more about distributing an application from the `Python Packaging User Guide <https://packaging.python.org/en/latest/tutorials/packaging-projects/>`_.
