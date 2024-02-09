@@ -61,6 +61,17 @@ Backward Incompatibilities
   These have been deprecated in Python's gettext module since 3.8, and
   removed in Python 3.11.
 
+Deprecations
+------------
+
+- Deprecated the ability to use a non-existent package with
+  ``pyramid.config.Configurator.add_static_view`` and
+  ``pyramid.static.static_view``. This can be fixed by choosing a path
+  located within a real package as the ``root_dir`` for your static files.
+  This is almost always either a misconfig or an attempt to define an alias
+  location for use with ``pyramid.config.Configurator.override_asset``.
+  See https://github.com/Pylons/pyramid/pull/3752
+
 Documentation Changes
 ---------------------
 
