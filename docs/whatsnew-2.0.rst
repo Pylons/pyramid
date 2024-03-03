@@ -240,7 +240,7 @@ We can easily write our own :class:`pyramid.interfaces.ISecurityPolicy` implemen
                 }
 
         def authenticated_userid(self, request):
-            # defer to the identity logic to determine if the user id logged in
+            # defer to the identity logic to determine if the user is logged in
             # and return None if they are not
             identity = request.identity
             if identity is not None:
