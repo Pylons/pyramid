@@ -166,10 +166,10 @@ For example, our above security policy can leverage these helpers like so:
             else:
                 return Denied('User is not signed in.')
 
-        def remember(request, userid, **kw):
+        def remember(self, request, userid, **kw):
             return self.helper.remember(request, userid, **kw)
 
-        def forget(request, **kw):
+        def forget(self, request, **kw):
             return self.helper.forget(request, **kw)
 
 Helpers are intended to be used with application-specific code.  Notice how the
