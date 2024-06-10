@@ -137,7 +137,7 @@ Subsequent requests return that cookie and identify the user.
 In our template, we fetched the ``logged_in`` value from the view class. We use
 this to calculate the logged-in user, if any. In the template we can then
 choose to show a login link to anonymous visitors or a logout link to logged-in
-users.
+users, including their login name.
 
 
 Extra credit

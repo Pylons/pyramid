@@ -8,8 +8,6 @@
 <span tal:replace="message"/>
 
 <form action="${url}" method="post">
-    <input type="hidden" name="came_from"
-           value="${came_from}"/>
     <label for="login">Username</label>
     <input type="text" id="login"
            name="login"

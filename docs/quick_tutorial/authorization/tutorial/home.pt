@@ -8,8 +8,10 @@
 <div>
     <a tal:condition="view.logged_in is None"
             href="${request.application_url}/login">Log In</a>
-    <a tal:condition="view.logged_in is not None"
-            href="${request.application_url}/logout">Logout</a>
+    <span tal:condition="view.logged_in is not None">
+     <a href="${request.application_url}/logout">Logout</a>
+        as ${view.logged_in}
+    </span>
 </div>
 
 <h1>Hi ${name}</h1>
