@@ -1,11 +1,16 @@
 from pyramid.config import Configurator
+from pyramid.session import SignedCookieSessionFactory
 
 from .security import SecurityPolicy
 
 
 def main(global_config, **settings):
-    config = Configurator(settings=settings,
-                          root_factory='.resources.Root')
+    my_session_factory = SignedCookieSessionFactory('itsaseekreet')
+    config = Configurator(
+        settings=settings,
+        root_factory='.resources.Root',
+        session_factory=my_session_factory,
+    )
     config.include('pyramid_chameleon')
 
     config.set_security_policy(
