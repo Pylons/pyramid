@@ -739,6 +739,210 @@ class ImperativeIncludeConfigurationTest(unittest.TestCase):
         self.assertTrue(b'three' in res.body)
 
 
+class IncludeRoutePrefixConfigurationTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from pyramid.config import Configurator
+
+        config = Configurator()
+        config.include('tests.pkgs.include_routeprefix_app')
+
+        app = config.make_wsgi_app()
+        cls.testapp = TestApp(app)
+        cls.config = config
+
+        cls.evaluated_paths = set()
+        cls.expected_paths = set(
+            '/' + route.path.strip('/')
+            for route in cls.config.get_routes_mapper().get_routes()
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.config.end()
+
+        # make sure we didn't forget to validate one combination
+        assert cls.expected_paths - cls.evaluated_paths == set()
+
+    def eval(self, path):
+        path = path.rstrip('/') if path != '/' else '/'
+        self.evaluated_paths.add(path)
+        res = self.testapp.get(path, status=(200, 307))  # noqa
+        if res.status_code != 200:
+            path += '/'
+            self.evaluated_paths.add(path)
+            res = self.testapp.get(path, status=200)
+        self.assertEqual(path.encode(), res.body)
+
+    # ---
+    # 'root' module included without prefix
+    # ---
+
+    def test_root(self):
+        self.eval('/')
+
+    def test_root_named_view(self):
+        self.eval('/named_view')
+
+    # ---
+    # 'root' module using context with simple prefix
+    # ---
+
+    def test_root_ctx_prefix_simple_view(self):
+        self.eval('/root_ctx_simple/ctx_simple_view')
+
+    def test_root_ctx_prefix_simple_ctx_simple_view(self):
+        self.eval('/root_ctx_simple/root_ctx_simple')
+
+    def test_root_ctx_prefix_simple_nested_view(self):
+        self.eval('/root_ctx_simple')
+
+    def test_root_ctx_prefix_simple_nested_route_simple(self):
+        self.eval('/root_ctx_simple/nested_route_simple')
+
+    def test_root_ctx_prefix_simple_nested_route_slash(self):
+        self.eval('/root_ctx_simple/nested_route_slash')
+
+    def test_root_ctx_prefix_simple_nested_ctx_simple_view(self):
+        self.eval('/root_ctx_simple/nested_ctx_simple/')
+
+    def test_root_ctx_prefix_simple_nested_ctx_simple_route_simple(self):
+        self.eval('/root_ctx_simple/nested_ctx_simple/nested_ctx_route_simple')
+
+    def test_root_ctx_prefix_simple_nested_ctx_simple_route_slash(self):
+        self.eval('/root_ctx_simple/nested_ctx_simple/nested_ctx_route_slash')
+
+    def test_root_ctx_prefix_simple_nested_ctx_slash_view(self):
+        self.eval('/root_ctx_simple/nested_ctx_slash/')
+
+    def test_root_ctx_prefix_simple_nested_ctx_slash_route_simple(self):
+        self.eval('/root_ctx_simple/nested_ctx_slash/nested_ctx_route_simple')
+
+    def test_root_ctx_prefix_simple_nested_ctx_slash_route_slash(self):
+        self.eval('/root_ctx_simple/nested_ctx_slash/nested_ctx_route_slash')
+
+    # ---
+    # 'root' module using context with slash prefix
+    # ---
+
+    def test_root_ctx_prefix_slash_view(self):
+        self.eval('/root_ctx_slash/ctx_slash_view')
+
+    def test_root_ctx_prefix_slash_ctx_slash_view(self):
+        self.eval('/root_ctx_slash/root_ctx_slash')
+
+    def test_root_ctx_prefix_slash_nested_view(self):
+        self.eval('/root_ctx_slash')
+
+    def test_root_ctx_prefix_slash_nested_route_simple(self):
+        self.eval('/root_ctx_slash/nested_route_simple')
+
+    def test_root_ctx_prefix_slash_nested_route_slash(self):
+        self.eval('/root_ctx_slash/nested_route_slash')
+
+    def test_root_ctx_prefix_slash_nested_ctx_simple_view(self):
+        self.eval('/root_ctx_slash/nested_ctx_simple/')
+
+    def test_root_ctx_prefix_slash_nested_ctx_simple_route_simple(self):
+        self.eval('/root_ctx_slash/nested_ctx_simple/nested_ctx_route_simple')
+
+    def test_root_ctx_prefix_slash_nested_ctx_simple_route_slash(self):
+        self.eval('/root_ctx_slash/nested_ctx_simple/nested_ctx_route_slash')
+
+    def test_root_ctx_prefix_slash_nested_ctx_slash_view(self):
+        self.eval('/root_ctx_slash/nested_ctx_slash/')
+
+    def test_root_ctx_prefix_slash_nested_ctx_slash_route_simple(self):
+        self.eval('/root_ctx_slash/nested_ctx_slash/nested_ctx_route_simple')
+
+    def test_root_ctx_prefix_slash_nested_ctx_slash_route_slash(self):
+        self.eval('/root_ctx_slash/nested_ctx_slash/nested_ctx_route_slash')
+
+    # ---
+    # 'root' module that includes 'nested' module without prefix
+    # ---
+
+    def test_root_no_prefix_nested_route_simple(self):
+        self.eval('/nested_route_simple')
+
+    def test_root_no_prefix_nested_route_slash(self):
+        self.eval('/nested_route_slash')
+
+    def test_root_no_prefix_nested_context_simple_view(self):
+        self.eval('/nested_ctx_simple')
+
+    def test_root_no_prefix_nested_context_slash_view(self):
+        self.eval('/nested_ctx_slash')
+
+    def test_root_no_prefix_slash_nested_ctx_simple_route_simple(self):
+        self.eval('/nested_ctx_simple/nested_ctx_route_simple')
+
+    def test_root_no_prefix_slash_nested_ctx_simple_route_slash(self):
+        self.eval('/nested_ctx_simple/nested_ctx_route_slash')
+
+    def test_root_no_prefix_nested_context_slash_route_simple(self):
+        self.eval('/nested_ctx_slash/nested_ctx_route_simple')
+
+    def test_root_no_prefix_nested_context_slash_route_slash(self):
+        self.eval('/nested_ctx_slash/nested_ctx_route_slash')
+
+    # ---
+    # 'root' module that includes 'nested' module with simple prefix
+    # ---
+
+    def test_root_simple_prefix_nested_route_simple(self):
+        self.eval('/prefix_simple/nested_route_simple')
+
+    def test_root_simple_prefix_nested_route_slash(self):
+        self.eval('/prefix_simple/nested_route_slash')
+
+    def test_root_simple_prefix_nested_context_simple_view(self):
+        self.eval('/prefix_simple/nested_ctx_simple/')
+
+    def test_root_simple_prefix_nested_context_slash_view(self):
+        self.eval('/prefix_simple/nested_ctx_slash/')
+
+    def test_root_simple_prefix_nested_context_simple_route_simple(self):
+        self.eval('/prefix_simple/nested_ctx_simple/nested_ctx_route_simple')
+
+    def test_root_simple_prefix_nested_context_simple_route_slash(self):
+        self.eval('/prefix_simple/nested_ctx_simple/nested_ctx_route_slash')
+
+    def test_root_simple_prefix_nested_context_slash_route_simple(self):
+        self.eval('/prefix_simple/nested_ctx_slash/nested_ctx_route_simple')
+
+    def test_root_simple_prefix_nested_context_slash_route_slash(self):
+        self.eval('/prefix_simple/nested_ctx_slash/nested_ctx_route_slash')
+
+    # ---
+    # 'root' module that includes 'nested' module with slash prefix
+    # ---
+
+    def test_root_slash_prefix_nested_route_simple(self):
+        self.eval('/prefix_slash/nested_route_simple')
+
+    def test_root_slash_prefix_nested_route_slash(self):
+        self.eval('/prefix_slash/nested_route_slash')
+
+    def test_root_slash_prefix_nested_context_simple_view(self):
+        self.eval('/prefix_slash/nested_ctx_simple/')
+
+    def test_root_slash_prefix_nested_context_slash_view(self):
+        self.eval('/prefix_slash/nested_ctx_slash/')
+
+    def test_root_slash_prefix_nested_context_simple_route_simple(self):
+        self.eval('/prefix_slash/nested_ctx_simple/nested_ctx_route_simple')
+
+    def test_root_slash_prefix_nested_context_simple_route_slash(self):
+        self.eval('/prefix_slash/nested_ctx_simple/nested_ctx_route_slash')
+
+    def test_root_slash_prefix_nested_context_slash_route_simple(self):
+        self.eval('/prefix_slash/nested_ctx_slash/nested_ctx_route_simple')
+
+    def test_root_slash_prefix_nested_context_slash_route_slash(self):
+        self.eval('/prefix_slash/nested_ctx_slash/nested_ctx_route_slash')
+
+
 class SelfScanAppTest(unittest.TestCase):
     def setUp(self):
         from .test_config.pkgs.selfscan import main

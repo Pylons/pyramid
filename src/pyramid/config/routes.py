@@ -595,11 +595,12 @@ class RoutesConfiguratorMixin:
         if old_route_prefix is None:
             old_route_prefix = ''
 
-        route_prefix = '{}/{}'.format(
-            old_route_prefix.rstrip('/'), route_prefix.lstrip('/')
-        )
+        if old_route_prefix.strip('/'):
+            route_prefix = '{}/{}'.format(
+                old_route_prefix, route_prefix.strip('/')
+            )
 
-        route_prefix = route_prefix.strip('/')
+        route_prefix = route_prefix.rstrip('/')
 
         if not route_prefix:
             route_prefix = None
