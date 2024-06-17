@@ -110,7 +110,8 @@ class InstancePropertyHelper:
         if name is None:
             if not hasattr(callable, '__name__'):
                 raise ValueError(
-                    'missing __name__, must specify "name" for property'
+                    'missing __name__, must specify "name" for property '
+                    'on Python < 3.13'
                 )
             name = callable.__name__
         name = get_callable_name(name)
