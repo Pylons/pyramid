@@ -39,6 +39,7 @@ install_requires = [
 tests_require = [
     'webtest >= 1.3.1',  # py3 compat
     'zope.component >= 4.0',  # py3 compat
+    'legacy-cgi;python_version>="3.13"',  # needed by webob, Pylons/webob#437
 ]
 
 docs_extras = [
