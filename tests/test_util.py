@@ -67,13 +67,21 @@ class Test_InstancePropertyHelper(unittest.TestCase):
 
     def test_property_without_name(self):
         def worker(obj):  # pragma: no cover
-            pass
+            return obj.bar
 
         foo = Dummy()
         helper = self._getTargetClass()
-        self.assertRaises(
-            ValueError, helper.set_property, foo, property(worker)
-        )
+        if sys.version_info < (3, 13):
+            self.assertRaises(
+                ValueError, helper.set_property, foo, property(worker)
+            )
+        else:
+            # Since Python 3.13, the name of the property is automatic
+            helper.set_property(foo, property(worker))
+            foo.bar = 1
+            self.assertEqual(1, foo.worker)
+            foo.bar = 2
+            self.assertEqual(2, foo.worker)
 
     def test_property_with_name(self):
         def worker(obj):
@@ -272,10 +280,18 @@ class Test_InstancePropertyMixin(unittest.TestCase):
 
     def test_property_without_name(self):
         def worker(obj):  # pragma: no cover
-            pass
+            return obj.bar
 
         foo = self._makeOne()
-        self.assertRaises(ValueError, foo.set_property, property(worker))
+        if sys.version_info < (3, 13):
+            self.assertRaises(ValueError, foo.set_property, property(worker))
+        else:
+            # Since Python 3.13, the name of the property is automatic
+            foo.set_property(property(worker))
+            foo.bar = 1
+            self.assertEqual(1, foo.worker)
+            foo.bar = 2
+            self.assertEqual(2, foo.worker)
 
     def test_property_with_name(self):
         def worker(obj):
