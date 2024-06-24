@@ -27,7 +27,7 @@ _marker = object()
 if sys.version_info.major < 3 or sys.version_info.minor < 11:
     Self = Sentinel('Self')  # pragma: no cover
 else:
-    from typing import Self
+    from typing import Self  # noqa: F401
 
 
 def render_view_to_response(context, request, name='', secure=True):
