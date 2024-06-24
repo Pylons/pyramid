@@ -56,7 +56,7 @@ from pyramid.util import (
     as_sorted_tuple,
     is_nonstr_iter,
 )
-from pyramid.view import Self, AppendSlashNotFoundViewFactory
+from pyramid.view import AppendSlashNotFoundViewFactory, Self
 import pyramid.viewderivers
 from pyramid.viewderivers import (
     INGRESS,
