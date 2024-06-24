@@ -23,7 +23,11 @@ from pyramid.threadlocal import get_current_registry, manager
 from pyramid.util import Sentinel, hide_attrs, reraise as reraise_
 
 _marker = object()
-LIFT = Sentinel('LIFT')
+
+if sys.version_info.major < 3 or sys.version_info.minor < 11:
+    Self = Sentinel('Self')  # pragma: no cover
+else:
+    from typing import Self
 
 
 def render_view_to_response(context, request, name='', secure=True):
