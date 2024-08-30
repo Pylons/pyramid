@@ -2,6 +2,8 @@ from plaster.exceptions import PlasterError
 import pytest
 import unittest
 
+import pyramid.scripts.common
+
 
 class TestParseVars(unittest.TestCase):
     def test_parse_vars_good(self):
@@ -19,15 +21,11 @@ class TestParseVars(unittest.TestCase):
 
 
 def test_get_config_loader_raises():
-    from pyramid.scripts.common import get_config_loader
-
     with pytest.raises(PlasterError):
-        get_config_loader('invalidscheme:/foo')
+        pyramid.scripts.common.get_config_loader('invalidscheme:/foo')
 
 
 def test_get_config_loader_calls():
-    from pyramid.scripts.common import get_config_loader
-
     def reporter(text):
         nonlocal reporter_called
         reporter_called = True
