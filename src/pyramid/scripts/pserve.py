@@ -187,7 +187,7 @@ class PServeCommand:
         app_spec = self.args.config_uri
         app_name = self.args.app_name
 
-        loader = self._get_config_loader(config_uri)
+        loader = self._get_config_loader(config_uri, self.out)
 
         # setup logging only in the worker process incase the logging config
         # opens files which should not be opened by multiple processes at once
