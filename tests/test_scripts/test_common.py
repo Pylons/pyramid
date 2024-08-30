@@ -33,9 +33,9 @@ def test_get_config_loader_calls():
         reporter_called = True
 
     reporter_called = False
-    with pytest.raises(SystemExit) as execinfo:
-        get_config_loader('invalidscheme:/foo', reporter)
-
-        assert execinfo.code == 1
+    with pytest.raises(SystemExit):
+        pyramid.scripts.common.get_config_loader(
+            'invalidscheme:/foo', reporter
+        )
 
     assert reporter_called is True
