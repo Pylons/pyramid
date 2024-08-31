@@ -24,7 +24,7 @@ jobs:
                 os:
                     - "ubuntu-20.04"
                     - "windows-2022"
-                    - "macos-latest"
+                    - "macos-12"
                 architecture:
                     - x64
                     - x86
@@ -41,7 +41,7 @@ jobs:
                     # Linux and macOS don't have x86 python
                     - os: "ubuntu-20.04"
                       architecture: x86
-                    - os: "macos-latest"
+                    - os: "macos-12"
                       architecture: x86
 
         name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
