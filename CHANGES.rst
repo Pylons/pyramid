@@ -11,8 +11,9 @@ Features
 
 - Coverage reports in tests based on Python 3.11 instead of Python 3.8.
 
-- Added `Self` sentinel value that may be used for context and name arguments
-  to view_config on class methods in conjunction with venusian lift.
+- Added `Self` sentinel value that may be used for context and name or
+  function as context arguments to view_config on class methods in conjunction
+  with venusian lift.
 
 Bug Fixes
 ---------

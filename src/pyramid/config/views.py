@@ -591,7 +591,9 @@ class ViewsConfiguratorMixin:
           exceptions, then set the ``exception_only`` to ``True``.
           When :term:`view` is a class, the sentinel value view.Self
           will cause the :term:`context` value to be set at scan time
-          (useful in conjunction with venusian lift).
+          (useful in conjunction with venusian lift). It can also be
+          a function taking the view as it's only argument which return
+          value will be set as context at scan time.
 
         route_name
 
@@ -823,10 +825,15 @@ class ViewsConfiguratorMixin:
         if inspect.isclass(view):
             if context is Self:
                 context = view
+            elif inspect.isfunction(context):
+                context = context(view)
             if name is Self:
                 name = attr or ""
         elif Self in (context, name):
             raise ValueError('Self is only allowed when view is a class')
+        elif inspect.isfunction(context):
+            raise ValueError(
+                'context as function is only allowed when view is a class')
 
         if is_nonstr_iter(decorator):
             decorator = combine_decorators(*map(self.maybe_dotted, decorator))

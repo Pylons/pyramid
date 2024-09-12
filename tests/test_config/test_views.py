@@ -446,6 +446,16 @@ class TestViewsConfigurationMixin(unittest.TestCase):
             lambda: config.add_view(view=view, context=Self, name=Self),
         )
 
+    def test_add_view_raises_on_function_context_with_non_class_view(self):
+        def view(exc, request):  # pragma: no cover
+            pass
+
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(
+            ValueError,
+            lambda: config.add_view(view=view, context=lambda x: x, name=Self),
+        )
+
     def test_add_view_replaces_self(self):
         from zope.interface import implementedBy
 
@@ -459,6 +469,26 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         config.add_view(Foo, context=Self, name=Self, attr='view')
         interface = implementedBy(Foo)
+        wrapper = self._getViewCallable(config, interface, name='view')
+        self.assertEqual(wrapper.__original_view__, Foo)
+
+    def test_add_view_replaces_function(self):
+        from zope.interface import implementedBy
+
+        class Foo2:
+            pass
+
+        class Foo:  # pragma: no cover
+            wrapped = Foo2
+            def __init__(self, request):
+                pass
+
+            def view(self):
+                pass
+
+        config = self._makeOne(autocommit=True)
+        config.add_view(Foo, context=lambda x: x.wrapped, name=Self, attr='view')
+        interface = implementedBy(Foo2)
         wrapper = self._getViewCallable(config, interface, name='view')
         self.assertEqual(wrapper.__original_view__, Foo)
 
