@@ -453,7 +453,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         config = self._makeOne(autocommit=True)
         self.assertRaises(
             ValueError,
-            lambda: config.add_view(view=view, context=lambda x: x, name=Self),
+            lambda: config.add_view(view=view, context=lambda x: x),
         )
 
     def test_add_view_replaces_self(self):
@@ -480,6 +480,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
 
         class Foo:  # pragma: no cover
             wrapped = Foo2
+
             def __init__(self, request):
                 pass
 
@@ -487,9 +488,9 @@ class TestViewsConfigurationMixin(unittest.TestCase):
                 pass
 
         config = self._makeOne(autocommit=True)
-        config.add_view(Foo, context=lambda x: x.wrapped, name=Self, attr='view')
+        config.add_view(Foo, context=lambda x: x.wrapped, attr='view')
         interface = implementedBy(Foo2)
-        wrapper = self._getViewCallable(config, interface, name='view')
+        wrapper = self._getViewCallable(config, interface)
         self.assertEqual(wrapper.__original_view__, Foo)
 
     def test_add_view_context_as_iface(self):
