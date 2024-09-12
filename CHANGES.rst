@@ -34,6 +34,10 @@ Features
 - Replace usage of ``pkg_resources`` in ``pdistreport`` and ``pshell`` CLI
   commands. See https://github.com/Pylons/pyramid/pull/3749
 
+- Added `Self` sentinel value that may be used for context and name or
+  function as context arguments to view_config on class methods in conjunction
+  with venusian lift.
+
 Bug Fixes
 ---------
 
