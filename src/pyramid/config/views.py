@@ -833,7 +833,8 @@ class ViewsConfiguratorMixin:
             raise ValueError('Self is only allowed when view is a class')
         elif inspect.isfunction(context):
             raise ValueError(
-                'context as function is only allowed when view is a class')
+                'context as function is only allowed when view is a class'
+            )
 
         if is_nonstr_iter(decorator):
             decorator = combine_decorators(*map(self.maybe_dotted, decorator))
