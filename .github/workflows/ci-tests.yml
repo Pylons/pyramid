@@ -7,6 +7,7 @@ on:
             - main
             - "[0-9].[0-9]+-branch"
         tags:
+            - "*"
     # Build pull requests
     pull_request:
 
@@ -15,34 +16,67 @@ jobs:
         strategy:
             matrix:
                 py:
-                    - "3.8"
                     - "3.9"
                     - "3.10"
                     - "3.11"
                     - "3.12"
-                    - "pypy-3.8"
+                    - "3.13"
+                    - "pypy-3.9"
+                    - "pypy-3.10"
+                    # Pre-release
                 os:
-                    - "ubuntu-20.04"
-                    - "windows-2022"
-                    - "macos-11"
+                    - "ubuntu-22.04"
+                    - "windows-latest"
+                    - "macos-14" # arm64
+                    - "macos-13" # x64
                 architecture:
                     - x64
                     - x86
-
+                    - arm64
                 include:
-                    # Only run coverage on ubuntu-20.04, except on pypy3
-                    - os: "ubuntu-20.04"
+                    - os: "ubuntu-22.04"
                       pytest-args: "--cov"
-                    - os: "ubuntu-20.04"
-                      py: "pypy-3.8"
+                    - py: "pypy-3.9"
+                      toxenv: "pypy39"
                       pytest-args: ""
-
+                    - py: "pypy-3.10"
+                      toxenv: "pypy310"
+                      pytest-args: ""
                 exclude:
-                    # Linux and macOS don't have x86 python
-                    - os: "ubuntu-20.04"
+                    # Ubuntu does not have x86/arm64 Python
+                    - os: "ubuntu-22.04"
                       architecture: x86
-                    - os: "macos-11"
+                    - os: "ubuntu-22.04"
+                      architecture: arm64
+                    # MacOS we need to make sure to remove x86 on all
+                    # We need to run no arm64 on macos-13 (Intel), but some
+                    # Python versions: 3.9/3.10
+                    #
+                    # From 3.11 onward, there is support for running x64 and
+                    # arm64 on Apple Silicon based systems (macos-14)
+                    - os: "macos-13"
                       architecture: x86
+                    - os: "macos-13"
+                      architecture: arm64
+                    - os: "macos-14"
+                      architecture: x86
+                    - os: "macos-14"
+                      architecture: x64
+                      py: "3.9"
+                    - os: "macos-14"
+                      architecture: x64
+                      py: "3.10"
+                    # Windows does not have arm64 releases
+                    - os: "windows-latest"
+                      architecture: arm64
+                    # Don't run all PyPy versions except latest on
+                    # Windows/macOS. They are expensive to run.
+                    - os: "windows-latest"
+                      py: "pypy-3.9"
+                    - os: "macos-13"
+                      py: "pypy-3.9"
+                    - os: "macos-14"
+                      py: "pypy-3.9"
 
         name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
@@ -54,41 +88,49 @@ jobs:
                   python-version: ${{ matrix.py }}
                   architecture: ${{ matrix.architecture }}
             - run: pip install tox
-            - name: Running tox
+            - name: Running tox with specific toxenv
+              if: ${{ matrix.toxenv != '' }}
+              env:
+                TOXENV: ${{ matrix.toxenv }}
+              run: tox
+            - name: Running tox for current python version
+              if: ${{ matrix.toxenv == '' }}
               run: tox -e py -- ${{ matrix.pytest-args }}
+
     coverage:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-22.04
         name: Validate coverage
         steps:
             - uses: actions/checkout@v4
             - name: Setup python
               uses: actions/setup-python@v5
               with:
-                  python-version: 3.12
+                  python-version: "3.13"
                   architecture: x64
+
             - run: pip install tox
-            - run: tox -e py312-cover,coverage
+            - run: tox -e py313-cover,coverage
     docs:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-22.04
         name: Build the documentation
         steps:
             - uses: actions/checkout@v4
             - name: Setup python
               uses: actions/setup-python@v5
               with:
-                  python-version: 3.8
+                  python-version: "3.13"
                   architecture: x64
             - run: pip install tox
             - run: tox -e docs
     lint:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-22.04
         name: Lint the package
         steps:
             - uses: actions/checkout@v4
             - name: Setup python
               uses: actions/setup-python@v5
               with:
-                  python-version: 3.8
+                  python-version: "3.13"
                   architecture: x64
             - run: pip install tox
             - run: tox -e lint
