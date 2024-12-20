@@ -715,7 +715,16 @@ your application and tries to run it, there just is no request data, because
 there isn't any real web request.  Therefore some parts of your application and
 some Pyramid APIs will not work.
 
-For this reason, :app:`Pyramid` makes it possible to run a script in an
+To assist with script writing :app:`Pyramid` provides the
+:mod:`paster <pyramid.paster>` module.
+
+.. versionchanged:: 2.0
+   Users of :mod:`paster <pyramid.paster>` are expected to themselves
+   handle any exceptions that might be raised by the :term:`plaster`
+   library, reporting to the user any problems (non-existant files,
+   etc.) with obtaining settings.
+
+:app:`Pyramid` makes it possible to run a script in an
 environment much like the environment produced when a particular
 :term:`request` reaches your :app:`Pyramid` application.  This is achieved by
 using the :func:`pyramid.paster.bootstrap` command in the body of your script.

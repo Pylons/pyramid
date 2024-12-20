@@ -174,7 +174,7 @@ class DummyLoader:
         self.server = server
         self.calls = []
 
-    def __call__(self, uri):
+    def __call__(self, uri, out=None):
         import plaster
 
         self.uri = plaster.parse_uri(uri)

@@ -52,6 +52,14 @@ Bug Fixes
 
   See https://github.com/Pylons/pyramid/pull/3742
 
+- When a bad settings URI (usually a path to a non-existant file) is
+  supplied to one of pyramid's command line programs, and in general
+  when there is a reason why a settings file cannot be used, produce
+  an error message instead of a traceback.
+
+  Applications which import pyramid.paster must handle the
+  plaster.exceptions.PlasterError exception themselves.
+
 Backward Incompatibilities
 --------------------------
 

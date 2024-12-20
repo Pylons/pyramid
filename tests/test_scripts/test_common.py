@@ -1,4 +1,8 @@
+from plaster.exceptions import PlasterError
+import pytest
 import unittest
+
+import pyramid.scripts.common
 
 
 class TestParseVars(unittest.TestCase):
@@ -14,3 +18,22 @@ class TestParseVars(unittest.TestCase):
 
         vars = ['a']
         self.assertRaises(ValueError, parse_vars, vars)
+
+
+def test_get_config_loader_raises():
+    with pytest.raises(PlasterError):
+        pyramid.scripts.common.get_config_loader('invalidscheme:/foo')
+
+
+def test_get_config_loader_calls():
+    def reporter(text):
+        nonlocal reporter_called
+        reporter_called = True
+
+    reporter_called = False
+    with pytest.raises(SystemExit):
+        pyramid.scripts.common.get_config_loader(
+            'invalidscheme:/foo', reporter
+        )
+
+    assert reporter_called is True

@@ -140,7 +140,7 @@ class PRequestCommand:
         config_vars.setdefault('__script__', self.script_name)
         path = self.args.path_info
 
-        loader = self._get_config_loader(config_uri)
+        loader = self._get_config_loader(config_uri, self.out)
         loader.setup_logging(config_vars)
 
         app = loader.get_wsgi_app(self.args.app_name, config_vars)
