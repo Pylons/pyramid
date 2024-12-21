@@ -66,13 +66,10 @@ class Test_InstancePropertyHelper(unittest.TestCase):
         self.assertEqual(1, foo.y)
 
     def test_property_without_name(self):
-        def worker(obj):  # pragma: no cover
-            pass
-
         foo = Dummy()
         helper = self._getTargetClass()
         self.assertRaises(
-            ValueError, helper.set_property, foo, property(worker)
+            ValueError, helper.set_property, foo, "has_no___name__"
         )
 
     def test_property_with_name(self):
@@ -271,11 +268,8 @@ class Test_InstancePropertyMixin(unittest.TestCase):
         self.assertEqual(1, foo.y)
 
     def test_property_without_name(self):
-        def worker(obj):  # pragma: no cover
-            pass
-
         foo = self._makeOne()
-        self.assertRaises(ValueError, foo.set_property, property(worker))
+        self.assertRaises(ValueError, foo.set_property, "has_no___name__")
 
     def test_property_with_name(self):
         def worker(obj):
