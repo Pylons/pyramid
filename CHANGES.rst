@@ -55,7 +55,7 @@ Bug Fixes
 Backward Incompatibilities
 --------------------------
 
-- Drop support for Python 3.6 and 3.7.
+- Drop support for Python 3.6 3.7, and 3.8.
 
 - Drop support for l*gettext() methods in the i18n module.
   These have been deprecated in Python's gettext module since 3.8, and
