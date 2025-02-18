@@ -188,7 +188,7 @@ class HttpHeaderCSRFStoragePolicy:
             response.headers.add(self.header_name, token)
 
         request.add_response_callback(set_header)
-        
+
         return token
 
     def get_csrf_token(self, request):
@@ -198,7 +198,7 @@ class HttpHeaderCSRFStoragePolicy:
 
         if not token:
             token = self.new_csrf_token(request)
-        
+
         return token
 
     def check_csrf_token(self, request, supplied_token):
