@@ -1,5 +1,5 @@
-from urllib.parse import urlparse
 import secrets
+from urllib.parse import urlparse
 from webob.cookies import CookieProfile
 from zope.interface import implementer
 
