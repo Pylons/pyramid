@@ -1,5 +1,5 @@
 from urllib.parse import urlparse
-import uuid
+import secrets
 from webob.cookies import CookieProfile
 from zope.interface import implementer
 
@@ -64,7 +64,7 @@ class SessionCSRFStoragePolicy:
 
     """
 
-    _token_factory = staticmethod(lambda: text_(uuid.uuid4().hex))
+    _token_factory = staticmethod(lambda: text_(secrets.token_hex()))
 
     def __init__(self, key='_csrft_'):
         self.key = key
@@ -109,7 +109,7 @@ class CookieCSRFStoragePolicy:
 
     """
 
-    _token_factory = staticmethod(lambda: text_(uuid.uuid4().hex))
+    _token_factory = staticmethod(lambda: text_(secrets.token_hex()))
 
     def __init__(
         self,
@@ -174,7 +174,7 @@ class HttpHeaderCSRFStoragePolicy:
 
     """
 
-    _token_factory = staticmethod(lambda: text_(uuid.uuid4().hex))
+    _token_factory = staticmethod(lambda: text_(secrets.token_hex()))
 
     def __init__(self, header_name='X-CSRF-Token'):
         self.header_name = header_name
