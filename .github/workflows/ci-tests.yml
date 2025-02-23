@@ -23,7 +23,7 @@ jobs:
                 os:
                     - "ubuntu-24.04"
                     - "windows-2022"
-                    - "macos-11"
+                    - "macos-13"
                 architecture:
                     - x64
                     - x86
@@ -40,7 +40,7 @@ jobs:
                     # Linux and macOS don't have x86 python
                     - os: "ubuntu-24.04"
                       architecture: x86
-                    - os: "macos-11"
+                    - os: "macos-13"
                       architecture: x86
 
         name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
