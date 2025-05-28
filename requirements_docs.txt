@@ -1,6 +1,6 @@
 # requirements to build the docs
 
-Sphinx >= 3.0.0  # Force RTD to use >= 3.0.0
+sphinx
 docutils
 pylons-sphinx-themes >= 1.0.8  # Ethical Ads
 pylons_sphinx_latesturl

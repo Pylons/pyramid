@@ -63,7 +63,6 @@ prequest = "pyramid.scripts.prequest:main"
 pdistreport = "pyramid.scripts.pdistreport:main"
 
 [project.entry-points."paste.server_runner"]
-tomatoes = "spam:main_tomatoes"
 wsgiref = "pyramid.scripts.pserve:wsgiref_server_runner"
 cherrypy = "pyramid.scripts.pserve:cherrypy_server_runner"
 
@@ -73,12 +72,30 @@ python = "pyramid.scripts.pshell:python_shell_runner"
 
 [project.urls]
 Homepage = "https://trypyramid.com"
-# dynamic to go to branch??
 Documentation = "https://docs.pylonsproject.org/projects/pyramid/en/latest/"
 Repository = "https://github.com/Pylons/pyramid"
 Issues = "https://github.com/Pylons/pyramid/issues"
 # add to readme somehow?
 Changelog = "https://github.com/Pylons/pyramid/blob/main/CHANGES.rst"
+
+[project.optional-dependencies]
+doc = [
+    "sphinx >= 8",
+    "docutils",
+    "pylons-sphinx-themes >= 1.0.8",  # Ethical Ads
+    "pylons_sphinx_latesturl",
+    "repoze.sphinx.autointerface",
+    "sphinx-copybutton",
+    "sphinxcontrib-autoprogram",
+]
+test = [
+    "webtest",
+    "zope.component",
+    "coverage",
+    "pytest",
+    "pytest-cov",
+]
+
 
 [tool.black]
 line-length = 79
