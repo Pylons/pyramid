@@ -21,15 +21,15 @@ readme = {file = "README.rst", content-type = "text/x-rst"}
 
 requires-python = ">=3.9"
 dependencies = [
-    "hupper >= 1.5",  # ignore_files support
+    "hupper",
     "plaster",
     "plaster_pastedeploy",
     "setuptools",
-    "translationstring >= 0.4",  # py3 compat
-    "venusian >= 1.0",  # ``ignore``
+    "translationstring",
+    "venusian",
     "webob >= 1.8.3",  # Accept.parse_offer
-    "zope.deprecation >= 3.5.0",  # py3 compat
-    "zope.interface >= 3.8.0",  # has zope.interface.registry
+    "zope.deprecation",
+    "zope.interface",
 ]
 
 keywords = ["web", "wsgi", "pylons", "pyramid"]

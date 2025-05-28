@@ -15,11 +15,11 @@ jobs:
         strategy:
             matrix:
                 py:
-                    - "3.8"
                     - "3.9"
                     - "3.10"
                     - "3.11"
                     - "3.12"
+                    - "3.13"
                     - "pypy-3.8"
                 os:
                     - "ubuntu-20.04"
@@ -76,7 +76,7 @@ jobs:
             - name: Setup python
               uses: actions/setup-python@v5
               with:
-                  python-version: 3.8
+                  python-version: 3.12
                   architecture: x64
             - run: pip install tox
             - run: tox -e docs
@@ -88,7 +88,8 @@ jobs:
             - name: Setup python
               uses: actions/setup-python@v5
               with:
-                  python-version: 3.8
+                  python-version: 3.9
                   architecture: x64
             - run: pip install tox
             - run: tox -e lint
+
