@@ -1,5 +1,0 @@
-webtest
-zope.component
-coverage
-pytest
-pytest-cov
