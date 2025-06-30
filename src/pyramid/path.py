@@ -6,7 +6,7 @@ import pkg_resources
 import sys
 from zope.interface import implementer
 
-from pyramid.interfaces import IAssetDescriptor
+from pyramid.interfaces import IAssetDescriptor, IPackageOverrides
 
 init_names = ['__init__%s' % x for x in SOURCE_SUFFIXES]
 
@@ -171,6 +171,10 @@ class AssetResolver(Resolver):
     absolute asset spec would be ``xml.minidom:template.pt``.
     """
 
+    def __init__(self, package=CALLER_PACKAGE, registry=None):
+        self.registry = registry
+        super().__init__(package=package)
+
     def resolve(self, spec):
         """
         Resolve the asset spec named as ``spec`` to an object that has the
@@ -213,7 +217,12 @@ class AssetResolver(Resolver):
                 raise ValueError(
                     f'relative spec {spec!r} irresolveable without package'
                 )
-        return PkgResourcesAssetDescriptor(package_name, path)
+
+        from pyramid.threadlocal import get_current_registry
+
+        registry = self.registry or get_current_registry()
+        overrides = registry.queryUtility(IPackageOverrides, package_name)
+        return PkgResourcesAssetDescriptor(package_name, path, overrides)
 
 
 class DottedNameResolver(Resolver):
@@ -402,28 +411,52 @@ class DottedNameResolver(Resolver):
 class PkgResourcesAssetDescriptor:
     pkg_resources = pkg_resources
 
-    def __init__(self, pkg_name, path):
+    def __init__(self, pkg_name, path, overrides=None):
         self.pkg_name = pkg_name
         self.path = path
+        self.overrides = overrides
 
     def absspec(self):
         return f'{self.pkg_name}:{self.path}'
 
     def abspath(self):
-        return os.path.abspath(
-            self.pkg_resources.resource_filename(self.pkg_name, self.path)
-        )
+        if self.overrides is not None:
+            filename = self.overrides.get_filename(self.path)
+        else:
+            filename = None
+        if filename is None:
+            filename = self.pkg_resources.resource_filename(
+                self.pkg_name,
+                self.path,
+            )
+        return os.path.abspath(filename)
 
     def stream(self):
+        if self.overrides is not None:
+            stream = self.overrides.get_stream(self.path)
+            if stream is not None:
+                return stream
         return self.pkg_resources.resource_stream(self.pkg_name, self.path)
 
     def isdir(self):
+        if self.overrides is not None:
+            result = self.overrides.isdir(self.path)
+            if result is not None:
+                return result
         return self.pkg_resources.resource_isdir(self.pkg_name, self.path)
 
     def listdir(self):
+        if self.overrides is not None:
+            result = self.overrides.listdir(self.path)
+            if result is not None:
+                return result
         return self.pkg_resources.resource_listdir(self.pkg_name, self.path)
 
     def exists(self):
+        if self.overrides is not None:
+            result = self.overrides.exists(self.path)
+            if result is not None:
+                return result
         return self.pkg_resources.resource_exists(self.pkg_name, self.path)
 
 
