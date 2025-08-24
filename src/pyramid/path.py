@@ -96,7 +96,7 @@ def package_path(package):
     # the result
     prefix = getattr(package, '__abspath__', None)
     if prefix is None:
-        prefix = pkg_resources.resource_filename(package.__name__, '')
+        prefix = resource_filename(package.__name__, '')
         # pkg_resources doesn't care whether we feed it a package
         # name or a module name within the package, the result
         # will be the same: a directory name to the package itself
