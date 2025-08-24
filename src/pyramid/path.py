@@ -163,3 +163,9 @@ class FSAssetDescriptor:
 
     def exists(self):
         return os.path.exists(self.path)
+
+
+# We're importing these classes for backwards compatibility, because these used
+# to exist in `pyramid.path`.
+# This must be at the bottom of the file to avoid a circular import.
+from .resolver import AssetResolver, DottedNameResolver, Resolver  # noqa
