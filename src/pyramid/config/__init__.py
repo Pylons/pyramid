@@ -36,8 +36,9 @@ from pyramid.interfaces import (
     IDebugLogger,
     IExceptionResponse,
 )
-from pyramid.path import DottedNameResolver, caller_package, package_of
+from pyramid.path import caller_package, package_of
 from pyramid.registry import Introspectable, Introspector, Registry
+from pyramid.resolver import DottedNameResolver
 from pyramid.router import Router
 from pyramid.settings import aslist
 from pyramid.threadlocal import manager
