@@ -4,6 +4,20 @@ import unittest
 here = os.path.abspath(os.path.dirname(__file__))
 
 
+class TestResourceFilename(unittest.TestCase):
+    def _callFUT(self, package, name):
+        from pyramid.path import resource_filename
+
+        return resource_filename(package, name)
+
+    def test_returns_path(self):
+        path = self._callFUT('tests', 'test_path.py')
+        self.assertIsInstance(path, str)
+        # If it's a real path, we should be able to open and read from it.
+        with open(path) as fh:
+            assert fh.read(1)
+
+
 class TestCallerPath(unittest.TestCase):
     def tearDown(self):
         from . import test_path

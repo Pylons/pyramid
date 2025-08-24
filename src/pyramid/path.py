@@ -1,4 +1,8 @@
+import atexit
+from contextlib import ExitStack
+import functools
 from importlib.machinery import SOURCE_SUFFIXES
+import importlib.resources
 import os
 import pkg_resources
 import sys
@@ -7,6 +11,30 @@ from zope.interface import implementer
 from pyramid.interfaces import IAssetDescriptor
 
 init_names = ['__init__%s' % x for x in SOURCE_SUFFIXES]
+
+
+@functools.lru_cache(maxsize=None)
+def resource_filename(package, name):
+    """
+    Return a filename on the filesystem for the given resource.  If the
+    resource does not exist in the filesystem (e.g. in a zipped egg), it will
+    be extracted to a temporary directory and cleaned up when the application
+    exits.
+
+    This function is equivalent to the now-deprecated
+    ``pkg_resources.resource_filename``.
+
+    This function is only included in order to provide legacy functionality;
+    use should be avoided.  Instead prefer to use ``importlib.resource`` APIs
+    directly.
+
+    """
+    ref = importlib.resources.files(package) / name
+
+    manager = ExitStack()
+    atexit.register(manager.close)
+    path = manager.enter_context(importlib.resources.as_file(ref))
+    return str(path)
 
 
 def caller_path(path, level=2):
