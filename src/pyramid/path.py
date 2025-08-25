@@ -14,12 +14,34 @@ init_names = ['__init__%s' % x for x in SOURCE_SUFFIXES]
 
 
 @functools.lru_cache(maxsize=None)
-def resource_filename(package, name):
+def ref_filename(ref):
+    """Return a filename on the filesystem for the given resource.
+
+    If the resource does not exist in the filesystem (e.g. in a zipped egg), it
+    will be extracted to a temporary directory and cleaned up when the
+    application exits.
+
+    Accessing resources via filesystem is discouraged, instead consider
+    directly accessing contents iva the ``importlib.resource`` APIs.
+
+    :param ref:  A reference pointing to the desired resource.
+    :type ref: importlib.resources.abc.Traversable
+    :return:  The filename on the filesystem.
+    :rtype:  str
+
     """
-    Return a filename on the filesystem for the given resource.  If the
-    resource does not exist in the filesystem (e.g. in a zipped egg), it will
-    be extracted to a temporary directory and cleaned up when the application
-    exits.
+    manager = ExitStack()
+    atexit.register(manager.close)
+    path = manager.enter_context(importlib.resources.as_file(ref))
+    return str(path)
+
+
+def resource_filename(package, name):
+    """Return a filename on the filesystem for the given resource.
+
+    If the resource does not exist in the filesystem (e.g. in a zipped egg), it
+    will be extracted to a temporary directory and cleaned up when the
+    application exits.
 
     This function is equivalent to the now-deprecated
     ``pkg_resources.resource_filename``.
@@ -28,13 +50,16 @@ def resource_filename(package, name):
     use should be avoided.  Instead prefer to use ``importlib.resource`` APIs
     directly.
 
+    :param package:  The package containing the resource.
+    :type package: str
+    :param name:  The name of the resource within the package.
+    :type name: str
+    :return:  The filename on the filesystem.
+    :rtype:  str
+
     """
     ref = importlib.resources.files(package) / name
-
-    manager = ExitStack()
-    atexit.register(manager.close)
-    path = manager.enter_context(importlib.resources.as_file(ref))
-    return str(path)
+    return ref_filename(ref)
 
 
 def caller_path(path, level=2):

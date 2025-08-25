@@ -4,6 +4,21 @@ import unittest
 here = os.path.abspath(os.path.dirname(__file__))
 
 
+class TestRefFilename(unittest.TestCase):
+    def _callFUT(self, ref):
+        from pyramid.path import ref_filename
+
+        return ref_filename(ref)
+
+    def test_returns_path(self):
+        import importlib.resources
+
+        ref = importlib.resources.files('tests.pkgs.assets') / 'foo.txt'
+        path = self._callFUT(ref)
+        expected = os.path.join(here, 'pkgs/assets/foo.txt')
+        self.assertEqual(path, expected)
+
+
 class TestResourceFilename(unittest.TestCase):
     def _callFUT(self, package, name):
         from pyramid.path import resource_filename
