@@ -1,3 +1,4 @@
+import importlib.resources
 import os
 import pkg_resources
 import sys
@@ -6,6 +7,7 @@ from zope.interface import implementer
 from pyramid.config.actions import action_method
 from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import PHASE1_CONFIG, IPackageOverrides
+from pyramid.path import ref_filename
 from pyramid.threadlocal import get_current_registry
 
 
@@ -219,39 +221,38 @@ class PackageAssetSource:
         else:
             self.pkg_name = package
         self.prefix = prefix
-
-    def get_path(self, resource_name):
-        return f'{self.prefix}{resource_name}'
+        self._base_ref = importlib.resources.files(package) / prefix
 
     def get_filename(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_filename(self.pkg_name, path)
+        ref = self._base_ref / resource_name
+        if ref.exists():
+            return ref_filename(ref)
 
     def get_stream(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_stream(self.pkg_name, path)
+        ref = self._base_ref / resource_name
+        if ref.exists():
+            return open(ref, 'rb')
 
     def get_string(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_string(self.pkg_name, path)
+        ref = self._base_ref / resource_name
+        if ref.exists():
+            with open(ref, 'rb') as fh:
+                return fh.read()
 
     def exists(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
+        ref = self._base_ref / resource_name
+        if ref.exists():
             return True
 
     def isdir(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_isdir(self.pkg_name, path)
+        ref = self._base_ref / resource_name
+        if ref.exists():
+            return ref.is_dir()
 
     def listdir(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_listdir(self.pkg_name, path)
+        ref = self._base_ref / resource_name
+        if ref.exists():
+            return list(ref.iterdir())
 
 
 class FSAssetSource:
