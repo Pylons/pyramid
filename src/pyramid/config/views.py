@@ -2338,14 +2338,7 @@ class StaticURLInfo:
             pathspec = f'{pkg_name}:{pkg_subpath}{subpath}'
             overrides = registry.queryUtility(IPackageOverrides, name=pkg_name)
             if overrides is not None:
-                resource_name = posixpath.join(pkg_subpath, subpath)
-                sources = overrides.filtered_sources(resource_name)
-                for source, filtered_path in sources:
-                    rawspec = source.get_path(filtered_path)
-                    if hasattr(source, 'pkg_name'):
-                        rawspec = f'{source.pkg_name}:{rawspec}'
-                    break
-
+                rawspec = overrides.get_spec(f'{pkg_subpath}{subpath}')
         else:
             pathspec = pkg_subpath + subpath
 
@@ -2354,6 +2347,7 @@ class StaticURLInfo:
 
         kw['pathspec'] = pathspec
         kw['rawspec'] = rawspec
+        print(kw)
         for spec_, cachebust, explicit in reversed(self.cache_busters):
             if (explicit and rawspec.startswith(spec_)) or (
                 not explicit and pathspec.startswith(spec_)
