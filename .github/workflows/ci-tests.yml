@@ -25,9 +25,6 @@ jobs:
                     - "ubuntu-latest"
                     - "windows-latest"
                     - "macos-latest"
-                architecture:
-                    - x64
-                    - x86
 
                 include:
                     # Only run coverage on ubuntu-latest, except on pypy3
@@ -37,14 +34,7 @@ jobs:
                       py: "pypy-3.8"
                       pytest-args: ""
 
-                exclude:
-                    # Linux doesn't have x86 python
-                    - os: "ubuntu-latest"
-                      architecture: x86
-                    - os: "macos-latest"
-                      architecture: x86
-
-        name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
+        name: "Python: ${{ matrix.py }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v4
@@ -52,7 +42,6 @@ jobs:
               uses: actions/setup-python@v5
               with:
                   python-version: ${{ matrix.py }}
-                  architecture: ${{ matrix.architecture }}
             - run: pip install tox
             - name: Running tox
               run: tox -e py -- ${{ matrix.pytest-args }}
@@ -65,7 +54,6 @@ jobs:
               uses: actions/setup-python@v5
               with:
                   python-version: 3.12
-                  architecture: x64
             - run: pip install tox
             - run: tox -e py312-cover,coverage
     docs:
@@ -77,7 +65,6 @@ jobs:
               uses: actions/setup-python@v5
               with:
                   python-version: 3.8
-                  architecture: x64
             - run: pip install tox
             - run: tox -e docs
     lint:
@@ -89,6 +76,5 @@ jobs:
               uses: actions/setup-python@v5
               with:
                   python-version: 3.8
-                  architecture: x64
             - run: pip install tox
             - run: tox -e lint
