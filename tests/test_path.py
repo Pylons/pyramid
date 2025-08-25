@@ -11,11 +11,9 @@ class TestResourceFilename(unittest.TestCase):
         return resource_filename(package, name)
 
     def test_returns_path(self):
-        path = self._callFUT('tests', 'test_path.py')
-        self.assertIsInstance(path, str)
-        # If it's a real path, we should be able to open and read from it.
-        with open(path) as fh:
-            assert fh.read(1)
+        path = self._callFUT('tests.pkgs.assets', 'foo.txt')
+        expected = os.path.join(here, 'pkgs/assets/foo.txt')
+        self.assertEqual(path, expected)
 
 
 class TestCallerPath(unittest.TestCase):
