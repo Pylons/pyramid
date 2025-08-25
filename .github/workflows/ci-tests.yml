@@ -22,26 +22,26 @@ jobs:
                     - "3.12"
                     - "pypy-3.8"
                 os:
-                    - "ubuntu-20.04"
-                    - "windows-2022"
-                    - "macos-11"
+                    - "ubuntu-latest"
+                    - "windows-latest"
+                    - "macos-latest"
                 architecture:
                     - x64
                     - x86
 
                 include:
-                    # Only run coverage on ubuntu-20.04, except on pypy3
-                    - os: "ubuntu-20.04"
+                    # Only run coverage on ubuntu-latest, except on pypy3
+                    - os: "ubuntu-latest"
                       pytest-args: "--cov"
-                    - os: "ubuntu-20.04"
+                    - os: "ubuntu-latest"
                       py: "pypy-3.8"
                       pytest-args: ""
 
                 exclude:
-                    # Linux and macOS don't have x86 python
-                    - os: "ubuntu-20.04"
+                    # Linux doesn't have x86 python
+                    - os: "ubuntu-latest"
                       architecture: x86
-                    - os: "macos-11"
+                    - os: "macos-latest"
                       architecture: x86
 
         name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
@@ -57,7 +57,7 @@ jobs:
             - name: Running tox
               run: tox -e py -- ${{ matrix.pytest-args }}
     coverage:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-latest
         name: Validate coverage
         steps:
             - uses: actions/checkout@v4
@@ -69,7 +69,7 @@ jobs:
             - run: pip install tox
             - run: tox -e py312-cover,coverage
     docs:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-latest
         name: Build the documentation
         steps:
             - uses: actions/checkout@v4
@@ -81,7 +81,7 @@ jobs:
             - run: pip install tox
             - run: tox -e docs
     lint:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-latest
         name: Lint the package
         steps:
             - uses: actions/checkout@v4
