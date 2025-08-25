@@ -26,14 +26,6 @@ jobs:
                     - "windows-latest"
                     - "macos-latest"
 
-                include:
-                    # Only run coverage on ubuntu-latest, except on pypy3
-                    - os: "ubuntu-latest"
-                      pytest-args: "--cov"
-                    - os: "ubuntu-latest"
-                      py: "pypy-3.8"
-                      pytest-args: ""
-
         name: "Python: ${{ matrix.py }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
         steps:
