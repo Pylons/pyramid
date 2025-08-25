@@ -122,6 +122,12 @@ class PackageOverrides:
             if o is not None:
                 yield o
 
+    def get_spec(self, resource_name):
+        for source, path in self.filtered_sources(resource_name):
+            result = source.get_spec(path)
+            if result is not None:
+                return result
+
     def get_filename(self, resource_name):
         for source, path in self.filtered_sources(resource_name):
             result = source.get_filename(path)
