@@ -359,6 +359,7 @@ def SignedCookieSessionFactory(
     hashalg='sha512',
     salt='pyramid.session.',
     serializer=None,
+    fips=False
 ):
     """
     Configure a :term:`session factory` which will provide signed
@@ -475,7 +476,7 @@ def SignedCookieSessionFactory(
         serializer = JSONSerializer()
 
     signed_serializer = SignedSerializer(
-        secret, salt, hashalg, serializer=serializer
+        secret, salt, hashalg, serializer=serializer, fips=fips
     )
 
     return BaseCookieSessionFactory(
