@@ -3,9 +3,8 @@ import os
 import pickle
 import time
 from webob.cookies import JSONSerializer, SignedSerializer
-from zope.deprecation import deprecated
+from zope.deprecation import deprecation
 from zope.interface import implementer
-
 from pyramid.csrf import check_csrf_origin, check_csrf_token
 from pyramid.interfaces import ISession
 from pyramid.util import bytes_, text_
@@ -78,7 +77,7 @@ class PickleSerializer:
         return pickle.dumps(appstruct, self.protocol)
 
 
-deprecated(
+deprecation.deprecated(
     'PickleSerializer',
     'pyramid.session.PickleSerializer is deprecated as of Pyramid 2.0 for '
     'security concerns. Use pyramid.session.JSONSerializer or reference the '
@@ -494,14 +493,14 @@ def SignedCookieSessionFactory(
 
 
 check_csrf_origin = check_csrf_origin  # api
-deprecated(
+deprecation.deprecated(
     'check_csrf_origin',
     'pyramid.session.check_csrf_origin is deprecated as of Pyramid '
     '1.9. Use pyramid.csrf.check_csrf_origin instead.',
 )
 
 check_csrf_token = check_csrf_token  # api
-deprecated(
+deprecation.deprecated(
     'check_csrf_token',
     'pyramid.session.check_csrf_token is deprecated as of Pyramid '
     '1.9. Use pyramid.csrf.check_csrf_token instead.',

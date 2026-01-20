@@ -1,4 +1,4 @@
-from zope.deprecation import deprecated
+from zope.deprecation import deprecation
 from zope.interface import implementer, providedBy
 
 from pyramid.interfaces import (
@@ -113,7 +113,7 @@ def principals_allowed_by_permission(context, permission):
     return policy.principals_allowed_by_permission(context, permission)
 
 
-deprecated(
+deprecation.deprecated(
     'principals_allowed_by_permission',
     'The new security policy has removed the concept of principals.  See '
     '"Upgrading Authentication/Authorization" in "What\'s New in Pyramid 2.0" '
@@ -307,7 +307,7 @@ class AuthenticationAPIMixin:
             return authn.unauthenticated_userid(self)
         return security.authenticated_userid(self)
 
-    unauthenticated_userid = deprecated(
+    unauthenticated_userid = deprecation.deprecated(
         unauthenticated_userid,
         (
             'The new security policy has deprecated unauthenticated_userid. '
@@ -338,7 +338,7 @@ class AuthenticationAPIMixin:
             return authn.effective_principals(self)
         return [Everyone]
 
-    effective_principals = deprecated(
+    effective_principals = deprecation.deprecated(
         effective_principals,
         (
             'The new security policy has deprecated effective_principals. '
@@ -479,7 +479,7 @@ for attr in (
     'Deny',
     'Everyone',
 ):
-    deprecated(
+    deprecation.deprecated(
         attr,
         '"pyramid.security.{attr}" is deprecated in Pyramid 2.0. Adjust your '
         'import to "pyramid.authorization.{attr}"'.format(attr=attr),

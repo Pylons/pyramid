@@ -177,7 +177,7 @@ The console will show ``pip`` checking for packages and installing missing packa
 
 .. code-block:: bash
 
-    Successfully installed Mako-1.3.2 PasteDeploy-3.1.0 Pygments-2.17.2 SQLAlchemy-2.0.25 WebTest-3.0.0 alembic-1.13.1 beautifulsoup4-4.12.3 coverage-7.4.1 greenlet-3.0.3 hupper-1.12.1 iniconfig-2.0.0 jinja2-3.1.3 markupsafe-2.1.5 packaging-23.2 plaster-1.1.2 plaster-pastedeploy-1.0.1 pluggy-1.4.0 pyramid-2.0.2 pyramid-debugtoolbar-4.12 pyramid-jinja2-2.10 pyramid-mako-1.1.0 pyramid-retry-2.1.1 pyramid-tm-2.5 pytest-8.0.0 pytest-cov-4.1.0 soupsieve-2.5 transaction-4.0 translationstring-1.4 tutorial-0.0 typing-extensions-4.9.0 venusian-3.1.0 waitress-2.1.2 webob-1.8.7 zope.deprecation-5.0 zope.interface-6.1 zope.sqlalchemy-3.1
+    Successfully installed Mako-1.3.2 PasteDeploy-3.1.0 Pygments-2.17.2 SQLAlchemy-2.0.25 WebTest-3.0.0 alembic-1.13.1 beautifulsoup4-4.12.3 coverage-7.4.1 greenlet-3.0.3 hupper-1.12.1 iniconfig-2.0.0 jinja2-3.1.3 markupsafe-2.1.5 packaging-23.2 plaster-1.1.2 plaster-pastedeploy-1.0.1 pluggy-1.4.0 pyramid-2.0.2 pyramid-debugtoolbar-4.12 pyramid-jinja2-2.10 pyramid-mako-1.1.0 pyramid-retry-2.1.1 pyramid-tm-2.5 pytest-8.0.0 pytest-cov-4.1.0 soupsieve-2.5 transaction-4.0 translationstring-1.4 tutorial-0.0 typing-extensions-4.9.0 venusian-3.1.0 waitress-2.1.2 webob-1.8.7 zope.deprecation-6.0 zope.interface-6.1 zope.sqlalchemy-3.1
 
 Testing requirements are defined in our project's ``pyproject.toml`` file in a ``testing`` optional dependency.
 

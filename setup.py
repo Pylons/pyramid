@@ -32,7 +32,7 @@ install_requires = [
     'translationstring >= 0.4',  # py3 compat
     'venusian >= 1.0',  # ``ignore``
     'webob >= 1.8.3',  # Accept.parse_offer
-    'zope.deprecation >= 3.5.0',  # py3 compat
+    'zope.deprecation >= 6.0',
     'zope.interface >= 3.8.0',  # has zope.interface.registry
 ]
 
