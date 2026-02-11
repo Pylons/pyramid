@@ -28,7 +28,7 @@ install_requires = [
     'hupper >= 1.5',  # ignore_files support
     'plaster',
     'plaster_pastedeploy',
-    'setuptools<81',
+    'setuptools < 82',  # needed for pkg_resources; see #3731
     'translationstring >= 0.4',  # py3 compat
     'venusian >= 1.0',  # ``ignore``
     'webob >= 1.8.3',  # Accept.parse_offer

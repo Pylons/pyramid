@@ -34,9 +34,9 @@ Features
 - Replace usage of ``pkg_resources`` in ``pdistreport`` and ``pshell`` CLI
   commands. See https://github.com/Pylons/pyramid/pull/3749
 
-- Temporarily pin ``setuptools<81`` to defend against planned removal of
-  ``pkg_resources`` on 2025/11/30. Work continues to fully remove
-  ``pkg_resources`` from Pyramid code.
+- Constrain ``setuptools < 82`` to defend against the removal of
+  ``pkg_resources`` in ``setuptools==82.0.0`` (released on 2026-02-08).
+  Work continues to fully remove ``pkg_resources`` from Pyramid code.
 
   See https://github.com/Pylons/pyramid/issues/3731
 
