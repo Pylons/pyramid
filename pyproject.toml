@@ -19,12 +19,12 @@ license-files = ["LICENSE.txt"]
 
 readme = {file = "README.rst", content-type = "text/x-rst"}
 
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "hupper",
     "plaster",
     "plaster_pastedeploy",
-    "setuptools",
+    "setuptools < 81",
     "translationstring",
     "venusian",
     "webob >= 1.8.3",  # Accept.parse_offer
@@ -38,10 +38,11 @@ classifiers = [
         "Intended Audience :: Developers",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Framework :: Pyramid",
@@ -50,8 +51,9 @@ classifiers = [
         "License :: Repoze Public License",
 ]
 
-[tool.setuptools.package-data]
-mypkg = ["*.txt", "*.rst"]
+# is there any package data?
+# [tool.setuptools.package-data]
+# pyramid = ["*.txt", "*.rst"]
 
 [project.scripts]
 pserve = "pyramid.scripts.pserve:main"
