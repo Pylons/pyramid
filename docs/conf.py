@@ -16,7 +16,7 @@ import warnings
 
 warnings.simplefilter('ignore', DeprecationWarning)
 
-import pkg_resources
+from importlib.metadata import version as pkg_version
 import pylons_sphinx_themes
 
 # skip raw nodes
@@ -98,7 +98,7 @@ copyright = '2008-%s, Agendaless Consulting' % thisyear
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = pkg_resources.get_distribution('pyramid').version
+version = pkg_version('pyramid')
 
 # The full version, including alpha/beta/rc tags.
 release = version
