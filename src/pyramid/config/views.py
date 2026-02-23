@@ -2,7 +2,6 @@ import functools
 import inspect
 import operator
 import os
-import posixpath
 from urllib.parse import quote, urljoin, urlparse, urlunparse
 import warnings
 from webob.acceptparse import Accept
