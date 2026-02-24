@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools<81", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
@@ -74,7 +74,8 @@ python = "pyramid.scripts.pshell:python_shell_runner"
 
 [project.urls]
 Homepage = "https://trypyramid.com"
-Documentation = "https://docs.pylonsproject.org/projects/pyramid/en/latest/"
+# Documentation = "https://docs.pylonsproject.org/projects/pyramid/en/latest/"
+Documentation = "https://docs.pylonsproject.org/projects/pyramid/en/2.1-branch/"
 Repository = "https://github.com/Pylons/pyramid"
 Issues = "https://github.com/Pylons/pyramid/issues"
 # add to readme somehow?
