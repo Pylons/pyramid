@@ -21,6 +21,7 @@ jobs:
                     - "3.11"
                     - "3.12"
                     - "3.13"
+                    - "3.14"
                     - "pypy-3.10"
                 os:
                     - "ubuntu-24.04" # x64
@@ -81,10 +82,10 @@ jobs:
             - name: Setup python
               uses: actions/setup-python@v6
               with:
-                  python-version: "3.13"
+                  python-version: "3.14"
                   architecture: x64
             - run: pip install tox
-            - run: tox -e py313-cover,coverage
+            - run: tox -e py314-cover,coverage
     docs:
         runs-on: ubuntu-24.04
         name: Build the documentation
@@ -93,7 +94,7 @@ jobs:
             - name: Setup python
               uses: actions/setup-python@v6
               with:
-                  python-version: "3.13"
+                  python-version: "3.14"
                   architecture: x64
             - run: pip install tox
             - run: tox -e docs
@@ -105,7 +106,7 @@ jobs:
             - name: Setup python
               uses: actions/setup-python@v6
               with:
-                  python-version: "3.13"
+                  python-version: "3.14"
                   architecture: x64
             - run: pip install tox
             - run: tox -e lint

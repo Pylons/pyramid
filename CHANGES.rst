@@ -4,12 +4,12 @@ unreleased
 Features
 --------
 
-- Add support for Python 3.12, and 3.13.
+- Add support for Python 3.12, 3.13, and 3.14.
 
 - Added HTTP 418 error code via `pyramid.httpexceptions.HTTPImATeapot`.
   See https://github.com/Pylons/pyramid/pull/3667
 
-- Base coverage reports in tests based on Python 3.12 instead of Python 3.8.
+- Base coverage reports in tests based on Python 3.14 instead of Python 3.8.
 
 - All scripts now pass a new option ``__script__`` when loading the WSGI app.
   For example, ``pserve`` sets ``__script__ == 'pserve'``. This works for

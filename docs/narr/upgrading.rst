@@ -90,6 +90,7 @@ Python is when security updates are no longer released.
 - `Python 3.11 Lifespan <https://devguide.python.org/versions/#versions>`_ 2027-10.
 - `Python 3.12 Lifespan <https://devguide.python.org/versions/#versions>`_ 2028-10.
 - `Python 3.13 Lifespan <https://devguide.python.org/versions/#versions>`_ 2029-10.
+- `Python 3.14 Lifespan <https://devguide.python.org/versions/#versions>`_ 2030-10.
 
 To determine the Python support for a specific release of Pyramid, view its
 ``tox.ini`` file at the root of the repository's version.
