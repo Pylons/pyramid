@@ -76,7 +76,7 @@ Homepage = "https://trypyramid.com"
 Documentation = "https://docs.pylonsproject.org/projects/pyramid/en/2.1-branch/"
 Repository = "https://github.com/Pylons/pyramid"
 Issues = "https://github.com/Pylons/pyramid/issues"
-Changelog = "https://docs.pylonsproject.org/projects/pyramid/en/2.1-branch/changes.html"
+Changelog = "https://docs.pylonsproject.org/projects/pyramid/en/2.1-branch/whatsnew-2.0.html"
 #Changelog = "https://github.com/Pylons/pyramid/blob/main/CHANGES.rst"
 
 [project.optional-dependencies]
