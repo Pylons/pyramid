@@ -13,7 +13,6 @@ description = "The Pyramid Web Framework, a Pylons project"
 authors = [
   {name = "Chris McDonough, Agendaless Consulting", email = "pylons-discuss@googlegroups.com"},
 ]
-
 # license = "BSD-derived (Repoze)"
 license-files = ["LICENSE.txt"]
 
@@ -81,7 +80,7 @@ Issues = "https://github.com/Pylons/pyramid/issues"
 Changelog = "https://github.com/Pylons/pyramid/blob/main/CHANGES.rst"
 
 [project.optional-dependencies]
-doc = [
+docs = [
     "sphinx >= 8",
     "docutils",
     "pylons-sphinx-themes >= 1.0.8",  # Ethical Ads
@@ -96,6 +95,15 @@ test = [
     "coverage",
     "pytest",
     "pytest-cov",
+]
+lint = [
+    "flake8~=6.1.0",
+    "black~=26.1.0",
+    "isort~=5.12",
+    "build",
+    "check-manifest",
+    "readme_renderer",
+    "twine",
 ]
 
 
