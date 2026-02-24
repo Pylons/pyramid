@@ -24,7 +24,7 @@ jobs:
                 # See https://github.com/actions/runner-images
                 os:
                     - "ubuntu-24.04" # x64
-                    - "windows-latest" # x64
+                    - "windows-2022" # x64
                     - "macos-15" # arm64
                     - "macos-15-intel" # x64
                 architecture:
@@ -40,18 +40,18 @@ jobs:
                     # Ubuntu does not have arm64 releases
                     - os: "ubuntu-24.04"
                       architecture: arm64
-                    # macOS 15 does not have Python 3.10 releases
+                    # macOS does not have Python 3.10 releases
                     - os: "macos-15"
                       py: "3.10"
                     - os: "macos-15-intel"
                       py: "3.10"
-                    # macOS 15 does not have PyPy releases
+                    # macOS does not have PyPy releases
                     - os: "macos-15"
                       py: "pypy-3.10"
                     - os: "macos-15-intel"
                       py: "pypy-3.10"
                     # Windows does not have arm64 releases
-                    - os: "windows-latest"
+                    - os: "windows-2022"
                       architecture: arm64
 
         name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
