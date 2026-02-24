@@ -48,7 +48,7 @@ Bug Fixes
   This also prevents issues where a ``request.url`` fails to be decoded when
   logging info when ``pyramid.debug_authorization`` is enabled.
 
-  See https://github.com/Pylons/pyramid/pull/3741/files
+  See https://github.com/Pylons/pyramid/pull/3741
 
 - Applications raising ``pyramid.exceptions.BadCSRFToken`` and
   ``pyramid.exceptions.BadCSRFOrigin`` were returning invalid HTTP status
@@ -64,6 +64,7 @@ Bug Fixes
   ``"latin-1"``.
   Previously ``UnicodeEncodeError`` was raised when ``supplied_token``
   could not be encoded to ``"latin-1"``.
+  See https://github.com/Pylons/pyramid/pull/3800
 
 Backward Incompatibilities
 --------------------------
