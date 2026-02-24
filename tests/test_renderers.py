@@ -37,13 +37,13 @@ class TestJSON(unittest.TestCase):
 
     def test_with_custom_adapter(self):
         request = testing.DummyRequest()
-        from datetime import datetime
+        from datetime import datetime, timezone
 
         def adapter(obj, req):
             self.assertEqual(req, request)
             return obj.isoformat()
 
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         renderer = self._makeOne()
         renderer.add_adapter(datetime, adapter)
         result = renderer(None)({'a': now}, {'request': request})
@@ -51,13 +51,13 @@ class TestJSON(unittest.TestCase):
 
     def test_with_custom_adapter2(self):
         request = testing.DummyRequest()
-        from datetime import datetime
+        from datetime import datetime, timezone
 
         def adapter(obj, req):
             self.assertEqual(req, request)
             return obj.isoformat()
 
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         renderer = self._makeOne(adapters=((datetime, adapter),))
         result = renderer(None)({'a': now}, {'request': request})
         self.assertEqual(result, '{"a": "%s"}' % now.isoformat())

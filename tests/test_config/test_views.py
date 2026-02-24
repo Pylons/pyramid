@@ -1,3 +1,4 @@
+from datetime import timezone
 import os
 import unittest
 import warnings
@@ -315,7 +316,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         self.assertFalse(wrapper is view)
         self.assertEqual(wrapper.__doc__, view.__doc__)
         request = testing.DummyRequest()
-        when = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        when = datetime.datetime.now(timezone.utc) + datetime.timedelta(days=1)
         result = wrapper(None, request)
         self.assertEqual(result, response)
         headers = dict(response.headerlist)
