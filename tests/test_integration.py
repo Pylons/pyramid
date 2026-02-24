@@ -1,5 +1,4 @@
-import datetime
-from datetime import timezone
+from datetime import datetime, timedelta, timezone
 import gc
 import locale
 import os
@@ -17,7 +16,7 @@ from pyramid.wsgi import wsgiapp
 from .pkgs.exceptionviewapp.models import AnException, NotAnException
 
 # 5 years from now (more or less)
-fiveyrsfuture = datetime.datetime.now(timezone.utc) + datetime.timedelta(
+fiveyrsfuture = datetime.now(timezone.utc) + timedelta(
     5 * 365
 )
 

@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import unittest
 
 from pyramid import testing
@@ -37,7 +38,6 @@ class TestJSON(unittest.TestCase):
 
     def test_with_custom_adapter(self):
         request = testing.DummyRequest()
-        from datetime import datetime, timezone
 
         def adapter(obj, req):
             self.assertEqual(req, request)
@@ -51,7 +51,6 @@ class TestJSON(unittest.TestCase):
 
     def test_with_custom_adapter2(self):
         request = testing.DummyRequest()
-        from datetime import datetime, timezone
 
         def adapter(obj, req):
             self.assertEqual(req, request)
