@@ -4,7 +4,7 @@ unreleased
 Features
 --------
 
-- Add support for Python 3.12.
+- Add support for Python 3.12, and 3.13.
 
 - Added HTTP 418 error code via `pyramid.httpexceptions.HTTPImATeapot`.
   See https://github.com/Pylons/pyramid/pull/3667
@@ -34,6 +34,11 @@ Features
 - Replace usage of ``pkg_resources`` in ``pdistreport`` and ``pshell`` CLI
   commands. See https://github.com/Pylons/pyramid/pull/3749
 
+- Constrain ``setuptools < 82`` to remain compatible with required ``pkg_resources``
+  features.
+  Work continues to fully remove ``pkg_resources`` from Pyramid code in future releases.
+  See https://github.com/Pylons/pyramid/pull/3795
+
 Bug Fixes
 ---------
 
@@ -55,7 +60,7 @@ Bug Fixes
 Backward Incompatibilities
 --------------------------
 
-- Drop support for Python 3.6, 3.7, and 3.8.
+- Drop support for Python 3.6, 3.7, 3.8, and 3.9.
 
 - Drop support for l*gettext() methods in the i18n module.
   These have been deprecated in Python's gettext module since 3.8, and
