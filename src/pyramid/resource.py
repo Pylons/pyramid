@@ -1,4 +1,4 @@
-""" Backwards compatibility shim module (forever). """
+"""Backwards compatibility shim module (forever)."""
 
 from pyramid.asset import *  # noqa b/w compat
 
