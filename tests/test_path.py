@@ -44,8 +44,9 @@ class TestCallerPath(unittest.TestCase):
         return caller_path(path, level)
 
     def test_isabs(self):
-        result = self._callFUT('/a/b/c')
-        self.assertEqual(result, '/a/b/c')
+        path = os.path.abspath('/a/b/c')
+        result = self._callFUT(path)
+        self.assertEqual(result, path)
 
     def test_pkgrelative(self):
         import os

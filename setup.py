@@ -28,7 +28,7 @@ install_requires = [
     'hupper >= 1.5',  # ignore_files support
     'plaster',
     'plaster_pastedeploy',
-    'setuptools',
+    'setuptools < 82',  # removed pkg_resources
     'translationstring >= 0.4',  # py3 compat
     'venusian >= 1.0',  # ``ignore``
     'webob >= 1.8.3',  # Accept.parse_offer
@@ -74,11 +74,10 @@ setup(
         "Intended Audience :: Developers",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Framework :: Pyramid",
@@ -100,7 +99,7 @@ setup(
     package_dir={'': 'src'},
     include_package_data=True,
     zip_safe=False,
-    python_requires='>=3.8',
+    python_requires='>=3.10',
     install_requires=install_requires,
     extras_require={'testing': testing_extras, 'docs': docs_extras},
     tests_require=tests_require,
