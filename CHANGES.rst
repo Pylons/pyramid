@@ -78,13 +78,10 @@ Backward Incompatibilities
 - Add `get_spec` method to `IPackageOverrides`.
   See https://github.com/Pylons/pyramid/pull/3792
 
-- When using a `cache buster`_ with `asset overrides`_, the cache buster will
+- When using a cache buster with asset overrides, the cache buster will
   find the first existing file in the override stack, rather than taking the
   first override regardless of whether the file exists or not.
   See https://github.com/Pylons/pyramid/pull/3792
-
-.. _cache buster: https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/assets.html#cache-busting
-.. _asset overrides: https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/assets.html#overriding-assets
 
 Deprecations
 ------------
