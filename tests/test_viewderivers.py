@@ -1203,9 +1203,7 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(inner_view.__module__, result.__module__)
         self.assertEqual(inner_view.__doc__, result.__doc__)
         request = self._makeRequest()
-        when = datetime.now(timezone.utc) + timedelta(
-            hours=1
-        )
+        when = datetime.now(timezone.utc) + timedelta(hours=1)
         result = result(None, request)
         self.assertEqual(result, response)
         headers = dict(result.headerlist)
@@ -1228,9 +1226,7 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(inner_view.__module__, result.__module__)
         self.assertEqual(inner_view.__doc__, result.__doc__)
         request = self._makeRequest()
-        when = datetime.now(timezone.utc) + timedelta(
-            hours=1
-        )
+        when = datetime.now(timezone.utc) + timedelta(hours=1)
         result = result(None, request)
         self.assertEqual(result, response)
         headers = dict(result.headerlist)
@@ -1253,9 +1249,7 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(inner_view.__module__, result.__module__)
         self.assertEqual(inner_view.__doc__, result.__doc__)
         request = self._makeRequest()
-        when = datetime.now(timezone.utc) + timedelta(
-            hours=1
-        )
+        when = datetime.now(timezone.utc) + timedelta(hours=1)
         result = result(None, request)
         self.assertEqual(result, response)
         headers = dict(result.headerlist)
