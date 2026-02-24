@@ -9,6 +9,9 @@ Pyramid
         :target: https://docs.pylonsproject.org/projects/pyramid/en/main
         :alt: main Documentation Status
 
+.. image:: https://img.shields.io/discord/1212201651218153582
+        :alt: Discord Server
+
 .. image:: https://img.shields.io/badge/IRC-Libera.Chat-blue.svg
         :target: https://web.libera.chat/#pyramid
         :alt: IRC Libera.Chat
