@@ -122,6 +122,12 @@ class PackageOverrides:
             if o is not None:
                 yield o
 
+    def get_spec(self, resource_name):
+        for source, path in self.filtered_sources(resource_name):
+            result = source.get_spec(path)
+            if result is not None:
+                return result
+
     def get_filename(self, resource_name):
         for source, path in self.filtered_sources(resource_name):
             result = source.get_filename(path)
@@ -223,6 +229,11 @@ class PackageAssetSource:
     def get_path(self, resource_name):
         return f'{self.prefix}{resource_name}'
 
+    def get_spec(self, resource_name):
+        path = self.get_path(resource_name)
+        if pkg_resources.resource_exists(self.pkg_name, path):
+            return f'{self.pkg_name}:{path}'
+
     def get_filename(self, resource_name):
         path = self.get_path(resource_name)
         if pkg_resources.resource_exists(self.pkg_name, path):
@@ -269,6 +280,9 @@ class FSAssetSource:
         else:
             path = self.prefix
         return path
+
+    def get_spec(self, resource_name):
+        return self.get_filename(resource_name)
 
     def get_filename(self, resource_name):
         path = self.get_path(resource_name)

@@ -1077,6 +1077,14 @@ class IPEP302Loader(Interface):
 class IPackageOverrides(IPEP302Loader):
     """Utility for pkg_resources overrides"""
 
+    def get_spec(resource_name):
+        """Return a specifier for the resource.
+
+        The specifier may be a dotted Python name or an absolute path on the
+        filesystem.
+
+        """
+
 
 # VH_ROOT_KEY is an interface; its imported from other packages (e.g.
 # traversalwrapper)

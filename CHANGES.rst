@@ -75,6 +75,14 @@ Backward Incompatibilities
   These have been deprecated in Python's gettext module since 3.8, and
   removed in Python 3.11.
 
+- Add `get_spec` method to `IPackageOverrides`.
+  See https://github.com/Pylons/pyramid/pull/3792
+
+- When using a cache buster with asset overrides, the cache buster will
+  find the first existing file in the override stack, rather than taking the
+  first override regardless of whether the file exists or not.
+  See https://github.com/Pylons/pyramid/pull/3792
+
 Deprecations
 ------------
 

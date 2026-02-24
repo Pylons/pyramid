@@ -4065,9 +4065,12 @@ class TestStaticURLInfo(unittest.TestCase):
         config = testing.setUp()
         try:
             request = testing.DummyRequest()
-            config.add_static_view('static', 'path')
+            config.add_static_view(
+                'static', 'tests.test_config.pkgs.cachebust:path/'
+            )
             config.override_asset(
-                'tests.test_config:path/', 'tests.test_config:other_path/'
+                'tests.test_config.pkgs.cachebust:path/',
+                'tests.test_config.pkgs.cachebust:override/',
             )
 
             def cb(val):
@@ -4077,11 +4080,21 @@ class TestStaticURLInfo(unittest.TestCase):
 
                 return cb_
 
-            config.add_cache_buster('path', cb('foo'))
-            result = request.static_url('path/foo.png')
+            config.add_cache_buster(
+                'tests.test_config.pkgs.cachebust:path/', cb('foo')
+            )
+            result = request.static_url(
+                'tests.test_config.pkgs.cachebust:path/foo.png'
+            )
             self.assertEqual(result, 'http://example.com/static/foo.png?x=foo')
-            config.add_cache_buster('other_path', cb('bar'), explicit=True)
-            result = request.static_url('path/foo.png')
+            config.add_cache_buster(
+                'tests.test_config.pkgs.cachebust:override/',
+                cb('bar'),
+                explicit=True,
+            )
+            result = request.static_url(
+                'tests.test_config.pkgs.cachebust:path/foo.png'
+            )
             self.assertEqual(result, 'http://example.com/static/foo.png?x=bar')
         finally:
             testing.tearDown()

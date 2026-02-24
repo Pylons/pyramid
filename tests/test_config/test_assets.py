@@ -638,6 +638,28 @@ class TestPackageOverrides(unittest.TestCase):
         po.overrides = overrides
         self.assertEqual(list(po.filtered_sources('whatever')), ['foo'])
 
+    def test_get_spec(self):
+        source = DummyAssetSource(spec='test:foo.pt')
+        overrides = [DummyOverride(None), DummyOverride((source, ''))]
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        po.overrides = overrides
+        result = po.get_spec('whatever')
+        self.assertEqual(result, 'test:foo.pt')
+        self.assertEqual(source.resource_name, '')
+
+    def test_get_spec_file_doesnt_exist(self):
+        source = DummyAssetSource(spec=None)
+        overrides = [
+            DummyOverride(None),
+            DummyOverride((source, 'wont_exist')),
+        ]
+        package = DummyPackage('package')
+        po = self._makeOne(package)
+        po.overrides = overrides
+        self.assertEqual(po.get_spec('whatever'), None)
+        self.assertEqual(source.resource_name, 'wont_exist')
+
     def test_get_filename(self):
         source = DummyAssetSource(filename='foo.pt')
         overrides = [DummyOverride(None), DummyOverride((source, ''))]
@@ -916,6 +938,24 @@ class TestPackageAssetSource(AssetSourceIntegrationTests, unittest.TestCase):
         klass = self._getTargetClass()
         return klass(package, prefix)
 
+    def test_get_spec(self):
+        source = self._makeOne('')
+        self.assertEqual(
+            source.get_spec('test_assets.py'),
+            'tests.test_config:test_assets.py',
+        )
+
+    def test_get_spec_with_prefix(self):
+        source = self._makeOne('test_assets.py')
+        self.assertEqual(
+            source.get_spec(''),
+            'tests.test_config:test_assets.py',
+        )
+
+    def test_get_spec_file_doesnt_exist(self):
+        source = self._makeOne('')
+        self.assertIsNone(source.get_spec('wont_exist'))
+
 
 class TestFSAssetSource(AssetSourceIntegrationTests, unittest.TestCase):
     def _getTargetClass(self):
@@ -926,6 +966,23 @@ class TestFSAssetSource(AssetSourceIntegrationTests, unittest.TestCase):
     def _makeOne(self, prefix, base_prefix=here):
         klass = self._getTargetClass()
         return klass(os.path.join(base_prefix, prefix))
+
+    def test_get_spec(self):
+        source = self._makeOne('')
+        self.assertEqual(
+            source.get_spec('test_assets.py'),
+            os.path.join(here, 'test_assets.py'),
+        )
+
+    def test_get_spec_with_prefix(self):
+        source = self._makeOne('test_assets.py')
+        self.assertEqual(
+            source.get_spec(''), os.path.join(here, 'test_assets.py')
+        )
+
+    def test_get_spec_file_doesnt_exist(self):
+        source = self._makeOne('')
+        self.assertEqual(source.get_spec('wont_exist'), None)
 
 
 class TestDirectoryOverride(unittest.TestCase):
@@ -1017,6 +1074,10 @@ class DummyPackage:
 class DummyAssetSource:
     def __init__(self, **kw):
         self.kw = kw
+
+    def get_spec(self, resource_name):
+        self.resource_name = resource_name
+        return self.kw['spec']
 
     def get_filename(self, resource_name):
         self.resource_name = resource_name
