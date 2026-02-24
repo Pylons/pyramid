@@ -10,6 +10,7 @@ Pyramid
         :alt: main Documentation Status
 
 .. image:: https://img.shields.io/discord/1212201651218153582
+        :target: https://discord.gg/2SZcvUVXbr
         :alt: Discord Server
 
 .. image:: https://img.shields.io/badge/IRC-Libera.Chat-blue.svg
