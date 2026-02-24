@@ -9,7 +9,7 @@ Pyramid
         :target: https://docs.pylonsproject.org/projects/pyramid/en/main
         :alt: main Documentation Status
 
-.. image:: https://img.shields.io/discord/1212201651218153582
+.. image:: https://img.shields.io/discord/1212201651218153582?label=Discord
         :target: https://discord.gg/2SZcvUVXbr
         :alt: Discord Server
 
