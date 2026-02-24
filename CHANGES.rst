@@ -57,6 +57,14 @@ Bug Fixes
 
   See https://github.com/Pylons/pyramid/pull/3742
 
+- The methods ``LegacySessionCSRFStoragePolicy.check_csrf_token``,
+  ``SessionCSRFStoragePolicy.check_csrf_token`` and
+  ``CookieCSRFStoragePolicy.check_csrf_token`` now use
+  ``errors='backslashreplace'`` when encoding the ``supplied_token`` to
+  ``"latin-1"``.
+  Previously ``UnicodeEncodeError`` was raised when ``supplied_token``
+  could not be encoded to ``"latin-1"``.
+
 Backward Incompatibilities
 --------------------------
 
