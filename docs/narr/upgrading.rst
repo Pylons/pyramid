@@ -86,7 +86,6 @@ At the time of a Pyramid version release, each supports all versions of Python
 through the end of their lifespans. The end-of-life for a given version of
 Python is when security updates are no longer released.
 
-- `Python 3.8 Lifespan <https://devguide.python.org/versions/#versions>`_ 2024-10.
 - `Python 3.9 Lifespan <https://devguide.python.org/versions/#versions>`_ 2025-10.
 - `Python 3.10 Lifespan <https://devguide.python.org/versions/#versions>`_ 2026-10.
 - `Python 3.11 Lifespan <https://devguide.python.org/versions/#versions>`_ 2027-10.

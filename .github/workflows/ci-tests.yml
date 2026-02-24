@@ -23,9 +23,8 @@ jobs:
                     - "3.13"
                     - "pypy-3.9"
                     - "pypy-3.10"
-                    # Pre-release
                 os:
-                    - "ubuntu-22.04"
+                    - "ubuntu-24.04"
                     - "windows-latest"
                     - "macos-14" # arm64
                     - "macos-13" # x64
@@ -34,7 +33,7 @@ jobs:
                     - x86
                     - arm64
                 include:
-                    - os: "ubuntu-22.04"
+                    - os: "ubuntu-24.04"
                       pytest-args: "--cov"
                     - py: "pypy-3.9"
                       toxenv: "pypy39"
@@ -44,9 +43,9 @@ jobs:
                       pytest-args: ""
                 exclude:
                     # Ubuntu does not have x86/arm64 Python
-                    - os: "ubuntu-22.04"
+                    - os: "ubuntu-24.04"
                       architecture: x86
-                    - os: "ubuntu-22.04"
+                    - os: "ubuntu-24.04"
                       architecture: arm64
                     # MacOS we need to make sure to remove x86 on all
                     # We need to run no arm64 on macos-13 (Intel), but some
@@ -81,9 +80,9 @@ jobs:
         name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
             - name: Setup python
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: ${{ matrix.py }}
                   architecture: ${{ matrix.architecture }}
@@ -98,12 +97,12 @@ jobs:
               run: tox -e py -- ${{ matrix.pytest-args }}
 
     coverage:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-24.04
         name: Validate coverage
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
             - name: Setup python
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.13"
                   architecture: x64
@@ -111,24 +110,24 @@ jobs:
             - run: pip install tox
             - run: tox -e py313-cover,coverage
     docs:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-24.04
         name: Build the documentation
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
             - name: Setup python
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.13"
                   architecture: x64
             - run: pip install tox
             - run: tox -e docs
     lint:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-24.04
         name: Lint the package
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
             - name: Setup python
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.13"
                   architecture: x64
