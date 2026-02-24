@@ -21,14 +21,14 @@ jobs:
                     - "3.12"
                     - "3.13"
                     - "pypy-3.10"
+                # See https://github.com/actions/runner-images
                 os:
-                    - "ubuntu-24.04"
-                    - "windows-latest"
-                    - "macos-14" # arm64
-                    - "macos-13" # x64
+                    - "ubuntu-24.04" # x64
+                    - "windows-latest" # x64
+                    - "macos-15" # arm64
+                    - "macos-15-intel" # x64
                 architecture:
                     - x64
-                    - x86
                     - arm64
                 include:
                     - os: "ubuntu-24.04"
@@ -37,26 +37,19 @@ jobs:
                       toxenv: "pypy310"
                       pytest-args: ""
                 exclude:
-                    # Ubuntu does not have x86/arm64 Python
-                    - os: "ubuntu-24.04"
-                      architecture: x86
+                    # Ubuntu does not have arm64 releases
                     - os: "ubuntu-24.04"
                       architecture: arm64
-                    # MacOS we need to make sure to remove x86 on all
-                    # We need to run no arm64 on macos-13 (Intel), but some
-                    # Python versions: 3.10
-                    #
-                    # From 3.11 onward, there is support for running x64 and
-                    # arm64 on Apple Silicon based systems (macos-14)
-                    - os: "macos-13"
-                      architecture: x86
-                    - os: "macos-13"
-                      architecture: arm64
-                    - os: "macos-14"
-                      architecture: x86
-                    - os: "macos-14"
-                      architecture: x64
+                    # macOS 15 does not have Python 3.10 releases
+                    - os: "macos-15"
                       py: "3.10"
+                    - os: "macos-15-intel"
+                      py: "3.10"
+                    # macOS 15 does not have PyPy releases
+                    - os: "macos-15"
+                      py: "pypy-3.10"
+                    - os: "macos-15-intel"
+                      py: "pypy-3.10"
                     # Windows does not have arm64 releases
                     - os: "windows-latest"
                       architecture: arm64
@@ -90,7 +83,6 @@ jobs:
               with:
                   python-version: "3.13"
                   architecture: x64
-
             - run: pip install tox
             - run: tox -e py313-cover,coverage
     docs:
