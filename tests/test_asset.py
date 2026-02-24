@@ -57,8 +57,9 @@ class Test_abspath_from_asset_spec(unittest.TestCase):
         self.assertEqual(result, 'abc')
 
     def test_pname_is_None_after_resolve_asset_spec(self):
-        result = self._callFUT('/abc', '__main__')
-        self.assertEqual(result, '/abc')
+        path = os.path.abspath('/abc')
+        result = self._callFUT(path, '__main__')
+        self.assertEqual(result, path)
 
     def test_pkgrelative(self):
         result = self._callFUT('abc', 'tests')
