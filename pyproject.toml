@@ -48,7 +48,6 @@ classifiers = [
         "Framework :: Pyramid",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI",
-        "License :: Repoze Public License",
 ]
 
 # is there any package data?
