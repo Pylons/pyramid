@@ -4,12 +4,12 @@ unreleased
 Features
 --------
 
-- Add support for Python 3.12, and 3.13.
+- Add support for Python 3.12, 3.13, and 3.14.
 
 - Added HTTP 418 error code via `pyramid.httpexceptions.HTTPImATeapot`.
   See https://github.com/Pylons/pyramid/pull/3667
 
-- Base coverage reports in tests based on Python 3.12 instead of Python 3.8.
+- Base coverage reports in tests based on Python 3.14 instead of Python 3.8.
 
 - All scripts now pass a new option ``__script__`` when loading the WSGI app.
   For example, ``pserve`` sets ``__script__ == 'pserve'``. This works for
@@ -38,6 +38,10 @@ Features
   features.
   Work continues to fully remove ``pkg_resources`` from Pyramid code in future releases.
   See https://github.com/Pylons/pyramid/pull/3795
+
+- Remove internal usages of deprecated ``locale`` and ``datetime`` APIs to reduce
+  deprecation warnings.
+  See https://github.com/Pylons/pyramid/pull/3808
 
 Bug Fixes
 ---------
@@ -74,6 +78,14 @@ Backward Incompatibilities
 - Drop support for l*gettext() methods in the i18n module.
   These have been deprecated in Python's gettext module since 3.8, and
   removed in Python 3.11.
+
+- Add `get_spec` method to `IPackageOverrides`.
+  See https://github.com/Pylons/pyramid/pull/3792
+
+- When using a cache buster with asset overrides, the cache buster will
+  find the first existing file in the override stack, rather than taking the
+  first override regardless of whether the file exists or not.
+  See https://github.com/Pylons/pyramid/pull/3792
 
 Deprecations
 ------------

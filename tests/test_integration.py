@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta, timezone
 import gc
 import locale
 import os
@@ -16,9 +16,11 @@ from pyramid.wsgi import wsgiapp
 from .pkgs.exceptionviewapp.models import AnException, NotAnException
 
 # 5 years from now (more or less)
-fiveyrsfuture = datetime.datetime.utcnow() + datetime.timedelta(5 * 365)
+fiveyrsfuture = datetime.now(timezone.utc) + timedelta(
+    5 * 365
+)
 
-defaultlocale = locale.getdefaultlocale()[1]
+defaultlocale = locale.getlocale()[1]
 
 
 class INothing(Interface):
