@@ -2,10 +2,11 @@ import functools
 from importlib import import_module
 from importlib.machinery import SOURCE_SUFFIXES
 import os
-from pyramid import _pkg_resources
 import sys
+
 from zope.interface import implementer
 
+from pyramid import _pkg_resources
 from pyramid.interfaces import IAssetDescriptor
 
 init_names = ['__init__%s' % x for x in SOURCE_SUFFIXES]
