@@ -7,88 +7,106 @@ on:
             - main
             - "[0-9].[0-9]+-branch"
         tags:
+            - "*"
     # Build pull requests
     pull_request:
 
 jobs:
     test:
         strategy:
+            # See https://github.com/actions/runner-images
             matrix:
                 py:
-                    - "3.9"
                     - "3.10"
                     - "3.11"
                     - "3.12"
                     - "3.13"
-                    - "pypy-3.8"
+                    - "3.14"
+                    - "pypy-3.10"
                 os:
-                    - "ubuntu-20.04"
-                    - "windows-2022"
-                    - "macos-11"
+                    - "ubuntu-24.04" # x64
+                    - "windows-2022" # x64
+                    - "macos-15" # arm64
+                    - "macos-15-intel" # x64
                 architecture:
                     - x64
-                    - x86
-
+                    - arm64
                 include:
-                    # Only run coverage on ubuntu-20.04, except on pypy3
-                    - os: "ubuntu-20.04"
+                    - os: "ubuntu-24.04"
                       pytest-args: "--cov"
-                    - os: "ubuntu-20.04"
-                      py: "pypy-3.8"
+                    - py: "pypy-3.10"
+                      toxenv: "pypy310"
                       pytest-args: ""
-
                 exclude:
-                    # Linux and macOS don't have x86 python
-                    - os: "ubuntu-20.04"
-                      architecture: x86
-                    - os: "macos-11"
-                      architecture: x86
+                    # Ubuntu does not have arm64 releases
+                    - os: "ubuntu-24.04"
+                      architecture: arm64
+                    # macOS does not have Python 3.10 releases
+                    - os: "macos-15"
+                      py: "3.10"
+                    - os: "macos-15-intel"
+                      py: "3.10"
+                    # macOS does not have PyPy releases
+                    - os: "macos-15"
+                      py: "pypy-3.10"
+                    - os: "macos-15-intel"
+                      py: "pypy-3.10"
+                    # Windows does not have arm64 releases
+                    - os: "windows-2022"
+                      architecture: arm64
 
         name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
             - name: Setup python
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: ${{ matrix.py }}
                   architecture: ${{ matrix.architecture }}
             - run: pip install tox
-            - name: Running tox
+            - name: Running tox with specific toxenv
+              if: ${{ matrix.toxenv != '' }}
+              env:
+                TOXENV: ${{ matrix.toxenv }}
+              run: tox
+            - name: Running tox for current python version
+              if: ${{ matrix.toxenv == '' }}
               run: tox -e py -- ${{ matrix.pytest-args }}
+
     coverage:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         name: Validate coverage
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
             - name: Setup python
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
-                  python-version: 3.12
+                  python-version: "3.14"
                   architecture: x64
             - run: pip install tox
-            - run: tox -e py312-cover,coverage
+            - run: tox -e py314-cover,coverage
     docs:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         name: Build the documentation
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
             - name: Setup python
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
-                  python-version: 3.12
+                  python-version: "3.14"
                   architecture: x64
             - run: pip install tox
             - run: tox -e docs
     lint:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-24.04
         name: Lint the package
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
             - name: Setup python
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
-                  python-version: 3.9
+                  python-version: "3.14"
                   architecture: x64
             - run: pip install tox
             - run: tox -e lint

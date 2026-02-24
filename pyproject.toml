@@ -102,7 +102,7 @@ test = [
 [tool.black]
 line-length = 79
 skip-string-normalization = true
-target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+target-version = ['py310', 'py311', 'py312', 'py313', 'py314']
 exclude = '''
 /(
     \.git

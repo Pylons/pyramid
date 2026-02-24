@@ -450,7 +450,7 @@ class TestPRoutesCommand(unittest.TestCase):
     def test_route_static_views(self):
         config = self._makeConfig(autocommit=True)
         config.add_static_view('static', 'static', cache_max_age=3600)
-        path2 = os.path.normpath('/var/www/static')
+        path2 = os.path.abspath('/var/www/static')
         config.add_static_view(name='static2', path=path2)
         config.add_static_view(
             name='pyramid_scaffold',

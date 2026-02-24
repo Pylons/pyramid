@@ -1,4 +1,4 @@
-""" Utility functions for dealing with URLs in pyramid """
+"""Utility functions for dealing with URLs in pyramid"""
 
 from functools import lru_cache
 import os
