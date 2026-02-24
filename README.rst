@@ -1,8 +1,8 @@
 Pyramid
 =======
 
-.. image:: https://github.com/Pylons/Pyramid/workflows/Build%20and%20test/badge.svg?branch=main
-        :target: https://github.com/Pylons/Pyramid/actions?query=workflow%3A%22Build+and+test%22
+.. image:: https://github.com/Pylons/Pyramid/actions/workflows/ci-tests.yml/badge.svg?branch=main
+        :target: https://github.com/Pylons/Pyramid/actions/workflows/ci-tests.yml
         :alt: main CI Status
 
 .. image:: https://readthedocs.org/projects/pyramid/badge/?version=main
