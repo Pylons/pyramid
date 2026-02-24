@@ -4,12 +4,12 @@ unreleased
 Features
 --------
 
-- Add support for Python 3.12.
+- Add support for Python 3.12, and 3.13.
 
 - Added HTTP 418 error code via `pyramid.httpexceptions.HTTPImATeapot`.
   See https://github.com/Pylons/pyramid/pull/3667
 
-- Coverage reports in tests based on Python 3.12 instead of Python 3.8.
+- Base coverage reports in tests based on Python 3.12 instead of Python 3.8.
 
 - All scripts now pass a new option ``__script__`` when loading the WSGI app.
   For example, ``pserve`` sets ``__script__ == 'pserve'``. This works for
@@ -34,6 +34,11 @@ Features
 - Replace usage of ``pkg_resources`` in ``pdistreport`` and ``pshell`` CLI
   commands. See https://github.com/Pylons/pyramid/pull/3749
 
+- Constrain ``setuptools < 82`` to remain compatible with required ``pkg_resources``
+  features.
+  Work continues to fully remove ``pkg_resources`` from Pyramid code in future releases.
+  See https://github.com/Pylons/pyramid/pull/3795
+
 Bug Fixes
 ---------
 
@@ -43,7 +48,7 @@ Bug Fixes
   This also prevents issues where a ``request.url`` fails to be decoded when
   logging info when ``pyramid.debug_authorization`` is enabled.
 
-  See https://github.com/Pylons/pyramid/pull/3741/files
+  See https://github.com/Pylons/pyramid/pull/3741
 
 - Applications raising ``pyramid.exceptions.BadCSRFToken`` and
   ``pyramid.exceptions.BadCSRFOrigin`` were returning invalid HTTP status
@@ -52,10 +57,19 @@ Bug Fixes
 
   See https://github.com/Pylons/pyramid/pull/3742
 
+- The methods ``LegacySessionCSRFStoragePolicy.check_csrf_token``,
+  ``SessionCSRFStoragePolicy.check_csrf_token`` and
+  ``CookieCSRFStoragePolicy.check_csrf_token`` now use
+  ``errors='backslashreplace'`` when encoding the ``supplied_token`` to
+  ``"latin-1"``.
+  Previously ``UnicodeEncodeError`` was raised when ``supplied_token``
+  could not be encoded to ``"latin-1"``.
+  See https://github.com/Pylons/pyramid/pull/3800
+
 Backward Incompatibilities
 --------------------------
 
-- Drop support for Python 3.6 and 3.7.
+- Drop support for Python 3.6, 3.7, 3.8, and 3.9.
 
 - Drop support for l*gettext() methods in the i18n module.
   These have been deprecated in Python's gettext module since 3.8, and
