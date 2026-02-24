@@ -110,4 +110,3 @@ jobs:
                   architecture: x64
             - run: pip install tox
             - run: tox -e lint
-

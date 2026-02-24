@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools<81", "wheel"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
@@ -20,15 +20,15 @@ readme = {file = "README.rst", content-type = "text/x-rst"}
 
 requires-python = ">=3.10"
 dependencies = [
-    "hupper",
+    "hupper >= 1.5",  # ignore_files support
     "plaster",
     "plaster_pastedeploy",
-    "setuptools < 81",
-    "translationstring",
-    "venusian",
+    "setuptools < 82",  # require pkg_resources
+    "translationstring >= 0.4",  # py3 compat
+    "venusian >= 1.0",  # ``ignore``
     "webob >= 1.8.3",  # Accept.parse_offer
-    "zope.deprecation",
-    "zope.interface",
+    "zope.deprecation >= 3.5.0",  # py3 compat
+    "zope.interface >= 3.8.0",  # has zope.interface.registry
 ]
 
 keywords = ["web", "wsgi", "pylons", "pyramid"]
@@ -49,10 +49,6 @@ classifiers = [
         "Topic :: Internet :: WWW/HTTP :: WSGI",
 ]
 
-# is there any package data?
-# [tool.setuptools.package-data]
-# pyramid = ["*.txt", "*.rst"]
-
 [project.scripts]
 pserve = "pyramid.scripts.pserve:main"
 pshell = "pyramid.scripts.pshell:main"
@@ -69,15 +65,12 @@ cherrypy = "pyramid.scripts.pserve:cherrypy_server_runner"
 [project.entry-points."pyramid.pshell_runner"]
 python = "pyramid.scripts.pshell:python_shell_runner"
 
-
 [project.urls]
 Homepage = "https://trypyramid.com"
-# Documentation = "https://docs.pylonsproject.org/projects/pyramid/en/latest/"
-Documentation = "https://docs.pylonsproject.org/projects/pyramid/en/2.1-branch/"
 Repository = "https://github.com/Pylons/pyramid"
 Issues = "https://github.com/Pylons/pyramid/issues"
-Changelog = "https://docs.pylonsproject.org/projects/pyramid/en/2.1-branch/whatsnew-2.0.html"
-#Changelog = "https://github.com/Pylons/pyramid/blob/main/CHANGES.rst"
+Documentation = "https://docs.pylonsproject.org/projects/pyramid/en/2.1-branch/"
+Changelog = "https://docs.pylonsproject.org/projects/pyramid/en/2.1-branch/whatsnew-2.1.html"
 
 [project.optional-dependencies]
 docs = [
@@ -89,23 +82,13 @@ docs = [
     "sphinx-copybutton",
     "sphinxcontrib-autoprogram",
 ]
-test = [
-    "webtest",
-    "zope.component",
+testing = [
+    "webtest >= 1.3.1",  # py3 compat
+    "zope.component >= 4.0",  # py3 compat
     "coverage",
-    "pytest",
+    "pytest >= 5.4.2",  # unittest.TestCase funkyness, see commit 77c1505ab
     "pytest-cov",
 ]
-lint = [
-    "flake8~=6.1.0",
-    "black~=26.1.0",
-    "isort~=5.12",
-    "build",
-    "check-manifest",
-    "readme_renderer",
-    "twine",
-]
-
 
 [tool.black]
 line-length = 79
@@ -148,15 +131,14 @@ testpaths = [
     "tests",
 ]
 
-
 [tool.check-manifest]
-ignore = [".gitignore",
-          ".gitattributes",
-          "PKG-INFO",
-          "*.egg-info",
-          "*.egg-info/*",
-          ]
+ignore = [
+    ".gitignore",
+    ".gitattributes",
+    "PKG-INFO",
+    "*.egg-info",
+    "*.egg-info/*",
+    "setup.cfg",
+]
 ignore-default-rules = true
 ignore-bad-ideas = "tests/pkgs/localeapp/**/*.mo"
-
-
