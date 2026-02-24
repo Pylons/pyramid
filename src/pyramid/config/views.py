@@ -2346,7 +2346,6 @@ class StaticURLInfo:
 
         kw['pathspec'] = pathspec
         kw['rawspec'] = rawspec
-        print(kw)
         for spec_, cachebust, explicit in reversed(self.cache_busters):
             if (explicit and rawspec.startswith(spec_)) or (
                 not explicit and pathspec.startswith(spec_)
