@@ -2,10 +2,11 @@ import functools
 from importlib import import_module
 from importlib.machinery import SOURCE_SUFFIXES
 import os
-import pkg_resources
 import sys
+
 from zope.interface import implementer
 
+from pyramid import _pkg_resources
 from pyramid.interfaces import IAssetDescriptor
 
 init_names = ['__init__%s' % x for x in SOURCE_SUFFIXES]
@@ -70,7 +71,7 @@ def package_path(package):
     # the result
     prefix = getattr(package, '__abspath__', None)
     if prefix is None:
-        prefix = pkg_resources.resource_filename(package.__name__, '')
+        prefix = _pkg_resources.resource_filename(package.__name__, '')
         # pkg_resources doesn't care whether we feed it a package
         # name or a module name within the package, the result
         # will be the same: a directory name to the package itself
@@ -400,7 +401,7 @@ class DottedNameResolver(Resolver):
 
 @implementer(IAssetDescriptor)
 class PkgResourcesAssetDescriptor:
-    pkg_resources = pkg_resources
+    pkg_resources = _pkg_resources
 
     def __init__(self, pkg_name, path):
         self.pkg_name = pkg_name
