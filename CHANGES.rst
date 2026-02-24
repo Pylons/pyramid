@@ -39,6 +39,10 @@ Features
   Work continues to fully remove ``pkg_resources`` from Pyramid code in future releases.
   See https://github.com/Pylons/pyramid/pull/3795
 
+- Remove internal usages of deprecated ``locale`` and ``datetime`` APIs to reduce
+  deprecation warnings.
+  See https://github.com/Pylons/pyramid/pull/3808
+
 Bug Fixes
 ---------
 
