@@ -13,7 +13,7 @@ description = "The Pyramid Web Framework, a Pylons project"
 authors = [
   {name = "Chris McDonough, Agendaless Consulting", email = "pylons-discuss@googlegroups.com"},
 ]
-# license = "BSD-derived (Repoze)"
+license = "BSD-derived (Repoze)"
 license-files = ["LICENSE.txt"]
 
 readme = {file = "README.rst", content-type = "text/x-rst"}
