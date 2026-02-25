@@ -4,6 +4,12 @@ What's New in Pyramid 2.1
 This article explains the new features in :app:`Pyramid` version 2.1 as compared to its predecessor, :app:`Pyramid` 2.0.
 It also documents backwards incompatibilities between the two versions and deprecations added to :app:`Pyramid` 2.1, as well as software dependency changes and notable documentation additions.
 
+Acknowledgments
+---------------
+
+Work on this release has been generously sponsored by pyfidelity UG via Florian Schulze (fschulze@pyfidelity.com), maintainer of `devpi <https://doc.devpi.net/>`__.
+Thank you!
+
 Major Feature Additions
 -----------------------
 
