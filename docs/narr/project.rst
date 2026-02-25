@@ -83,7 +83,7 @@ On all platforms, generate a project using cookiecutter.
 
 .. code-block:: bash
 
-    cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout main
+    cookiecutter gh:Pylons/pyramid-cookiecutter-starter --checkout 2.1-branch
 
 If prompted for the first item, accept the default ``yes`` by hitting return.
 
