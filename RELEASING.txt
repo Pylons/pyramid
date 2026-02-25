@@ -64,7 +64,9 @@ Prepare new release branch
   branch, and previously released branch. Also in the previously released
   branch only, uncomment the sections to enable pylons_sphinx_latesturl.
 
-- Change setup.py version to the release version number.
+- Change the version in pyproject.toml to the release version number.
+
+- Change the [project.urls] to reference the correct branch/version.
 
 - Make sure PyPI long description renders::
 
@@ -100,7 +102,9 @@ Prepare "main" for further development (major releases only)
 - In docs/conf.py, add a commented line under
   pylons_sphinx_latesturl_pagename_overrides for the release.
 
-- Change setup.py version to the next version number.
+- Change the version in pyproject.toml to the next version number.
+
+- Change the [project.urls] to reference the correct branch/version.
 
 - Update README.rst to use correct versions of badges, URLs, and ALT option
   for "main" instead of the major release version.
