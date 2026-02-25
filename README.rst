@@ -1,12 +1,12 @@
 Pyramid
 =======
 
-.. image:: https://github.com/Pylons/Pyramid/actions/workflows/ci-tests.yml/badge.svg?branch=main
+.. image:: https://github.com/Pylons/Pyramid/actions/workflows/ci-tests.yml/badge.svg?branch=2.1-branch
         :target: https://github.com/Pylons/Pyramid/actions/workflows/ci-tests.yml
-        :alt: main CI Status
+        :alt: 2.1-branch CI Status
 
-.. image:: https://readthedocs.org/projects/pyramid/badge/?version=main
-        :target: https://docs.pylonsproject.org/projects/pyramid/en/main
+.. image:: https://readthedocs.org/projects/pyramid/badge/?version=2.1-branch
+        :target: https://docs.pylonsproject.org/projects/pyramid/en/2.1-branch
         :alt: main Documentation Status
 
 .. image:: https://img.shields.io/discord/1212201651218153582?label=Discord
