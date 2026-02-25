@@ -43,6 +43,10 @@ Features
   deprecation warnings.
   See https://github.com/Pylons/pyramid/pull/3808
 
+- Added `Self` sentinel value that may be used for context and name or
+  function as context arguments to view_config on class methods in conjunction
+  with venusian lift.
+
 Bug Fixes
 ---------
 
