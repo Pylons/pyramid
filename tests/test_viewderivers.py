@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 import unittest
 from zope.interface import implementer
 
@@ -1190,8 +1191,6 @@ class TestDeriveView(unittest.TestCase):
         self.assertNotEqual(result, view)
 
     def test_http_cached_view_integer(self):
-        import datetime
-
         from pyramid.response import Response
 
         response = Response('OK')
@@ -1204,7 +1203,7 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(inner_view.__module__, result.__module__)
         self.assertEqual(inner_view.__doc__, result.__doc__)
         request = self._makeRequest()
-        when = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        when = datetime.now(timezone.utc) + timedelta(hours=1)
         result = result(None, request)
         self.assertEqual(result, response)
         headers = dict(result.headerlist)
@@ -1213,8 +1212,6 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(headers['Cache-Control'], 'max-age=3600')
 
     def test_http_cached_view_timedelta(self):
-        import datetime
-
         from pyramid.response import Response
 
         response = Response('OK')
@@ -1223,13 +1220,13 @@ class TestDeriveView(unittest.TestCase):
             return response
 
         result = self.config._derive_view(
-            inner_view, http_cache=datetime.timedelta(hours=1)
+            inner_view, http_cache=timedelta(hours=1)
         )
         self.assertFalse(result is inner_view)
         self.assertEqual(inner_view.__module__, result.__module__)
         self.assertEqual(inner_view.__doc__, result.__doc__)
         request = self._makeRequest()
-        when = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        when = datetime.now(timezone.utc) + timedelta(hours=1)
         result = result(None, request)
         self.assertEqual(result, response)
         headers = dict(result.headerlist)
@@ -1238,8 +1235,6 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(headers['Cache-Control'], 'max-age=3600')
 
     def test_http_cached_view_tuple(self):
-        import datetime
-
         from pyramid.response import Response
 
         response = Response('OK')
@@ -1254,7 +1249,7 @@ class TestDeriveView(unittest.TestCase):
         self.assertEqual(inner_view.__module__, result.__module__)
         self.assertEqual(inner_view.__doc__, result.__doc__)
         request = self._makeRequest()
-        when = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        when = datetime.now(timezone.utc) + timedelta(hours=1)
         result = result(None, request)
         self.assertEqual(result, response)
         headers = dict(result.headerlist)
@@ -2094,11 +2089,9 @@ class DummySession(dict):
 
 
 def parse_httpdate(s):
-    import datetime
-
     # cannot use %Z, must use literal GMT; Jython honors timezone
     # but CPython does not
-    return datetime.datetime.strptime(s, "%a, %d %b %Y %H:%M:%S GMT")
+    return datetime.strptime(s, "%a, %d %b %Y %H:%M:%S GMT")
 
 
 def assert_similar_datetime(one, two):
