@@ -902,6 +902,30 @@ test_config.dummy_include2"""
 
         root_config.include(dummy_subapp, route_prefix='root')
 
+    def test_include_with_route_prefix_no_trailing_slash(self):
+        root_config = self._makeOne(autocommit=True)
+
+        def dummy_subapp(config):
+            self.assertEqual(config.route_prefix, '/root')
+
+        root_config.include(dummy_subapp, route_prefix='/root/')
+
+    def test_include_with_route_prefix_with_leading_slash(self):
+        root_config = self._makeOne(autocommit=True)
+
+        def dummy_subapp(config):
+            self.assertEqual(config.route_prefix, 'root')
+
+        root_config.include(dummy_subapp, route_prefix='root/')
+
+    def test_include_with_route_prefix_with_leading_no_trailing_slash(self):
+        root_config = self._makeOne(autocommit=True)
+
+        def dummy_subapp(config):
+            self.assertEqual(config.route_prefix, '/root')
+
+        root_config.include(dummy_subapp, route_prefix='/root/')
+
     def test_include_with_nested_route_prefix(self):
         root_config = self._makeOne(autocommit=True, route_prefix='root')
 
@@ -921,6 +945,26 @@ test_config.dummy_include2"""
             config.include(dummy_subapp3, route_prefix='nested2')
 
         root_config.include(dummy_subapp, route_prefix='nested')
+
+    def test_include_with_nested_route_prefix_with_leading_slash(self):
+        root_config = self._makeOne(autocommit=True, route_prefix='/root')
+
+        def dummy_subapp2(config):
+            self.assertEqual(config.route_prefix, '/root/nested')
+
+        def dummy_subapp3(config):
+            self.assertEqual(config.route_prefix, '/root/nested/nested2')
+            config.include(dummy_subapp4)
+
+        def dummy_subapp4(config):
+            self.assertEqual(config.route_prefix, '/root/nested/nested2')
+
+        def dummy_subapp(config):
+            self.assertEqual(config.route_prefix, '/root/nested')
+            config.include(dummy_subapp2)
+            config.include(dummy_subapp3, route_prefix='/nested2')
+
+        root_config.include(dummy_subapp, route_prefix='/nested')
 
     def test_include_with_missing_source_file(self):
         import inspect

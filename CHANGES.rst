@@ -46,6 +46,9 @@ Features
 Bug Fixes
 ---------
 
+- Fix ``pyramid.config.routes.RoutesConfiguratorMixin.route_prefix_context``
+  to avoid removal of leading ``/`` provided in the prefix.
+
 - Fix issues where permissions may be checked on exception views. This is not
   supposed to happen in normal circumstances.
 
