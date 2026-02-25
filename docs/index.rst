@@ -174,6 +174,7 @@ Change History
 .. toctree::
    :maxdepth: 1
 
+   whatsnew-2.1
    whatsnew-2.0
    whatsnew-1.10
    whatsnew-1.9
