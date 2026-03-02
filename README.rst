@@ -10,7 +10,7 @@ Pyramid
         :alt: main Documentation Status
 
 .. image:: https://img.shields.io/discord/1212201651218153582?label=Discord
-        :target: https://discord.gg/2SZcvUVXbr
+        :target: https://trypyramid.com/discord-invite.html
         :alt: Discord Server
 
 .. image:: https://img.shields.io/badge/IRC-Libera.Chat-blue.svg
