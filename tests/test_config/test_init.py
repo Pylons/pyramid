@@ -781,10 +781,8 @@ class ConfiguratorTests(unittest.TestCase):
 
         reg = Registry()
         config = self._makeOne(reg)
-        settings = {
-            'pyramid.includes': """tests.test_config.dummy_include
-tests.test_config.dummy_include2"""
-        }
+        settings = {'pyramid.includes': """tests.test_config.dummy_include
+tests.test_config.dummy_include2"""}
         config.setup_registry(settings=settings)
         self.assertTrue(reg.included)
         self.assertTrue(reg.also_included)

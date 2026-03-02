@@ -51,6 +51,13 @@ class TestLegacySessionCSRFStoragePolicy(unittest.TestCase):
         self.assertTrue(policy.check_csrf_token(request, 'foo'))
         self.assertFalse(policy.check_csrf_token(request, 'bar'))
 
+    def test_check_csrf_token_invalid_latin_1(self):
+        request = DummyRequest(session=self.MockSession('foo'))
+
+        policy = self._makeOne()
+        self.assertTrue(policy.check_csrf_token(request, 'foo'))
+        self.assertFalse(policy.check_csrf_token(request, chr(0x1F600)))
+
 
 class TestSessionCSRFStoragePolicy(unittest.TestCase):
     def _makeOne(self, **kw):
@@ -96,6 +103,13 @@ class TestSessionCSRFStoragePolicy(unittest.TestCase):
         request.session = {'_csrft_': 'foo'}
         self.assertTrue(policy.check_csrf_token(request, 'foo'))
         self.assertFalse(policy.check_csrf_token(request, 'bar'))
+
+    def test_check_csrf_token_invalid_latin_1(self):
+        request = DummyRequest(session={'_csrft_': 'foo'})
+
+        policy = self._makeOne()
+        self.assertTrue(policy.check_csrf_token(request, 'foo'))
+        self.assertFalse(policy.check_csrf_token(request, chr(0x1F600)))
 
 
 class TestCookieCSRFStoragePolicy(unittest.TestCase):
@@ -194,6 +208,14 @@ class TestCookieCSRFStoragePolicy(unittest.TestCase):
         request.cookies = {'csrf_token': 'foo'}
         self.assertTrue(policy.check_csrf_token(request, 'foo'))
         self.assertFalse(policy.check_csrf_token(request, 'bar'))
+
+    def test_check_csrf_token_invalid_latin_1(self):
+        request = DummyRequest()
+        request.cookies = {'csrf_token': 'foo'}
+
+        policy = self._makeOne()
+        self.assertTrue(policy.check_csrf_token(request, 'foo'))
+        self.assertFalse(policy.check_csrf_token(request, chr(0x1F600)))
 
 
 class Test_get_csrf_token(unittest.TestCase):

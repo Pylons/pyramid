@@ -1,13 +1,17 @@
 Pyramid
 =======
 
-.. image:: https://github.com/Pylons/Pyramid/workflows/Build%20and%20test/badge.svg?branch=main
-        :target: https://github.com/Pylons/Pyramid/actions?query=workflow%3A%22Build+and+test%22
+.. image:: https://github.com/Pylons/Pyramid/actions/workflows/ci-tests.yml/badge.svg?branch=main
+        :target: https://github.com/Pylons/Pyramid/actions/workflows/ci-tests.yml
         :alt: main CI Status
 
 .. image:: https://readthedocs.org/projects/pyramid/badge/?version=main
         :target: https://docs.pylonsproject.org/projects/pyramid/en/main
         :alt: main Documentation Status
+
+.. image:: https://img.shields.io/discord/1212201651218153582?label=Discord
+        :target: https://discord.gg/2SZcvUVXbr
+        :alt: Discord Server
 
 .. image:: https://img.shields.io/badge/IRC-Libera.Chat-blue.svg
         :target: https://web.libera.chat/#pyramid

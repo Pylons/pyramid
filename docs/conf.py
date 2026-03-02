@@ -9,14 +9,13 @@
 # All configuration values have a default value; values that are commented out
 # serve to show the default value.
 
-import sys
+import importlib.metadata
 import os
 import datetime
 import warnings
 
 warnings.simplefilter('ignore', DeprecationWarning)
 
-from importlib.metadata import version as pkg_version
 import pylons_sphinx_themes
 
 # skip raw nodes
@@ -98,7 +97,7 @@ copyright = '2008-%s, Agendaless Consulting' % thisyear
 # other places throughout the built documents.
 #
 # The short X.Y version.
-version = pkg_version('pyramid')
+version = importlib.metadata.distribution('pyramid').version
 
 # The full version, including alpha/beta/rc tags.
 release = version

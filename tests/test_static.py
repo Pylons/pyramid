@@ -1,11 +1,11 @@
-import datetime
+from datetime import datetime, timedelta, timezone
 import os.path
 import unittest
 
 here = os.path.dirname(__file__)
 
 # 5 years from now (more or less)
-fiveyrsfuture = datetime.datetime.utcnow() + datetime.timedelta(5 * 365)
+fiveyrsfuture = datetime.now(timezone.utc) + timedelta(5 * 365)
 
 
 class Test_static_view_use_subpath_False(unittest.TestCase):

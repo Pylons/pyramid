@@ -1170,9 +1170,10 @@ class Test_static_url(unittest.TestCase):
 
     def test_it_abs(self):
         request = self._makeRequest()
-        result = self._callFUT('/foo/bar/abc', request, _app_url='')
+        path = os.path.abspath('/foo/bar/abc')
+        result = self._callFUT(path, request, _app_url='')
         self.assertEqual(result, 'static url')
-        self.assertEqual(request.path, '/foo/bar/abc')
+        self.assertEqual(request.path, path)
         self.assertEqual(request.kw, {'_app_url': ''})
 
     def test_it_absspec(self):
@@ -1207,9 +1208,10 @@ class Test_static_path(unittest.TestCase):
 
     def test_it_abs(self):
         request = self._makeRequest()
-        result = self._callFUT('/foo/bar/abc', request, _anchor='anchor')
+        path = os.path.abspath('/foo/bar/abc')
+        result = self._callFUT(path, request, _anchor='anchor')
         self.assertEqual(result, 'static path')
-        self.assertEqual(request.path, '/foo/bar/abc')
+        self.assertEqual(request.path, path)
         self.assertEqual(request.kw, {'_anchor': 'anchor'})
 
     def test_it_absspec(self):

@@ -100,12 +100,10 @@ class IResponse(Interface):
         list. For more information on Allow see RFC 2616, Section 14.7."""
     )
 
-    app_iter = Attribute(
-        """Returns the app_iter of the response.
+    app_iter = Attribute("""Returns the app_iter of the response.
 
         If body was set, this will create an app_iter from that body
-        (a single-item list)"""
-    )
+        (a single-item list)""")
 
     def app_iter_range(start, stop):
         """Return a new app_iter built from the response app_iter that
@@ -1078,6 +1076,14 @@ class IPEP302Loader(Interface):
 
 class IPackageOverrides(IPEP302Loader):
     """Utility for pkg_resources overrides"""
+
+    def get_spec(resource_name):
+        """Return a specifier for the resource.
+
+        The specifier may be a dotted Python name or an absolute path on the
+        filesystem.
+
+        """
 
 
 # VH_ROOT_KEY is an interface; its imported from other packages (e.g.

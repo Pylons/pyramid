@@ -193,7 +193,7 @@ class PShellCommand:
                 if k not in orig_env or v is not orig_env[k]:
                     if getattr(v, '__doc__', False):
                         env_help[k] = v.__doc__.replace("\n", " ")
-                    else:
+                    else:  # pragma: nocover -- Python >= 3.13 has a __doc__
                         env_help[k] = v
             del orig_env
 

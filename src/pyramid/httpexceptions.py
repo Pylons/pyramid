@@ -188,23 +188,18 @@ class HTTPException(Response, Exception):
     code = 520
     title = 'Unknown Error'
     explanation = ''
-    body_template_obj = Template(
-        '''\
+    body_template_obj = Template('''\
 ${explanation}${br}${br}
 ${detail}
 ${html_comment}
-'''
-    )
+''')
 
-    plain_template_obj = Template(
-        '''\
+    plain_template_obj = Template('''\
 ${status}
 
-${body}'''
-    )
+${body}''')
 
-    html_template_obj = Template(
-        '''\
+    html_template_obj = Template('''\
 <html>
  <head>
   <title>${status}</title>
@@ -213,8 +208,7 @@ ${body}'''
   <h1>${status}</h1>
   ${body}
  </body>
-</html>'''
-    )
+</html>''')
 
     # Set this to True for responses that should have no response body
     empty_body = False
@@ -516,12 +510,10 @@ class _HTTPMove(HTTPRedirection):
     # - ``add_slash`` argument is no longer accepted:  code that passes
     #   add_slash argument to the constructor will receive an exception.
     explanation = 'The resource has been moved to'
-    body_template_obj = Template(
-        '''\
+    body_template_obj = Template('''\
 ${explanation} ${location}; you should be redirected automatically.
 ${detail}
-${html_comment}'''
-    )
+${html_comment}''')
 
     def __init__(
         self,
@@ -841,11 +833,9 @@ class HTTPMethodNotAllowed(HTTPClientError):
     # - body_template_obj uses ${br} instead of <br />
     code = 405
     title = 'Method Not Allowed'
-    body_template_obj = Template(
-        '''\
+    body_template_obj = Template('''\
 The method ${REQUEST_METHOD} is not allowed for this resource. ${br}${br}
-${detail}'''
-    )
+${detail}''')
 
 
 class HTTPNotAcceptable(HTTPClientError):

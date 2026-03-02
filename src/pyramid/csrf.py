@@ -44,7 +44,8 @@ class LegacySessionCSRFStoragePolicy:
         """Returns ``True`` if the ``supplied_token`` is valid."""
         expected_token = self.get_csrf_token(request)
         return not strings_differ(
-            bytes_(expected_token), bytes_(supplied_token)
+            bytes_(expected_token),
+            bytes_(supplied_token, errors='backslashreplace'),
         )
 
 
@@ -87,7 +88,8 @@ class SessionCSRFStoragePolicy:
         """Returns ``True`` if the ``supplied_token`` is valid."""
         expected_token = self.get_csrf_token(request)
         return not strings_differ(
-            bytes_(expected_token), bytes_(supplied_token)
+            bytes_(expected_token),
+            bytes_(supplied_token, errors='backslashreplace'),
         )
 
 
@@ -157,7 +159,8 @@ class CookieCSRFStoragePolicy:
         """Returns ``True`` if the ``supplied_token`` is valid."""
         expected_token = self.get_csrf_token(request)
         return not strings_differ(
-            bytes_(expected_token), bytes_(supplied_token)
+            bytes_(expected_token),
+            bytes_(supplied_token, errors='backslashreplace'),
         )
 
 
