@@ -28,85 +28,69 @@ jobs:
                     - "windows-2022" # x64
                     - "macos-15" # arm64
                     - "macos-15-intel" # x64
-                architecture:
-                    - x64
-                    - arm64
                 include:
                     - os: "ubuntu-24.04"
                       pytest-args: "--cov"
                     - py: "pypy-3.10"
                       toxenv: "pypy310"
                       pytest-args: ""
-                exclude:
-                    # Ubuntu does not have arm64 releases
-                    - os: "ubuntu-24.04"
-                      architecture: arm64
-                    # macOS does not have Python 3.10 releases
-                    - os: "macos-15"
-                      py: "3.10"
-                    - os: "macos-15-intel"
-                      py: "3.10"
-                    # macOS does not have PyPy releases
-                    - os: "macos-15"
-                      py: "pypy-3.10"
-                    - os: "macos-15-intel"
-                      py: "pypy-3.10"
-                    # Windows does not have arm64 releases
-                    - os: "windows-2022"
-                      architecture: arm64
 
-        name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
+        name: "Python: ${{ matrix.py }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v6
-            - name: Setup python
-              uses: actions/setup-python@v6
+            - name: Setup uv
+              uses: astral-sh/setup-uv@v7
               with:
                   python-version: ${{ matrix.py }}
-                  architecture: ${{ matrix.architecture }}
-            - run: pip install tox
+                  enable-cache: true
+            - run: uv venv
+            - run: uv pip install tox
             - name: Running tox with specific toxenv
               if: ${{ matrix.toxenv != '' }}
               env:
                 TOXENV: ${{ matrix.toxenv }}
-              run: tox
+              run: uv run tox
             - name: Running tox for current python version
               if: ${{ matrix.toxenv == '' }}
-              run: tox -e py -- ${{ matrix.pytest-args }}
+              run: uv run tox -e py -- ${{ matrix.pytest-args }}
 
     coverage:
         runs-on: ubuntu-24.04
         name: Validate coverage
         steps:
             - uses: actions/checkout@v6
-            - name: Setup python
-              uses: actions/setup-python@v6
+            - name: Setup uv
+              uses: astral-sh/setup-uv@v7
               with:
                   python-version: "3.14"
-                  architecture: x64
-            - run: pip install tox
-            - run: tox -e py314-cover,coverage
+                  enable-cache: true
+            - run: uv venv
+            - run: uv pip install tox
+            - run: uv run tox -e py314-cover,coverage
     docs:
         runs-on: ubuntu-24.04
         name: Build the documentation
         steps:
             - uses: actions/checkout@v6
-            - name: Setup python
-              uses: actions/setup-python@v6
+            - name: Setup uv
+              uses: astral-sh/setup-uv@v7
               with:
                   python-version: "3.14"
-                  architecture: x64
-            - run: pip install tox
-            - run: tox -e docs
+                  enable-cache: true
+            - run: uv venv
+            - run: uv pip install tox
+            - run: uv run tox -e docs
     lint:
         runs-on: ubuntu-24.04
         name: Lint the package
         steps:
             - uses: actions/checkout@v6
-            - name: Setup python
-              uses: actions/setup-python@v6
+            - name: Setup uv
+              uses: astral-sh/setup-uv@v7
               with:
                   python-version: "3.14"
-                  architecture: x64
-            - run: pip install tox
-            - run: tox -e lint
+                  enable-cache: true
+            - run: uv venv
+            - run: uv pip install tox
+            - run: uv run tox -e lint
