@@ -87,6 +87,9 @@ Backward Incompatibilities
   first override regardless of whether the file exists or not.
   See https://github.com/Pylons/pyramid/pull/3792
 
+- Add a ``RuntimeWarning`` when using ``pyramid.session.PickleSerializer`` to
+  highlight security risks associated with the pickle protocol.
+
 Deprecations
 ------------
 
