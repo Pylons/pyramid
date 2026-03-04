@@ -2,6 +2,7 @@ import binascii
 import os
 import pickle
 import time
+import warnings
 from webob.cookies import JSONSerializer, SignedSerializer
 from zope.deprecation import deprecated
 from zope.interface import implementer
@@ -66,6 +67,12 @@ class PickleSerializer:
 
     def loads(self, bstruct):
         """Accept bytes and return a Python object."""
+        warnings.warn(
+            'PickleSerializer is insecure and may lead to remote code execution. '
+            'It is recommended to use JSONSerializer or a safer alternative.',
+            RuntimeWarning,
+            stacklevel=2,
+        )
         try:
             return pickle.loads(bstruct)
         except Exception:
