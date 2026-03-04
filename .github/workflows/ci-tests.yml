@@ -43,17 +43,14 @@ jobs:
               uses: astral-sh/setup-uv@v7
               with:
                   python-version: ${{ matrix.py }}
-                  enable-cache: true
-            - run: uv venv
-            - run: uv pip install tox
             - name: Running tox with specific toxenv
               if: ${{ matrix.toxenv != '' }}
               env:
                 TOXENV: ${{ matrix.toxenv }}
-              run: uv run tox
+              run: uvx tox
             - name: Running tox for current python version
               if: ${{ matrix.toxenv == '' }}
-              run: uv run tox -e py -- ${{ matrix.pytest-args }}
+              run: uvx tox -e py -- ${{ matrix.pytest-args }}
 
     coverage:
         runs-on: ubuntu-24.04
@@ -64,10 +61,7 @@ jobs:
               uses: astral-sh/setup-uv@v7
               with:
                   python-version: "3.14"
-                  enable-cache: true
-            - run: uv venv
-            - run: uv pip install tox
-            - run: uv run tox -e py314-cover,coverage
+            - run: uvx tox -e py314-cover,coverage
     docs:
         runs-on: ubuntu-24.04
         name: Build the documentation
@@ -77,10 +71,7 @@ jobs:
               uses: astral-sh/setup-uv@v7
               with:
                   python-version: "3.14"
-                  enable-cache: true
-            - run: uv venv
-            - run: uv pip install tox
-            - run: uv run tox -e docs
+            - run: uvx tox -e docs
     lint:
         runs-on: ubuntu-24.04
         name: Lint the package
@@ -90,7 +81,4 @@ jobs:
               uses: astral-sh/setup-uv@v7
               with:
                   python-version: "3.14"
-                  enable-cache: true
-            - run: uv venv
-            - run: uv pip install tox
-            - run: uv run tox -e lint
+            - run: uvx tox -e lint
