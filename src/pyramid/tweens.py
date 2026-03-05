@@ -1,6 +1,10 @@
 import sys
 
-from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import (
+    HTTPMethodNotAllowed,
+    HTTPNotAcceptable,
+    HTTPNotFound,
+)
 from pyramid.util import reraise
 
 
@@ -11,7 +15,7 @@ def _error_handler(request, exc):
 
     try:
         response = request.invoke_exception_view(exc_info)
-    except HTTPNotFound:
+    except (HTTPNotFound, HTTPMethodNotAllowed, HTTPNotAcceptable):
         # re-raise the original exception as no exception views were
         # able to handle the error
         reraise(*exc_info)

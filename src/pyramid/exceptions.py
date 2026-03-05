@@ -61,6 +61,50 @@ class PredicateMismatch(HTTPNotFound):
     exception view.
     """
 
+    def __init__(self, *args, predicate=None, mismatches=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.predicate = predicate
+        self.mismatches = mismatches
+
+    @classmethod
+    def raise_if_specialized(cls, mismatches, all_views=None):
+        """Analyze predicate mismatches and raise 405/406 if appropriate.
+
+        ``mismatches`` is a list of ``(view, predicate)`` tuples.
+
+        ``all_views`` is an optional list of ``(order, view, phash)``
+        tuples used to collect all allowed methods for 405 responses.
+        """
+        if not mismatches:
+            return
+        predicates = [p for _, p in mismatches]
+        if any(p is None for p in predicates):
+            return
+
+        from pyramid.predicates import AcceptPredicate, RequestMethodPredicate
+
+        if all(isinstance(p, RequestMethodPredicate) for p in predicates):
+            from pyramid.httpexceptions import HTTPMethodNotAllowed
+
+            methods = set()
+            if all_views is not None:
+                for _order, view, _phash in all_views:
+                    if hasattr(view, '__predicates__'):
+                        for pred in view.__predicates__:
+                            if isinstance(pred, RequestMethodPredicate):
+                                methods.update(pred.val)
+            else:
+                for _, p in mismatches:
+                    methods.update(p.val)
+            if methods:
+                allow = ', '.join(sorted(methods))
+                raise HTTPMethodNotAllowed(headers={'Allow': allow})
+
+        if all(isinstance(p, AcceptPredicate) for p in predicates):
+            from pyramid.httpexceptions import HTTPNotAcceptable
+
+            raise HTTPNotAcceptable()
+
 
 class URLDecodeError(UnicodeDecodeError):
     """

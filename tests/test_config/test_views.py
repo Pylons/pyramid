@@ -3431,6 +3431,39 @@ class TestMultiView(unittest.TestCase):
         response = mv(context, request)
         self.assertEqual(response, expected_response)
 
+    def test_match_method_mismatch_with_media_views(self):
+        from pyramid.httpexceptions import HTTPMethodNotAllowed
+        from pyramid.predicates import RequestMethodPredicate
+
+        mv = self._makeOne()
+        context = DummyContext()
+        request = DummyRequest()
+        request.method = 'DELETE'
+
+        pred = RequestMethodPredicate(('GET',), None)
+
+        def view(context, request):
+            """ """
+
+        view.__predicated__ = lambda *arg: False
+        view.__predicates__ = [pred]
+        mv.views = [(100, view, None)]
+
+        post_pred = RequestMethodPredicate(('POST',), None)
+
+        def media_view(context, request):
+            """ """
+
+        media_view.__predicated__ = lambda *arg: False
+        media_view.__predicates__ = [post_pred]
+        mv.media_views['text/html'] = [(99, media_view, None)]
+
+        with self.assertRaises(HTTPMethodNotAllowed) as cm:
+            mv.match(context, request)
+        allow = cm.exception.headers['Allow']
+        self.assertIn('GET', allow)
+        self.assertIn('POST', allow)
+
     def test___call__raise_not_found_isnt_interpreted_as_pred_mismatch(self):
         from pyramid.httpexceptions import HTTPNotFound
 
@@ -3533,6 +3566,177 @@ class TestMultiView(unittest.TestCase):
         mv.accepts = ['text/xml']
         response = mv(context, request)
         self.assertEqual(response, expected_response)
+
+    def test___call__all_method_mismatches_raises_405(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.httpexceptions import HTTPMethodNotAllowed
+        from pyramid.predicates import RequestMethodPredicate
+
+        mv = self._makeOne()
+        context = DummyContext()
+        request = DummyRequest()
+        request.method = 'DELETE'
+
+        pred_get = RequestMethodPredicate(('GET',), None)
+        pred_post = RequestMethodPredicate(('POST',), None)
+
+        def view1(context, request):
+            raise PredicateMismatch('mismatch', predicate=pred_get)
+
+        view1.__predicates__ = [pred_get]
+
+        def view2(context, request):
+            raise PredicateMismatch('mismatch', predicate=pred_post)
+
+        view2.__predicates__ = [pred_post]
+
+        mv.views = [(100, view1, None), (99, view2, None)]
+        with self.assertRaises(HTTPMethodNotAllowed) as cm:
+            mv(context, request)
+        allow = cm.exception.headers.get('Allow', '')
+        self.assertIn('GET', allow)
+        self.assertIn('POST', allow)
+        self.assertIn('HEAD', allow)
+
+    def test___call__all_accept_mismatches_raises_406(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.httpexceptions import HTTPNotAcceptable
+        from pyramid.predicates import AcceptPredicate
+
+        mv = self._makeOne()
+        context = DummyContext()
+        request = DummyRequest()
+
+        pred_html = AcceptPredicate(('text/html',), None)
+        pred_xml = AcceptPredicate(('text/xml',), None)
+
+        def view1(context, request):
+            raise PredicateMismatch('mismatch', predicate=pred_html)
+
+        def view2(context, request):
+            raise PredicateMismatch('mismatch', predicate=pred_xml)
+
+        mv.views = [(100, view1, None), (99, view2, None)]
+        self.assertRaises(HTTPNotAcceptable, mv, context, request)
+
+    def test___call__mixed_mismatches_raises_predicate_mismatch(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.predicates import AcceptPredicate, RequestMethodPredicate
+
+        mv = self._makeOne()
+        context = DummyContext()
+        request = DummyRequest()
+
+        pred_get = RequestMethodPredicate(('GET',), None)
+        pred_html = AcceptPredicate(('text/html',), None)
+
+        def view1(context, request):
+            raise PredicateMismatch('mismatch', predicate=pred_get)
+
+        def view2(context, request):
+            raise PredicateMismatch('mismatch', predicate=pred_html)
+
+        mv.views = [(100, view1, None), (99, view2, None)]
+        self.assertRaises(PredicateMismatch, mv, context, request)
+
+    def test___call__none_predicate_mixed_with_typed_raises_predicate_mismatch(
+        self,
+    ):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.predicates import RequestMethodPredicate
+
+        mv = self._makeOne()
+        context = DummyContext()
+        request = DummyRequest()
+
+        pred_get = RequestMethodPredicate(('GET',), None)
+
+        def view1(context, request):
+            raise PredicateMismatch('bare mismatch')
+
+        def view2(context, request):
+            raise PredicateMismatch('mismatch', predicate=pred_get)
+
+        mv.views = [(100, view1, None), (99, view2, None)]
+        self.assertRaises(PredicateMismatch, mv, context, request)
+
+    def test_match_all_method_mismatches_raises_405(self):
+        from pyramid.httpexceptions import HTTPMethodNotAllowed
+        from pyramid.predicates import RequestMethodPredicate
+
+        mv = self._makeOne()
+        context = DummyContext()
+        request = DummyRequest()
+        request.method = 'DELETE'
+
+        pred_get = RequestMethodPredicate(('GET',), None)
+        pred_post = RequestMethodPredicate(('POST',), None)
+
+        def view1(context, request):  # pragma: no cover
+            pass
+
+        view1.__predicated__ = lambda context, request: False
+        view1.__predicates__ = [pred_get]
+
+        def view2(context, request):  # pragma: no cover
+            pass
+
+        view2.__predicated__ = lambda context, request: False
+        view2.__predicates__ = [pred_post]
+
+        mv.views = [(100, view1, None), (99, view2, None)]
+        with self.assertRaises(HTTPMethodNotAllowed) as cm:
+            mv.match(context, request)
+        allow = cm.exception.headers.get('Allow', '')
+        self.assertIn('GET', allow)
+        self.assertIn('POST', allow)
+
+    def test_match_all_accept_mismatches_raises_406(self):
+        from pyramid.httpexceptions import HTTPNotAcceptable
+        from pyramid.predicates import AcceptPredicate
+
+        mv = self._makeOne()
+        context = DummyContext()
+        request = DummyRequest()
+        request.accept = DummyAccept('text/plain')
+
+        pred_html = AcceptPredicate(('text/html',), None)
+
+        def view1(context, request):  # pragma: no cover
+            pass
+
+        view1.__predicated__ = lambda context, request: False
+        view1.__predicates__ = [pred_html]
+
+        mv.views = [(100, view1, None)]
+        self.assertRaises(HTTPNotAcceptable, mv.match, context, request)
+
+
+class Test_predicated_view(unittest.TestCase):
+    def _callFUT(self, view, info):
+        from pyramid.config.views import predicated_view
+
+        return predicated_view(view, info)
+
+    def test_predicate_mismatch_carries_predicate(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.predicates import RequestMethodPredicate
+
+        pred = RequestMethodPredicate(('GET',), None)
+
+        def view(context, request):  # pragma: no cover
+            pass
+
+        class DummyInfo:
+            predicates = [pred]
+
+        wrapper = self._callFUT(view, DummyInfo())
+        request = DummyRequest()
+        request.method = 'POST'
+        context = DummyContext()
+        with self.assertRaises(PredicateMismatch) as cm:
+            wrapper(context, request)
+        self.assertIs(cm.exception.predicate, pred)
 
 
 class TestDefaultViewMapper(unittest.TestCase):

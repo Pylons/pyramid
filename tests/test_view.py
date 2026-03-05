@@ -1156,8 +1156,8 @@ class TestViewMethodsMixin(unittest.TestCase):
         else:  # pragma: no cover
             self.fail()
 
-    def test_it_raises_predicate_mismatch(self):
-        from pyramid.exceptions import PredicateMismatch
+    def test_it_raises_405_on_request_method_mismatch(self):
+        from pyramid.httpexceptions import HTTPMethodNotAllowed
 
         def exc_view(exc, request):  # pragma: no cover
             pass
@@ -1171,7 +1171,9 @@ class TestViewMethodsMixin(unittest.TestCase):
         try:
             raise dummy_exc
         except RuntimeError:
-            self.assertRaises(PredicateMismatch, request.invoke_exception_view)
+            self.assertRaises(
+                HTTPMethodNotAllowed, request.invoke_exception_view
+            )
         else:  # pragma: no cover
             self.fail()
 
@@ -1200,6 +1202,90 @@ class ExceptionResponse(Exception):
     status = '404 Not Found'
     app_iter = ['Not Found']
     headerlist = []
+
+
+class Test_call_view(BaseTest, unittest.TestCase):
+    def _callFUT(self, *arg, **kw):
+        from pyramid.view import render_view_to_response
+
+        return render_view_to_response(*arg, **kw)
+
+    def test_405_propagated_from_multiview(self):
+        from pyramid.httpexceptions import HTTPMethodNotAllowed
+
+        request = self._makeRequest()
+        context = self._makeContext()
+
+        def view(context, request):
+            raise HTTPMethodNotAllowed()
+
+        self._registerView(request.registry, view, 'aview')
+        with self.assertRaises(HTTPMethodNotAllowed):
+            self._callFUT(context, request, name='aview')
+
+    def test_406_propagated_from_multiview(self):
+        from pyramid.httpexceptions import HTTPNotAcceptable
+
+        request = self._makeRequest()
+        context = self._makeContext()
+
+        def view(context, request):
+            raise HTTPNotAcceptable()
+
+        self._registerView(request.registry, view, 'aview')
+        with self.assertRaises(HTTPNotAcceptable):
+            self._callFUT(context, request, name='aview')
+
+    def test_all_method_mismatches_raises_405(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.httpexceptions import HTTPMethodNotAllowed
+        from pyramid.predicates import RequestMethodPredicate
+
+        request = self._makeRequest()
+        context = self._makeContext()
+        pred = RequestMethodPredicate(('GET',), None)
+
+        def view(context, request):
+            raise PredicateMismatch('mismatch', predicate=pred)
+
+        self._registerView(request.registry, view, 'aview')
+        with self.assertRaises(HTTPMethodNotAllowed):
+            self._callFUT(context, request, name='aview')
+
+    def test_all_accept_mismatches_raises_406(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.httpexceptions import HTTPNotAcceptable
+        from pyramid.predicates import AcceptPredicate
+
+        request = self._makeRequest()
+        context = self._makeContext()
+        pred = AcceptPredicate(('text/html',), None)
+
+        def view(context, request):
+            raise PredicateMismatch('mismatch', predicate=pred)
+
+        self._registerView(request.registry, view, 'aview')
+        with self.assertRaises(HTTPNotAcceptable):
+            self._callFUT(context, request, name='aview')
+
+    def test_mismatches_with_populated_mismatches_list(self):
+        from pyramid.exceptions import PredicateMismatch
+        from pyramid.httpexceptions import HTTPMethodNotAllowed
+        from pyramid.predicates import RequestMethodPredicate
+
+        request = self._makeRequest()
+        context = self._makeContext()
+        pred = RequestMethodPredicate(('POST',), None)
+
+        def view(context, request):
+            raise PredicateMismatch(
+                'mismatch', mismatches=[('inner_view', pred)]
+            )
+
+        self._registerView(request.registry, view, 'aview')
+        with self.assertRaises(HTTPMethodNotAllowed) as cm:
+            self._callFUT(context, request, name='aview')
+        self.assertIn('POST', cm.exception.headers['Allow'])
 
 
 class DummyContext:

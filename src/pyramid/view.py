@@ -6,6 +6,8 @@ from zope.interface import providedBy
 
 from pyramid.exceptions import ConfigurationError, PredicateMismatch
 from pyramid.httpexceptions import (
+    HTTPMethodNotAllowed,
+    HTTPNotAcceptable,
     HTTPNotFound,
     HTTPTemporaryRedirect,
     default_exceptionresponse_view,
@@ -655,7 +657,7 @@ def _call_view(
         view_classifier=view_classifier,
     )
 
-    pme = None
+    mismatches = []
     response = None
 
     for view_callable in view_callables:
@@ -673,11 +675,20 @@ def _call_view(
             # permission
             response = view_callable(context, request)
             return response
+        except (HTTPMethodNotAllowed, HTTPNotAcceptable):
+            raise
         except PredicateMismatch as _pme:
-            pme = _pme
+            mismatches.append(_pme)
 
-    if pme is not None:
-        raise pme
+    if mismatches:
+        all_mismatches = []
+        for e in mismatches:
+            if e.mismatches:
+                all_mismatches.extend(e.mismatches)
+            else:
+                all_mismatches.append((None, e.predicate))
+        PredicateMismatch.raise_if_specialized(all_mismatches)
+        raise mismatches[-1]
 
     return response
 
