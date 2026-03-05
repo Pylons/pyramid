@@ -125,13 +125,26 @@ class MultiView:
             return views
         return self.views
 
+    def _all_views(self):
+        views = list(self.views)
+        for subset in self.media_views.values():
+            views.extend(subset)
+        return views
+
     def match(self, context, request):
+        mismatches = []
         for order, view, phash in self.get_views(request):
             if not hasattr(view, '__predicated__'):
                 return view
             if view.__predicated__(context, request):
                 return view
-        raise PredicateMismatch(self.name)
+            if hasattr(view, '__predicates__'):
+                for pred in view.__predicates__:
+                    if not pred(context, request):
+                        mismatches.append((view, pred))
+                        break
+        PredicateMismatch.raise_if_specialized(mismatches, self._all_views())
+        raise PredicateMismatch(self.name, mismatches=mismatches)
 
     def __permitted__(self, context, request):
         view = self.match(context, request)
@@ -145,12 +158,15 @@ class MultiView:
         return view(context, request)
 
     def __call__(self, context, request):
+        mismatches = []
         for order, view, phash in self.get_views(request):
             try:
                 return view(context, request)
-            except PredicateMismatch:
+            except PredicateMismatch as e:
+                mismatches.append((view, e.predicate))
                 continue
-        raise PredicateMismatch(self.name)
+        PredicateMismatch.raise_if_specialized(mismatches, self._all_views())
+        raise PredicateMismatch(self.name, mismatches=mismatches)
 
 
 def attr_wrapped_view(view, info):
@@ -190,7 +206,8 @@ def predicated_view(view, info):
                 view_name = getattr(view, '__name__', view)
                 raise PredicateMismatch(
                     'predicate mismatch for view %s (%s)'
-                    % (view_name, predicate.text())
+                    % (view_name, predicate.text()),
+                    predicate=predicate,
                 )
         return view(context, request)
 
