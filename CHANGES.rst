@@ -1,5 +1,15 @@
-unreleased
-==========
+2.1rc1 (2026-03-09)
+===================
+
+- Switch dev dependencies to using dependency groups instead of extras.
+  See https://github.com/Pylons/pyramid/pull/3810
+
+- Update Github actions to install Python versions using uv instead of setup-python
+  to support versions that aren't available by default on hosted runner images.
+  See https://github.com/Pylons/pyramid/pull/3810
+
+2.1a1 (2026-02-25)
+==================
 
 Features
 --------
@@ -42,13 +52,6 @@ Features
 - Remove internal usages of deprecated ``locale`` and ``datetime`` APIs to reduce
   deprecation warnings.
   See https://github.com/Pylons/pyramid/pull/3808
-
-- Switch dev dependencies to using dependency groups instead of extras.
-  See https://github.com/Pylons/pyramid/pull/3810
-
-- Update Github actions to install Python versions using uv instead of setup-python
-  to support versions that aren't available by default on hosted runner images.
-  See https://github.com/Pylons/pyramid/pull/3810
 
 Bug Fixes
 ---------
