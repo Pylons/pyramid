@@ -72,7 +72,7 @@ Issues = "https://github.com/Pylons/pyramid/issues"
 Documentation = "https://docs.pylonsproject.org/projects/pyramid/en/2.1-branch/"
 Changelog = "https://docs.pylonsproject.org/projects/pyramid/en/2.1-branch/whatsnew-2.1.html"
 
-[project.optional-dependencies]
+[dependency-groups]
 docs = [
     "sphinx >= 8",
     "docutils",
@@ -88,6 +88,15 @@ testing = [
     "coverage",
     "pytest >= 5.4.2",  # unittest.TestCase funkyness, see commit 77c1505ab
     "pytest-cov",
+]
+lint = [
+    "flake8 ~= 6.1.0",
+    "black ~= 26.1.0",
+    "isort ~= 5.12",
+    "build",
+    "check-manifest",
+    "readme_renderer",
+    "twine",
 ]
 
 [tool.black]
