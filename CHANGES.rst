@@ -1,3 +1,8 @@
+2.1rc2 (2026-03-09)
+===================
+
+- Remove static `license` specifier in metadata, relying on the license file instead.
+
 2.1rc1 (2026-03-09)
 ===================
 
