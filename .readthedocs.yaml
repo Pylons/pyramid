@@ -4,14 +4,12 @@ build:
   os: ubuntu-24.04
   tools:
     python: '3.14'
+  jobs:
+    install:
+      - pip install --upgrade pip
+      - pip install --group docs .
 sphinx:
   configuration: docs/conf.py
 formats:
   - pdf
   - epub
-python:
-  install:
-    - method: pip
-      path: .
-      extra_requirements:
-        - docs

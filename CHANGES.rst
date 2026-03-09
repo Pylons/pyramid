@@ -43,6 +43,13 @@ Features
   deprecation warnings.
   See https://github.com/Pylons/pyramid/pull/3808
 
+- Switch dev dependencies to using dependency groups instead of extras.
+  See https://github.com/Pylons/pyramid/pull/3810
+
+- Update Github actions to install Python versions using uv instead of setup-python
+  to support versions that aren't available by default on hosted runner images.
+  See https://github.com/Pylons/pyramid/pull/3810
+
 Bug Fixes
 ---------
 
