@@ -1,3 +1,8 @@
+2.1rc3 (2026-03-09)
+===================
+
+- Add "Operating System :: Independent" trove classifier.
+
 2.1rc2 (2026-03-09)
 ===================
 
