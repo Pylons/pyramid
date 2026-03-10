@@ -24,6 +24,16 @@
 Features
 --------
 
+- When a route matches but no view matches due to predicate mismatches,
+  Pyramid now returns the correct HTTP status instead of always returning 404:
+
+  - **405 Method Not Allowed** (with ``Allow`` header) when all views failed
+    because of ``request_method`` predicates.
+  - **406 Not Acceptable** when all views failed because of ``accept``
+    predicates.
+  - **404 Not Found** remains the default when mismatches are mixed or
+    unrelated to method/accept.
+
 - Add support for Python 3.12, 3.13, and 3.14.
 
 - Added HTTP 418 error code via `pyramid.httpexceptions.HTTPImATeapot`.
@@ -92,6 +102,17 @@ Bug Fixes
 
 Backward Incompatibilities
 --------------------------
+
+- When all views for a matched route fail due to ``request_method`` predicates,
+  Pyramid now raises ``HTTPMethodNotAllowed`` (405) instead of
+  ``PredicateMismatch`` (a subclass of ``HTTPNotFound``, 404). Similarly,
+  ``accept`` predicate mismatches now raise ``HTTPNotAcceptable`` (406).
+
+  ``HTTPMethodNotAllowed`` and ``HTTPNotAcceptable`` do **not** inherit from
+  ``HTTPNotFound`` or ``PredicateMismatch``. Code that catches ``HTTPNotFound``
+  or registers exception views for ``HTTPNotFound`` will no longer intercept
+  these responses. Update exception handlers to also catch the new types if
+  needed.
 
 - Drop support for Python 3.6, 3.7, 3.8, and 3.9.
 
