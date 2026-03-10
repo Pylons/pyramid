@@ -1,3 +1,9 @@
+2.1rc4 (2026-03-10)
+===================
+
+- Add static `license` specifier `LicenseRef-Repoze-BSD-derived` to the package
+  metadata to satisfy SPDX license format.
+
 2.1rc3 (2026-03-09)
 ===================
 
