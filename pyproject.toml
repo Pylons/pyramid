@@ -7,12 +7,13 @@ where = ["src"]
 
 [project]
 name = "pyramid"
-version = "2.1rc3"
+version = "2.1rc4"
 description = "The Pyramid Web Framework, a Pylons project"
 
 authors = [
   {name = "Chris McDonough, Agendaless Consulting", email = "pylons-discuss@googlegroups.com"},
 ]
+license = "LicenseRef-Repoze-BSD-derived"
 license-files = ["LICENSE.txt"]
 
 readme = {file = "README.rst", content-type = "text/x-rst"}
