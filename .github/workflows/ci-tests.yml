@@ -14,8 +14,6 @@ on:
 jobs:
     test:
         strategy:
-            fail-fast: false
-            # See https://github.com/actions/runner-images
             matrix:
                 py:
                     - "3.6"
@@ -26,61 +24,76 @@ jobs:
                     - "3.11"
                     - "pypy-3.8"
                 os:
-                    - "ubuntu-24.04" # x64
-                    - "windows-2022" # x64
-                    - "macos-15" # arm64
-                    - "macos-15-intel" # x64
+                    - "ubuntu-20.04"
+                    - "windows-2022"
+                    - "macos-11"
+                architecture:
+                    - x64
+                    - x86
+
                 include:
-                    - os: "ubuntu-24.04"
+                    # Only run coverage on ubuntu-20.04, except on pypy3
+                    - os: "ubuntu-20.04"
                       pytest-args: "--cov"
-                    - py: "pypy-3.8"
-                      toxenv: "pypy38"
+                    - os: "ubuntu-20.04"
+                      py: "pypy-3.8"
                       pytest-args: ""
 
-        name: "Python: ${{ matrix.py }} on ${{ matrix.os }}"
+                exclude:
+                    # Linux and macOS don't have x86 python
+                    - os: "ubuntu-20.04"
+                      architecture: x86
+                    - os: "macos-11"
+                      architecture: x86
+                    # PyPy3 on Windows doesn't seem to work
+                    - os: "windows-2022"
+                      py: "pypy-3.8"
+
+        name: "Python: ${{ matrix.py }}-${{ matrix.architecture }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
         steps:
-            - uses: actions/checkout@v6
-            - name: Setup uv
-              uses: astral-sh/setup-uv@v7
+            - uses: actions/checkout@v3
+            - name: Setup python
+              uses: actions/setup-python@v4
               with:
                   python-version: ${{ matrix.py }}
-            - name: Running tox with specific toxenv
-              if: ${{ matrix.toxenv != '' }}
-              env:
-                TOXENV: ${{ matrix.toxenv }}
-              run: uvx tox
-            - name: Running tox for current python version
-              if: ${{ matrix.toxenv == '' }}
-              run: uvx tox -e py -- ${{ matrix.pytest-args }}
-
+                  architecture: ${{ matrix.architecture }}
+            - run: pip install tox
+            - name: Running tox
+              run: tox -e py -- ${{ matrix.pytest-args }}
     coverage:
-        runs-on: ubuntu-24.04
+        runs-on: ubuntu-20.04
         name: Validate coverage
         steps:
-            - uses: actions/checkout@v6
-            - name: Setup uv
-              uses: astral-sh/setup-uv@v7
+            - uses: actions/checkout@v3
+            - name: Setup python
+              uses: actions/setup-python@v4
               with:
                   python-version: "3.8"
-            - run: uvx tox -e py38-cover,coverage
+                  architecture: x64
+            - run: pip install tox
+            - run: tox -e py38-cover,coverage
     docs:
-        runs-on: ubuntu-24.04
+        runs-on: ubuntu-20.04
         name: Build the documentation
         steps:
-            - uses: actions/checkout@v6
-            - name: Setup uv
-              uses: astral-sh/setup-uv@v7
+            - uses: actions/checkout@v3
+            - name: Setup python
+              uses: actions/setup-python@v4
               with:
                   python-version: "3.8"
-            - run: uvx tox -e docs
+                  architecture: x64
+            - run: pip install tox
+            - run: tox -e docs
     lint:
-        runs-on: ubuntu-24.04
+        runs-on: ubuntu-20.04
         name: Lint the package
         steps:
-            - uses: actions/checkout@v6
-            - name: Setup uv
-              uses: astral-sh/setup-uv@v7
+            - uses: actions/checkout@v3
+            - name: Setup python
+              uses: actions/setup-python@v4
               with:
                   python-version: "3.8"
-            - run: uvx tox -e lint
+                  architecture: x64
+            - run: pip install tox
+            - run: tox -e lint
