@@ -14,6 +14,7 @@ on:
 jobs:
     test:
         strategy:
+            fail-fast: false
             matrix:
                 py:
                     - "3.6"
