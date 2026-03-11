@@ -7,7 +7,7 @@ where = ["src"]
 
 [project]
 name = "pyramid"
-version = "2.1"
+version = "2.2.dev0"
 description = "The Pyramid Web Framework, a Pylons project"
 
 authors = [
