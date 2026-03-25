@@ -16,9 +16,7 @@ from pyramid.wsgi import wsgiapp
 from .pkgs.exceptionviewapp.models import AnException, NotAnException
 
 # 5 years from now (more or less)
-fiveyrsfuture = datetime.now(timezone.utc) + timedelta(
-    5 * 365
-)
+fiveyrsfuture = datetime.now(timezone.utc) + timedelta(5 * 365)
 
 defaultlocale = locale.getlocale()[1]
 
