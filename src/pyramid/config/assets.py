@@ -230,8 +230,10 @@ class PackageAssetSource:
         self._base_ref = importlib.resources.files(package) / prefix
 
     def get_spec(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
+        ref = self._base_ref / resource_name
+        base = importlib.resources.files(self.pkg_name)
+        if ref.exists():
+            path = ref.relative_to(base)
             return f'{self.pkg_name}:{path}'
 
     def get_filename(self, resource_name):
