@@ -1,7 +1,7 @@
 from pyramid.config.actions import action_method
 from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import ILocaleNegotiator, ITranslationDirectories
-from pyramid.path import AssetResolver
+from pyramid.resolver import AssetResolver
 
 
 class I18NConfiguratorMixin:
