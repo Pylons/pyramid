@@ -1,9 +1,13 @@
+from datetime import datetime, timezone
 import io
 import mimetypes
 import os
+from os.path import getmtime, getsize
 import unittest
+from unittest.mock import Mock
 
 from pyramid import testing
+from pyramid.request import Request
 
 
 class TestResponse(unittest.TestCase):
@@ -26,6 +30,13 @@ class TestResponse(unittest.TestCase):
 
 
 class TestFileResponse(unittest.TestCase):
+    def setUp(self):
+        self.request = Request.blank('/')
+        self.config = testing.setUp(request=self.request)
+
+    def tearDown(self):
+        testing.tearDown()
+
     def _makeOne(self, file, **kw):
         from pyramid.response import FileResponse
 
@@ -40,6 +51,10 @@ class TestFileResponse(unittest.TestCase):
         with open(path, 'rb') as fh:
             expected = fh.read()
         self.assertEqual(r.body, expected, 'File contents do not match.')
+        expected_dt = datetime.fromtimestamp(getmtime(path), timezone.utc)
+        expected_dt = expected_dt.replace(microsecond=0)
+        self.assertEqual(r.last_modified, expected_dt)
+        self.assertEqual(r.content_length, getsize(path))
 
     def test_with_image_content_type(self):
         path = self._get_path('jpg')
@@ -73,6 +88,23 @@ class TestFileResponse(unittest.TestCase):
                 mimetypes.guess_type(path, strict=False)[0],
             )
             self._validate_content(r, suffix)
+
+    def test_wsgi_file_wrapper(self):
+        from pyramid.response import FileIter
+
+        wrapper = Mock(side_effect=FileIter)
+        request = Request.blank(
+            '/',
+            environ={
+                'wsgi.file_wrapper': wrapper,
+            },
+        )
+
+        path = self._get_path()
+        r = self._makeOne(path, request=request)
+        self._validate_content(r)
+
+        wrapper.assert_called_once()
 
 
 class TestFileIter(unittest.TestCase):
