@@ -31,43 +31,48 @@ class TestFileResponse(unittest.TestCase):
 
         return FileResponse(file, **kw)
 
-    def _getPath(self, suffix='txt'):
+    def _get_path(self, suffix='txt'):
         here = os.path.dirname(__file__)
         return os.path.join(here, 'fixtures', f'minimal.{suffix}')
 
+    def _validate_content(self, r, suffix='txt'):
+        path = self._get_path(suffix)
+        with open(path, 'rb') as fh:
+            expected = fh.read()
+        self.assertEqual(r.body, expected, 'File contents do not match.')
+
     def test_with_image_content_type(self):
-        path = self._getPath('jpg')
+        path = self._get_path('jpg')
         r = self._makeOne(path, content_type='image/jpeg')
         self.assertEqual(r.content_type, 'image/jpeg')
         self.assertEqual(r.headers['content-type'], 'image/jpeg')
-        path = self._getPath()
-        r.app_iter.close()
+        self._validate_content(r, 'jpg')
 
     def test_with_xml_content_type(self):
-        path = self._getPath('xml')
+        path = self._get_path('xml')
         r = self._makeOne(path, content_type='application/xml')
         self.assertEqual(r.content_type, 'application/xml')
         self.assertEqual(
             r.headers['content-type'], 'application/xml; charset=UTF-8'
         )
-        r.app_iter.close()
+        self._validate_content(r, 'xml')
 
     def test_with_pdf_content_type(self):
-        path = self._getPath('xml')
+        path = self._get_path('xml')
         r = self._makeOne(path, content_type='application/pdf')
         self.assertEqual(r.content_type, 'application/pdf')
         self.assertEqual(r.headers['content-type'], 'application/pdf')
-        r.app_iter.close()
+        self._validate_content(r, 'xml')
 
     def test_without_content_type(self):
         for suffix in ('txt', 'xml', 'pdf'):
-            path = self._getPath(suffix)
+            path = self._get_path(suffix)
             r = self._makeOne(path)
             self.assertEqual(
                 r.headers['content-type'].split(';')[0],
                 mimetypes.guess_type(path, strict=False)[0],
             )
-            r.app_iter.close()
+            self._validate_content(r, suffix)
 
 
 class TestFileIter(unittest.TestCase):
