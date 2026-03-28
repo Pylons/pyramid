@@ -5,6 +5,7 @@ from webob import Response as _Response
 from zope.interface import implementer
 
 from pyramid.interfaces import IResponse, IResponseFactory
+from pyramid.threadlocal import get_current_request
 
 _BLOCK_SIZE = 4096 * 64  # 256K
 
@@ -19,7 +20,7 @@ class FileResponse(Response):
     A Response object that can be used to serve a static file from disk
     simply.
 
-    ``path`` is a file path on disk.
+    ``path`` is a path on the filesystem or an :ref:`asset specification`.
 
     ``request`` must be a Pyramid :term:`request` object.  Note
     that a request *must* be passed if the response is meant to attempt to
@@ -52,6 +53,9 @@ class FileResponse(Response):
             content_type=content_type,
             content_encoding=content_encoding,
         )
+        if request is None:
+            request = get_current_request()
+        path = request.resolve_asset(path).abspath()
         self.last_modified = getmtime(path)
         content_length = getsize(path)
         f = open(path, 'rb')
