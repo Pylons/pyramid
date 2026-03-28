@@ -106,6 +106,15 @@ class TestFileResponse(unittest.TestCase):
 
         wrapper.assert_called_once()
 
+    def test_asset_spec(self):
+        r = self._makeOne('tests:fixtures/minimal.txt')
+        self._validate_content(r)
+
+    def test_asset_spec_explicit_request(self):
+        request = Request.blank('/')
+        r = self._makeOne('tests:fixtures/minimal.txt', request=request)
+        self._validate_content(r)
+
 
 class TestFileIter(unittest.TestCase):
     def _makeOne(self, file, block_size):
