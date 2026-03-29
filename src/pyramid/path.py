@@ -1,3 +1,7 @@
+# The implementation of this module exists over at `_path.py`.  This is because
+# the `pyramid.resolver` APIs are exported by this module as well for backwards
+# compatibility, and `_path.py` prevents a circular dependency.  See
+# https://github.com/Pylons/pyramid/issues/3731 for more details.
 from ._path import (
     CALLER_PACKAGE,
     caller_module,
