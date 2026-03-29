@@ -5,7 +5,7 @@ import inspect
 import platform
 import weakref
 
-from pyramid.path import DottedNameResolver as _DottedNameResolver
+from pyramid.resolver import DottedNameResolver as _DottedNameResolver
 
 _marker = object()
 

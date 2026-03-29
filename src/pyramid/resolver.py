@@ -60,7 +60,7 @@ class AssetResolver(Resolver):
     The default value is :attr:`pyramid.path.CALLER_PACKAGE`.
 
     The ``package`` is used when a relative asset specification is supplied
-    to the :meth:`~pyramid.path.AssetResolver.resolve` method.  An asset
+    to the :meth:`~pyramid.resolver.AssetResolver.resolve` method.  An asset
     specification without a colon in it is treated as relative.
 
     If ``package`` is ``None``, the resolver will
@@ -70,8 +70,8 @@ class AssetResolver(Resolver):
 
     If ``package`` is :attr:`pyramid.path.CALLER_PACKAGE`,
     the resolver will treat relative asset specifications as
-    relative to the caller of the :meth:`~pyramid.path.AssetResolver.resolve`
-    method.
+    relative to the caller of the
+    :meth:`~pyramid.resolver.AssetResolver.resolve` method.
 
     If ``package`` is a *module* or *module name* (as opposed to a package or
     package name), its containing package is computed and this
@@ -79,16 +79,16 @@ class AssetResolver(Resolver):
     to packages, never to modules).  For example, if the ``package`` argument
     to this type was passed the string ``xml.dom.expatbuilder``, and
     ``template.pt`` is supplied to the
-    :meth:`~pyramid.path.AssetResolver.resolve` method, the resulting absolute
-    asset spec would be ``xml.minidom:template.pt``, because
+    :meth:`~pyramid.resolver.AssetResolver.resolve` method, the resulting
+    absolute asset spec would be ``xml.minidom:template.pt``, because
     ``xml.dom.expatbuilder`` is a module object, not a package object.
 
     If ``package`` is a *package* or *package name* (as opposed to a module or
     module name), this package will be used to compute relative
     asset specifications.  For example, if the ``package`` argument to this
     type was passed the string ``xml.dom``, and ``template.pt`` is supplied
-    to the :meth:`~pyramid.path.AssetResolver.resolve` method, the resulting
-    absolute asset spec would be ``xml.minidom:template.pt``.
+    to the :meth:`~pyramid.resolver.AssetResolver.resolve` method, the
+    resulting absolute asset spec would be ``xml.minidom:template.pt``.
     """
 
     def resolve(self, spec):
@@ -156,9 +156,9 @@ class DottedNameResolver(Resolver):
     The default value is :attr:`pyramid.path.CALLER_PACKAGE`.
 
     The ``package`` is used when a relative dotted name is supplied to the
-    :meth:`~pyramid.path.DottedNameResolver.resolve` method.  A dotted name
-    which has a ``.`` (dot) or ``:`` (colon) as its first character is
-    treated as relative.
+    :meth:`~pyramid.resolver.DottedNameResolver.resolve` method.  A dotted name
+    which has a ``.`` (dot) or ``:`` (colon) as its first character is treated
+    as relative.
 
     If ``package`` is ``None``, the resolver will only be able to resolve
     fully qualified (not relative) names.  Any attempt to resolve a
@@ -166,7 +166,7 @@ class DottedNameResolver(Resolver):
 
     If ``package`` is :attr:`pyramid.path.CALLER_PACKAGE`,
     the resolver will treat relative dotted names as relative to
-    the caller of the :meth:`~pyramid.path.DottedNameResolver.resolve`
+    the caller of the :meth:`~pyramid.resolver.DottedNameResolver.resolve`
     method.
 
     If ``package`` is a *module* or *module name* (as opposed to a package or
@@ -175,15 +175,15 @@ class DottedNameResolver(Resolver):
     to packages, never to modules).  For example, if the ``package`` argument
     to this type was passed the string ``xml.dom.expatbuilder``, and
     ``.mindom`` is supplied to the
-    :meth:`~pyramid.path.DottedNameResolver.resolve` method, the resulting
-    import would be for ``xml.minidom``, because ``xml.dom.expatbuilder`` is
-    a module object, not a package object.
+    :meth:`~pyramid.resolver.DottedNameResolver.resolve` method, the resulting
+    import would be for ``xml.minidom``, because ``xml.dom.expatbuilder`` is a
+    module object, not a package object.
 
     If ``package`` is a *package* or *package name* (as opposed to a module or
     module name), this package will be used to relative compute
     dotted names.  For example, if the ``package`` argument to this type was
     passed the string ``xml.dom``, and ``.minidom`` is supplied to the
-    :meth:`~pyramid.path.DottedNameResolver.resolve` method, the resulting
+    :meth:`~pyramid.resolver.DottedNameResolver.resolve` method, the resulting
     import would be for ``xml.minidom``.
     """
 
@@ -231,7 +231,7 @@ class DottedNameResolver(Resolver):
     def maybe_resolve(self, dotted):
         """
         This method behaves just like
-        :meth:`~pyramid.path.DottedNameResolver.resolve`, except if the
+        :meth:`~pyramid.resolver.DottedNameResolver.resolve`, except if the
         ``dotted`` value passed is not a string, it is simply returned.  For
         example:
 
