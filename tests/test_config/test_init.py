@@ -396,6 +396,18 @@ class ConfiguratorTests(unittest.TestCase):
         result = config.maybe_dotted(tests.test_config)
         self.assertEqual(result, tests.test_config)
 
+    def test_resolve_asset(self):
+        config = self._makeOne()
+        asset = config.resolve_asset('tests:fixtures/minimal.txt')
+        self.assertEqual(asset.absspec(), 'tests:fixtures/minimal.txt')
+
+    def test_resolve_asset_relative(self):
+        import tests
+
+        config = self._makeOne(package=tests)
+        asset = config.resolve_asset('fixtures/minimal.txt')
+        self.assertEqual(asset.absspec(), 'tests:fixtures/minimal.txt')
+
     def test_absolute_asset_spec_already_absolute(self):
         import tests.test_config
 
