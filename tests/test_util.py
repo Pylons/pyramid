@@ -1,7 +1,10 @@
+import os
 import sys
 import unittest
 
 from pyramid.util import bytes_, text_
+
+here = os.path.abspath(os.path.dirname(__file__))
 
 
 class TestDottedNameResolver(unittest.TestCase):
@@ -1309,3 +1312,30 @@ class TestReraise(unittest.TestCase):
         self.assertIsNot(val2, val)
         self.assertIsInstance(val2, Exception)
         self.assertIs(get_next(tb2), tb)
+
+
+class TestRefFilename(unittest.TestCase):
+    def _callFUT(self, ref):
+        from pyramid.util import ref_filename
+
+        return ref_filename(ref)
+
+    def test_returns_path(self):
+        import importlib.resources
+
+        ref = importlib.resources.files('tests') / 'fixtures' / 'minimal.txt'
+        path = self._callFUT(ref)
+        expected = os.path.join(here, 'fixtures/minimal.txt')
+        self.assertEqual(path, expected)
+
+
+class TestResourceFilename(unittest.TestCase):
+    def _callFUT(self, package, name):
+        from pyramid.util import resource_filename
+
+        return resource_filename(package, name)
+
+    def test_returns_path(self):
+        path = self._callFUT('tests', 'fixtures/minimal.txt')
+        expected = os.path.join(here, 'fixtures/minimal.txt')
+        self.assertEqual(path, expected)

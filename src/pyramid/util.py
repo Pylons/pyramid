@@ -1,6 +1,8 @@
-from contextlib import contextmanager
+import atexit
+from contextlib import ExitStack, contextmanager
 import functools
 from hmac import compare_digest
+import importlib.resources
 import inspect
 import platform
 import weakref
@@ -749,3 +751,55 @@ def reraise(tp, value, tb=None):
     finally:
         value = None
         tb = None
+
+
+@functools.lru_cache(maxsize=None)
+def ref_filename(ref):
+    """Return a filename on the filesystem for the given resource.
+
+    .. note::
+
+        Instead of using this function directly, consider using Pyramid's asset
+        APIs as detailed in :ref: `accessing_assets`.
+
+    If the resource does not exist in the filesystem (e.g. in a zipped egg), it
+    will be extracted to a temporary directory and cleaned up when the
+    application exits.
+
+    :param ref:  A reference pointing to the desired resource.
+    :type ref: importlib.resources.abc.Traversable
+    :return:  The filename on the filesystem.
+    :rtype:  str
+
+    """
+    manager = ExitStack()
+    atexit.register(manager.close)
+    path = manager.enter_context(importlib.resources.as_file(ref))
+    return str(path)
+
+
+def resource_filename(package, name):
+    """Return a filename on the filesystem for the given resource.
+
+    .. note::
+
+        Instead of using this function directly, consider using Pyramid's asset
+        APIs as detailed in :ref: `accessing_assets`.
+
+    If the resource does not exist in the filesystem (e.g. in a zipped egg), it
+    will be extracted to a temporary directory and cleaned up when the
+    application exits.
+
+    This function is equivalent to the now-deprecated
+    ``pkg_resources.resource_filename``.
+
+    :param package:  The package containing the resource.
+    :type package: str
+    :param name:  The name of the resource within the package.
+    :type name: str
+    :return:  The filename on the filesystem.
+    :rtype:  str
+
+    """
+    ref = importlib.resources.files(package) / name
+    return ref_filename(ref)
