@@ -740,6 +740,10 @@ def reraise(tp, value, tb=None):
         tb = None
 
 
+_exit_stack = ExitStack()
+atexit.register(_exit_stack.close)
+
+
 @functools.lru_cache(maxsize=None)
 def ref_filename(ref):
     """Return a filename on the filesystem for the given resource.
@@ -759,9 +763,7 @@ def ref_filename(ref):
     :rtype:  str
 
     """
-    manager = ExitStack()
-    atexit.register(manager.close)
-    path = manager.enter_context(importlib.resources.as_file(ref))
+    path = _exit_stack.enter_context(importlib.resources.as_file(ref))
     return str(path)
 
 
