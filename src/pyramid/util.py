@@ -760,11 +760,10 @@ def ref_filename(ref):
     :param ref:  A reference pointing to the desired resource.
     :type ref: importlib.resources.abc.Traversable
     :return:  The filename on the filesystem.
-    :rtype:  str
+    :rtype:  ``pathlib.Path``
 
     """
-    path = _exit_stack.enter_context(importlib.resources.as_file(ref))
-    return str(path)
+    return _exit_stack.enter_context(importlib.resources.as_file(ref))
 
 
 def resource_filename(package, name):
@@ -791,4 +790,4 @@ def resource_filename(package, name):
 
     """
     ref = importlib.resources.files(package) / name
-    return ref_filename(ref)
+    return str(ref_filename(ref))

@@ -1,4 +1,5 @@
 import os
+import pathlib
 import sys
 import unittest
 
@@ -1290,7 +1291,7 @@ class TestRefFilename(unittest.TestCase):
 
         ref = importlib.resources.files('tests') / 'fixtures' / 'minimal.txt'
         path = self._callFUT(ref)
-        expected = os.path.join(here, 'fixtures/minimal.txt')
+        expected = pathlib.Path(here) / 'fixtures' / 'minimal.txt'
         self.assertEqual(path, expected)
 
 
