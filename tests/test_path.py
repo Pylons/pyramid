@@ -1,4 +1,5 @@
 import os
+import pathlib
 import unittest
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -213,6 +214,33 @@ class TestPackageName(unittest.TestCase):
 
         result = self._callFUT(__main__)
         self.assertEqual(result, '__main__')
+
+
+class TestRefFilename(unittest.TestCase):
+    def _callFUT(self, ref):
+        from pyramid.path import ref_filename
+
+        return ref_filename(ref)
+
+    def test_returns_path(self):
+        import importlib.resources
+
+        ref = importlib.resources.files('tests') / 'fixtures' / 'minimal.txt'
+        path = self._callFUT(ref)
+        expected = pathlib.Path(here) / 'fixtures' / 'minimal.txt'
+        self.assertEqual(path, expected)
+
+
+class TestResourceFilename(unittest.TestCase):
+    def _callFUT(self, package, name):
+        from pyramid.path import resource_filename
+
+        return resource_filename(package, name)
+
+    def test_returns_path(self):
+        path = self._callFUT('tests', 'fixtures/minimal.txt')
+        expected = os.path.join(here, 'fixtures/minimal.txt')
+        self.assertEqual(path, expected)
 
 
 class TestResolver(unittest.TestCase):
