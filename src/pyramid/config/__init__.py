@@ -5,6 +5,7 @@ import threading
 import venusian
 from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
 
+from pyramid._path import caller_package, package_of
 from pyramid.asset import resolve_asset_spec
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config.actions import (
@@ -36,7 +37,6 @@ from pyramid.interfaces import (
     IDebugLogger,
     IExceptionResponse,
 )
-from pyramid.path import caller_package, package_of
 from pyramid.registry import Introspectable, Introspector, Registry
 from pyramid.resolver import DottedNameResolver
 from pyramid.router import Router

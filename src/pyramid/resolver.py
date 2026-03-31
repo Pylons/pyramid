@@ -5,9 +5,8 @@ import pkg_resources
 import sys
 from zope.interface import implementer
 
+from pyramid._path import CALLER_PACKAGE, caller_package, package_of
 from pyramid.interfaces import IAssetDescriptor
-
-from ._path import CALLER_PACKAGE, caller_package, package_of
 
 
 class Resolver:
