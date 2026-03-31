@@ -4,11 +4,11 @@ import os
 from webob.acceptparse import create_accept_header
 from zope.interface import alsoProvides, implementer
 
+from pyramid._path import caller_package
 from pyramid.config import Configurator
 from pyramid.decorator import reify
 from pyramid.i18n import LocalizerRequestMixin
 from pyramid.interfaces import IRequest, ISession
-from pyramid.path import caller_package
 from pyramid.registry import Registry
 from pyramid.request import CallbackMethodsMixin
 from pyramid.response import _get_response_factory
