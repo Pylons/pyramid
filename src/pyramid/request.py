@@ -13,6 +13,7 @@ from pyramid.interfaces import (
     IResponse,
     ISessionFactory,
 )
+from pyramid.path import AssetResolver, caller_package
 from pyramid.response import Response, _get_response_factory
 from pyramid.security import AuthenticationAPIMixin, SecurityAPIMixin
 from pyramid.url import URLMethodsMixin
@@ -227,6 +228,16 @@ class Request(
         if adapted is None:
             return False
         return adapted is ob
+
+    def resolve_asset(self, spec):
+        """Resolve the given :term:`asset specification` string to a
+        :class:`pyramid.interfaces.IAssetDescriptor` instance.  Overrides
+        registered via :meth:`pyramid.config.Configurator.override_asset` will
+        change how this method resolves assets, which is described in detail in
+        :ref:`assets_chapter`.
+        """
+        package = caller_package()
+        return AssetResolver(package).resolve(spec)
 
 
 def route_request_iface(name, bases=()):

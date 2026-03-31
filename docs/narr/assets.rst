@@ -365,6 +365,40 @@ package. If the folder does exist, then the overriden folder is given priority,
 if the file's name exists in both locations.
 
 .. index::
+   single: Accessing Static Assets
+
+.. _accessing_assets:
+
+Accessing Static Assets
+-----------------------
+
+In addition to serving static assets, your application may need to access asset
+data.  Pyramid provides two methods for this:
+
+- During configuration, you can use :meth:`pyramid.config.Configuration.resolve_asset`.
+- During a request, you can use :meth:`pyramid.request.Request.resolve_asset`.
+
+Both these methods accept a single argument of a :term:`asset specification` as
+a string and return an :class:`pyramid.interfaces.IAssetDescriptor` instance.
+
+Asset descriptors provide a :meth:`pyramid.interfaces.IAssetDescriptor.stream`
+method which returns a binary file-like object.  You can use ``read()`` to
+return a bytestring of the asset contents.
+
+If you need the access the asset via the filesystem, you can use the
+:meth:`pyramid.interfaces.IAssetDescriptor.abspath` method.  However, this is
+discouraged, as assets in zip packages do not have a filesystem path and
+require extracting the asset to a temporary file for the lifetime of the
+application.
+
+Python provides first-party asset APIs via `importlib.resources`_, but this
+does not support :ref:`overriding assets <overriding_assets_section>`.
+Applications may choose to use ``importlib.resources`` if they do not need to
+support overrides, but add-ons should utilize Pyramid's APIs.
+
+.. _importlib.resources: https://docs.python.org/3/library/importlib.resources.html
+
+.. index::
    single: Cache Busting
 
 .. _cache_busting:
@@ -493,6 +527,7 @@ well:
 
 .. code-block:: python
     :linenos:
+
 
     import posixpath
 
