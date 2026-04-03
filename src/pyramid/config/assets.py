@@ -1,3 +1,4 @@
+import importlib.resources
 import os
 import pkg_resources
 import sys
@@ -7,6 +8,7 @@ from pyramid.config.actions import action_method
 from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import PHASE1_CONFIG, IPackageOverrides
 from pyramid.threadlocal import get_current_registry
+from pyramid.util import ref_filename
 
 
 class OverrideProvider(pkg_resources.DefaultProvider):
@@ -226,43 +228,41 @@ class PackageAssetSource:
             self.pkg_name = package
         self.prefix = prefix
 
+    def _base(self):
+        return importlib.resources.files(self.pkg_name) / self.prefix
+
     def get_path(self, resource_name):
         return f'{self.prefix}{resource_name}'
 
     def get_spec(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return f'{self.pkg_name}:{path}'
+        if self.exists(resource_name):
+            return f'{self.pkg_name}:{self.prefix}{resource_name}'
 
     def get_filename(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_filename(self.pkg_name, path)
+        if self.exists(resource_name):
+            return str(ref_filename(self._base() / resource_name))
 
     def get_stream(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_stream(self.pkg_name, path)
+        if self.exists(resource_name):
+            return (self._base() / resource_name).open('rb')
 
     def get_string(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_string(self.pkg_name, path)
+        if self.exists(resource_name):
+            return (self._base() / resource_name).read_bytes()
 
     def exists(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
+        path = self._base() / resource_name
+        if path.exists():
             return True
 
     def isdir(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_isdir(self.pkg_name, path)
+        if self.exists(resource_name):
+            return (self._base() / resource_name).is_dir()
 
     def listdir(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_listdir(self.pkg_name, path)
+        if self.exists(resource_name):
+            path = self._base() / resource_name
+            return [str(item.relative_to(path)) for item in path.iterdir()]
 
 
 class FSAssetSource:
