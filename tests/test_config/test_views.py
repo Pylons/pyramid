@@ -11,6 +11,7 @@ from pyramid.exceptions import (
     ConfigurationExecutionError,
 )
 from pyramid.interfaces import IMultiView, IRequest, IResponse
+from pyramid.request import Request
 from pyramid.util import text_
 
 from . import IDummy, dummy_view
@@ -3866,8 +3867,8 @@ class TestStaticURLInfo(unittest.TestCase):
         return self._getTargetClass()()
 
     def _makeRequest(self):
-        request = DummyRequest()
-        request.registry = DummyRegistry()
+        request = Request.blank("/")
+        request.registry = self.config.registry
         return request
 
     def test_verifyClass(self):
@@ -4067,7 +4068,7 @@ class TestStaticURLInfo(unittest.TestCase):
         self.assertTrue(called[0])
 
     def test_generate_url_cachebust_with_overrides(self):
-        request = testing.DummyRequest()
+        request = self._makeRequest()
         self.config.add_static_view(
             'static', 'tests.test_config.pkgs.cachebust:path/'
         )
@@ -4089,7 +4090,7 @@ class TestStaticURLInfo(unittest.TestCase):
         result = request.static_url(
             'tests.test_config.pkgs.cachebust:path/foo.png'
         )
-        self.assertEqual(result, 'http://example.com/static/foo.png?x=foo')
+        self.assertEqual(result, 'http://localhost/static/foo.png?x=foo')
         self.config.add_cache_buster(
             'tests.test_config.pkgs.cachebust:override/',
             cb('bar'),
@@ -4098,7 +4099,7 @@ class TestStaticURLInfo(unittest.TestCase):
         result = request.static_url(
             'tests.test_config.pkgs.cachebust:path/foo.png'
         )
-        self.assertEqual(result, 'http://example.com/static/foo.png?x=bar')
+        self.assertEqual(result, 'http://localhost/static/foo.png?x=bar')
 
     def test_add_already_exists(self):
         config = DummyConfig()
