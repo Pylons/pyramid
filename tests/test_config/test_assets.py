@@ -596,6 +596,13 @@ class TestPackageOverrides(unittest.TestCase):
         self.assertEqual(po.overrides, [])
         self.assertEqual(po.overridden_package_name, 'package')
 
+    def test_ctor_pkg_resources_no_exists(self):
+        package = DummyPackage('package')
+        klass = self._getTargetClass()
+        po = klass(package, pkg_resources=None)
+        self.assertEqual(po.overrides, [])
+        self.assertEqual(po.overridden_package_name, 'package')
+
     def test_insert_directory(self):
         from pyramid.config.assets import DirectoryOverride
 
