@@ -1,3 +1,4 @@
+from collections import deque
 from contextlib import contextmanager
 import functools
 from hmac import compare_digest
@@ -501,7 +502,10 @@ class TopologicalSorter:
     def sorted(self):
         """Returns the sort input values in topologically sorted order"""
         order = [(self.first, self.last)]
-        roots = []
+        # CWE-407 fix: deque for O(1) popleft/appendleft; roots_set for O(1)
+        # membership check and removal instead of O(N) list.remove()
+        roots = deque()
+        roots_set = set()
         graph = {}
         names = [self.first, self.last]
         names.extend(self.names)
@@ -512,13 +516,14 @@ class TopologicalSorter:
         def add_node(node):
             if node not in graph:
                 roots.append(node)
+                roots_set.add(node)
                 graph[node] = [0]  # 0 = number of arcs coming into this node
 
         def add_arc(fromnode, tonode):
             graph[fromnode].append(tonode)
             graph[tonode][0] += 1
-            if tonode in roots:
-                roots.remove(tonode)
+            if tonode in roots_set:
+                roots_set.discard(tonode)
 
         for name in names:
             add_node(name)
@@ -549,8 +554,14 @@ class TopologicalSorter:
 
         sorted_names = []
 
-        while roots:
-            root = roots.pop(0)
+        while roots_set:
+            root = roots.popleft()
+            # skip nodes removed from roots_set by add_arc
+            while root not in roots_set and roots:
+                root = roots.popleft()
+            if root not in roots_set:
+                break
+            roots_set.discard(root)
             sorted_names.append(root)
             children = graph[root][1:]
             for child in children:
@@ -558,7 +569,8 @@ class TopologicalSorter:
                 arcs -= 1
                 graph[child][0] = arcs
                 if arcs == 0:
-                    roots.insert(0, child)
+                    roots.appendleft(child)
+                    roots_set.add(child)
             del graph[root]
 
         if graph:
