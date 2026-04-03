@@ -15,79 +15,83 @@ except ImportError:
     pkg_resources = None
 
 
-class OverrideProvider(pkg_resources.DefaultProvider):
-    def __init__(self, module):
-        pkg_resources.DefaultProvider.__init__(self, module)
-        self.module_name = module.__name__
+if pkg_resources is not None:
 
-    def _get_overrides(self):
-        reg = get_current_registry()
-        overrides = reg.queryUtility(IPackageOverrides, self.module_name)
-        return overrides
+    class OverrideProvider(pkg_resources.DefaultProvider):
+        def __init__(self, module):
+            pkg_resources.DefaultProvider.__init__(self, module)
+            self.module_name = module.__name__
 
-    def get_resource_filename(self, manager, resource_name):
-        """Return a true filesystem path for resource_name,
-        co-ordinating the extraction with manager, if the resource
-        must be unpacked to the filesystem.
-        """
-        overrides = self._get_overrides()
-        if overrides is not None:
-            filename = overrides.get_filename(resource_name)
-            if filename is not None:
-                return filename
-        return pkg_resources.DefaultProvider.get_resource_filename(
-            self, manager, resource_name
-        )
+        def _get_overrides(self):
+            reg = get_current_registry()
+            overrides = reg.queryUtility(IPackageOverrides, self.module_name)
+            return overrides
 
-    def get_resource_stream(self, manager, resource_name):
-        """Return a readable file-like object for resource_name."""
-        overrides = self._get_overrides()
-        if overrides is not None:
-            stream = overrides.get_stream(resource_name)
-            if stream is not None:
-                return stream
-        return pkg_resources.DefaultProvider.get_resource_stream(
-            self, manager, resource_name
-        )
+        def get_resource_filename(self, manager, resource_name):
+            """Return a true filesystem path for resource_name,
+            co-ordinating the extraction with manager, if the resource
+            must be unpacked to the filesystem.
+            """
+            overrides = self._get_overrides()
+            if overrides is not None:
+                filename = overrides.get_filename(resource_name)
+                if filename is not None:
+                    return filename
+            return pkg_resources.DefaultProvider.get_resource_filename(
+                self, manager, resource_name
+            )
 
-    def get_resource_string(self, manager, resource_name):
-        """Return a string containing the contents of resource_name."""
-        overrides = self._get_overrides()
-        if overrides is not None:
-            string = overrides.get_string(resource_name)
-            if string is not None:
-                return string
-        return pkg_resources.DefaultProvider.get_resource_string(
-            self, manager, resource_name
-        )
+        def get_resource_stream(self, manager, resource_name):
+            """Return a readable file-like object for resource_name."""
+            overrides = self._get_overrides()
+            if overrides is not None:
+                stream = overrides.get_stream(resource_name)
+                if stream is not None:
+                    return stream
+            return pkg_resources.DefaultProvider.get_resource_stream(
+                self, manager, resource_name
+            )
 
-    def has_resource(self, resource_name):
-        overrides = self._get_overrides()
-        if overrides is not None:
-            result = overrides.has_resource(resource_name)
-            if result is not None:
-                return result
-        return pkg_resources.DefaultProvider.has_resource(self, resource_name)
+        def get_resource_string(self, manager, resource_name):
+            """Return a string containing the contents of resource_name."""
+            overrides = self._get_overrides()
+            if overrides is not None:
+                string = overrides.get_string(resource_name)
+                if string is not None:
+                    return string
+            return pkg_resources.DefaultProvider.get_resource_string(
+                self, manager, resource_name
+            )
 
-    def resource_isdir(self, resource_name):
-        overrides = self._get_overrides()
-        if overrides is not None:
-            result = overrides.isdir(resource_name)
-            if result is not None:
-                return result
-        return pkg_resources.DefaultProvider.resource_isdir(
-            self, resource_name
-        )
+        def has_resource(self, resource_name):
+            overrides = self._get_overrides()
+            if overrides is not None:
+                result = overrides.has_resource(resource_name)
+                if result is not None:
+                    return result
+            return pkg_resources.DefaultProvider.has_resource(
+                self, resource_name
+            )
 
-    def resource_listdir(self, resource_name):
-        overrides = self._get_overrides()
-        if overrides is not None:
-            result = overrides.listdir(resource_name)
-            if result is not None:
-                return result
-        return pkg_resources.DefaultProvider.resource_listdir(
-            self, resource_name
-        )
+        def resource_isdir(self, resource_name):
+            overrides = self._get_overrides()
+            if overrides is not None:
+                result = overrides.isdir(resource_name)
+                if result is not None:
+                    return result
+            return pkg_resources.DefaultProvider.resource_isdir(
+                self, resource_name
+            )
+
+        def resource_listdir(self, resource_name):
+            overrides = self._get_overrides()
+            if overrides is not None:
+                result = overrides.listdir(resource_name)
+                if result is not None:
+                    return result
+            return pkg_resources.DefaultProvider.resource_listdir(
+                self, resource_name
+            )
 
 
 @implementer(IPackageOverrides)
