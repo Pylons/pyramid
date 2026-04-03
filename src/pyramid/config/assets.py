@@ -1,6 +1,5 @@
 import importlib.resources
 import os
-import pkg_resources
 import sys
 from zope.interface import implementer
 
@@ -9,6 +8,11 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import PHASE1_CONFIG, IPackageOverrides
 from pyramid.threadlocal import get_current_registry
 from pyramid.util import ref_filename
+
+try:
+    import pkg_resources
+except ImportError:
+    pkg_resources = None
 
 
 class OverrideProvider(pkg_resources.DefaultProvider):
@@ -90,23 +94,25 @@ class OverrideProvider(pkg_resources.DefaultProvider):
 class PackageOverrides:
     # pkg_resources arg in kw args below for testing
     def __init__(self, package, pkg_resources=pkg_resources):
-        loader = self._real_loader = getattr(package, '__loader__', None)
-        if isinstance(loader, self.__class__):
-            self._real_loader = None
-        # We register ourselves as a __loader__ *only* to support the
-        # setuptools _find_adapter adapter lookup; this class doesn't
-        # actually support the PEP 302 loader "API".  This is
-        # excusable due to the following statement in the spec:
-        # ... Loader objects are not
-        # required to offer any useful functionality (any such functionality,
-        # such as the zipimport get_data() method mentioned above, is
-        # optional)...
-        # A __loader__ attribute is basically metadata, and setuptools
-        # uses it as such.
-        package.__loader__ = self
-        # we call register_loader_type for every instantiation of this
-        # class; that's OK, it's idempotent to do it more than once.
-        pkg_resources.register_loader_type(self.__class__, OverrideProvider)
+        if pkg_resources is not None:
+            loader = self._real_loader = getattr(package, '__loader__', None)
+            if isinstance(loader, self.__class__):
+                self._real_loader = None
+            # We register ourselves as a __loader__ *only* to support the
+            # setuptools _find_adapter adapter lookup; this class doesn't
+            # actually support the PEP 302 loader "API".  This is
+            # excusable due to the following statement in the spec:
+            # ... Loader objects are not required to offer any useful
+            # functionality (any such functionality, such as the zipimport
+            # get_data() method mentioned above, is optional)...
+            # A __loader__ attribute is basically metadata, and setuptools
+            # uses it as such.
+            package.__loader__ = self
+            # we call register_loader_type for every instantiation of this
+            # class; that's OK, it's idempotent to do it more than once.
+            pkg_resources.register_loader_type(
+                self.__class__, OverrideProvider
+            )
         self.overrides = []
         self.overridden_package_name = package.__name__
 
