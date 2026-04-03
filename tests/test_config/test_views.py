@@ -3921,11 +3921,11 @@ class TestStaticURLInfo(unittest.TestCase):
     def test_generate_quoting(self):
         from pyramid.interfaces import IStaticURLInfo
 
-        self.config.add_static_view('images', path='mypkg:templates')
+        self.config.add_static_view('images', path='tests:fixtures')
         request = testing.DummyRequest()
         request.registry = self.registry
         inst = self.registry.getUtility(IStaticURLInfo)
-        result = inst.generate('mypkg:templates/foo%2Fbar', request)
+        result = inst.generate('tests:fixtures/foo%2Fbar', request)
         self.assertEqual(result, 'http://example.com/images/foo%252Fbar')
 
     def test_generate_route_url(self):
@@ -4143,8 +4143,8 @@ class TestStaticURLInfo(unittest.TestCase):
 
         config = DummyConfig()
         inst = self._makeOne()
-        inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1)
-        expected = [(None, 'anotherpackage:path/', '__view/')]
+        inst.add(config, 'view', 'tests:fixtures', cache_max_age=1)
+        expected = [(None, 'tests:fixtures/', '__view/')]
         self.assertEqual(inst.registrations, expected)
         self.assertEqual(config.route_args, ('__view/', 'view/*subpath'))
         self.assertEqual(config.view_kw['permission'], NO_PERMISSION_REQUIRED)
@@ -4154,8 +4154,8 @@ class TestStaticURLInfo(unittest.TestCase):
         config = DummyConfig()
         config.route_prefix = '/abc'
         inst = self._makeOne()
-        inst.add(config, 'view', 'anotherpackage:path')
-        expected = [(None, 'anotherpackage:path/', '__/abc/view/')]
+        inst.add(config, 'view', 'tests:fixtures')
+        expected = [(None, 'tests:fixtures/', '__/abc/view/')]
         self.assertEqual(inst.registrations, expected)
         self.assertEqual(config.route_args, ('__/abc/view/', 'view/*subpath'))
 
@@ -4165,7 +4165,7 @@ class TestStaticURLInfo(unittest.TestCase):
         inst.add(
             config,
             'view',
-            'anotherpackage:path',
+            'tests:fixtures',
             cache_max_age=1,
             permission='abc',
         )
@@ -4177,7 +4177,7 @@ class TestStaticURLInfo(unittest.TestCase):
         inst.add(
             config,
             'view',
-            'anotherpackage:path',
+            'tests:fixtures',
             cache_max_age=1,
             context=DummyContext,
         )
@@ -4189,7 +4189,7 @@ class TestStaticURLInfo(unittest.TestCase):
         inst.add(
             config,
             'view',
-            'anotherpackage:path',
+            'tests:fixtures',
             cache_max_age=1,
             for_=DummyContext,
         )
@@ -4201,7 +4201,7 @@ class TestStaticURLInfo(unittest.TestCase):
         inst.add(
             config,
             'view',
-            'anotherpackage:path',
+            'tests:fixtures',
             cache_max_age=1,
             renderer='mypackage:templates/index.pt',
         )
