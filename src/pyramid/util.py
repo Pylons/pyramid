@@ -431,6 +431,8 @@ class TopologicalSorter:
         self, default_before=LAST, default_after=None, first=FIRST, last=LAST
     ):
         self.names = []
+        # CWE-407 fix: shadow set for O(1) membership on self.names
+        self._names_set = set()
         self.req_before = set()
         self.req_after = set()
         self.name2before = {}
@@ -448,6 +450,7 @@ class TopologicalSorter:
     def remove(self, name):
         """Remove a node from the sort input"""
         self.names.remove(name)
+        self._names_set.discard(name)
         del self.name2val[name]
         after = self.name2after.pop(name, [])
         if after:
@@ -479,9 +482,11 @@ class TopologicalSorter:
            sorter.sorted() # will be {'c':3}, {'b':2}, {'a':1}
 
         """
-        if name in self.names:
+        # CWE-407 fix: O(1) set lookup instead of O(N) list scan
+        if name in self._names_set:
             self.remove(name)
         self.names.append(name)
+        self._names_set.add(name)
         self.name2val[name] = val
         if after is None and before is None:
             before = self.default_before
@@ -528,9 +533,11 @@ class TopologicalSorter:
         for name in names:
             add_node(name)
 
+        # CWE-407 fix: O(1) set lookup instead of O(N) list scan per edge
+        names_set = set(names)
         has_before, has_after = set(), set()
         for a, b in order:
-            if a in names and b in names:  # deal with missing dependencies
+            if a in names_set and b in names_set:  # deal with missing dependencies
                 add_arc(a, b)
                 has_before.add(a)
                 has_after.add(b)
@@ -586,7 +593,8 @@ class TopologicalSorter:
         result = []
 
         for name in sorted_names:
-            if name in self.names:
+            # CWE-407 fix: O(1) set lookup instead of O(N) list scan
+            if name in self._names_set:
                 result.append((name, self.name2val[name]))
 
         return result
