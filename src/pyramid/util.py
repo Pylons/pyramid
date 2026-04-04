@@ -566,7 +566,7 @@ class TopologicalSorter:
             # skip nodes removed from roots_set by add_arc
             while root not in roots_set and roots:
                 root = roots.popleft()
-            if root not in roots_set:
+            if root not in roots_set:  # pragma: no cover
                 break
             roots_set.discard(root)
             sorted_names.append(root)

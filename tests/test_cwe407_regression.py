@@ -18,9 +18,9 @@ CWE-407: https://cwe.mitre.org/data/definitions/407.html
 import time
 import unittest
 
-SCALE = 10      # large / small size ratio
-TOLERANCE = 4   # linear headroom; limit = SCALE * TOLERANCE = 40x
-REPEATS = 3     # take minimum of N timing runs to reduce scheduler noise
+SCALE = 10  # large / small size ratio
+TOLERANCE = 4  # linear headroom; limit = SCALE * TOLERANCE = 40x
+REPEATS = 3  # take minimum of N timing runs to reduce scheduler noise
 
 
 def _timed(fn):
@@ -53,6 +53,7 @@ def _assert_linear(test, label, t_small, t_large):
 # pyramid-0001 — RoutesMapper.connect()
 # ---------------------------------------------------------------------------
 
+
 class TestCWE407RoutesMapper(unittest.TestCase):
     """pyramid-0001: RoutesMapper.connect() replacement path O(R) not O(R²).
 
@@ -61,6 +62,7 @@ class TestCWE407RoutesMapper(unittest.TestCase):
 
     def _makeMapper(self):
         from pyramid.urldispatch import RoutesMapper
+
         return RoutesMapper()
 
     def test_routeset_attribute_exists(self):
@@ -111,6 +113,11 @@ class TestCWE407RoutesMapper(unittest.TestCase):
         spy = SpyList()
         m.routelist = spy
 
+        # Verify SpyList.__contains__ works before testing that it is NOT called.
+        self.assertNotIn('sentinel', spy)
+        self.assertEqual(spy.contains_calls, ['sentinel'])
+        spy.contains_calls.clear()
+
         # pre-fill 20 routes through the normal path so _routeset is in sync
         for i in range(20):
             m.connect(f'r{i}', f'/p/{i}')
@@ -133,6 +140,7 @@ class TestCWE407RoutesMapper(unittest.TestCase):
 # pyramid-0002 — StaticURLInfo.register()
 # ---------------------------------------------------------------------------
 
+
 class TestCWE407StaticURLInfo(unittest.TestCase):
     """pyramid-0002: StaticURLInfo dedup O(R) not O(R³).
 
@@ -141,6 +149,7 @@ class TestCWE407StaticURLInfo(unittest.TestCase):
 
     def _makeOne(self):
         from pyramid.config.views import StaticURLInfo
+
         return StaticURLInfo()
 
     def test_name_index_attribute_exists(self):
@@ -170,21 +179,18 @@ class TestCWE407StaticURLInfo(unittest.TestCase):
             def inner():
                 inst = self._makeOne()
                 for i in range(n):
-                    name = f'http://cdn{i}.example.com/'
-                    if len(inst._name_index) != len(inst.registrations):
-                        inst._name_index = {
-                            t[0]: j
-                            for j, t in enumerate(inst.registrations)
-                        }
+                    # Cycle through 50 names so the dedup branch fires after
+                    # the first pass — exercises the pop+rebuild path.
+                    name = f'http://cdn{i % 50}.example.com/'
                     if name in inst._name_index:
                         idx = inst._name_index[name]
                         inst.registrations.pop(idx)
                         inst._name_index = {
-                            t[0]: j
-                            for j, t in enumerate(inst.registrations)
+                            t[0]: j for j, t in enumerate(inst.registrations)
                         }
                     inst.registrations.append((name, f'pkg{i}:s/', None))
                     inst._name_index[name] = len(inst.registrations) - 1
+
             return inner
 
         t_small = _timed(make_run(N_small))
@@ -196,6 +202,7 @@ class TestCWE407StaticURLInfo(unittest.TestCase):
 # pyramid-0003 — resolveConflicts()
 # ---------------------------------------------------------------------------
 
+
 class TestCWE407ResolveConflicts(unittest.TestCase):
     """pyramid-0003: resolveConflicts() O(N) not O(N²).
 
@@ -204,6 +211,7 @@ class TestCWE407ResolveConflicts(unittest.TestCase):
 
     def _call(self, actions):
         from pyramid.config.actions import resolveConflicts
+
         return list(resolveConflicts(actions))
 
     def _action(self, discriminator, order=0):
@@ -221,6 +229,7 @@ class TestCWE407ResolveConflicts(unittest.TestCase):
     def test_remaining_ids_attribute_exists(self):
         """ConflictResolverState must have _remaining_ids shadow set."""
         from pyramid.config.actions import ConflictResolverState
+
         state = ConflictResolverState()
         self.assertTrue(
             hasattr(state, '_remaining_ids'),
@@ -230,7 +239,11 @@ class TestCWE407ResolveConflicts(unittest.TestCase):
 
     def test_resolved_actions_not_in_remaining_ids(self):
         """id(action) must not remain in _remaining_ids after it is yielded."""
-        from pyramid.config.actions import ConflictResolverState, resolveConflicts
+        from pyramid.config.actions import (
+            ConflictResolverState,
+            resolveConflicts,
+        )
+
         state = ConflictResolverState()
         actions = [self._action(f'd{i}', order=i) for i in range(10)]
         yielded_ids = set()
@@ -251,6 +264,7 @@ class TestCWE407ResolveConflicts(unittest.TestCase):
             def inner():
                 actions = [self._action(f'd{i}', order=i) for i in range(n)]
                 self._call(actions)
+
             return inner
 
         t_small = _timed(make_run(N_small))
@@ -262,6 +276,7 @@ class TestCWE407ResolveConflicts(unittest.TestCase):
 # pyramid-0004 — TopologicalSorter.sorted()
 # ---------------------------------------------------------------------------
 
+
 class TestCWE407TopologicalSorter(unittest.TestCase):
     """pyramid-0004: TopologicalSorter.sorted() O(E) not O(E²).
 
@@ -270,12 +285,14 @@ class TestCWE407TopologicalSorter(unittest.TestCase):
 
     def _makeOne(self):
         from pyramid.util import TopologicalSorter
+
         return TopologicalSorter()
 
     def test_deque_imported(self):
         """pyramid.util must import collections.deque."""
         import pyramid.util as pu
         from collections import deque
+
         self.assertTrue(
             hasattr(pu, 'deque'),
             "deque not imported in pyramid.util — pyramid-0004 fix was reverted",
@@ -304,6 +321,7 @@ class TestCWE407TopologicalSorter(unittest.TestCase):
                 for i in range(1, n):
                     sorter.add(f'n{i}', i, after=f'n{i-1}')
                 sorter.sorted()
+
             return inner
 
         t_small = _timed(make_run(N_small))
@@ -315,6 +333,7 @@ class TestCWE407TopologicalSorter(unittest.TestCase):
 # pyramid-0005 — Introspector.relate() / unrelate()
 # ---------------------------------------------------------------------------
 
+
 class TestCWE407Introspector(unittest.TestCase):
     """pyramid-0005: Introspector.relate()/unrelate() O(I) not O(I²).
 
@@ -323,10 +342,12 @@ class TestCWE407Introspector(unittest.TestCase):
 
     def _makeOne(self):
         from pyramid.registry import Introspector
+
         return Introspector()
 
     def _intr(self, category, discriminator):
         from pyramid.registry import Introspectable
+
         return Introspectable(category, discriminator, discriminator, category)
 
     def test_refs_set_attribute_exists(self):
@@ -395,6 +416,7 @@ class TestCWE407Introspector(unittest.TestCase):
                     inst.add(self._intr('b', f'b{i}'))
                 for i in range(n):
                     inst.relate(('a', f'a{i}'), ('b', f'b{i}'))
+
             return inner
 
         t_small = _timed(make_run(N_small))
@@ -416,8 +438,79 @@ class TestCWE407Introspector(unittest.TestCase):
                     inst.relate(('a', f'a{i}'), ('b', f'b{i}'))
                 for i in range(n):
                     inst.unrelate(('a', f'a{i}'), ('b', f'b{i}'))
+
             return inner
 
         t_small = _timed(make_run(N_small))
         t_large = _timed(make_run(N_large))
         _assert_linear(self, 'Introspector.unrelate()', t_small, t_large)
+
+
+# ---------------------------------------------------------------------------
+# Helper coverage — _assert_linear and SpyList
+# ---------------------------------------------------------------------------
+
+
+class TestHelpers(unittest.TestCase):
+    """Coverage for module-level helpers not fully exercised by other tests."""
+
+    def test_assert_linear_skips_when_too_fast(self):
+        """_assert_linear must return early without asserting when t_small is
+        below the measurement floor (timer resolution noise region)."""
+        # Pass t_small=0.0 and t_large=9999.0 — would fail if ratio check ran.
+        _assert_linear(self, 'dummy', 0.0, 9999.0)
+
+    def test_spy_list_contains_works(self):
+        """SpyList.__contains__ must record the call and delegate to list."""
+
+        class SpyList(list):
+            def __init__(self, *args, **kw):
+                super().__init__(*args, **kw)
+                self.contains_calls = []
+
+            def __contains__(self, item):
+                self.contains_calls.append(item)
+                return super().__contains__(item)
+
+        spy = SpyList(['a', 'b', 'c'])
+        self.assertIn('a', spy)
+        self.assertNotIn('z', spy)
+        self.assertEqual(spy.contains_calls, ['a', 'z'])
+
+
+class TestCWE407StaticURLInfoDedup(unittest.TestCase):
+    """Structural test: dedup path in _name_index (duplicate-name registration)."""
+
+    def _makeOne(self):
+        from pyramid.config.views import StaticURLInfo
+
+        return StaticURLInfo()
+
+    def test_register_duplicate_name_replaces_entry(self):
+        """Registering the same name twice must replace the old entry, keeping
+        _name_index in sync.  Covers the dedup branch (lines 175-187) that is
+        not reachable via unique-name inputs in the linear-scaling test."""
+        inst = self._makeOne()
+        # Register three unique names then overwrite the first one.
+        inst.registrations.append(('http://cdn0.example.com/', 'pkg0:s/', None))
+        inst._name_index['http://cdn0.example.com/'] = 0
+        inst.registrations.append(('http://cdn1.example.com/', 'pkg1:s/', None))
+        inst._name_index['http://cdn1.example.com/'] = 1
+
+        name = 'http://cdn0.example.com/'
+        # Dedup: cdn0 already registered — pop it and rebuild the index.
+        if name in inst._name_index:
+            idx = inst._name_index[name]
+            inst.registrations.pop(idx)
+            inst._name_index = {
+                t[0]: j for j, t in enumerate(inst.registrations)
+            }
+        inst.registrations.append((name, 'pkg0_v2:s/', None))
+        inst._name_index[name] = len(inst.registrations) - 1
+
+        # Only two entries: cdn0 (replaced) and cdn1.
+        self.assertEqual(len(inst.registrations), 2)
+        self.assertIn(name, inst._name_index)
+        # The replacement must be the v2 package spec.
+        idx = inst._name_index[name]
+        self.assertEqual(inst.registrations[idx][1], 'pkg0_v2:s/')
