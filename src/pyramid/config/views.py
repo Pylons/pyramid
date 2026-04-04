@@ -2159,6 +2159,8 @@ class ViewDeriverInfo:
 class StaticURLInfo:
     def __init__(self):
         self.registrations = []
+        # CWE-407 fix: O(1) name lookup instead of O(R) list scan in register()
+        self._name_index = {}
         self.cache_busters = []
 
     def generate(self, path, request, **kw):
@@ -2262,14 +2264,20 @@ class StaticURLInfo:
         def register():
             registrations = self.registrations
 
-            names = [t[0] for t in registrations]
+            # CWE-407 fix: O(1) dict lookup instead of O(R) list comprehension.
+            # Rebuild index if registrations were modified externally (e.g. tests).
+            if len(self._name_index) != len(registrations):
+                self._name_index = {t[0]: i for i, t in enumerate(registrations)}
 
-            if name in names:
-                idx = names.index(name)
+            if name in self._name_index:
+                idx = self._name_index[name]
                 registrations.pop(idx)
+                # rebuild index after pop since indices shift
+                self._name_index = {t[0]: i for i, t in enumerate(registrations)}
 
             # url, spec, route_name
             registrations.append((url, spec, route_name))
+            self._name_index[name] = len(registrations) - 1
 
         intr = config.introspectable(
             'static views', name, 'static view for %r' % name, 'static view'

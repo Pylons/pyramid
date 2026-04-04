@@ -338,6 +338,8 @@ class ConflictResolverState:
 
         # actions left over from a previous iteration
         self.remaining_actions = []
+        # CWE-407 fix: shadow id-set for O(1) removal in resolveConflicts
+        self._remaining_ids = set()
 
         # after executing an action we memoize its order to avoid any new
         # actions sending us backward
@@ -375,7 +377,14 @@ def resolveConflicts(actions, state=None):
         state = ConflictResolverState()
 
     # pick up where we left off last time, but track the new actions as well
-    state.remaining_actions.extend(normalize_actions(actions))
+    new_actions = normalize_actions(actions)
+    # CWE-407 fix: compact resolved actions once per call (O(N)), then track
+    # removals via id-set for O(1) discard instead of O(N) list.remove()
+    state.remaining_actions = [
+        a for a in state.remaining_actions if id(a) in state._remaining_ids
+    ]
+    state.remaining_actions.extend(new_actions)
+    state._remaining_ids.update(id(a) for a in new_actions)
     actions = state.remaining_actions
 
     def orderandpos(v):
@@ -487,7 +496,8 @@ def resolveConflicts(actions, state=None):
             # do not memoize the order until we resolve an action inside it
             state.min_order = action['order']
             state.start = i + 1
-            state.remaining_actions.remove(action)
+            # CWE-407 fix: O(1) id-set discard; list compacted once per call
+            state._remaining_ids.discard(id(action))
             state.resolved_ainfos[action['discriminator']] = (i, action)
             yield action
 

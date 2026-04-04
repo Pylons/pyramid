@@ -28,6 +28,8 @@ class RoutesMapper:
     def __init__(self):
         self.routelist = []
         self.static_routes = []
+        # CWE-407 fix: shadow set for O(1) membership check in connect()
+        self._routeset = set()
 
         self.routes = {}
 
@@ -54,12 +56,16 @@ class RoutesMapper:
     ):
         if name in self.routes:
             oldroute = self.routes[name]
-            if oldroute in self.routelist:
+            # CWE-407 fix: O(1) set lookup instead of O(N) list scan
+            if oldroute in self._routeset:
                 self.routelist.remove(oldroute)
+                self._routeset.discard(oldroute)
 
         route = Route(name, pattern, factory, predicates, pregenerator)
         if not static:
             self.routelist.append(route)
+            # CWE-407 fix: maintain shadow set for O(1) membership
+            self._routeset.add(route)
         else:
             self.static_routes.append(route)
 
