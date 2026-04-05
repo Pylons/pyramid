@@ -4,9 +4,8 @@ import mimetypes
 import os
 from os.path import exists, getmtime, getsize
 import posixpath
-import warnings
 
-from pyramid.asset import abspath_from_asset_spec, resolve_asset_spec
+from pyramid.asset import abspath_from_asset_spec
 from pyramid.httpexceptions import HTTPMovedPermanently, HTTPNotFound
 from pyramid.path import AssetResolver, caller_package
 from pyramid.response import FileResponse, _guess_type
@@ -89,27 +88,14 @@ class static_view:
         # package_name is for bw compat; it is preferred to pass in a
         # package-relative path as root_dir
         # (e.g. ``anotherpackage:foo/static``).
-        self.cache_max_age = cache_max_age
         if package_name is None:
             package_name = caller_package().__name__
-        package_name, docroot = resolve_asset_spec(root_dir, package_name)
-        if package_name:
-            try:
-                __import__(package_name)
-            except ImportError:
-                warnings.warn(
-                    f'A "pyramid.static.static_view" is being created with an'
-                    f' asset spec referencing a package "{package_name}" that'
-                    f' does not exist. This will break in the future.'
-                    f' If this is done to override an asset, you must adjust'
-                    f' this to override a location inside a real package.',
-                    DeprecationWarning,
-                    stacklevel=2,
-                )
-        self.use_subpath = use_subpath
         self.package_name = package_name
         self.resolver = AssetResolver(self.package_name)
-        self.docroot = docroot
+        self.root_dir = root_dir
+
+        self.use_subpath = use_subpath
+        self.cache_max_age = cache_max_age
         self.index = index
         self.reload = reload
         self.content_encodings = _compile_content_encodings(content_encodings)
@@ -151,7 +137,7 @@ class static_view:
             raise HTTPNotFound('Out of bounds: %s' % request.url)
 
         # normalize asset spec or fs path into resource_path
-        resource_path = posixpath.join(self.docroot, path)
+        resource_path = posixpath.join(self.root_dir, path)
         asset = self.resolver.resolve(resource_path)
         if asset.isdir():
             if not request.path_url.endswith('/'):
