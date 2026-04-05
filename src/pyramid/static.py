@@ -2,9 +2,10 @@ from functools import lru_cache
 import json
 import mimetypes
 import os
-from os.path import getmtime, getsize
+from os.path import exists, getmtime, getsize
 import posixpath
 
+from pyramid.asset import abspath_from_asset_spec
 from pyramid.httpexceptions import HTTPMovedPermanently, HTTPNotFound
 from pyramid.path import AssetResolver, caller_package
 from pyramid.response import FileResponse, _guess_type
@@ -361,12 +362,13 @@ class ManifestCacheBuster:
     .. versionadded:: 1.6
     """
 
+    exists = staticmethod(exists)  # testing
     getmtime = staticmethod(getmtime)  # testing
 
     def __init__(self, manifest_spec, reload=False):
         package_name = caller_package().__name__
-        self.manifest_asset = AssetResolver(package_name).resolve(
-            manifest_spec
+        self.manifest_path = abspath_from_asset_spec(
+            manifest_spec, package_name
         )
         self.reload = reload
 
@@ -375,12 +377,13 @@ class ManifestCacheBuster:
             self._manifest = self.get_manifest()
 
     def get_manifest(self):
-        with self.manifest_asset.stream() as fp:
+        with open(self.manifest_path, 'rb') as fp:
             return self.parse_manifest(fp.read())
 
     def parse_manifest(self, content):
         """
-        Parse the ``content`` read from the manifest into a dictionary mapping.
+        Parse the ``content`` read from the ``manifest_path`` into a
+        dictionary mapping.
 
         Subclasses may override this method to use something other than
         ``json.loads`` to load any type of file format and return a conforming
@@ -393,9 +396,9 @@ class ManifestCacheBuster:
     def manifest(self):
         """The current manifest dictionary."""
         if self.reload:
-            if not self.manifest_asset.exists():
+            if not self.exists(self.manifest_path):
                 return {}
-            mtime = self.getmtime(self.manifest_asset.abspath())
+            mtime = self.getmtime(self.manifest_path)
             if self._mtime is None or mtime > self._mtime:
                 self._manifest = self.get_manifest()
                 self._mtime = mtime

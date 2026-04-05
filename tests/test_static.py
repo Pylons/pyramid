@@ -3,7 +3,6 @@ import os.path
 import unittest
 
 from pyramid import testing
-from pyramid.path import ImportlibResourcesAssetDescriptor
 
 here = os.path.dirname(__file__)
 
@@ -659,12 +658,8 @@ class TestManifestCacheBuster(unittest.TestCase):
         )
 
     def test_reload(self):
-        manifest = ImportlibResourcesAssetDescriptor(
-            'tests', 'fixtures/manifest.json'
-        )
-        new_manifest = ImportlibResourcesAssetDescriptor(
-            'tests', 'fixtures/manifest2.json'
-        )
+        manifest_path = os.path.join(here, 'fixtures', 'manifest.json')
+        new_manifest_path = os.path.join(here, 'fixtures', 'manifest2.json')
         inst = self._makeOne('foo', reload=True)
         inst.getmtime = lambda *args, **kwargs: 0
         fut = inst
@@ -673,13 +668,13 @@ class TestManifestCacheBuster(unittest.TestCase):
         self.assertEqual(fut('foo', 'css/main.css', {}), ('css/main.css', {}))
 
         # swap to a real manifest, setting mtime to 0
-        inst.manifest_asset = manifest
+        inst.manifest_path = manifest_path
         self.assertEqual(
             fut('foo', 'css/main.css', {}), ('css/main-test.css', {})
         )
 
         # ensure switching the path doesn't change the result
-        inst.manifest_asset = new_manifest
+        inst.manifest_path = new_manifest_path
         self.assertEqual(
             fut('foo', 'css/main.css', {}), ('css/main-test.css', {})
         )
