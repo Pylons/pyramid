@@ -117,6 +117,8 @@ class PackageOverrides:
             pkg_resources.register_loader_type(
                 self.__class__, OverrideProvider
             )
+        else:
+            self._real_loader = None
         self.overrides = []
         self.overridden_package_name = package.__name__
 
