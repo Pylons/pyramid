@@ -1,7 +1,14 @@
 import os.path
+import pytest
 import unittest
 
 from pyramid.testing import cleanUp
+
+try:
+    import pkg_resources
+except ImportError:
+    pkg_resources = None
+has_pkg_resources = pkg_resources is not None
 
 # we use this folder
 here = os.path.dirname(os.path.abspath(__file__))
@@ -327,6 +334,7 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(overrides.package, package)
 
 
+@pytest.mark.skipif(not has_pkg_resources, reason='requires `pkg_resources`')
 class TestOverrideProvider(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -530,8 +538,13 @@ class TestPackageOverrides(unittest.TestCase):
         if package is None:
             package = DummyPackage('package')
         klass = self._getTargetClass()
-        if pkg_resources is None:
+        if pkg_resources is True:
             pkg_resources = DummyPkgResources()
+        if pkg_resources and not has_pkg_resources:
+            # Even though we're using a dummy pkg_resources implementation, if
+            # pkg_resources doesn't exist then OverrideProvider won't exist and
+            # the constructor will fail.
+            pytest.skip('requires `pkg_resources`')
         return klass(package, pkg_resources=pkg_resources)
 
     def test_class_conforms_to_IPackageOverrides(self):
@@ -565,23 +578,26 @@ class TestPackageOverrides(unittest.TestCase):
     def test_ctor_package_already_has_loader_of_different_type(self):
         package = DummyPackage('package')
         loader = package.__loader__ = DummyLoader()
-        po = self._makeOne(package)
+        po = self._makeOne(package, pkg_resources=True)
         self.assertTrue(package.__loader__ is po)
         self.assertTrue(po.real_loader is loader)
 
     def test_ctor_package_already_has_loader_of_same_type(self):
         package = DummyPackage('package')
-        package.__loader__ = self._makeOne(package)
-        po = self._makeOne(package)
+        package.__loader__ = self._makeOne(package, pkg_resources=True)
+        po = self._makeOne(package, pkg_resources=True)
         self.assertEqual(package.__loader__, po)
 
     def test_ctor_sets_loader(self):
         package = DummyPackage('package')
-        po = self._makeOne(package)
+        po = self._makeOne(package, pkg_resources=True)
         self.assertEqual(package.__loader__, po)
 
     def test_ctor_registers_loader_type(self):
-        from pyramid.config.assets import OverrideProvider
+        try:
+            from pyramid.config.assets import OverrideProvider
+        except ImportError:
+            pytest.skip("`OverrideProvider` doesn't exist")
 
         dummy_pkg_resources = DummyPkgResources()
         package = DummyPackage('package')
@@ -806,49 +822,49 @@ class TestPackageOverrides(unittest.TestCase):
     # PEP 302 __loader__ extensions:  use the "real" __loader__, if present.
     def test_get_data_pkg_has_no___loader__(self):
         package = DummyPackage('package')
-        po = self._makeOne(package)
+        po = self._makeOne(package, pkg_resources=True)
         self.assertRaises(NotImplementedError, po.get_data, 'whatever')
 
     def test_get_data_pkg_has___loader__(self):
         package = DummyPackage('package')
         loader = package.__loader__ = DummyLoader()
-        po = self._makeOne(package)
+        po = self._makeOne(package, pkg_resources=True)
         self.assertEqual(po.get_data('whatever'), b'DEADBEEF')
         self.assertEqual(loader._got_data, 'whatever')
 
     def test_is_package_pkg_has_no___loader__(self):
         package = DummyPackage('package')
-        po = self._makeOne(package)
+        po = self._makeOne(package, pkg_resources=True)
         self.assertRaises(NotImplementedError, po.is_package, 'whatever')
 
     def test_is_package_pkg_has___loader__(self):
         package = DummyPackage('package')
         loader = package.__loader__ = DummyLoader()
-        po = self._makeOne(package)
+        po = self._makeOne(package, pkg_resources=True)
         self.assertTrue(po.is_package('whatever'))
         self.assertEqual(loader._is_package, 'whatever')
 
     def test_get_code_pkg_has_no___loader__(self):
         package = DummyPackage('package')
-        po = self._makeOne(package)
+        po = self._makeOne(package, pkg_resources=True)
         self.assertRaises(NotImplementedError, po.get_code, 'whatever')
 
     def test_get_code_pkg_has___loader__(self):
         package = DummyPackage('package')
         loader = package.__loader__ = DummyLoader()
-        po = self._makeOne(package)
+        po = self._makeOne(package, pkg_resources=True)
         self.assertEqual(po.get_code('whatever'), b'DEADBEEF')
         self.assertEqual(loader._got_code, 'whatever')
 
     def test_get_source_pkg_has_no___loader__(self):
         package = DummyPackage('package')
-        po = self._makeOne(package)
+        po = self._makeOne(package, pkg_resources=True)
         self.assertRaises(NotImplementedError, po.get_source, 'whatever')
 
     def test_get_source_pkg_has___loader__(self):
         package = DummyPackage('package')
         loader = package.__loader__ = DummyLoader()
-        po = self._makeOne(package)
+        po = self._makeOne(package, pkg_resources=True)
         self.assertEqual(po.get_source('whatever'), 'def foo():\n    pass')
         self.assertEqual(loader._got_source, 'whatever')
 
