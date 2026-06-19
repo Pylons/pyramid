@@ -38,7 +38,7 @@ jobs:
         name: "Python: ${{ matrix.py }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - name: Setup uv
               uses: astral-sh/setup-uv@v7
               with:
@@ -56,7 +56,7 @@ jobs:
         runs-on: ubuntu-24.04
         name: Validate coverage
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - name: Setup uv
               uses: astral-sh/setup-uv@v7
               with:
@@ -66,7 +66,7 @@ jobs:
         runs-on: ubuntu-24.04
         name: Build the documentation
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - name: Setup uv
               uses: astral-sh/setup-uv@v7
               with:
@@ -76,7 +76,7 @@ jobs:
         runs-on: ubuntu-24.04
         name: Lint the package
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
             - name: Setup uv
               uses: astral-sh/setup-uv@v7
               with:
