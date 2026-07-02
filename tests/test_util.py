@@ -1,4 +1,5 @@
 import sys
+from unittest import mock
 import unittest
 
 from pyramid.util import bytes_, text_
@@ -1186,6 +1187,19 @@ class Test_takes_one_arg(unittest.TestCase):
         getattr(foo, '__annotations__', {}).update({'bar': 'baz'})
         self.assertTrue(self._callFUT(foo))
 
+    def test_function_annotations_without_getfullargspec(self):
+        def foo(request):
+            """ """
+
+        getattr(foo, '__annotations__', {}).update(
+            {'request': 'IRequest', 'return': 'IResponse'}
+        )
+        with mock.patch(
+            'pyramid.util.inspect.getfullargspec',
+            side_effect=AssertionError('should not be called'),
+        ):
+            self.assertTrue(self._callFUT(foo))
+
 
 class TestSimpleSerializer(unittest.TestCase):
     def _makeOne(self):
@@ -1217,6 +1231,13 @@ class TestUnboundMethods(unittest.TestCase):
 
     def test_unbound_method(self):
         self.assertTrue(self._callFUT(self.Dummy.run))
+
+    def test_unbound_method_without_getfullargspec(self):
+        with mock.patch(
+            'pyramid.util.inspect.getfullargspec',
+            side_effect=AssertionError('should not be called'),
+        ):
+            self.assertTrue(self._callFUT(self.Dummy.run))
 
     def test_normal_func_unbound(self):
         def func():  # pragma: no cover
