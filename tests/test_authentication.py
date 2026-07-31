@@ -1137,7 +1137,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         )
         self.assertTrue(value.startswith('auth_tkt='))
 
-    def test_remember_parent_domain_supercedes_wild_domain(self):
+    def test_remember_parent_domain_supersedes_wild_domain(self):
         helper = self._makeOne('secret', parent_domain=True, wild_domain=True)
         request = self._makeRequest()
         request.domain = 'www.example.com'
@@ -1164,7 +1164,7 @@ class TestAuthTktCookieHelper(unittest.TestCase):
         )
         self.assertTrue(result[0][1].startswith('auth_tkt='))
 
-    def test_remember_domain_supercedes_parent_and_wild_domain(self):
+    def test_remember_domain_supersedes_parent_and_wild_domain(self):
         helper = self._makeOne(
             'secret',
             domain='pyramid.bazinga',

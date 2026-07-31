@@ -364,7 +364,7 @@ Response
 
 The :app:`Pyramid` response object can be imported as
 :class:`pyramid.response.Response`.  This class is a subclass of the
-``webob.reponse.Response`` class.  The subclass does not add or change any
+``webob.response.Response`` class.  The subclass does not add or change any
 functionality, so the WebOb Response documentation will be completely relevant
 for this class as well.
 
