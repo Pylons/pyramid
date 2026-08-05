@@ -536,7 +536,7 @@ class AuthTktAuthenticationPolicy(CallbackAuthenticationPolicy):
        parent domain of the current site. For example if your site is
        hosted under ``www.example.com`` a cookie will be generated for
        ``.example.com``. This can be useful if you have multiple sites
-       sharing the same domain. This option supercedes the ``wild_domain``
+       sharing the same domain. This option supersedes the ``wild_domain``
        option.
        Optional.
 
@@ -922,7 +922,7 @@ class AuthTktCookieHelper:
        parent domain of the current site. For example if your site is
        hosted under ``www.example.com`` a cookie will be generated for
        ``.example.com``. This can be useful if you have multiple sites
-       sharing the same domain. This option supercedes the ``wild_domain``
+       sharing the same domain. This option supersedes the ``wild_domain``
        option.
        Optional.
 
