@@ -4,6 +4,33 @@ import unittest
 here = os.path.abspath(os.path.dirname(__file__))
 
 
+class TestRefFilename(unittest.TestCase):
+    def _callFUT(self, ref):
+        from pyramid.path import ref_filename
+
+        return ref_filename(ref)
+
+    def test_returns_path(self):
+        import importlib.resources
+
+        ref = importlib.resources.files('tests.pkgs.assets') / 'foo.txt'
+        path = self._callFUT(ref)
+        expected = os.path.join(here, 'pkgs', 'assets', 'foo.txt')
+        self.assertEqual(path, expected)
+
+
+class TestResourceFilename(unittest.TestCase):
+    def _callFUT(self, package, name):
+        from pyramid.path import resource_filename
+
+        return resource_filename(package, name)
+
+    def test_returns_path(self):
+        path = self._callFUT('tests.pkgs.assets', 'foo.txt')
+        expected = os.path.join(here, 'pkgs', 'assets', 'foo.txt')
+        self.assertEqual(path, expected)
+
+
 class TestCallerPath(unittest.TestCase):
     def tearDown(self):
         from . import test_path
@@ -215,105 +242,14 @@ class TestPackageName(unittest.TestCase):
         self.assertEqual(result, '__main__')
 
 
-class TestResolver(unittest.TestCase):
-    def _getTargetClass(self):
-        from pyramid.path import Resolver
-
-        return Resolver
-
-    def _makeOne(self, package):
-        return self._getTargetClass()(package)
-
-    def test_get_package_caller_package(self):
-        from pyramid.path import CALLER_PACKAGE
-        import tests
-
-        self.assertEqual(self._makeOne(CALLER_PACKAGE).get_package(), tests)
-
-    def test_get_package_name_caller_package(self):
-        from pyramid.path import CALLER_PACKAGE
-
-        self.assertEqual(
-            self._makeOne(CALLER_PACKAGE).get_package_name(), 'tests'
-        )
-
-    def test_get_package_string(self):
-        import tests
-
-        self.assertEqual(self._makeOne('tests').get_package(), tests)
-
-    def test_get_package_name_string(self):
-        self.assertEqual(self._makeOne('tests').get_package_name(), 'tests')
-
-
-class TestAssetResolver(unittest.TestCase):
-    def _getTargetClass(self):
-        from pyramid.path import AssetResolver
-
-        return AssetResolver
-
-    def _makeOne(self, package='tests'):
-        return self._getTargetClass()(package)
-
-    def test_ctor_as_package(self):
-        import sys
-
-        tests = sys.modules['tests']
-        inst = self._makeOne(tests)
-        self.assertEqual(inst.package, tests)
-
-    def test_ctor_as_str(self):
-        import sys
-
-        tests = sys.modules['tests']
-        inst = self._makeOne('tests')
-        self.assertEqual(inst.package, tests)
-
-    def test_resolve_abspath(self):
-        from pyramid.path import FSAssetDescriptor
-
-        inst = self._makeOne(None)
-        r = inst.resolve(os.path.join(here, 'test_asset.py'))
-        self.assertEqual(r.__class__, FSAssetDescriptor)
-        self.assertTrue(r.exists())
-
-    def test_resolve_absspec(self):
-        from pyramid.path import PkgResourcesAssetDescriptor
-
-        inst = self._makeOne(None)
-        r = inst.resolve('tests:test_asset.py')
-        self.assertEqual(r.__class__, PkgResourcesAssetDescriptor)
-        self.assertTrue(r.exists())
-
-    def test_resolve_relspec_with_pkg(self):
-        from pyramid.path import PkgResourcesAssetDescriptor
-
-        inst = self._makeOne('tests')
-        r = inst.resolve('test_asset.py')
-        self.assertEqual(r.__class__, PkgResourcesAssetDescriptor)
-        self.assertTrue(r.exists())
-
-    def test_resolve_relspec_no_package(self):
-        inst = self._makeOne(None)
-        self.assertRaises(ValueError, inst.resolve, 'test_asset.py')
-
-    def test_resolve_relspec_caller_package(self):
-        from pyramid.path import CALLER_PACKAGE, PkgResourcesAssetDescriptor
-
-        inst = self._makeOne(CALLER_PACKAGE)
-        r = inst.resolve('test_asset.py')
-        self.assertEqual(r.__class__, PkgResourcesAssetDescriptor)
-        self.assertTrue(r.exists())
-
-
 class TestPkgResourcesAssetDescriptor(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.path import PkgResourcesAssetDescriptor
 
         return PkgResourcesAssetDescriptor
 
-    def _makeOne(self, pkg='tests', path='test_asset.py'):
-        return self._getTargetClass()(pkg, path)
+    def _makeOne(self, pkg='tests', path='test_asset.py', overrides=None):
+        return self._getTargetClass()(pkg, path, overrides)
 
     def test_class_conforms_to_IAssetDescriptor(self):
         from zope.interface.verify import verifyClass
@@ -339,34 +275,48 @@ class TestPkgResourcesAssetDescriptor(unittest.TestCase):
 
     def test_stream(self):
         inst = self._makeOne()
-        inst.pkg_resources = DummyPkgResource()
-        inst.pkg_resources.resource_stream = lambda x, y: f'{x}:{y}'
-        s = inst.stream()
-        self.assertEqual(s, '{}:{}'.format('tests', 'test_asset.py'))
+        with inst.stream() as stream:
+            self.assertTrue(b'asset' in stream.read())
 
     def test_isdir(self):
         inst = self._makeOne()
-        inst.pkg_resources = DummyPkgResource()
-        inst.pkg_resources.resource_isdir = lambda x, y: f'{x}:{y}'
-        self.assertEqual(
-            inst.isdir(), '{}:{}'.format('tests', 'test_asset.py')
-        )
+        self.assertFalse(inst.isdir())
 
     def test_listdir(self):
-        inst = self._makeOne()
-        inst.pkg_resources = DummyPkgResource()
-        inst.pkg_resources.resource_listdir = lambda x, y: f'{x}:{y}'
-        self.assertEqual(
-            inst.listdir(), '{}:{}'.format('tests', 'test_asset.py')
-        )
+        inst = self._makeOne('tests', '')
+        self.assertIn('test_asset.py', inst.listdir())
 
     def test_exists(self):
         inst = self._makeOne()
-        inst.pkg_resources = DummyPkgResource()
-        inst.pkg_resources.resource_exists = lambda x, y: f'{x}:{y}'
-        self.assertEqual(
-            inst.exists(), '{}:{}'.format('tests', 'test_asset.py')
-        )
+        self.assertTrue(inst.exists())
+
+    def test_stream_with_overrides(self):
+        from io import BytesIO
+
+        class Overrides:
+            def get_stream(self, resource_name):
+                return BytesIO(b'override')
+
+        inst = self._makeOne(overrides=Overrides())
+        stream = inst.stream()
+        self.assertEqual(stream.read(), b'override')
+        stream.close()
+
+    def test_listdir_with_overrides(self):
+        class Overrides:
+            def listdir(self, resource_name):
+                return ['a', 'b']
+
+        inst = self._makeOne(overrides=Overrides())
+        self.assertEqual(inst.listdir(), ['a', 'b'])
+
+    def test_exists_with_overrides(self):
+        class Overrides:
+            def has_resource(self, resource_name):
+                return True
+
+        inst = self._makeOne(overrides=Overrides())
+        self.assertTrue(inst.exists())
 
 
 class TestFSAssetDescriptor(unittest.TestCase):
@@ -424,224 +374,30 @@ class TestFSAssetDescriptor(unittest.TestCase):
         self.assertTrue(inst.exists())
 
 
-class TestDottedNameResolver(unittest.TestCase):
-    def _makeOne(self, package=None):
+class TestPathLazyExports(unittest.TestCase):
+    def test_asset_resolver_reexport(self):
+        from pyramid.path import AssetResolver
+        from pyramid.resolver import AssetResolver as direct
+
+        self.assertIs(AssetResolver, direct)
+
+    def test_dotted_name_resolver_reexport(self):
         from pyramid.path import DottedNameResolver
+        from pyramid.resolver import DottedNameResolver as direct
 
-        return DottedNameResolver(package)
+        self.assertIs(DottedNameResolver, direct)
 
-    def config_exc(self, func, *arg, **kw):
-        try:
-            func(*arg, **kw)
-        except ValueError as e:
-            return e
-        else:
-            raise AssertionError('Invalid not raised')  # pragma: no cover
+    def test_resolver_reexport(self):
+        from pyramid.path import Resolver
+        from pyramid.resolver import Resolver as direct
 
-    def test_zope_dottedname_style_resolve_builtin(self):
-        typ = self._makeOne()
-        result = typ._zope_dottedname_style('builtins.str', None)
-        self.assertEqual(result, str)
+        self.assertIs(Resolver, direct)
 
-    def test_zope_dottedname_style_resolve_absolute(self):
-        typ = self._makeOne()
-        result = typ._zope_dottedname_style(
-            'tests.test_path.TestDottedNameResolver', None
-        )
-        self.assertEqual(result, self.__class__)
+    def test_unknown_attribute_raises(self):
+        import pyramid.path as path_module
 
-    def test_zope_dottedname_style_irrresolveable_absolute(self):
-        typ = self._makeOne()
-        self.assertRaises(
-            ImportError,
-            typ._zope_dottedname_style,
-            'pyramid.test_path.nonexisting_name',
-            None,
-        )
-
-    def test__zope_dottedname_style_resolve_relative(self):
-        import tests
-
-        typ = self._makeOne()
-        result = typ._zope_dottedname_style(
-            '.test_path.TestDottedNameResolver', tests
-        )
-        self.assertEqual(result, self.__class__)
-
-    def test__zope_dottedname_style_resolve_relative_leading_dots(self):
-        import tests.test_path
-
-        typ = self._makeOne()
-        result = typ._zope_dottedname_style(
-            '..tests.test_path.TestDottedNameResolver', tests
-        )
-        self.assertEqual(result, self.__class__)
-
-    def test__zope_dottedname_style_resolve_relative_is_dot(self):
-        import tests
-
-        typ = self._makeOne()
-        result = typ._zope_dottedname_style('.', tests)
-        self.assertEqual(result, tests)
-
-    def test__zope_dottedname_style_irresolveable_relative_is_dot(self):
-        typ = self._makeOne()
-        e = self.config_exc(typ._zope_dottedname_style, '.', None)
-        self.assertEqual(
-            e.args[0], "relative name '.' irresolveable without package"
-        )
-
-    def test_zope_dottedname_style_resolve_relative_nocurrentpackage(self):
-        typ = self._makeOne()
-        e = self.config_exc(typ._zope_dottedname_style, '.whatever', None)
-        self.assertEqual(
-            e.args[0],
-            "relative name '.whatever' irresolveable without package",
-        )
-
-    def test_zope_dottedname_style_irrresolveable_relative(self):
-        import tests
-
-        typ = self._makeOne()
-        self.assertRaises(
-            ImportError, typ._zope_dottedname_style, '.notexisting', tests
-        )
-
-    def test__zope_dottedname_style_resolveable_relative(self):
-        import tests
-
-        typ = self._makeOne()
-        result = typ._zope_dottedname_style('.', tests)
-        self.assertEqual(result, tests)
-
-    def test__zope_dottedname_style_irresolveable_absolute(self):
-        typ = self._makeOne()
-        self.assertRaises(
-            ImportError, typ._zope_dottedname_style, 'pyramid.fudge.bar', None
-        )
-
-    def test__zope_dottedname_style_resolveable_absolute(self):
-        typ = self._makeOne()
-        result = typ._zope_dottedname_style(
-            'tests.test_path.TestDottedNameResolver', None
-        )
-        self.assertEqual(result, self.__class__)
-
-    def test__pkg_resources_style_resolve_absolute(self):
-        typ = self._makeOne()
-        result = typ._pkg_resources_style(
-            'tests.test_path:TestDottedNameResolver', None
-        )
-        self.assertEqual(result, self.__class__)
-
-    def test__pkg_resources_style_irrresolveable_absolute(self):
-        typ = self._makeOne()
-        self.assertRaises(
-            ImportError, typ._pkg_resources_style, 'tests:nonexisting', None
-        )
-
-    def test__pkg_resources_style_resolve_relative(self):
-        import tests
-
-        typ = self._makeOne()
-        result = typ._pkg_resources_style(
-            '.test_path:TestDottedNameResolver', tests
-        )
-        self.assertEqual(result, self.__class__)
-
-    def test__pkg_resources_style_resolve_relative_is_dot(self):
-        import tests
-
-        typ = self._makeOne()
-        result = typ._pkg_resources_style('.', tests)
-        self.assertEqual(result, tests)
-
-    def test__pkg_resources_style_resolve_relative_nocurrentpackage(self):
-        typ = self._makeOne()
-        self.assertRaises(
-            ValueError, typ._pkg_resources_style, '.whatever', None
-        )
-
-    def test__pkg_resources_style_irrresolveable_relative(self):
-        import pyramid
-
-        typ = self._makeOne()
-        self.assertRaises(
-            ImportError, typ._pkg_resources_style, ':notexisting', pyramid
-        )
-
-    def test_resolve_not_a_string(self):
-        typ = self._makeOne()
-        e = self.config_exc(typ.resolve, None)
-        self.assertEqual(e.args[0], 'None is not a string')
-
-    def test_resolve_using_pkgresources_style(self):
-        typ = self._makeOne()
-        result = typ.resolve('tests.test_path:TestDottedNameResolver')
-        self.assertEqual(result, self.__class__)
-
-    def test_resolve_using_zope_dottedname_style(self):
-        typ = self._makeOne()
-        result = typ.resolve('tests.test_path:TestDottedNameResolver')
-        self.assertEqual(result, self.__class__)
-
-    def test_resolve_missing_raises(self):
-        typ = self._makeOne()
-        self.assertRaises(ImportError, typ.resolve, 'cant.be.found')
-
-    def test_resolve_caller_package(self):
-        from pyramid.path import CALLER_PACKAGE
-
-        typ = self._makeOne(CALLER_PACKAGE)
-        self.assertEqual(
-            typ.resolve('.test_path.TestDottedNameResolver'), self.__class__
-        )
-
-    def test_maybe_resolve_caller_package(self):
-        from pyramid.path import CALLER_PACKAGE
-
-        typ = self._makeOne(CALLER_PACKAGE)
-        self.assertEqual(
-            typ.maybe_resolve('.test_path.TestDottedNameResolver'),
-            self.__class__,
-        )
-
-    def test_ctor_string_module_resolveable(self):
-        import tests
-
-        typ = self._makeOne('tests.test_path')
-        self.assertEqual(typ.package, tests)
-
-    def test_ctor_string_package_resolveable(self):
-        import tests
-
-        typ = self._makeOne('tests')
-        self.assertEqual(typ.package, tests)
-
-    def test_ctor_string_irresolveable(self):
-        self.assertRaises(ValueError, self._makeOne, 'cant.be.found')
-
-    def test_ctor_module(self):
-        import tests
-
-        from . import test_path
-
-        typ = self._makeOne(test_path)
-        self.assertEqual(typ.package, tests)
-
-    def test_ctor_package(self):
-        import tests
-
-        typ = self._makeOne(tests)
-        self.assertEqual(typ.package, tests)
-
-    def test_ctor_None(self):
-        typ = self._makeOne(None)
-        self.assertEqual(typ.package, None)
-
-
-class DummyPkgResource:
-    pass
+        with self.assertRaises(AttributeError):
+            getattr(path_module, 'this_does_not_exist')
 
 
 class DummyPackageOrModule:

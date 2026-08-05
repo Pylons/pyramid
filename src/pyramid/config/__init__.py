@@ -36,13 +36,9 @@ from pyramid.interfaces import (
     IDebugLogger,
     IExceptionResponse,
 )
-from pyramid.path import (
-    AssetResolver,
-    DottedNameResolver,
-    caller_package,
-    package_of,
-)
+from pyramid.path import caller_package, package_of
 from pyramid.registry import Introspectable, Introspector, Registry
+from pyramid.resolver import AssetResolver, DottedNameResolver
 from pyramid.router import Router
 from pyramid.settings import aslist
 from pyramid.threadlocal import manager
@@ -297,7 +293,6 @@ class Configurator(
         self.name_resolver = name_resolver
         self.package_name = name_resolver.get_package_name()
         self.package = name_resolver.get_package()
-        self.asset_resolver = AssetResolver(self.package)
         self.root_package = root_package
         self.registry = registry
         self.autocommit = autocommit
@@ -322,6 +317,9 @@ class Configurator(
                 default_view_mapper=default_view_mapper,
                 exceptionresponse_view=exceptionresponse_view,
             )
+        self.asset_resolver = AssetResolver(
+            self.package, registry=self.registry
+        )
 
     def setup_registry(
         self,

@@ -3,12 +3,12 @@ import json
 import mimetypes
 import os
 from os.path import exists, getmtime, getsize, isdir, join, normcase, normpath
-from pkg_resources import resource_exists, resource_filename, resource_isdir
 import warnings
 
 from pyramid.asset import abspath_from_asset_spec, resolve_asset_spec
 from pyramid.httpexceptions import HTTPMovedPermanently, HTTPNotFound
 from pyramid.path import caller_package
+from pyramid.resolver import AssetResolver
 from pyramid.response import FileResponse, _guess_type
 from pyramid.traversal import traversal_path_info
 
@@ -117,7 +117,8 @@ class static_view:
 
     def __call__(self, context, request):
         resource_name = self.get_resource_name(request)
-        files = self.get_possible_files(resource_name)
+        registry = getattr(request, 'registry', None)
+        files = self.get_possible_files(resource_name, registry=registry)
         filepath, content_encoding = self.find_best_match(request, files)
         if filepath is None:
             raise HTTPNotFound(request.url)
@@ -153,7 +154,10 @@ class static_view:
         # normalize asset spec or fs path into resource_path
         if self.package_name:  # package resource
             resource_path = '{}/{}'.format(self.docroot.rstrip('/'), path)
-            if resource_isdir(self.package_name, resource_path):
+            registry = getattr(request, 'registry', None)
+            resolver = AssetResolver(None, registry=registry)
+            asset = resolver.resolve(f'{self.package_name}:{resource_path}')
+            if asset.isdir():
                 if not request.path_url.endswith('/'):
                     raise self.add_slash_redirect(request)
                 resource_path = '{}/{}'.format(
@@ -171,20 +175,22 @@ class static_view:
 
         return resource_path
 
-    def find_resource_path(self, name):
+    def find_resource_path(self, name, registry=None):
         """
         Return the absolute path to the resource or ``None`` if it doesn't
         exist.
 
         """
         if self.package_name:
-            if resource_exists(self.package_name, name):
-                return resource_filename(self.package_name, name)
+            resolver = AssetResolver(None, registry=registry)
+            asset = resolver.resolve(f'{self.package_name}:{name}')
+            if asset.exists():
+                return asset.abspath()
 
         elif exists(name):
             return name
 
-    def get_possible_files(self, resource_name):
+    def get_possible_files(self, resource_name, registry=None):
         """Return a sorted list of ``(size, encoding, path)`` entries."""
         result = self.filemap.get(resource_name)
         if result is not None:
@@ -196,7 +202,7 @@ class static_view:
         result = []
 
         # add the identity
-        path = self.find_resource_path(resource_name)
+        path = self.find_resource_path(resource_name, registry=registry)
         if path:
             result.append((path, None))
 
@@ -207,7 +213,7 @@ class static_view:
         for encoding, extensions in self.content_encodings.items():
             for ext in extensions:
                 encoded_name = resource_name + ext
-                path = self.find_resource_path(encoded_name)
+                path = self.find_resource_path(encoded_name, registry=registry)
                 if path:
                     result.append((path, encoding))
 

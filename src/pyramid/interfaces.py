@@ -1074,8 +1074,8 @@ class IPEP302Loader(Interface):
         """
 
 
-class IPackageOverrides(IPEP302Loader):
-    """Utility for pkg_resources overrides"""
+class IPackageOverrides(Interface):
+    """Utility for package asset overrides registered with the application."""
 
     def get_spec(resource_name):
         """Return a specifier for the resource.
@@ -1084,6 +1084,25 @@ class IPackageOverrides(IPEP302Loader):
         filesystem.
 
         """
+
+    def get_filename(resource_name):
+        """Return a filesystem path for the resource, or ``None``."""
+
+    def get_stream(resource_name):
+        """Return a readable file-like object for the resource, or ``None``."""
+
+    def get_string(resource_name):
+        """Return the contents of the resource as bytes, or ``None``."""
+
+    def has_resource(resource_name):
+        """Return ``True`` if the resource exists, or ``None`` if unknown."""
+
+    def isdir(resource_name):
+        """Return ``True`` if the resource is a directory, ``False`` if a file,
+        or ``None`` if unknown."""
+
+    def listdir(resource_name):
+        """Return a list of names in the directory, or ``None`` if unknown."""
 
 
 # VH_ROOT_KEY is an interface; its imported from other packages (e.g.

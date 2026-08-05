@@ -118,8 +118,8 @@ The fundamental "plug points" of an application developed using :app:`Pyramid`
 are *routes*, *views*, and *assets*.  Routes are declarations made using the
 :meth:`pyramid.config.Configurator.add_route` method.  Views are declarations
 made using the :meth:`pyramid.config.Configurator.add_view` method.  Assets are
-files that are accessed by :app:`Pyramid` using the :term:`pkg_resources` API
-such as static files and templates via a :term:`asset specification`.  Other
+files that are accessed by :app:`Pyramid` using the :mod:`importlib.resources`
+API such as static files and templates via a :term:`asset specification`.  Other
 directives and configurator methods also deal in routes, views, and assets.
 For example, the ``add_handler`` directive of the ``pyramid_handlers`` package
 adds a single route and some number of views.
