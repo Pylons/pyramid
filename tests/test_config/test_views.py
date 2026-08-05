@@ -12,6 +12,7 @@ from pyramid.exceptions import (
 )
 from pyramid.interfaces import IMultiView, IRequest, IResponse
 from pyramid.util import text_
+from pyramid.view import Self
 
 from . import IDummy, dummy_view
 
@@ -435,6 +436,63 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         foo = implementedBy(Foo)
         wrapper = self._getViewCallable(config, foo)
         self.assertEqual(wrapper, view)
+
+    def test_add_view_raises_on_self_with_non_class_view(self):
+        def view(exc, request):  # pragma: no cover
+            pass
+
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(
+            ValueError,
+            lambda: config.add_view(view=view, context=Self, name=Self),
+        )
+
+    def test_add_view_raises_on_function_context_with_non_class_view(self):
+        def view(exc, request):  # pragma: no cover
+            pass
+
+        config = self._makeOne(autocommit=True)
+        self.assertRaises(
+            ValueError,
+            lambda: config.add_view(view=view, context=lambda x: x),
+        )
+
+    def test_add_view_replaces_self(self):
+        from zope.interface import implementedBy
+
+        class Foo:  # pragma: no cover
+            def __init__(self, request):
+                pass
+
+            def view(self):
+                pass
+
+        config = self._makeOne(autocommit=True)
+        config.add_view(Foo, context=Self, name=Self, attr='view')
+        interface = implementedBy(Foo)
+        wrapper = self._getViewCallable(config, interface, name='view')
+        self.assertEqual(wrapper.__original_view__, Foo)
+
+    def test_add_view_replaces_function(self):
+        from zope.interface import implementedBy
+
+        class Foo2:
+            pass
+
+        class Foo:  # pragma: no cover
+            wrapped = Foo2
+
+            def __init__(self, request):
+                pass
+
+            def view(self):
+                pass
+
+        config = self._makeOne(autocommit=True)
+        config.add_view(Foo, context=lambda x: x.wrapped, attr='view')
+        interface = implementedBy(Foo2)
+        wrapper = self._getViewCallable(config, interface)
+        self.assertEqual(wrapper.__original_view__, Foo)
 
     def test_add_view_context_as_iface(self):
         from pyramid.renderers import null_renderer

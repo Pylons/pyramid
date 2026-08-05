@@ -55,7 +55,7 @@ from pyramid.util import (
     as_sorted_tuple,
     is_nonstr_iter,
 )
-from pyramid.view import AppendSlashNotFoundViewFactory
+from pyramid.view import AppendSlashNotFoundViewFactory, Self
 import pyramid.viewderivers
 from pyramid.viewderivers import (
     INGRESS,
@@ -571,7 +571,9 @@ class ViewsConfiguratorMixin:
         name
 
           The :term:`view name`.  Read :ref:`traversal_chapter` to
-          understand the concept of a view name.
+          understand the concept of a view name. When :term:`view` is a class,
+          the sentinel value view.Self will cause the attr value to be copied
+          to name (useful with view_defaults to reduce boilerplate).
 
         context
 
@@ -586,6 +588,11 @@ class ViewsConfiguratorMixin:
           to ``add_view`` as ``for_`` (an older, still-supported
           spelling). If the view should *only* match when handling
           exceptions, then set the ``exception_only`` to ``True``.
+          When :term:`view` is a class, the sentinel value view.Self
+          will cause the :term:`context` value to be set at scan time
+          (useful in conjunction with venusian lift). It can also be
+          a function taking the view as it's only argument which return
+          value will be set as context at scan time.
 
         route_name
 
@@ -813,6 +820,20 @@ class ViewsConfiguratorMixin:
         for_ = self.maybe_dotted(for_)
         containment = self.maybe_dotted(containment)
         mapper = self.maybe_dotted(mapper)
+
+        if inspect.isclass(view):
+            if context is Self:
+                context = view
+            elif inspect.isfunction(context):
+                context = context(view)
+            if name is Self:
+                name = attr or ""
+        elif Self in (context, name):
+            raise ValueError('Self is only allowed when view is a class')
+        elif inspect.isfunction(context):
+            raise ValueError(
+                'context as function is only allowed when view is a class'
+            )
 
         if is_nonstr_iter(decorator):
             decorator = combine_decorators(*map(self.maybe_dotted, decorator))
