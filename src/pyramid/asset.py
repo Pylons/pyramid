@@ -1,7 +1,7 @@
 import os
 import pkg_resources
 
-from pyramid.path import package_name, package_path
+from pyramid._path import package_name, package_path
 
 
 def resolve_asset_spec(spec, pname='__main__'):
@@ -33,7 +33,7 @@ def asset_spec_from_abspath(abspath, package):
     return abspath
 
 
-# bw compat only; use pyramid.path.AssetResolver().resolve(spec).abspath()
+# bw compat only; use pyramid.resolver.AssetResolver().resolve(spec).abspath()
 def abspath_from_asset_spec(spec, pname='__main__'):
     if pname is None:
         return spec

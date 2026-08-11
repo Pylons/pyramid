@@ -7,13 +7,5 @@
 
     .. attribute:: CALLER_PACKAGE
 
-       A constant used by the constructor of
-       :class:`pyramid.path.DottedNameResolver` and
-       :class:`pyramid.path.AssetResolver`.
-
-    .. autoclass:: DottedNameResolver
-       :members:
-
-    .. autoclass:: AssetResolver
-       :members:
-
+       A constant representing the package of the caller.  Commonly used as a
+       default for a "package" argument.

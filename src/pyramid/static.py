@@ -6,9 +6,9 @@ from os.path import exists, getmtime, getsize, isdir, join, normcase, normpath
 from pkg_resources import resource_exists, resource_filename, resource_isdir
 import warnings
 
+from pyramid._path import caller_package
 from pyramid.asset import abspath_from_asset_spec, resolve_asset_spec
 from pyramid.httpexceptions import HTTPMovedPermanently, HTTPNotFound
-from pyramid.path import caller_package
 from pyramid.response import FileResponse, _guess_type
 from pyramid.traversal import traversal_path_info
 

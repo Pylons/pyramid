@@ -3,9 +3,9 @@
 from functools import lru_cache
 import os
 
+from pyramid._path import caller_package
 from pyramid.encode import url_quote, urlencode
 from pyramid.interfaces import IResourceURL, IRoutesMapper, IStaticURLInfo
-from pyramid.path import caller_package
 from pyramid.threadlocal import get_current_registry
 from pyramid.traversal import (
     PATH_SAFE,
