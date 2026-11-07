@@ -1,8 +1,8 @@
 import functools
 from importlib import import_module
+import importlib.resources
 from importlib.machinery import SOURCE_SUFFIXES
 import os
-import pkg_resources
 import sys
 from zope.interface import implementer
 
@@ -70,10 +70,19 @@ def package_path(package):
     # the result
     prefix = getattr(package, '__abspath__', None)
     if prefix is None:
-        prefix = pkg_resources.resource_filename(package.__name__, '')
-        # pkg_resources doesn't care whether we feed it a package
-        # name or a module name within the package, the result
-        # will be the same: a directory name to the package itself
+        pkg = getattr(package, '__name__', package)
+        try:
+            prefix = os.path.abspath(str(importlib.resources.files(pkg)))
+        except Exception:
+            f = getattr(package, '__file__', None)
+            if f is not None:
+                prefix = os.path.dirname(os.path.abspath(f))
+            else:
+                p = getattr(package, '__path__', None)
+                if p is not None:
+                    prefix = os.path.abspath(next(iter(p)))
+                else:
+                    prefix = ''
         try:
             package.__abspath__ = prefix
         except Exception:
@@ -213,7 +222,7 @@ class AssetResolver(Resolver):
                 raise ValueError(
                     f'relative spec {spec!r} irresolveable without package'
                 )
-        return PkgResourcesAssetDescriptor(package_name, path)
+        return PackageAssetDescriptor(package_name, path)
 
 
 class DottedNameResolver(Resolver):
@@ -398,33 +407,93 @@ class DottedNameResolver(Resolver):
         return found
 
 
-@implementer(IAssetDescriptor)
-class PkgResourcesAssetDescriptor:
-    pkg_resources = pkg_resources
+def _resource_ref(pkg_name, path):
+    ref = importlib.resources.files(pkg_name)
+    if path:
+        for part in path.replace('\\', '/').split('/'):
+            if part and part != '.':
+                ref = ref.joinpath(part)
+    return ref
 
+
+@implementer(IAssetDescriptor)
+class PackageAssetDescriptor:
     def __init__(self, pkg_name, path):
         self.pkg_name = pkg_name
         self.path = path
 
+    def _get_overrides(self):
+        try:
+            from pyramid.interfaces import IPackageOverrides
+            from pyramid.threadlocal import get_current_registry
+
+            reg = get_current_registry()
+            if reg is not None:
+                return reg.queryUtility(IPackageOverrides, self.pkg_name)
+        except Exception:
+            pass
+        return None
+
     def absspec(self):
+        overrides = self._get_overrides()
+        if overrides is not None:
+            spec = overrides.get_spec(self.path)
+            if spec is not None:
+                return spec
         return f'{self.pkg_name}:{self.path}'
 
+    def _ref(self):
+        return _resource_ref(self.pkg_name, self.path)
+
     def abspath(self):
-        return os.path.abspath(
-            self.pkg_resources.resource_filename(self.pkg_name, self.path)
-        )
+        overrides = self._get_overrides()
+        if overrides is not None:
+            filename = overrides.get_filename(self.path)
+            if filename is not None:
+                return os.path.abspath(filename)
+        return os.path.abspath(str(self._ref()))
 
     def stream(self):
-        return self.pkg_resources.resource_stream(self.pkg_name, self.path)
+        overrides = self._get_overrides()
+        if overrides is not None:
+            stream = overrides.get_stream(self.path)
+            if stream is not None:
+                return stream
+        return self._ref().open('rb')
 
     def isdir(self):
-        return self.pkg_resources.resource_isdir(self.pkg_name, self.path)
+        overrides = self._get_overrides()
+        if overrides is not None:
+            isdir = overrides.isdir(self.path)
+            if isdir is not None:
+                return isdir
+        try:
+            return self._ref().is_dir()
+        except Exception:
+            return False
 
     def listdir(self):
-        return self.pkg_resources.resource_listdir(self.pkg_name, self.path)
+        overrides = self._get_overrides()
+        if overrides is not None:
+            listdir = overrides.listdir(self.path)
+            if listdir is not None:
+                return listdir
+        return [item.name for item in self._ref().iterdir()]
 
     def exists(self):
-        return self.pkg_resources.resource_exists(self.pkg_name, self.path)
+        overrides = self._get_overrides()
+        if overrides is not None:
+            exists = overrides.has_resource(self.path)
+            if exists is not None:
+                return exists
+        try:
+            ref = self._ref()
+            return ref.is_file() or ref.is_dir()
+        except Exception:
+            return False
+
+
+PkgResourcesAssetDescriptor = PackageAssetDescriptor
 
 
 @implementer(IAssetDescriptor)
