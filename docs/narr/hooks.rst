@@ -1493,7 +1493,7 @@ method. For example:
         def __call__(self, context, request):
             return request.content_type == self.val
 
-The constructor of an :class:`pyramid.interfaces.IPredicateFactory`` takes two arguments: ``val`` and ``info``.
+The constructor of an :class:`pyramid.interfaces.IPredicateFactory` takes two arguments: ``val`` and ``info``.
 The ``val`` argument will be the argument passed to ``view_config`` (or ``add_view``).
 In the example above, it will be the string ``File``.
 The second argument, ``info``, will be an :class:`pyramid.interfaces.IPredicateInfo` instance created relative to the action configuring the predicate.

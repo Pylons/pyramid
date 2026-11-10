@@ -116,6 +116,11 @@ exclude_patterns = ['_themes/README.rst', ]
 # unit titles (such as .. function::).
 add_module_names = False
 
+# Show "add_view()" rather than "Configurator.add_view()" for API objects in
+# the sidebar table of contents. The parents are already given by the nesting,
+# and the fully qualified names are too long to fit in the sidebar.
+toc_object_entries_show_parents = 'hide'
+
 # The name of the Pygments (syntax highlighting) style to use.
 #pygments_style = book and 'bw' or 'tango'
 if book:
