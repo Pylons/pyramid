@@ -1,7 +1,7 @@
 import os
-import pkg_resources
 
 from pyramid.path import package_name, package_path
+from pyramid.resolver import AssetResolver
 
 
 def resolve_asset_spec(spec, pname='__main__'):
@@ -40,4 +40,4 @@ def abspath_from_asset_spec(spec, pname='__main__'):
     pname, filename = resolve_asset_spec(spec, pname)
     if pname is None:
         return filename
-    return pkg_resources.resource_filename(pname, filename)
+    return AssetResolver(None).resolve(f'{pname}:{filename}').abspath()

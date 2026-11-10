@@ -49,11 +49,10 @@ Glossary
      distribution, and installation of libraries and applications.
 
    pkg_resources
-     A module which ships with :term:`Setuptools` that
+     A deprecated module which ships with :term:`Setuptools` that
      provides an API for addressing "asset files" within a Python
-     :term:`package`.  Asset files are static files, template files, etc;
-     basically anything non-Python-source that lives in a Python package can
-     be considered a asset file.
+     :term:`package`.  :app:`Pyramid` no longer uses ``pkg_resources``;
+     asset resolution is performed using :mod:`importlib.resources` instead.
      
      .. seealso::
          

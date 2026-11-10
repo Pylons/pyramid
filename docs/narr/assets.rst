@@ -68,11 +68,11 @@ two parts:
 
 The two parts are separated by a colon ``:`` character.
 
-:app:`Pyramid` uses the Python :term:`pkg_resources` API to resolve the package
-name and asset name to an absolute (operating system-specific) file name.  It
-eventually passes this resolved absolute filesystem path to the Chameleon
-templating engine, which then uses it to load, parse, and execute the template
-file.
+:app:`Pyramid` uses the Python :mod:`importlib.resources` API to resolve the
+package name and asset name to an absolute (operating system-specific) file
+name.  It eventually passes this resolved absolute filesystem path to the
+Chameleon templating engine, which then uses it to load, parse, and execute
+the template file.
 
 There is a second form of asset specification: a *relative* asset
 specification.  Instead of using an "absolute" asset specification which
@@ -801,8 +801,10 @@ feature, a :term:`Configurator` API exists named
 - A directory of static files served up by an instance of the
   ``pyramid.static.static_view`` helper class.
 
-- Any other asset (or set of assets) addressed by code that uses the Setuptools
-  :term:`pkg_resources` API.
+- Any other asset (or set of assets) addressed by code that uses Pyramid's
+  asset resolution APIs (such as
+  :class:`pyramid.path.AssetResolver` and
+  :func:`pyramid.path.resource_filename`).
 
 .. index::
    single: override_asset
@@ -875,11 +877,11 @@ path.  The first asset that exists in the search path will be used; if no asset
 exists in the override path, the original asset is used.
 
 Asset overrides can actually override assets other than templates and static
-files.  Any software which uses the
-:func:`pkg_resources.get_resource_filename`,
-:func:`pkg_resources.get_resource_stream`, or
-:func:`pkg_resources.get_resource_string` APIs will obtain an overridden file
-when an override is used.
+files.  Any code that resolves assets through Pyramid's asset APIs (such as
+:meth:`pyramid.path.AssetResolver.resolve`,
+:func:`pyramid.path.resource_filename`, or
+:func:`pyramid.asset.abspath_from_asset_spec`) will obtain an overridden file
+when an override is registered.
 
 .. versionadded:: 1.6
   As of Pyramid 1.6, it is also possible to override an asset by supplying an

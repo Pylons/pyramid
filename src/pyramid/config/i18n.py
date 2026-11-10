@@ -1,7 +1,7 @@
 from pyramid.config.actions import action_method
 from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import ILocaleNegotiator, ITranslationDirectories
-from pyramid.path import AssetResolver
+from pyramid.resolver import AssetResolver
 
 
 class I18NConfiguratorMixin:
@@ -87,7 +87,7 @@ class I18NConfiguratorMixin:
 
         def register():
             directories = []
-            resolver = AssetResolver(self.package_name)
+            resolver = AssetResolver(self.package_name, registry=self.registry)
 
             # defer spec resolution until register to allow for asset
             # overrides to take place in an earlier config phase

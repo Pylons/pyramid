@@ -1,8 +1,6 @@
 import os.path
 import unittest
 
-from pyramid.testing import cleanUp
-
 # we use this folder
 here = os.path.dirname(os.path.abspath(__file__))
 
@@ -327,212 +325,17 @@ class TestAssetsConfiguratorMixin(unittest.TestCase):
         self.assertEqual(overrides.package, package)
 
 
-class TestOverrideProvider(unittest.TestCase):
-    def setUp(self):
-        cleanUp()
-
-    def tearDown(self):
-        cleanUp()
-
-    def _getTargetClass(self):
-        from pyramid.config.assets import OverrideProvider
-
-        return OverrideProvider
-
-    def _makeOne(self, module):
-        klass = self._getTargetClass()
-        return klass(module)
-
-    def _registerOverrides(self, overrides, name='tests.test_config'):
-        from pyramid.interfaces import IPackageOverrides
-        from pyramid.threadlocal import get_current_registry
-
-        reg = get_current_registry()
-        reg.registerUtility(overrides, IPackageOverrides, name=name)
-
-    def test_get_resource_filename_no_overrides(self):
-        resource_name = 'test_assets.py'
-        import tests.test_config
-
-        provider = self._makeOne(tests.test_config)
-        expected = os.path.join(here, resource_name)
-        result = provider.get_resource_filename(None, resource_name)
-        self.assertEqual(result, expected)
-
-    def test_get_resource_stream_no_overrides(self):
-        resource_name = 'test_assets.py'
-        import tests.test_config
-
-        provider = self._makeOne(tests.test_config)
-        with provider.get_resource_stream(None, resource_name) as result:
-            _assertBody(result.read(), os.path.join(here, resource_name))
-
-    def test_get_resource_string_no_overrides(self):
-        resource_name = 'test_assets.py'
-        import tests.test_config
-
-        provider = self._makeOne(tests.test_config)
-        result = provider.get_resource_string(None, resource_name)
-        _assertBody(result, os.path.join(here, resource_name))
-
-    def test_has_resource_no_overrides(self):
-        resource_name = 'test_assets.py'
-        import tests.test_config
-
-        provider = self._makeOne(tests.test_config)
-        result = provider.has_resource(resource_name)
-        self.assertEqual(result, True)
-
-    def test_resource_isdir_no_overrides(self):
-        file_resource_name = 'test_assets.py'
-        directory_resource_name = 'files'
-        import tests.test_config
-
-        provider = self._makeOne(tests.test_config)
-        result = provider.resource_isdir(file_resource_name)
-        self.assertEqual(result, False)
-        result = provider.resource_isdir(directory_resource_name)
-        self.assertEqual(result, True)
-
-    def test_resource_listdir_no_overrides(self):
-        resource_name = 'files'
-        import tests.test_config
-
-        provider = self._makeOne(tests.test_config)
-        result = provider.resource_listdir(resource_name)
-        self.assertTrue(result)
-
-    def test_get_resource_filename_override_returns_None(self):
-        overrides = DummyOverrides(None)
-        self._registerOverrides(overrides)
-        resource_name = 'test_assets.py'
-        import tests.test_config
-
-        provider = self._makeOne(tests.test_config)
-        expected = os.path.join(here, resource_name)
-        result = provider.get_resource_filename(None, resource_name)
-        self.assertEqual(result, expected)
-
-    def test_get_resource_stream_override_returns_None(self):
-        overrides = DummyOverrides(None)
-        self._registerOverrides(overrides)
-        resource_name = 'test_assets.py'
-        import tests.test_config
-
-        provider = self._makeOne(tests.test_config)
-        with provider.get_resource_stream(None, resource_name) as result:
-            _assertBody(result.read(), os.path.join(here, resource_name))
-
-    def test_get_resource_string_override_returns_None(self):
-        overrides = DummyOverrides(None)
-        self._registerOverrides(overrides)
-        resource_name = 'test_assets.py'
-        import tests.test_config
-
-        provider = self._makeOne(tests.test_config)
-        result = provider.get_resource_string(None, resource_name)
-        _assertBody(result, os.path.join(here, resource_name))
-
-    def test_has_resource_override_returns_None(self):
-        overrides = DummyOverrides(None)
-        self._registerOverrides(overrides)
-        resource_name = 'test_assets.py'
-        import tests.test_config
-
-        provider = self._makeOne(tests.test_config)
-        result = provider.has_resource(resource_name)
-        self.assertEqual(result, True)
-
-    def test_resource_isdir_override_returns_None(self):
-        overrides = DummyOverrides(None)
-        self._registerOverrides(overrides)
-        resource_name = 'files'
-        import tests.test_config
-
-        provider = self._makeOne(tests.test_config)
-        result = provider.resource_isdir(resource_name)
-        self.assertEqual(result, True)
-
-    def test_resource_listdir_override_returns_None(self):
-        overrides = DummyOverrides(None)
-        self._registerOverrides(overrides)
-        resource_name = 'files'
-        import tests.test_config
-
-        provider = self._makeOne(tests.test_config)
-        result = provider.resource_listdir(resource_name)
-        self.assertTrue(result)
-
-    def test_get_resource_filename_override_returns_value(self):
-        overrides = DummyOverrides('value')
-        import tests.test_config
-
-        self._registerOverrides(overrides)
-        provider = self._makeOne(tests.test_config)
-        result = provider.get_resource_filename(None, 'test_assets.py')
-        self.assertEqual(result, 'value')
-
-    def test_get_resource_stream_override_returns_value(self):
-        from io import BytesIO
-
-        overrides = DummyOverrides(BytesIO(b'value'))
-        import tests.test_config
-
-        self._registerOverrides(overrides)
-        provider = self._makeOne(tests.test_config)
-        with provider.get_resource_stream(None, 'test_assets.py') as stream:
-            self.assertEqual(stream.getvalue(), b'value')
-
-    def test_get_resource_string_override_returns_value(self):
-        overrides = DummyOverrides('value')
-        import tests.test_config
-
-        self._registerOverrides(overrides)
-        provider = self._makeOne(tests.test_config)
-        result = provider.get_resource_string(None, 'test_assets.py')
-        self.assertEqual(result, 'value')
-
-    def test_has_resource_override_returns_True(self):
-        overrides = DummyOverrides(True)
-        import tests.test_config
-
-        self._registerOverrides(overrides)
-        provider = self._makeOne(tests.test_config)
-        result = provider.has_resource('test_assets.py')
-        self.assertEqual(result, True)
-
-    def test_resource_isdir_override_returns_False(self):
-        overrides = DummyOverrides(False)
-        import tests.test_config
-
-        self._registerOverrides(overrides)
-        provider = self._makeOne(tests.test_config)
-        result = provider.resource_isdir('files')
-        self.assertEqual(result, False)
-
-    def test_resource_listdir_override_returns_values(self):
-        overrides = DummyOverrides(['a'])
-        import tests.test_config
-
-        self._registerOverrides(overrides)
-        provider = self._makeOne(tests.test_config)
-        result = provider.resource_listdir('files')
-        self.assertEqual(result, ['a'])
-
-
 class TestPackageOverrides(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.config.assets import PackageOverrides
 
         return PackageOverrides
 
-    def _makeOne(self, package=None, pkg_resources=None):
+    def _makeOne(self, package=None):
         if package is None:
             package = DummyPackage('package')
         klass = self._getTargetClass()
-        if pkg_resources is None:
-            pkg_resources = DummyPkgResources()
-        return klass(package, pkg_resources=pkg_resources)
+        return klass(package)
 
     def test_class_conforms_to_IPackageOverrides(self):
         from zope.interface.verify import verifyClass
@@ -547,48 +350,6 @@ class TestPackageOverrides(unittest.TestCase):
         from pyramid.interfaces import IPackageOverrides
 
         verifyObject(IPackageOverrides, self._makeOne())
-
-    def test_class_conforms_to_IPEP302Loader(self):
-        from zope.interface.verify import verifyClass
-
-        from pyramid.interfaces import IPEP302Loader
-
-        verifyClass(IPEP302Loader, self._getTargetClass())
-
-    def test_instance_conforms_to_IPEP302Loader(self):
-        from zope.interface.verify import verifyObject
-
-        from pyramid.interfaces import IPEP302Loader
-
-        verifyObject(IPEP302Loader, self._makeOne())
-
-    def test_ctor_package_already_has_loader_of_different_type(self):
-        package = DummyPackage('package')
-        loader = package.__loader__ = DummyLoader()
-        po = self._makeOne(package)
-        self.assertTrue(package.__loader__ is po)
-        self.assertTrue(po.real_loader is loader)
-
-    def test_ctor_package_already_has_loader_of_same_type(self):
-        package = DummyPackage('package')
-        package.__loader__ = self._makeOne(package)
-        po = self._makeOne(package)
-        self.assertEqual(package.__loader__, po)
-
-    def test_ctor_sets_loader(self):
-        package = DummyPackage('package')
-        po = self._makeOne(package)
-        self.assertEqual(package.__loader__, po)
-
-    def test_ctor_registers_loader_type(self):
-        from pyramid.config.assets import OverrideProvider
-
-        dummy_pkg_resources = DummyPkgResources()
-        package = DummyPackage('package')
-        po = self._makeOne(package, dummy_pkg_resources)
-        self.assertEqual(
-            dummy_pkg_resources.registered, [(po.__class__, OverrideProvider)]
-        )
 
     def test_ctor_sets_local_state(self):
         package = DummyPackage('package')
@@ -796,55 +557,6 @@ class TestPackageOverrides(unittest.TestCase):
         self.assertEqual(po.listdir('whatever'), None)
         self.assertEqual(source.resource_name, 'wont_exist')
 
-    # PEP 302 __loader__ extensions:  use the "real" __loader__, if present.
-    def test_get_data_pkg_has_no___loader__(self):
-        package = DummyPackage('package')
-        po = self._makeOne(package)
-        self.assertRaises(NotImplementedError, po.get_data, 'whatever')
-
-    def test_get_data_pkg_has___loader__(self):
-        package = DummyPackage('package')
-        loader = package.__loader__ = DummyLoader()
-        po = self._makeOne(package)
-        self.assertEqual(po.get_data('whatever'), b'DEADBEEF')
-        self.assertEqual(loader._got_data, 'whatever')
-
-    def test_is_package_pkg_has_no___loader__(self):
-        package = DummyPackage('package')
-        po = self._makeOne(package)
-        self.assertRaises(NotImplementedError, po.is_package, 'whatever')
-
-    def test_is_package_pkg_has___loader__(self):
-        package = DummyPackage('package')
-        loader = package.__loader__ = DummyLoader()
-        po = self._makeOne(package)
-        self.assertTrue(po.is_package('whatever'))
-        self.assertEqual(loader._is_package, 'whatever')
-
-    def test_get_code_pkg_has_no___loader__(self):
-        package = DummyPackage('package')
-        po = self._makeOne(package)
-        self.assertRaises(NotImplementedError, po.get_code, 'whatever')
-
-    def test_get_code_pkg_has___loader__(self):
-        package = DummyPackage('package')
-        loader = package.__loader__ = DummyLoader()
-        po = self._makeOne(package)
-        self.assertEqual(po.get_code('whatever'), b'DEADBEEF')
-        self.assertEqual(loader._got_code, 'whatever')
-
-    def test_get_source_pkg_has_no___loader__(self):
-        package = DummyPackage('package')
-        po = self._makeOne(package)
-        self.assertRaises(NotImplementedError, po.get_source, 'whatever')
-
-    def test_get_source_pkg_has___loader__(self):
-        package = DummyPackage('package')
-        loader = package.__loader__ = DummyLoader()
-        po = self._makeOne(package)
-        self.assertEqual(po.get_source('whatever'), 'def foo():\n    pass')
-        self.assertEqual(loader._got_source, 'whatever')
-
 
 class AssetSourceIntegrationTests:
     def test_get_filename(self):
@@ -1039,16 +751,6 @@ class DummyOverride:
         return self.result
 
 
-class DummyOverrides:
-    def __init__(self, result):
-        self.result = result
-
-    def get_filename(self, resource_name):
-        return self.result
-
-    listdir = isdir = has_resource = get_stream = get_string = get_filename
-
-
 class DummyPackageOverrides:
     def __init__(self, package):
         self.package = package
@@ -1056,14 +758,6 @@ class DummyPackageOverrides:
 
     def insert(self, path, source):
         self.inserted.append((path, source))
-
-
-class DummyPkgResources:
-    def __init__(self):
-        self.registered = []
-
-    def register_loader_type(self, typ, inst):
-        self.registered.append((typ, inst))
 
 
 class DummyPackage:
@@ -1102,26 +796,6 @@ class DummyAssetSource:
     def listdir(self, resource_name):
         self.resource_name = resource_name
         return self.kw['listdir']
-
-
-class DummyLoader:
-    _got_data = _is_package = None
-
-    def get_data(self, path):
-        self._got_data = path
-        return b'DEADBEEF'
-
-    def is_package(self, fullname):
-        self._is_package = fullname
-        return True
-
-    def get_code(self, fullname):
-        self._got_code = fullname
-        return b'DEADBEEF'
-
-    def get_source(self, fullname):
-        self._got_source = fullname
-        return 'def foo():\n    pass'
 
 
 class DummyUnderOverride:

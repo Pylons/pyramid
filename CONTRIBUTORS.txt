@@ -362,3 +362,5 @@ Contributors
 - Camill Kaipf, 2022/08/12
 
 - Stefano Rivera, 2022/12/29
+
+- Rémy Hubscher, 2026/08/05

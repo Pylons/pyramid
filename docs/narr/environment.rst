@@ -456,9 +456,8 @@ the distinction can be confusing.  It's helpful to read
 When ``pyramid.reload_templates`` is true, :app:`Pyramid` takes advantage of
 the underlying templating system's ability to check for file modifications to
 an individual template file.  When ``pyramid.reload_templates`` is true, but
-``pyramid.reload_assets`` is *not* true, the template filename returned by the
-``pkg_resources`` package (used under the hood by asset resolution) is cached
-by :app:`Pyramid` on the first request.  Subsequent requests for the same
+``pyramid.reload_assets`` is *not* true, the template filename returned by
+asset resolution is cached by :app:`Pyramid` on the first request.  Subsequent requests for the same
 template file will return a cached template filename.  The underlying
 templating system checks for modifications to this particular file for every
 request.  Setting ``pyramid.reload_templates`` to ``True`` doesn't affect

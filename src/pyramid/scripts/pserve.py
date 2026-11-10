@@ -18,7 +18,7 @@ import threading
 import time
 import webbrowser
 
-from pyramid.path import AssetResolver
+from pyramid.resolver import AssetResolver
 from pyramid.scripts.common import get_config_loader, parse_vars
 from pyramid.settings import aslist
 

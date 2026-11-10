@@ -1,110 +1,17 @@
+import importlib.resources
 import os
-import pkg_resources
 import sys
 from zope.interface import implementer
 
 from pyramid.config.actions import action_method
 from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import PHASE1_CONFIG, IPackageOverrides
-from pyramid.threadlocal import get_current_registry
-
-
-class OverrideProvider(pkg_resources.DefaultProvider):
-    def __init__(self, module):
-        pkg_resources.DefaultProvider.__init__(self, module)
-        self.module_name = module.__name__
-
-    def _get_overrides(self):
-        reg = get_current_registry()
-        overrides = reg.queryUtility(IPackageOverrides, self.module_name)
-        return overrides
-
-    def get_resource_filename(self, manager, resource_name):
-        """Return a true filesystem path for resource_name,
-        co-ordinating the extraction with manager, if the resource
-        must be unpacked to the filesystem.
-        """
-        overrides = self._get_overrides()
-        if overrides is not None:
-            filename = overrides.get_filename(resource_name)
-            if filename is not None:
-                return filename
-        return pkg_resources.DefaultProvider.get_resource_filename(
-            self, manager, resource_name
-        )
-
-    def get_resource_stream(self, manager, resource_name):
-        """Return a readable file-like object for resource_name."""
-        overrides = self._get_overrides()
-        if overrides is not None:
-            stream = overrides.get_stream(resource_name)
-            if stream is not None:
-                return stream
-        return pkg_resources.DefaultProvider.get_resource_stream(
-            self, manager, resource_name
-        )
-
-    def get_resource_string(self, manager, resource_name):
-        """Return a string containing the contents of resource_name."""
-        overrides = self._get_overrides()
-        if overrides is not None:
-            string = overrides.get_string(resource_name)
-            if string is not None:
-                return string
-        return pkg_resources.DefaultProvider.get_resource_string(
-            self, manager, resource_name
-        )
-
-    def has_resource(self, resource_name):
-        overrides = self._get_overrides()
-        if overrides is not None:
-            result = overrides.has_resource(resource_name)
-            if result is not None:
-                return result
-        return pkg_resources.DefaultProvider.has_resource(self, resource_name)
-
-    def resource_isdir(self, resource_name):
-        overrides = self._get_overrides()
-        if overrides is not None:
-            result = overrides.isdir(resource_name)
-            if result is not None:
-                return result
-        return pkg_resources.DefaultProvider.resource_isdir(
-            self, resource_name
-        )
-
-    def resource_listdir(self, resource_name):
-        overrides = self._get_overrides()
-        if overrides is not None:
-            result = overrides.listdir(resource_name)
-            if result is not None:
-                return result
-        return pkg_resources.DefaultProvider.resource_listdir(
-            self, resource_name
-        )
+from pyramid.path import ref_filename
 
 
 @implementer(IPackageOverrides)
 class PackageOverrides:
-    # pkg_resources arg in kw args below for testing
-    def __init__(self, package, pkg_resources=pkg_resources):
-        loader = self._real_loader = getattr(package, '__loader__', None)
-        if isinstance(loader, self.__class__):
-            self._real_loader = None
-        # We register ourselves as a __loader__ *only* to support the
-        # setuptools _find_adapter adapter lookup; this class doesn't
-        # actually support the PEP 302 loader "API".  This is
-        # excusable due to the following statement in the spec:
-        # ... Loader objects are not
-        # required to offer any useful functionality (any such functionality,
-        # such as the zipimport get_data() method mentioned above, is
-        # optional)...
-        # A __loader__ attribute is basically metadata, and setuptools
-        # uses it as such.
-        package.__loader__ = self
-        # we call register_loader_type for every instantiation of this
-        # class; that's OK, it's idempotent to do it more than once.
-        pkg_resources.register_loader_type(self.__class__, OverrideProvider)
+    def __init__(self, package):
         self.overrides = []
         self.overridden_package_name = package.__name__
 
@@ -163,28 +70,6 @@ class PackageOverrides:
             if result is not None:
                 return result
 
-    @property
-    def real_loader(self):
-        if self._real_loader is None:
-            raise NotImplementedError()
-        return self._real_loader
-
-    def get_data(self, path):
-        """See IPEP302Loader."""
-        return self.real_loader.get_data(path)
-
-    def is_package(self, fullname):
-        """See IPEP302Loader."""
-        return self.real_loader.is_package(fullname)
-
-    def get_code(self, fullname):
-        """See IPEP302Loader."""
-        return self.real_loader.get_code(fullname)
-
-    def get_source(self, fullname):
-        """See IPEP302Loader."""
-        return self.real_loader.get_source(fullname)
-
 
 class DirectoryOverride:
     def __init__(self, path, source):
@@ -229,40 +114,45 @@ class PackageAssetSource:
     def get_path(self, resource_name):
         return f'{self.prefix}{resource_name}'
 
-    def get_spec(self, resource_name):
+    def _ref(self, resource_name):
         path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return f'{self.pkg_name}:{path}'
+        return importlib.resources.files(self.pkg_name) / path
+
+    def get_spec(self, resource_name):
+        ref = self._ref(resource_name)
+        if ref.is_file() or ref.is_dir():
+            return f'{self.pkg_name}:{self.get_path(resource_name)}'
 
     def get_filename(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_filename(self.pkg_name, path)
+        ref = self._ref(resource_name)
+        if ref.is_file() or ref.is_dir():
+            return ref_filename(ref)
 
     def get_stream(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_stream(self.pkg_name, path)
+        ref = self._ref(resource_name)
+        if ref.is_file() or ref.is_dir():
+            return ref.open('rb')
 
     def get_string(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_string(self.pkg_name, path)
+        ref = self._ref(resource_name)
+        if ref.is_file() or ref.is_dir():
+            with ref.open('rb') as fh:
+                return fh.read()
 
     def exists(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
+        ref = self._ref(resource_name)
+        if ref.is_file() or ref.is_dir():
             return True
 
     def isdir(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_isdir(self.pkg_name, path)
+        ref = self._ref(resource_name)
+        if ref.is_file() or ref.is_dir():
+            return ref.is_dir()
 
     def listdir(self, resource_name):
-        path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_listdir(self.pkg_name, path)
+        ref = self._ref(resource_name)
+        if ref.is_file() or ref.is_dir():
+            return [x.name for x in ref.iterdir()]
 
 
 class FSAssetSource:
