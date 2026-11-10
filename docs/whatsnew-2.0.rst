@@ -171,7 +171,7 @@ If you were previously using :class:`pyramid.authorization.ACLAuthorizationPolic
 For more details on implementing an ACL, see :ref:`assigning_acls`.
 
 Pyramid does not provide any built-in security policies.
-Similiar functionality of the authentication and authorization policies is now provided by helpers, which can be utilized to implement your own security policy.
+Similar functionality of the authentication and authorization policies is now provided by helpers, which can be utilized to implement your own security policy.
 The functionality of the legacy authentication policies roughly correspond to the following helpers:
 
 +----------------------------------------------------------------+-------------------------------------------------------------------+

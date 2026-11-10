@@ -70,7 +70,7 @@ Feature Additions
   https://github.com/Pylons/pyramid/pull/1583 and
   https://github.com/Pylons/pyramid/pull/2171
 
-- Assets can now be overidden by an absolute path on the filesystem when using
+- Assets can now be overridden by an absolute path on the filesystem when using
   the :meth:`~pyramid.config.Configurator.override_asset` API. This makes it
   possible to fully support serving up static content from a mutable directory
   while still being able to use the :meth:`~pyramid.request.Request.static_url`
