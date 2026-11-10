@@ -241,7 +241,7 @@ class RepozeWho1AuthenticationPolicy(CallbackAuthenticationPolicy):
 
         if userid is None:
             self.debug and self._log(
-                'repoze.who.userid is None, returning None' % userid,
+                'repoze.who.userid is None, returning None',
                 'authenticated_userid',
                 request,
             )
