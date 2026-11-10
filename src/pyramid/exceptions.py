@@ -41,7 +41,7 @@ class PredicateMismatch(HTTPNotFound):
 
     This exception subclasses the :class:`HTTPNotFound` exception for a
     specific reason: if it reaches the main exception handler, it should
-    be treated as :class:`HTTPNotFound`` by any exception view
+    be treated as :class:`HTTPNotFound` by any exception view
     registrations. Thus, typically, this exception will not be seen
     publicly.
 

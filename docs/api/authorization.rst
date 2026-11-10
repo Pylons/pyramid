@@ -11,7 +11,7 @@
   .. autoclass:: ACLAuthorizationPolicy
 
 Constants
----------
+~~~~~~~~~
 
 .. attribute:: Everyone
 
@@ -57,22 +57,22 @@ Constants
         Moved from ``pyramid.security`` into ``pyramid.authorization``.
 
 Return Values
--------------
+~~~~~~~~~~~~~
 
 .. autoclass:: ACLDenied
    :members: msg
 
    .. automethod:: __new__
 
-    .. versionadded:: 2.0
+   .. versionadded:: 2.0
 
-        Moved from ``pyramid.security`` into ``pyramid.authorization``.
+      Moved from ``pyramid.security`` into ``pyramid.authorization``.
 
 .. autoclass:: ACLAllowed
    :members: msg
 
    .. automethod:: __new__
 
-    .. versionadded:: 2.0
+   .. versionadded:: 2.0
 
-        Moved from ``pyramid.security`` into ``pyramid.authorization``.
+      Moved from ``pyramid.security`` into ``pyramid.authorization``.

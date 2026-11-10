@@ -116,7 +116,7 @@ Deprecations
   - :class:`pyramid.authorization.ACLAuthorizationPolicy`
   - The ``effective_principals`` view and route predicates.
 
-- Deprecated :func:`pyramid.security.principals_allowed_by_permission``.
+- Deprecated :func:`pyramid.security.principals_allowed_by_permission`.
   This method continues to work with the deprecated :class:`pyramid.interfaces.IAuthorizationPolicy` interface but will not work with the new :class:`pyramid.interfaces.ISecurityPolicy`.
   See https://github.com/Pylons/pyramid/pull/3465
 
