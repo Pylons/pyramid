@@ -118,6 +118,8 @@ class Registry(Components, dict):
 class Introspector:
     def __init__(self):
         self._refs = {}
+        # CWE-407 fix: shadow set-dict for O(1) membership in relate/unrelate
+        self._refs_set = {}
         self._categories = {}
         self._counter = 0
 
@@ -165,9 +167,13 @@ class Introspector:
         if intr is None:
             return
         L = self._refs.pop(intr, [])
+        self._refs_set.pop(intr, None)
         for d in L:
-            L2 = self._refs[d]
-            L2.remove(intr)
+            L2 = self._refs.get(d, [])
+            S2 = self._refs_set.get(d, set())
+            if intr in S2:
+                S2.discard(intr)
+                L2.remove(intr)
         category = self._categories[intr.category_name]
         del category[intr.discriminator]
         del category[intr.discriminator_hash]
@@ -186,17 +192,22 @@ class Introspector:
         introspectables = self._get_intrs_by_pairs(pairs)
         relatable = ((x, y) for x in introspectables for y in introspectables)
         for x, y in relatable:
-            L = self._refs.setdefault(x, [])
-            if x is not y and y not in L:
-                L.append(y)
+            # CWE-407 fix: shadow set for O(1) membership check; list kept for
+            # interface compatibility (_refs values must remain lists)
+            S = self._refs_set.setdefault(x, set())
+            if x is not y and y not in S:
+                S.add(y)
+                self._refs.setdefault(x, []).append(y)
 
     def unrelate(self, *pairs):
         introspectables = self._get_intrs_by_pairs(pairs)
         relatable = ((x, y) for x in introspectables for y in introspectables)
         for x, y in relatable:
-            L = self._refs.get(x, [])
-            if y in L:
-                L.remove(y)
+            # CWE-407 fix: O(1) set check before O(N) list.remove
+            S = self._refs_set.get(x, set())
+            if y in S:
+                S.discard(y)
+                self._refs.get(x, []).remove(y)
 
     def related(self, intr):
         category_name, discriminator = intr.category_name, intr.discriminator
