@@ -379,14 +379,15 @@ class IDict(Interface):
     def values():
         """Return a list of values from the dictionary"""
 
-    def pop(k, default=None):
+    def pop(k, *args):
         """Pop the key k from the dictionary and return its value.  If k
-        doesn't exist, and default is provided, return the default.  If k
-        doesn't exist and default is not provided, raise a KeyError."""
+        doesn't exist, and a default is provided as the second positional
+        argument, return the default.  If k doesn't exist and no default is
+        provided, raise a KeyError."""
 
     def popitem():
-        """Pop the item with key k from the dictionary and return it as a
-        two-tuple (k, v).  If k doesn't exist, raise a KeyError."""
+        """Pop an arbitrary item from the dictionary and return it as a
+        two-tuple (k, v).  If the dictionary is empty, raise a KeyError."""
 
     def setdefault(k, default=None):
         """Return the existing value for key ``k`` in the dictionary.  If no
