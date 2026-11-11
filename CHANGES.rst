@@ -4,9 +4,9 @@ unreleased
 Features
 --------
 
-- Add `Configurator.resolve_asset` and `Request.resolve_asset` methods.  See
-  https://github.com/Pylons/pyramid/pull/3815.
-- Add `pyramid.utils.ref_filename` and `pyramid.utils.resource_filename`
+- Add ``Configurator.resolve_asset`` and ``Request.resolve_asset`` methods.
+  See https://github.com/Pylons/pyramid/pull/3815.
+- Add ``pyramid.utils.ref_filename`` and ``pyramid.utils.resource_filename``
   functions.  See https://github.com/Pylons/pyramid/pull/3835.
 
 Bug Fixes
