@@ -312,8 +312,26 @@ class TestPkgResourcesAssetDescriptor(unittest.TestCase):
 
         return PkgResourcesAssetDescriptor
 
-    def _makeOne(self, pkg='tests', path='fixtures/minimal.txt'):
-        return self._getTargetClass()(pkg, path)
+    def _makeOne(
+        self, pkg='tests', path='fixtures/minimal.txt', overrides=None
+    ):
+        return self._getTargetClass()(pkg, path, overrides=overrides)
+
+    def _makeOverrides(self, pkg_name='tests', overrides=None):
+        from importlib import import_module
+
+        from pyramid.config.assets import PackageAssetSource, PackageOverrides
+
+        pkg = import_module(pkg_name)
+        inst = PackageOverrides(pkg)
+        if overrides is None:
+            source = PackageAssetSource(pkg_name, 'fixtures/nonminimal.txt')
+            inst.insert('fixtures/minimal.txt', source)
+        else:
+            for path, source in overrides:
+                source = PackageAssetSource(pkg_name, source)
+                inst.insert(path, source)
+        return inst
 
     def test_class_conforms_to_IAssetDescriptor(self):
         from zope.interface.verify import verifyClass
@@ -333,10 +351,34 @@ class TestPkgResourcesAssetDescriptor(unittest.TestCase):
         inst = self._makeOne()
         self.assertEqual(inst.absspec(), 'tests:fixtures/minimal.txt')
 
+    def test_absspec_with_overrides(self):
+        overrides = self._makeOverrides()
+        inst = self._makeOne(overrides=overrides)
+        self.assertEqual(inst.absspec(), 'tests:fixtures/nonminimal.txt')
+
+    def test_absspec_with_overrides_no_override(self):
+        overrides = self._makeOverrides()
+        inst = self._makeOne(path='fixtures/minimal.xml', overrides=overrides)
+        self.assertEqual(inst.absspec(), 'tests:fixtures/minimal.xml')
+
     def test_abspath(self):
         inst = self._makeOne()
         self.assertEqual(
             inst.abspath(), os.path.join(here, 'fixtures/minimal.txt')
+        )
+
+    def test_abspath_with_overrides(self):
+        overrides = self._makeOverrides()
+        inst = self._makeOne(overrides=overrides)
+        self.assertEqual(
+            inst.abspath(), os.path.join(here, 'fixtures/nonminimal.txt')
+        )
+
+    def test_abspath_with_overrides_no_override(self):
+        overrides = self._makeOverrides()
+        inst = self._makeOne(path='fixtures/minimal.xml', overrides=overrides)
+        self.assertEqual(
+            inst.abspath(), os.path.join(here, 'fixtures/minimal.xml')
         )
 
     def test_stream(self):
@@ -347,6 +389,24 @@ class TestPkgResourcesAssetDescriptor(unittest.TestCase):
         expected = read_binary('tests', 'fixtures/minimal.txt')
         self.assertEqual(data, expected)
 
+    def test_stream_with_overrides(self):
+        from importlib.resources import read_binary
+
+        overrides = self._makeOverrides()
+        inst = self._makeOne(overrides=overrides)
+        data = inst.stream().read()
+        expected = read_binary('tests', 'fixtures/nonminimal.txt')
+        self.assertEqual(data, expected)
+
+    def test_stream_with_overrides_no_override(self):
+        from importlib.resources import read_binary
+
+        overrides = self._makeOverrides()
+        inst = self._makeOne(path='fixtures/minimal.xml', overrides=overrides)
+        data = inst.stream().read()
+        expected = read_binary('tests', 'fixtures/minimal.xml')
+        self.assertEqual(data, expected)
+
     def test_isdir(self):
         inst = self._makeOne(path='fixtures/')
         self.assertTrue(inst.isdir())
@@ -355,8 +415,36 @@ class TestPkgResourcesAssetDescriptor(unittest.TestCase):
         inst = self._makeOne()
         self.assertFalse(inst.isdir())
 
+    def test_isdir_with_overrides(self):
+        overrides = self._makeOverrides(
+            overrides=[('fixtures/minimal.txt', 'fixtures/static/')]
+        )
+        inst = self._makeOne(overrides=overrides)
+        self.assertTrue(inst.isdir())
+
+    def test_isdir_with_overrides_no_override(self):
+        overrides = self._makeOverrides(
+            overrides=[('fixtures/nonminimal.txt', 'fixtures/static/')]
+        )
+        inst = self._makeOne(overrides=overrides)
+        self.assertFalse(inst.isdir())
+
     def test_listdir(self):
         inst = self._makeOne(path='fixtures/')
+        self.assertIn('minimal.txt', inst.listdir())
+
+    def test_listdir_with_overrides(self):
+        overrides = self._makeOverrides(
+            overrides=[('fixtures/static/', 'fixtures/')]
+        )
+        inst = self._makeOne(path='fixtures/static/', overrides=overrides)
+        self.assertIn('minimal.txt', inst.listdir())
+
+    def test_listdir_with_overrides_no_override(self):
+        overrides = self._makeOverrides(
+            overrides=[('fixtures/static/subdir/', 'fixtures/static/')]
+        )
+        inst = self._makeOne(path='fixtures/', overrides=overrides)
         self.assertIn('minimal.txt', inst.listdir())
 
     def test_exists(self):
@@ -366,6 +454,13 @@ class TestPkgResourcesAssetDescriptor(unittest.TestCase):
     def test_exists_no_exists(self):
         inst = self._makeOne(path='fixtures/noexists.txt')
         self.assertFalse(inst.exists())
+
+    def test_exists_with_overrides(self):
+        overrides = self._makeOverrides(
+            overrides=[('fixtures/nonexist.txt', 'fixtures/minimal.txt')]
+        )
+        inst = self._makeOne(path='fixtures/nonexist.txt', overrides=overrides)
+        self.assertTrue(inst.exists())
 
 
 class TestFSAssetDescriptor(unittest.TestCase):

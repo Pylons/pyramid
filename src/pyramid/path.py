@@ -403,28 +403,53 @@ class DottedNameResolver(Resolver):
 class PkgResourcesAssetDescriptor:
     pkg_resources = pkg_resources
 
-    def __init__(self, pkg_name, path):
+    def __init__(self, pkg_name, path, overrides=None):
         self.pkg_name = pkg_name
         self.path = path
+        self.overrides = overrides
 
     def absspec(self):
+        if self.overrides is not None:
+            spec = self.overrides.get_spec(self.path)
+            if spec is not None:
+                return spec
         return f'{self.pkg_name}:{self.path}'
 
     def abspath(self):
-        return os.path.abspath(
+        if self.overrides is not None:
+            path = self.overrides.get_filename(self.path)
+            if path is not None:
+                return os.path.normpath(path)
+        return os.path.normpath(
             self.pkg_resources.resource_filename(self.pkg_name, self.path)
         )
 
     def stream(self):
+        if self.overrides is not None:
+            stream = self.overrides.get_stream(self.path)
+            if stream is not None:
+                return stream
         return self.pkg_resources.resource_stream(self.pkg_name, self.path)
 
     def isdir(self):
+        if self.overrides is not None:
+            result = self.overrides.isdir(self.path)
+            if result is not None:
+                return result
         return self.pkg_resources.resource_isdir(self.pkg_name, self.path)
 
     def listdir(self):
+        if self.overrides is not None:
+            results = self.overrides.listdir(self.path)
+            if results is not None:
+                return results
         return self.pkg_resources.resource_listdir(self.pkg_name, self.path)
 
     def exists(self):
+        if self.overrides is not None:
+            exists = self.overrides.has_resource(self.path)
+            if exists is not None:
+                return exists
         return self.pkg_resources.resource_exists(self.pkg_name, self.path)
 
 
