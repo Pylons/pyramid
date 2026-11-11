@@ -1,18 +1,56 @@
 import os
-import pkg_resources
 import sys
 from zope.interface import implementer
 
 from pyramid.config.actions import action_method
 from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import PHASE1_CONFIG, IPackageOverrides
+from pyramid.path import PackageAssetDescriptor
 from pyramid.threadlocal import get_current_registry
 
-
-class OverrideProvider(pkg_resources.DefaultProvider):
+class _DefaultProvider:
     def __init__(self, module):
-        pkg_resources.DefaultProvider.__init__(self, module)
-        self.module_name = module.__name__
+        self.module = module
+        self.module_name = getattr(module, '__name__', str(module))
+
+    def _desc(self, resource_name):
+        return PackageAssetDescriptor(self.module_name, resource_name)
+
+    def get_resource_filename(self, manager, resource_name):
+        desc = self._desc(resource_name)
+        return desc.abspath()
+
+    def get_resource_stream(self, manager, resource_name):
+        desc = self._desc(resource_name)
+        return desc.stream()
+
+    def get_resource_string(self, manager, resource_name):
+        desc = self._desc(resource_name)
+        with desc.stream() as s:
+            return s.read()
+
+    def has_resource(self, resource_name):
+        desc = self._desc(resource_name)
+        return desc.exists()
+
+    def resource_isdir(self, resource_name):
+        desc = self._desc(resource_name)
+        return desc.isdir()
+
+    def resource_listdir(self, resource_name):
+        desc = self._desc(resource_name)
+        return desc.listdir()
+
+
+def _register_pkg_resources_loader(cls):
+    pkg_resources = sys.modules.get('pkg_resources')
+    if pkg_resources is not None and hasattr(pkg_resources, 'register_loader_type'):
+        pkg_resources.register_loader_type(cls, OverrideProvider)
+
+
+class OverrideProvider(_DefaultProvider):
+    def __init__(self, module):
+        super().__init__(module)
 
     def _get_overrides(self):
         reg = get_current_registry()
@@ -29,9 +67,7 @@ class OverrideProvider(pkg_resources.DefaultProvider):
             filename = overrides.get_filename(resource_name)
             if filename is not None:
                 return filename
-        return pkg_resources.DefaultProvider.get_resource_filename(
-            self, manager, resource_name
-        )
+        return super().get_resource_filename(manager, resource_name)
 
     def get_resource_stream(self, manager, resource_name):
         """Return a readable file-like object for resource_name."""
@@ -40,9 +76,7 @@ class OverrideProvider(pkg_resources.DefaultProvider):
             stream = overrides.get_stream(resource_name)
             if stream is not None:
                 return stream
-        return pkg_resources.DefaultProvider.get_resource_stream(
-            self, manager, resource_name
-        )
+        return super().get_resource_stream(manager, resource_name)
 
     def get_resource_string(self, manager, resource_name):
         """Return a string containing the contents of resource_name."""
@@ -51,9 +85,7 @@ class OverrideProvider(pkg_resources.DefaultProvider):
             string = overrides.get_string(resource_name)
             if string is not None:
                 return string
-        return pkg_resources.DefaultProvider.get_resource_string(
-            self, manager, resource_name
-        )
+        return super().get_resource_string(manager, resource_name)
 
     def has_resource(self, resource_name):
         overrides = self._get_overrides()
@@ -61,7 +93,7 @@ class OverrideProvider(pkg_resources.DefaultProvider):
             result = overrides.has_resource(resource_name)
             if result is not None:
                 return result
-        return pkg_resources.DefaultProvider.has_resource(self, resource_name)
+        return super().has_resource(resource_name)
 
     def resource_isdir(self, resource_name):
         overrides = self._get_overrides()
@@ -69,9 +101,7 @@ class OverrideProvider(pkg_resources.DefaultProvider):
             result = overrides.isdir(resource_name)
             if result is not None:
                 return result
-        return pkg_resources.DefaultProvider.resource_isdir(
-            self, resource_name
-        )
+        return super().resource_isdir(resource_name)
 
     def resource_listdir(self, resource_name):
         overrides = self._get_overrides()
@@ -79,15 +109,13 @@ class OverrideProvider(pkg_resources.DefaultProvider):
             result = overrides.listdir(resource_name)
             if result is not None:
                 return result
-        return pkg_resources.DefaultProvider.resource_listdir(
-            self, resource_name
-        )
+        return super().resource_listdir(resource_name)
 
 
 @implementer(IPackageOverrides)
 class PackageOverrides:
     # pkg_resources arg in kw args below for testing
-    def __init__(self, package, pkg_resources=pkg_resources):
+    def __init__(self, package, pkg_resources=None):
         loader = self._real_loader = getattr(package, '__loader__', None)
         if isinstance(loader, self.__class__):
             self._real_loader = None
@@ -104,7 +132,10 @@ class PackageOverrides:
         package.__loader__ = self
         # we call register_loader_type for every instantiation of this
         # class; that's OK, it's idempotent to do it more than once.
-        pkg_resources.register_loader_type(self.__class__, OverrideProvider)
+        if pkg_resources is not None and hasattr(pkg_resources, 'register_loader_type'):
+            pkg_resources.register_loader_type(self.__class__, OverrideProvider)
+        else:
+            _register_pkg_resources_loader(self.__class__)
         self.overrides = []
         self.overridden_package_name = package.__name__
 
@@ -231,38 +262,46 @@ class PackageAssetSource:
 
     def get_spec(self, resource_name):
         path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
+        desc = PackageAssetDescriptor(self.pkg_name, path)
+        if desc.exists():
             return f'{self.pkg_name}:{path}'
 
     def get_filename(self, resource_name):
         path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_filename(self.pkg_name, path)
+        desc = PackageAssetDescriptor(self.pkg_name, path)
+        if desc.exists():
+            return desc.abspath()
 
     def get_stream(self, resource_name):
         path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_stream(self.pkg_name, path)
+        desc = PackageAssetDescriptor(self.pkg_name, path)
+        if desc.exists():
+            return desc.stream()
 
     def get_string(self, resource_name):
         path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_string(self.pkg_name, path)
+        desc = PackageAssetDescriptor(self.pkg_name, path)
+        if desc.exists():
+            with desc.stream() as stream:
+                return stream.read()
 
     def exists(self, resource_name):
         path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
+        desc = PackageAssetDescriptor(self.pkg_name, path)
+        if desc.exists():
             return True
 
     def isdir(self, resource_name):
         path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_isdir(self.pkg_name, path)
+        desc = PackageAssetDescriptor(self.pkg_name, path)
+        if desc.exists():
+            return desc.isdir()
 
     def listdir(self, resource_name):
         path = self.get_path(resource_name)
-        if pkg_resources.resource_exists(self.pkg_name, path):
-            return pkg_resources.resource_listdir(self.pkg_name, path)
+        desc = PackageAssetDescriptor(self.pkg_name, path)
+        if desc.exists():
+            return desc.listdir()
 
 
 class FSAssetSource:
