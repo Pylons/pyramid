@@ -230,7 +230,7 @@ class AssetResolver(Resolver):
 
         registry = self.registry or get_current_registry()
         overrides = registry.queryUtility(IPackageOverrides, package_name)
-        return PkgResourcesAssetDescriptor(
+        return ImportlibResourcesAssetDescriptor(
             package_name, path, overrides=overrides
         )
 
@@ -418,7 +418,7 @@ class DottedNameResolver(Resolver):
 
 
 @implementer(IAssetDescriptor)
-class PkgResourcesAssetDescriptor:
+class ImportlibResourcesAssetDescriptor:
     def __init__(self, pkg_name, path, overrides=None):
         self.pkg_name = pkg_name
         self.path = path
@@ -471,6 +471,9 @@ class PkgResourcesAssetDescriptor:
             if exists is not None:
                 return exists
         return self._ref().exists()
+
+
+PkgResourcesAssetDescriptor = ImportlibResourcesAssetDescriptor  # bw compat
 
 
 @implementer(IAssetDescriptor)
