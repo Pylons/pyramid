@@ -33,6 +33,7 @@ class TestFileResponse(unittest.TestCase):
     def setUp(self):
         self.request = Request.blank('/')
         self.config = testing.setUp(request=self.request)
+        self.request.registry = self.config.registry
 
     def tearDown(self):
         testing.tearDown()
@@ -99,6 +100,7 @@ class TestFileResponse(unittest.TestCase):
                 'wsgi.file_wrapper': wrapper,
             },
         )
+        request.registry = self.config.registry
 
         path = self._get_path()
         r = self._makeOne(path, request=request)
@@ -112,6 +114,7 @@ class TestFileResponse(unittest.TestCase):
 
     def test_asset_spec_explicit_request(self):
         request = Request.blank('/')
+        request.registry = self.config.registry
         r = self._makeOne('tests:fixtures/minimal.txt', request=request)
         self._validate_content(r)
 

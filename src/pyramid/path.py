@@ -6,7 +6,7 @@ import pkg_resources
 import sys
 from zope.interface import implementer
 
-from pyramid.interfaces import IAssetDescriptor
+from pyramid.interfaces import IAssetDescriptor, IPackageOverrides
 from pyramid.util import resource_filename
 
 init_names = ['__init__%s' % x for x in SOURCE_SUFFIXES]
@@ -127,8 +127,7 @@ class AssetResolver(Resolver):
 
     .. versionadded:: 1.3
 
-    The constructor accepts a single argument named ``package`` which may be
-    any of:
+    The constructor accepts an argument ``package`` which may be any of:
 
     - A fully qualified (not relative) dotted name to a module or package
 
@@ -170,7 +169,18 @@ class AssetResolver(Resolver):
     type was passed the string ``xml.dom``, and ``template.pt`` is supplied
     to the :meth:`~pyramid.path.AssetResolver.resolve` method, the resulting
     absolute asset spec would be ``xml.minidom:template.pt``.
+
+    :param package:  The package to use for relative asset specifications.
+    :type package:  ``str``, module, ``None``, or
+        :attr:`pyramid.path.CALLER_PACKAGE`
+    :param registry:  A registry instance, or ``None`` to use the current
+        registry.
+    :type registry:  :class:`pyramid.registry.Registry` or ``None``
     """
+
+    def __init__(self, package=CALLER_PACKAGE, registry=None):
+        super().__init__(package)
+        self.registry = registry
 
     def resolve(self, spec):
         """
@@ -214,7 +224,15 @@ class AssetResolver(Resolver):
                 raise ValueError(
                     f'relative spec {spec!r} irresolveable without package'
                 )
-        return PkgResourcesAssetDescriptor(package_name, path)
+
+        # Lazy import to avoid circular dependency.
+        from pyramid.threadlocal import get_current_registry
+
+        registry = self.registry or get_current_registry()
+        overrides = registry.queryUtility(IPackageOverrides, package_name)
+        return PkgResourcesAssetDescriptor(
+            package_name, path, overrides=overrides
+        )
 
 
 class DottedNameResolver(Resolver):

@@ -1,6 +1,8 @@
 import os
 import unittest
 
+from pyramid import testing
+
 here = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -247,13 +249,19 @@ class TestResolver(unittest.TestCase):
 
 
 class TestAssetResolver(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
     def _getTargetClass(self):
         from pyramid.path import AssetResolver
 
         return AssetResolver
 
-    def _makeOne(self, package='tests'):
-        return self._getTargetClass()(package)
+    def _makeOne(self, package='tests', registry=None):
+        return self._getTargetClass()(package, registry)
 
     def test_ctor_as_package(self):
         import sys
@@ -304,6 +312,40 @@ class TestAssetResolver(unittest.TestCase):
         r = inst.resolve('test_asset.py')
         self.assertEqual(r.__class__, PkgResourcesAssetDescriptor)
         self.assertTrue(r.exists())
+
+    def test_resolve_with_overrides(self):
+        from pyramid.config.assets import PackageAssetSource, PackageOverrides
+        from pyramid.interfaces import IPackageOverrides
+        import tests
+
+        overrides = PackageOverrides(tests)
+        source = PackageAssetSource('tests', 'fixtures/nonminimal.txt')
+        overrides.insert('fixtures/minimal.txt', source)
+
+        self.config.registry.registerUtility(
+            overrides, IPackageOverrides, name='tests'
+        )
+
+        inst = self._makeOne(registry=self.config.registry)
+        r = inst.resolve('tests:fixtures/minimal.txt')
+        self.assertEqual(r.absspec(), 'tests:fixtures/nonminimal.txt')
+
+    def test_resolve_with_overrides_threadlocal(self):
+        from pyramid.config.assets import PackageAssetSource, PackageOverrides
+        from pyramid.interfaces import IPackageOverrides
+        import tests
+
+        overrides = PackageOverrides(tests)
+        source = PackageAssetSource('tests', 'fixtures/nonminimal.txt')
+        overrides.insert('fixtures/minimal.txt', source)
+
+        self.config.registry.registerUtility(
+            overrides, IPackageOverrides, name='tests'
+        )
+
+        inst = self._makeOne()
+        r = inst.resolve('tests:fixtures/minimal.txt')
+        self.assertEqual(r.absspec(), 'tests:fixtures/nonminimal.txt')
 
 
 class TestPkgResourcesAssetDescriptor(unittest.TestCase):

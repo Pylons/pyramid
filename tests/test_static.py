@@ -2,6 +2,8 @@ from datetime import datetime, timedelta, timezone
 import os.path
 import unittest
 
+from pyramid import testing
+
 here = os.path.dirname(__file__)
 
 # 5 years from now (more or less)
@@ -9,6 +11,12 @@ fiveyrsfuture = datetime.now(timezone.utc) + timedelta(5 * 365)
 
 
 class Test_static_view_use_subpath_False(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
     def _getTargetClass(self):
         from pyramid.static import static_view
 
@@ -31,7 +39,9 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
         }
         if kw is not None:
             environ.update(kw)
-        return Request(environ=environ)
+        request = Request(environ=environ)
+        request.registry = self.config.registry
+        return request
 
     def test_ctor_defaultargs(self):
         inst = self._makeOne('package:resource_name')
@@ -234,6 +244,12 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
 
 
 class Test_static_view_use_subpath_True(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
     def _getTargetClass(self):
         from pyramid.static import static_view
 
@@ -257,7 +273,9 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
         }
         if kw is not None:
             environ.update(kw)
-        return Request(environ=environ)
+        request = Request(environ=environ)
+        request.registry = self.config.registry
+        return request
 
     def test_ctor_defaultargs(self):
         inst = self._makeOne('package:resource_name')
@@ -419,6 +437,12 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
 
 
 class Test_static_view_content_encodings(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
     def _getTargetClass(self):
         from pyramid.static import static_view
 
@@ -441,7 +465,9 @@ class Test_static_view_content_encodings(unittest.TestCase):
         }
         if kw is not None:
             environ.update(kw)
-        return Request(environ=environ)
+        request = Request(environ=environ)
+        request.registry = self.config.registry
+        return request
 
     def test_call_without_accept(self):
         inst = self._makeOne(
