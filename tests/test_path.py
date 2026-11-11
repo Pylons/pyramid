@@ -392,6 +392,16 @@ class TestImportlibResourcesAssetDescriptor(unittest.TestCase):
 
         verifyObject(IAssetDescriptor, self._makeOne())
 
+    def test_origspec(self):
+        inst = self._makeOne()
+        self.assertEqual(inst.origspec(), 'tests:fixtures/minimal.txt')
+
+    def test_origspec_with_overrides(self):
+        # Overrides should not change output.
+        overrides = self._makeOverrides()
+        inst = self._makeOne(overrides=overrides)
+        self.assertEqual(inst.origspec(), 'tests:fixtures/minimal.txt')
+
     def test_absspec(self):
         inst = self._makeOne()
         self.assertEqual(inst.absspec(), 'tests:fixtures/minimal.txt')
@@ -530,6 +540,10 @@ class TestFSAssetDescriptor(unittest.TestCase):
         from pyramid.interfaces import IAssetDescriptor
 
         verifyObject(IAssetDescriptor, self._makeOne())
+
+    def test_origspec(self):
+        inst = self._makeOne()
+        self.assertEqual(inst.origspec(), os.path.join(here, 'test_asset.py'))
 
     def test_absspec(self):
         inst = self._makeOne()

@@ -428,12 +428,15 @@ class ImportlibResourcesAssetDescriptor:
     def _ref(self):
         return importlib.resources.files(self.pkg_name) / self.path
 
+    def origspec(self):
+        return f'{self.pkg_name}:{self.path}'
+
     def absspec(self):
         if self.overrides is not None:
             spec = self.overrides.get_spec(self.path)
             if spec is not None:
                 return spec
-        return f'{self.pkg_name}:{self.path}'
+        return self.origspec()
 
     def abspath(self):
         if self.overrides is not None:
@@ -491,6 +494,9 @@ deprecated(
 class FSAssetDescriptor:
     def __init__(self, path):
         self.path = os.path.abspath(path)
+
+    def origspec(self):
+        return self.path
 
     def absspec(self):
         return self.path
