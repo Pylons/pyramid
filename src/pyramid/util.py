@@ -23,7 +23,7 @@ def DottedNameResolver(package=None):
     """
     .. deprecated:: 2.2
 
-        Please use :class:`pyramid.resolver.DottedNameResolver` instead.
+        Please use :class:`pyramid.path.DottedNameResolver` instead.
 
     """
     from pyramid.path import DottedNameResolver as _DottedNameResolver
@@ -35,7 +35,7 @@ deprecated(
     'DottedNameResolver',
     (
         '`pyramid.util.DottedNameResolver` has been moved to '
-        '`pyramid.resolver.DottedNameResolver`.'
+        '`pyramid.path.DottedNameResolver`.'
     ),
 )
 
