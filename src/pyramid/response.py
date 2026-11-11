@@ -20,7 +20,7 @@ class FileResponse(Response):
     A Response object that can be used to serve a static file from disk
     simply.
 
-    ``path`` is a path on the filesystem or an :ref:`asset specification`.
+    ``path`` is a path on the filesystem or an :term:`asset specification`.
 
     ``request`` must be a Pyramid :term:`request` object.  Note
     that a request *must* be passed if the response is meant to attempt to
