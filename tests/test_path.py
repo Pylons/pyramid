@@ -312,7 +312,7 @@ class TestPkgResourcesAssetDescriptor(unittest.TestCase):
 
         return PkgResourcesAssetDescriptor
 
-    def _makeOne(self, pkg='tests', path='test_asset.py'):
+    def _makeOne(self, pkg='tests', path='fixtures/minimal.txt'):
         return self._getTargetClass()(pkg, path)
 
     def test_class_conforms_to_IAssetDescriptor(self):
@@ -331,42 +331,41 @@ class TestPkgResourcesAssetDescriptor(unittest.TestCase):
 
     def test_absspec(self):
         inst = self._makeOne()
-        self.assertEqual(inst.absspec(), 'tests:test_asset.py')
+        self.assertEqual(inst.absspec(), 'tests:fixtures/minimal.txt')
 
     def test_abspath(self):
         inst = self._makeOne()
-        self.assertEqual(inst.abspath(), os.path.join(here, 'test_asset.py'))
+        self.assertEqual(
+            inst.abspath(), os.path.join(here, 'fixtures/minimal.txt')
+        )
 
     def test_stream(self):
+        from importlib.resources import read_binary
+
         inst = self._makeOne()
-        inst.pkg_resources = DummyPkgResource()
-        inst.pkg_resources.resource_stream = lambda x, y: f'{x}:{y}'
-        s = inst.stream()
-        self.assertEqual(s, '{}:{}'.format('tests', 'test_asset.py'))
+        data = inst.stream().read()
+        expected = read_binary('tests', 'fixtures/minimal.txt')
+        self.assertEqual(data, expected)
 
     def test_isdir(self):
+        inst = self._makeOne(path='fixtures/')
+        self.assertTrue(inst.isdir())
+
+    def test_isdir_file(self):
         inst = self._makeOne()
-        inst.pkg_resources = DummyPkgResource()
-        inst.pkg_resources.resource_isdir = lambda x, y: f'{x}:{y}'
-        self.assertEqual(
-            inst.isdir(), '{}:{}'.format('tests', 'test_asset.py')
-        )
+        self.assertFalse(inst.isdir())
 
     def test_listdir(self):
-        inst = self._makeOne()
-        inst.pkg_resources = DummyPkgResource()
-        inst.pkg_resources.resource_listdir = lambda x, y: f'{x}:{y}'
-        self.assertEqual(
-            inst.listdir(), '{}:{}'.format('tests', 'test_asset.py')
-        )
+        inst = self._makeOne(path='fixtures/')
+        self.assertIn('minimal.txt', inst.listdir())
 
     def test_exists(self):
         inst = self._makeOne()
-        inst.pkg_resources = DummyPkgResource()
-        inst.pkg_resources.resource_exists = lambda x, y: f'{x}:{y}'
-        self.assertEqual(
-            inst.exists(), '{}:{}'.format('tests', 'test_asset.py')
-        )
+        self.assertTrue(inst.exists())
+
+    def test_exists_no_exists(self):
+        inst = self._makeOne(path='fixtures/noexists.txt')
+        self.assertFalse(inst.exists())
 
 
 class TestFSAssetDescriptor(unittest.TestCase):
