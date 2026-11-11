@@ -4,6 +4,7 @@ from importlib.machinery import SOURCE_SUFFIXES
 import importlib.resources
 import os
 import sys
+from zope.deprecation import deprecated
 from zope.interface import implementer
 
 from pyramid.interfaces import IAssetDescriptor, IPackageOverrides
@@ -474,6 +475,16 @@ class ImportlibResourcesAssetDescriptor:
 
 
 PkgResourcesAssetDescriptor = ImportlibResourcesAssetDescriptor  # bw compat
+
+
+deprecated(
+    'PkgResourcesAssetDescriptor',
+    (
+        'Due to `pkg_resources` deprecation and removal, '
+        '`pyramid.resolver.PkgResourcesAssetDescriptor` has been replaced '
+        'with `pyramid.resolver.ImportlibResourcesAssetDescriptor`.'
+    ),
+)
 
 
 @implementer(IAssetDescriptor)
