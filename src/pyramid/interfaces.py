@@ -1418,10 +1418,24 @@ class IAssetDescriptor(Interface):
     Describes an :term:`asset`.
     """
 
+    def origspec():
+        """
+        Returns the absolute asset specification for this asset (e.g.
+        ``mypackage:templates/foo.pt``) prior to applying overrides, i.e. the
+        asset specified by the user.  See :ref:`overriding_assets_section` for
+        more information on asset overrides.
+
+        The output of this method should be valid input for
+        :meth:`pyramid.path.AssetResolver.resolve` and result in an identical
+        asset descriptor.
+        """
+
     def absspec():
         """
-        Returns the absolute asset specification for this asset
-        (e.g. ``mypackage:templates/foo.pt``).
+        Returns the absolute asset specification for this asset (e.g.
+        ``mypackage:templates/foo.pt``), applying overrides where applicable.
+        See :ref:`overriding_assets_section` for more information on asset
+        overrides.
         """
 
     def abspath():

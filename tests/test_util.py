@@ -1,7 +1,46 @@
+import os
+import pathlib
 import sys
 import unittest
 
 from pyramid.util import bytes_, text_
+
+here = os.path.abspath(os.path.dirname(__file__))
+
+
+class TestDottedNameResolver(unittest.TestCase):
+    def _makeOne(self, *args):
+        from pyramid.util import DottedNameResolver
+
+        return DottedNameResolver(*args)
+
+    def test_resolve(self):
+        """
+        Test that basic resolver functionality works as expected.
+        """
+        import tests.test_util
+
+        resolver = self._makeOne()
+        result = resolver.resolve('tests.test_util')
+        self.assertEqual(result, tests.test_util)
+
+    def test_package_none(self):
+        """
+        Test that package defaults to ``None``, rather than new behavior of
+        ``caller_package``.
+        """
+        resolver = self._makeOne()
+        self.assertRaises(ValueError, resolver.resolve, '.test_util')
+
+    def test_package_explicit(self):
+        """
+        Test that package argument is honored.
+        """
+        import tests.test_util
+
+        resolver = self._makeOne('tests')
+        result = resolver.resolve('.test_util')
+        self.assertEqual(result, tests.test_util)
 
 
 class Test_InstancePropertyHelper(unittest.TestCase):
@@ -1274,3 +1313,30 @@ class TestReraise(unittest.TestCase):
         self.assertIsNot(val2, val)
         self.assertIsInstance(val2, Exception)
         self.assertIs(get_next(tb2), tb)
+
+
+class TestRefFilename(unittest.TestCase):
+    def _callFUT(self, ref):
+        from pyramid.util import ref_filename
+
+        return ref_filename(ref)
+
+    def test_returns_path(self):
+        import importlib.resources
+
+        ref = importlib.resources.files('tests') / 'fixtures' / 'minimal.txt'
+        path = self._callFUT(ref)
+        expected = pathlib.Path(here) / 'fixtures' / 'minimal.txt'
+        self.assertEqual(path, expected)
+
+
+class TestResourceFilename(unittest.TestCase):
+    def _callFUT(self, package, name):
+        from pyramid.util import resource_filename
+
+        return resource_filename(package, name)
+
+    def test_returns_path(self):
+        path = self._callFUT('tests', 'fixtures/minimal.txt')
+        expected = os.path.join(here, 'fixtures/minimal.txt')
+        self.assertEqual(path, expected)

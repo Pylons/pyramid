@@ -1,9 +1,13 @@
+from datetime import datetime, timezone
 import io
 import mimetypes
 import os
+from os.path import getmtime, getsize
 import unittest
+from unittest.mock import Mock
 
 from pyramid import testing
+from pyramid.request import Request
 
 
 class TestResponse(unittest.TestCase):
@@ -26,72 +30,93 @@ class TestResponse(unittest.TestCase):
 
 
 class TestFileResponse(unittest.TestCase):
+    def setUp(self):
+        self.request = Request.blank('/')
+        self.config = testing.setUp(request=self.request)
+        self.request.registry = self.config.registry
+
+    def tearDown(self):
+        testing.tearDown()
+
     def _makeOne(self, file, **kw):
         from pyramid.response import FileResponse
 
         return FileResponse(file, **kw)
 
-    def _getPath(self, suffix='txt'):
+    def _get_path(self, suffix='txt'):
         here = os.path.dirname(__file__)
         return os.path.join(here, 'fixtures', f'minimal.{suffix}')
 
+    def _validate_content(self, r, suffix='txt'):
+        path = self._get_path(suffix)
+        with open(path, 'rb') as fh:
+            expected = fh.read()
+        self.assertEqual(r.body, expected, 'File contents do not match.')
+        expected_dt = datetime.fromtimestamp(getmtime(path), timezone.utc)
+        expected_dt = expected_dt.replace(microsecond=0)
+        self.assertEqual(r.last_modified, expected_dt)
+        self.assertEqual(r.content_length, getsize(path))
+
     def test_with_image_content_type(self):
-        path = self._getPath('jpg')
+        path = self._get_path('jpg')
         r = self._makeOne(path, content_type='image/jpeg')
         self.assertEqual(r.content_type, 'image/jpeg')
         self.assertEqual(r.headers['content-type'], 'image/jpeg')
-        path = self._getPath()
-        r.app_iter.close()
+        self._validate_content(r, 'jpg')
 
     def test_with_xml_content_type(self):
-        path = self._getPath('xml')
+        path = self._get_path('xml')
         r = self._makeOne(path, content_type='application/xml')
         self.assertEqual(r.content_type, 'application/xml')
         self.assertEqual(
             r.headers['content-type'], 'application/xml; charset=UTF-8'
         )
-        r.app_iter.close()
+        self._validate_content(r, 'xml')
 
     def test_with_pdf_content_type(self):
-        path = self._getPath('xml')
+        path = self._get_path('xml')
         r = self._makeOne(path, content_type='application/pdf')
         self.assertEqual(r.content_type, 'application/pdf')
         self.assertEqual(r.headers['content-type'], 'application/pdf')
-        r.app_iter.close()
+        self._validate_content(r, 'xml')
 
     def test_without_content_type(self):
         for suffix in ('txt', 'xml', 'pdf'):
-            path = self._getPath(suffix)
+            path = self._get_path(suffix)
             r = self._makeOne(path)
             self.assertEqual(
                 r.headers['content-type'].split(';')[0],
                 mimetypes.guess_type(path, strict=False)[0],
             )
-            r.app_iter.close()
+            self._validate_content(r, suffix)
 
-    def test_python_277_bug_15207(self):
-        # python 2.7.7 on windows has a bug where its mimetypes.guess_type
-        # function returns Unicode for the content_type, unlike any previous
-        # version of Python.  See https://github.com/Pylons/pyramid/issues/1360
-        # for more information.
-        import mimetypes as old_mimetypes
+    def test_wsgi_file_wrapper(self):
+        from pyramid.response import FileIter
 
-        from pyramid import response
-        from pyramid.util import text_
+        wrapper = Mock(side_effect=FileIter)
+        request = Request.blank(
+            '/',
+            environ={
+                'wsgi.file_wrapper': wrapper,
+            },
+        )
+        request.registry = self.config.registry
 
-        class FakeMimetypesModule:
-            def guess_type(self, *arg, **kw):
-                return text_('foo/bar'), None
+        path = self._get_path()
+        r = self._makeOne(path, request=request)
+        self._validate_content(r)
 
-        fake_mimetypes = FakeMimetypesModule()
-        try:
-            response.mimetypes = fake_mimetypes
-            path = self._getPath('xml')
-            r = self._makeOne(path)
-            self.assertEqual(r.content_type, 'foo/bar')
-            self.assertEqual(type(r.content_type), str)
-        finally:
-            response.mimetypes = old_mimetypes
+        wrapper.assert_called_once()
+
+    def test_asset_spec(self):
+        r = self._makeOne('tests:fixtures/minimal.txt')
+        self._validate_content(r)
+
+    def test_asset_spec_explicit_request(self):
+        request = Request.blank('/')
+        request.registry = self.config.registry
+        r = self._makeOne('tests:fixtures/minimal.txt', request=request)
+        self._validate_content(r)
 
 
 class TestFileIter(unittest.TestCase):

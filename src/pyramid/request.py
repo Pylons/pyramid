@@ -237,7 +237,7 @@ class Request(
         :ref:`assets_chapter`.
         """
         package = caller_package()
-        return AssetResolver(package).resolve(spec)
+        return AssetResolver(package, self.registry).resolve(spec)
 
 
 def route_request_iface(name, bases=()):

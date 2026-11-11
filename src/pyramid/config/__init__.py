@@ -297,7 +297,6 @@ class Configurator(
         self.name_resolver = name_resolver
         self.package_name = name_resolver.get_package_name()
         self.package = name_resolver.get_package()
-        self.asset_resolver = AssetResolver(self.package)
         self.root_package = root_package
         self.registry = registry
         self.autocommit = autocommit
@@ -322,6 +321,7 @@ class Configurator(
                 default_view_mapper=default_view_mapper,
                 exceptionresponse_view=exceptionresponse_view,
             )
+        self.asset_resolver = AssetResolver(self.package, registry)
 
     def setup_registry(
         self,

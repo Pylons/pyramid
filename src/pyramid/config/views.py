@@ -9,7 +9,6 @@ from zope.interface import Interface, implementedBy, implementer
 from zope.interface.interfaces import IInterface
 
 from pyramid import renderers
-from pyramid.asset import resolve_asset_spec
 from pyramid.config.actions import action_method
 from pyramid.config.predicates import (
     DEFAULT_PHASH,
@@ -31,7 +30,6 @@ from pyramid.interfaces import (
     IException,
     IExceptionViewClassifier,
     IMultiView,
-    IPackageOverrides,
     IRendererFactory,
     IRequest,
     IResponse,
@@ -2329,21 +2327,9 @@ class StaticURLInfo:
         config.action(None, callable=register, introspectables=(intr,))
 
     def _bust_asset_path(self, request, spec, subpath, kw):
-        registry = request.registry
-        pkg_name, pkg_subpath = resolve_asset_spec(spec)
-        rawspec = None
-
-        if pkg_name is not None:
-            pathspec = f'{pkg_name}:{pkg_subpath}{subpath}'
-            overrides = registry.queryUtility(IPackageOverrides, name=pkg_name)
-            if overrides is not None:
-                rawspec = overrides.get_spec(f'{pkg_subpath}{subpath}')
-        else:
-            pathspec = pkg_subpath + subpath
-
-        if rawspec is None:
-            rawspec = pathspec
-
+        asset = request.resolve_asset(spec + subpath)
+        pathspec = asset.origspec()
+        rawspec = asset.absspec()
         kw['pathspec'] = pathspec
         kw['rawspec'] = rawspec
         for spec_, cachebust, explicit in reversed(self.cache_busters):

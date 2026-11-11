@@ -11,6 +11,7 @@ from pyramid.exceptions import (
     ConfigurationExecutionError,
 )
 from pyramid.interfaces import IMultiView, IRequest, IResponse
+from pyramid.request import Request
 from pyramid.util import text_
 
 from . import IDummy, dummy_view
@@ -2577,6 +2578,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.request import Request
 
         request = Request.blank('/static/minimal.txt')
+        request.registry = config.registry
         request.subpath = ('minimal.txt',)
         result = wrapped(None, request)
         self.assertEqual(result.status, '200 OK')
@@ -3849,6 +3851,13 @@ class Test_preserve_view_attrs(unittest.TestCase):
 
 
 class TestStaticURLInfo(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+        self.registry = self.config.registry
+
+    def tearDown(self):
+        testing.tearDown()
+
     def _getTargetClass(self):
         from pyramid.config.views import StaticURLInfo
 
@@ -3858,8 +3867,8 @@ class TestStaticURLInfo(unittest.TestCase):
         return self._getTargetClass()()
 
     def _makeRequest(self):
-        request = DummyRequest()
-        request.registry = DummyRegistry()
+        request = Request.blank("/")
+        request.registry = self.config.registry
         return request
 
     def test_verifyClass(self):
@@ -3912,16 +3921,12 @@ class TestStaticURLInfo(unittest.TestCase):
     def test_generate_quoting(self):
         from pyramid.interfaces import IStaticURLInfo
 
-        config = testing.setUp()
-        try:
-            config.add_static_view('images', path='mypkg:templates')
-            request = testing.DummyRequest()
-            request.registry = config.registry
-            inst = config.registry.getUtility(IStaticURLInfo)
-            result = inst.generate('mypkg:templates/foo%2Fbar', request)
-            self.assertEqual(result, 'http://example.com/images/foo%252Fbar')
-        finally:
-            testing.tearDown()
+        self.config.add_static_view('images', path='tests:fixtures')
+        request = testing.DummyRequest()
+        request.registry = self.registry
+        inst = self.registry.getUtility(IStaticURLInfo)
+        result = inst.generate('tests:fixtures/foo%2Fbar', request)
+        self.assertEqual(result, 'http://example.com/images/foo%252Fbar')
 
     def test_generate_route_url(self):
         inst = self._makeOne()
@@ -4063,42 +4068,38 @@ class TestStaticURLInfo(unittest.TestCase):
         self.assertTrue(called[0])
 
     def test_generate_url_cachebust_with_overrides(self):
-        config = testing.setUp()
-        try:
-            request = testing.DummyRequest()
-            config.add_static_view(
-                'static', 'tests.test_config.pkgs.cachebust:path/'
-            )
-            config.override_asset(
-                'tests.test_config.pkgs.cachebust:path/',
-                'tests.test_config.pkgs.cachebust:override/',
-            )
+        request = self._makeRequest()
+        self.config.add_static_view(
+            'static', 'tests.test_config.pkgs.cachebust:path/'
+        )
+        self.config.override_asset(
+            'tests.test_config.pkgs.cachebust:path/',
+            'tests.test_config.pkgs.cachebust:override/',
+        )
 
-            def cb(val):
-                def cb_(request, subpath, kw):
-                    kw['_query'] = {'x': val}
-                    return subpath, kw
+        def cb(val):
+            def cb_(request, subpath, kw):
+                kw['_query'] = {'x': val}
+                return subpath, kw
 
-                return cb_
+            return cb_
 
-            config.add_cache_buster(
-                'tests.test_config.pkgs.cachebust:path/', cb('foo')
-            )
-            result = request.static_url(
-                'tests.test_config.pkgs.cachebust:path/foo.png'
-            )
-            self.assertEqual(result, 'http://example.com/static/foo.png?x=foo')
-            config.add_cache_buster(
-                'tests.test_config.pkgs.cachebust:override/',
-                cb('bar'),
-                explicit=True,
-            )
-            result = request.static_url(
-                'tests.test_config.pkgs.cachebust:path/foo.png'
-            )
-            self.assertEqual(result, 'http://example.com/static/foo.png?x=bar')
-        finally:
-            testing.tearDown()
+        self.config.add_cache_buster(
+            'tests.test_config.pkgs.cachebust:path/', cb('foo')
+        )
+        result = request.static_url(
+            'tests.test_config.pkgs.cachebust:path/foo.png'
+        )
+        self.assertEqual(result, 'http://localhost/static/foo.png?x=foo')
+        self.config.add_cache_buster(
+            'tests.test_config.pkgs.cachebust:override/',
+            cb('bar'),
+            explicit=True,
+        )
+        result = request.static_url(
+            'tests.test_config.pkgs.cachebust:path/foo.png'
+        )
+        self.assertEqual(result, 'http://localhost/static/foo.png?x=bar')
 
     def test_add_already_exists(self):
         config = DummyConfig()
@@ -4142,8 +4143,8 @@ class TestStaticURLInfo(unittest.TestCase):
 
         config = DummyConfig()
         inst = self._makeOne()
-        inst.add(config, 'view', 'anotherpackage:path', cache_max_age=1)
-        expected = [(None, 'anotherpackage:path/', '__view/')]
+        inst.add(config, 'view', 'tests:fixtures', cache_max_age=1)
+        expected = [(None, 'tests:fixtures/', '__view/')]
         self.assertEqual(inst.registrations, expected)
         self.assertEqual(config.route_args, ('__view/', 'view/*subpath'))
         self.assertEqual(config.view_kw['permission'], NO_PERMISSION_REQUIRED)
@@ -4153,8 +4154,8 @@ class TestStaticURLInfo(unittest.TestCase):
         config = DummyConfig()
         config.route_prefix = '/abc'
         inst = self._makeOne()
-        inst.add(config, 'view', 'anotherpackage:path')
-        expected = [(None, 'anotherpackage:path/', '__/abc/view/')]
+        inst.add(config, 'view', 'tests:fixtures')
+        expected = [(None, 'tests:fixtures/', '__/abc/view/')]
         self.assertEqual(inst.registrations, expected)
         self.assertEqual(config.route_args, ('__/abc/view/', 'view/*subpath'))
 
@@ -4164,7 +4165,7 @@ class TestStaticURLInfo(unittest.TestCase):
         inst.add(
             config,
             'view',
-            'anotherpackage:path',
+            'tests:fixtures',
             cache_max_age=1,
             permission='abc',
         )
@@ -4176,7 +4177,7 @@ class TestStaticURLInfo(unittest.TestCase):
         inst.add(
             config,
             'view',
-            'anotherpackage:path',
+            'tests:fixtures',
             cache_max_age=1,
             context=DummyContext,
         )
@@ -4188,7 +4189,7 @@ class TestStaticURLInfo(unittest.TestCase):
         inst.add(
             config,
             'view',
-            'anotherpackage:path',
+            'tests:fixtures',
             cache_max_age=1,
             for_=DummyContext,
         )
@@ -4200,7 +4201,7 @@ class TestStaticURLInfo(unittest.TestCase):
         inst.add(
             config,
             'view',
-            'anotherpackage:path',
+            'tests:fixtures',
             cache_max_age=1,
             renderer='mypackage:templates/index.pt',
         )

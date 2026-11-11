@@ -1,11 +1,12 @@
-from contextlib import contextmanager
+import atexit
+from contextlib import ExitStack, contextmanager
 import functools
 from hmac import compare_digest
+import importlib.resources
 import inspect
 import platform
 import weakref
-
-from pyramid.path import DottedNameResolver as _DottedNameResolver
+from zope.deprecation import deprecated
 
 _marker = object()
 
@@ -20,11 +21,25 @@ except BaseException:  # pragma: no cover
     PYPY = False
 
 
-class DottedNameResolver(_DottedNameResolver):
-    def __init__(
-        self, package=None
-    ):  # default to package = None for bw compat
-        _DottedNameResolver.__init__(self, package)
+def DottedNameResolver(package=None):
+    """
+    .. deprecated:: 2.2
+
+        Please use :class:`pyramid.resolver.DottedNameResolver` instead.
+
+    """
+    from pyramid.path import DottedNameResolver as _DottedNameResolver
+
+    return _DottedNameResolver(package)
+
+
+deprecated(
+    'DottedNameResolver',
+    (
+        '`pyramid.util.DottedNameResolver` has been moved to '
+        '`pyramid.resolver.DottedNameResolver`.'
+    ),
+)
 
 
 def text_(s, encoding='latin-1', errors='strict'):
@@ -736,3 +751,56 @@ def reraise(tp, value, tb=None):
     finally:
         value = None
         tb = None
+
+
+_exit_stack = ExitStack()
+atexit.register(_exit_stack.close)
+
+
+@functools.lru_cache(maxsize=None)
+def ref_filename(ref):
+    """Return a filename on the filesystem for the given resource.
+
+    .. note::
+
+        Instead of using this function directly, consider using Pyramid's asset
+        APIs as detailed in :ref: `accessing_assets`.
+
+    If the resource does not exist in the filesystem (e.g. in a zipped egg), it
+    will be extracted to a temporary directory and cleaned up when the
+    application exits.
+
+    :param ref:  A reference pointing to the desired resource.
+    :type ref: importlib.resources.abc.Traversable
+    :return:  The filename on the filesystem.
+    :rtype:  ``pathlib.Path``
+
+    """
+    return _exit_stack.enter_context(importlib.resources.as_file(ref))
+
+
+def resource_filename(package, name):
+    """Return a filename on the filesystem for the given resource.
+
+    .. note::
+
+        Instead of using this function directly, consider using Pyramid's asset
+        APIs as detailed in :ref: `accessing_assets`.
+
+    If the resource does not exist in the filesystem (e.g. in a zipped egg), it
+    will be extracted to a temporary directory and cleaned up when the
+    application exits.
+
+    This function is equivalent to the now-deprecated
+    ``pkg_resources.resource_filename``.
+
+    :param package:  The package containing the resource.
+    :type package: str
+    :param name:  The name of the resource within the package.
+    :type name: str
+    :return:  The filename on the filesystem.
+    :rtype:  str
+
+    """
+    ref = importlib.resources.files(package) / name
+    return str(ref_filename(ref))

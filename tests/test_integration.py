@@ -8,7 +8,7 @@ from webtest import TestApp
 from zope.interface import Interface
 
 from pyramid.static import static_view
-from pyramid.testing import skip_on
+from pyramid.testing import setUp, skip_on, tearDown
 from pyramid.util import text_
 from pyramid.view import view_config
 from pyramid.wsgi import wsgiapp
@@ -305,6 +305,12 @@ class TestStaticAppWithEncodings(IntegrationBase, unittest.TestCase):
 class TestStaticAppNoSubpath(unittest.TestCase):
     staticapp = static_view(os.path.join(here, 'fixtures'), use_subpath=False)
 
+    def setUp(self):
+        self.config = setUp()
+
+    def tearDown(self):
+        tearDown()
+
     def _makeRequest(self, extra):
         from io import BytesIO
 
@@ -322,6 +328,7 @@ class TestStaticAppNoSubpath(unittest.TestCase):
         }
         kw.update(extra)
         request = Request(kw)
+        request.registry = self.config.registry
         return request
 
     def test_basic(self):

@@ -102,13 +102,8 @@ def _get_view_module(view_callable):
             original_view = None
 
         if isinstance(original_view, static_view):
-            if original_view.package_name is not None:
-                return '{}:{}'.format(
-                    original_view.package_name,
-                    original_view.docroot,
-                )
-            else:
-                return original_view.docroot
+            asset = original_view.resolver.resolve(original_view.root_dir)
+            return asset.absspec()
         else:
             view_name = view_callable.__name__
     else:
