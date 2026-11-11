@@ -437,29 +437,31 @@ class TestImportlibResourcesAssetDescriptor(unittest.TestCase):
         )
 
     def test_stream(self):
-        from importlib.resources import read_binary
+        from importlib.resources import files
 
         inst = self._makeOne()
         data = inst.stream().read()
-        expected = read_binary('tests', 'fixtures/minimal.txt')
+        expected = files('tests').joinpath('fixtures/minimal.txt').read_bytes()
         self.assertEqual(data, expected)
 
     def test_stream_with_overrides(self):
-        from importlib.resources import read_binary
+        from importlib.resources import files
 
         overrides = self._makeOverrides()
         inst = self._makeOne(overrides=overrides)
         data = inst.stream().read()
-        expected = read_binary('tests', 'fixtures/nonminimal.txt')
+        expected = (
+            files('tests').joinpath('fixtures/nonminimal.txt').read_bytes()
+        )
         self.assertEqual(data, expected)
 
     def test_stream_with_overrides_no_override(self):
-        from importlib.resources import read_binary
+        from importlib.resources import files
 
         overrides = self._makeOverrides()
         inst = self._makeOne(path='fixtures/minimal.xml', overrides=overrides)
         data = inst.stream().read()
-        expected = read_binary('tests', 'fixtures/minimal.xml')
+        expected = files('tests').joinpath('fixtures/minimal.xml').read_bytes()
         self.assertEqual(data, expected)
 
     def test_isdir(self):
