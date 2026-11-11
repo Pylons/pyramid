@@ -438,7 +438,7 @@ class FSAssetDescriptor:
         self.path = os.path.abspath(path)
 
     def absspec(self):
-        raise NotImplementedError
+        return self.path
 
     def abspath(self):
         return self.path
