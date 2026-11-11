@@ -7,9 +7,10 @@ import sys
 import textwrap
 
 from pyramid.paster import bootstrap
+from pyramid.path import DottedNameResolver
 from pyramid.scripts.common import get_config_loader, parse_vars
 from pyramid.settings import aslist
-from pyramid.util import DottedNameResolver, make_contextmanager
+from pyramid.util import make_contextmanager
 
 
 def main(argv=sys.argv, quiet=False):

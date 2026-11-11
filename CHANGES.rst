@@ -21,8 +21,16 @@ Bug Fixes
 Backward Incompatibilities
 --------------------------
 
+- Replace ``pyramid.util.DottedNameResolver`` with a shim.  Users should use
+  ``pyramid.path.DottedNameResolver`` instead.  See
+  https://github.com/Pylons/pyramid/pull/3837.
+
 Deprecations
 ------------
+
+- Deprecate ``pyramid.util.DottedNameResolver`` in favor of
+  ``pyramid.path.DottedNameResolver``.  See
+  https://github.com/Pylons/pyramid/pull/3837.
 
 Documentation Changes
 ---------------------

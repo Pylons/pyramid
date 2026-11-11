@@ -4,8 +4,7 @@ from hmac import compare_digest
 import inspect
 import platform
 import weakref
-
-from pyramid.path import DottedNameResolver as _DottedNameResolver
+from zope.deprecation import deprecated
 
 _marker = object()
 
@@ -20,11 +19,25 @@ except BaseException:  # pragma: no cover
     PYPY = False
 
 
-class DottedNameResolver(_DottedNameResolver):
-    def __init__(
-        self, package=None
-    ):  # default to package = None for bw compat
-        _DottedNameResolver.__init__(self, package)
+def DottedNameResolver(package=None):
+    """
+    .. deprecated:: 2.2
+
+        Please use :class:`pyramid.path.DottedNameResolver` instead.
+
+    """
+    from pyramid.path import DottedNameResolver as _DottedNameResolver
+
+    return _DottedNameResolver(package)
+
+
+deprecated(
+    'DottedNameResolver',
+    (
+        '`pyramid.util.DottedNameResolver` has been moved to '
+        '`pyramid.path.DottedNameResolver`.'
+    ),
+)
 
 
 def text_(s, encoding='latin-1', errors='strict'):
