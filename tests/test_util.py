@@ -1303,5 +1303,5 @@ class TestResourceFilename(unittest.TestCase):
 
     def test_returns_path(self):
         path = self._callFUT('tests', 'fixtures/minimal.txt')
-        expected = os.path.join(here, 'fixtures/minimal.txt')
+        expected = str(pathlib.Path(here) / 'fixtures' / 'minimal.txt')
         self.assertEqual(path, expected)
