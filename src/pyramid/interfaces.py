@@ -1421,7 +1421,9 @@ class IAssetDescriptor(Interface):
     def absspec():
         """
         Returns the absolute asset specification for this asset
-        (e.g. ``mypackage:templates/foo.pt``).
+        (e.g. ``mypackage:templates/foo.pt``).  The output of this method
+        should be valid input for :meth:`pyramid.path.AssetResolver.resolve`
+        and result in an identical asset descriptor.
         """
 
     def abspath():

@@ -394,7 +394,7 @@ class TestFSAssetDescriptor(unittest.TestCase):
 
     def test_absspec(self):
         inst = self._makeOne()
-        self.assertRaises(NotImplementedError, inst.absspec)
+        self.assertEqual(inst.absspec(), os.path.join(here, 'test_asset.py'))
 
     def test_abspath(self):
         inst = self._makeOne()
