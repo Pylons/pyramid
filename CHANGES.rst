@@ -10,6 +10,11 @@ Features
 Bug Fixes
 ---------
 
+- Avoid ``inspect.getfullargspec`` when checking view and subscriber
+  callables so Python 3.14's deferred annotation evaluation does not resolve
+  annotations that Pyramid does not use. See
+  https://github.com/Pylons/pyramid/issues/3812
+
 - Correct the ``pop`` declaration on the documentation-only
   ``pyramid.interfaces.IDict``.  It was declared ``pop(k, default=None)``,
   which contradicts its own docstring: with a default always bound, the

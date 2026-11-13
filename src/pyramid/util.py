@@ -3,6 +3,7 @@ import functools
 from hmac import compare_digest
 import inspect
 import platform
+import sys
 import weakref
 
 from pyramid.path import DottedNameResolver as _DottedNameResolver
@@ -18,6 +19,12 @@ try:  # pragma: no cover
 except BaseException:  # pragma: no cover
     __pypy__ = None
     PYPY = False
+
+_SIGNATURE_KWARGS = {}
+if sys.version_info >= (3, 14):  # pragma: no cover
+    from annotationlib import Format
+
+    _SIGNATURE_KWARGS['annotation_format'] = Format.FORWARDREF
 
 
 class DottedNameResolver(_DottedNameResolver):
@@ -652,46 +659,57 @@ def make_contextmanager(fn):
     return wrapper
 
 
+def get_signature(fn):
+    return inspect.signature(fn, **_SIGNATURE_KWARGS)
+
+
+def _get_positional_parameters(sig):
+    return [
+        param
+        for param in sig.parameters.values()
+        if param.kind
+        in (
+            inspect.Parameter.POSITIONAL_ONLY,
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        )
+    ]
+
+
 def takes_one_arg(callee, attr=None, argname=None, allow_varargs=True):
-    ismethod = False
     if attr is None:
         attr = '__call__'
-    if inspect.isroutine(callee):
+    if inspect.isroutine(callee) or inspect.isclass(callee):
         fn = callee
-    elif inspect.isclass(callee):
-        fn = callee.__init__
-        ismethod = hasattr(fn, '__call__')
     else:
         try:
             fn = getattr(callee, attr)
         except AttributeError:
             return False
 
-    argspec = inspect.getfullargspec(fn)
-    args = argspec[0]
-
-    if hasattr(fn, '__func__') or ismethod:
-        # it's an instance method
-        if not args:
-            return False
-        args = args[1:]
+    try:
+        sig = get_signature(fn)
+    except (TypeError, ValueError):
+        return False
+    args = _get_positional_parameters(sig)
 
     if not args:
         return False
 
-    if not allow_varargs and argspec.varargs:
+    if not allow_varargs and any(
+        param.kind == inspect.Parameter.VAR_POSITIONAL
+        for param in sig.parameters.values()
+    ):
         return False
 
     if len(args) == 1:
         return True
 
     if argname:
-        defaults = argspec[3]
-        if defaults is None:
-            defaults = ()
-
-        if args[0] == argname:
-            if len(args) - len(defaults) == 1:
+        required_args = [
+            arg for arg in args if arg.default is inspect.Parameter.empty
+        ]
+        if args[0].name == argname:
+            if len(required_args) == 1:
                 return True
 
     return False
@@ -717,8 +735,8 @@ def is_unbound_method(fn):
     is_bound = is_bound_method(fn)
 
     if not is_bound and inspect.isroutine(fn):
-        spec = inspect.getfullargspec(fn)
-        has_self = len(spec.args) > 0 and spec.args[0] == 'self'
+        args = _get_positional_parameters(get_signature(fn))
+        has_self = len(args) > 0 and args[0].name == 'self'
 
         if inspect.isfunction(fn) and has_self:
             return True

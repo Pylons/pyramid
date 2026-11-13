@@ -1186,6 +1186,15 @@ class Test_takes_one_arg(unittest.TestCase):
         getattr(foo, '__annotations__', {}).update({'bar': 'baz'})
         self.assertTrue(self._callFUT(foo))
 
+    @unittest.skipIf(
+        sys.version_info < (3, 14), 'deferred annotations require Python 3.14'
+    )
+    def test_function_with_unresolved_deferred_annotation(self):
+        def view(request: Missing):  # noqa: F821
+            pass
+
+        self.assertTrue(self._callFUT(view))
+
 
 class TestSimpleSerializer(unittest.TestCase):
     def _makeOne(self):
@@ -1217,6 +1226,16 @@ class TestUnboundMethods(unittest.TestCase):
 
     def test_unbound_method(self):
         self.assertTrue(self._callFUT(self.Dummy.run))
+
+    @unittest.skipIf(
+        sys.version_info < (3, 14), 'deferred annotations require Python 3.14'
+    )
+    def test_unbound_method_with_unresolved_deferred_annotation(self):
+        class Dummy:
+            def run(self, request: Missing):  # noqa: F821
+                pass
+
+        self.assertTrue(self._callFUT(Dummy.run))
 
     def test_normal_func_unbound(self):
         def func():  # pragma: no cover
