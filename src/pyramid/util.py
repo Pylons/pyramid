@@ -471,7 +471,7 @@ class TopologicalSorter:
         any other hashable object, the ``val`` should be the sortable (doesn't
         need to be hashable).  ``after`` and ``before`` represents the name of
         one of the other sortables (or a sequence of such named) or one of the
-        special sentinel values :attr:`pyramid.util.FIRST`` or
+        special sentinel values :attr:`pyramid.util.FIRST` or
         :attr:`pyramid.util.LAST` representing the first or last positions
         respectively.  ``FIRST`` and ``LAST`` can also be part of a sequence
         passed as ``before`` or ``after``.  A sortable should not be added

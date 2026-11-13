@@ -386,6 +386,17 @@ class TestRequest(unittest.TestCase):
         self.assertEqual(1, request.db)
         self.assertEqual(1, request.db)
 
+    def test_resolve_asset(self):
+        request = self._makeOne()
+        asset = request.resolve_asset('tests:fixtures/minimal.txt')
+        self.assertEqual(asset.absspec(), 'tests:fixtures/minimal.txt')
+
+    def test_resolve_asset_relative(self):
+        # Relative to caller_package, which is `tests` for this test class.
+        request = self._makeOne()
+        asset = request.resolve_asset('fixtures/minimal.txt')
+        self.assertEqual(asset.absspec(), 'tests:fixtures/minimal.txt')
+
 
 class Test_route_request_iface(unittest.TestCase):
     def _callFUT(self, name):

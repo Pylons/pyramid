@@ -116,7 +116,7 @@ Deprecations
   - :class:`pyramid.authorization.ACLAuthorizationPolicy`
   - The ``effective_principals`` view and route predicates.
 
-- Deprecated :func:`pyramid.security.principals_allowed_by_permission``.
+- Deprecated :func:`pyramid.security.principals_allowed_by_permission`.
   This method continues to work with the deprecated :class:`pyramid.interfaces.IAuthorizationPolicy` interface but will not work with the new :class:`pyramid.interfaces.ISecurityPolicy`.
   See https://github.com/Pylons/pyramid/pull/3465
 
@@ -171,7 +171,7 @@ If you were previously using :class:`pyramid.authorization.ACLAuthorizationPolic
 For more details on implementing an ACL, see :ref:`assigning_acls`.
 
 Pyramid does not provide any built-in security policies.
-Similiar functionality of the authentication and authorization policies is now provided by helpers, which can be utilized to implement your own security policy.
+Similar functionality of the authentication and authorization policies is now provided by helpers, which can be utilized to implement your own security policy.
 The functionality of the legacy authentication policies roughly correspond to the following helpers:
 
 +----------------------------------------------------------------+-------------------------------------------------------------------+

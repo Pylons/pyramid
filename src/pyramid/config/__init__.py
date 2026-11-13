@@ -36,7 +36,12 @@ from pyramid.interfaces import (
     IDebugLogger,
     IExceptionResponse,
 )
-from pyramid.path import DottedNameResolver, caller_package, package_of
+from pyramid.path import (
+    AssetResolver,
+    DottedNameResolver,
+    caller_package,
+    package_of,
+)
 from pyramid.registry import Introspectable, Introspector, Registry
 from pyramid.router import Router
 from pyramid.settings import aslist
@@ -292,6 +297,7 @@ class Configurator(
         self.name_resolver = name_resolver
         self.package_name = name_resolver.get_package_name()
         self.package = name_resolver.get_package()
+        self.asset_resolver = AssetResolver(self.package)
         self.root_package = root_package
         self.registry = registry
         self.autocommit = autocommit
@@ -738,6 +744,15 @@ class Configurator(
         consider it relative to the ``package`` argument supplied to
         this Configurator's constructor."""
         return self.name_resolver.maybe_resolve(dotted)
+
+    def resolve_asset(self, spec):
+        """Resolve the given :term:`asset specification` string to a
+        :class:`pyramid.interfaces.IAssetDescriptor` instance.  Overrides
+        registered via :meth:`pyramid.config.Configurator.override_asset` will
+        change how this method resolves assets, which is described in detail in
+        :ref:`assets_chapter`.
+        """
+        return self.asset_resolver.resolve(spec)
 
     def absolute_asset_spec(self, relative_spec):
         """Resolve the potentially relative :term:`asset

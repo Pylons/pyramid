@@ -188,7 +188,7 @@ class PShellCommand:
         orig_env = env.copy()
         setup_manager = make_contextmanager(self.setup)
         with setup_manager(env):
-            # remove any objects from default help that were overidden
+            # remove any objects from default help that were overridden
             for k, v in env.items():
                 if k not in orig_env or v is not orig_env[k]:
                     if getattr(v, '__doc__', False):

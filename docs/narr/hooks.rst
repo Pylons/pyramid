@@ -852,11 +852,11 @@ callable, if that object asserts that it implements
 ``zope.interface.implementer(IResponse)``) , an adapter needn't be registered
 for the object; Pyramid will use it directly.
 
-An IResponse adapter for ``webob.reponse.Response`` (as opposed to
+An IResponse adapter for ``webob.response.Response`` (as opposed to
 :class:`pyramid.response.Response`) is registered by Pyramid by default at
 startup time, as by their nature, instances of this class (and instances of
 subclasses of the class) will natively provide IResponse.  The adapter
-registered for ``webob.reponse.Response`` simply returns the response object.
+registered for ``webob.response.Response`` simply returns the response object.
 
 Instead of using :meth:`pyramid.config.Configurator.add_response_adapter`, you
 can use the :class:`pyramid.response.response_adapter` decorator:
@@ -1493,7 +1493,7 @@ method. For example:
         def __call__(self, context, request):
             return request.content_type == self.val
 
-The constructor of an :class:`pyramid.interfaces.IPredicateFactory`` takes two arguments: ``val`` and ``info``.
+The constructor of an :class:`pyramid.interfaces.IPredicateFactory` takes two arguments: ``val`` and ``info``.
 The ``val`` argument will be the argument passed to ``view_config`` (or ``add_view``).
 In the example above, it will be the string ``File``.
 The second argument, ``info``, will be an :class:`pyramid.interfaces.IPredicateInfo` instance created relative to the action configuring the predicate.

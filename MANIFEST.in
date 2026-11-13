@@ -8,6 +8,7 @@ include CHANGES.rst HISTORY.rst BFG_HISTORY.rst
 include CONTRIBUTORS.txt LICENSE.txt COPYRIGHT.txt
 
 include .coveragerc .flake8 pyproject.toml
+include .mailmap
 include tox.ini .readthedocs.yaml
 include contributing.md RELEASING.txt HACKING.txt TODO.txt
 graft .github

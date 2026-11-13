@@ -115,7 +115,7 @@ Minor Feature Additions
   earlier calls. See https://github.com/Pylons/pyramid/pull/2902
 
 - Added a new ``callback`` option to
-  :meth:`pyramid.config.Configurator.set_default_csrf_options`` which
+  :meth:`pyramid.config.Configurator.set_default_csrf_options` which
   can be used to determine per-request whether CSRF checking should be enabled
   to allow for a mix authentication methods. Only cookie-based methods
   generally require CSRF checking.

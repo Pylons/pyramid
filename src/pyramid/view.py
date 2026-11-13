@@ -715,7 +715,7 @@ class ViewMethodsMixin:
 
             A boolean indicating whether the original error should be reraised
             if a :term:`response` object could not be created. If ``False``
-            then an :class:`pyramid.httpexceptions.HTTPNotFound`` exception
+            then an :class:`pyramid.httpexceptions.HTTPNotFound` exception
             will be raised. Default: ``False``.
 
         If a response is generated then ``request.exception`` and
