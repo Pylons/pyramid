@@ -1,5 +1,4 @@
 import sys
-from unittest import mock
 import unittest
 
 from pyramid.util import bytes_, text_
@@ -1187,18 +1186,14 @@ class Test_takes_one_arg(unittest.TestCase):
         getattr(foo, '__annotations__', {}).update({'bar': 'baz'})
         self.assertTrue(self._callFUT(foo))
 
-    def test_function_annotations_without_getfullargspec(self):
-        def foo(request):
-            """ """
+    @unittest.skipIf(
+        sys.version_info < (3, 14), 'deferred annotations require Python 3.14'
+    )
+    def test_function_with_unresolved_deferred_annotation(self):
+        def view(request: Missing):  # noqa: F821
+            pass
 
-        getattr(foo, '__annotations__', {}).update(
-            {'request': 'IRequest', 'return': 'IResponse'}
-        )
-        with mock.patch(
-            'pyramid.util.inspect.getfullargspec',
-            side_effect=AssertionError('should not be called'),
-        ):
-            self.assertTrue(self._callFUT(foo))
+        self.assertTrue(self._callFUT(view))
 
 
 class TestSimpleSerializer(unittest.TestCase):
@@ -1232,12 +1227,15 @@ class TestUnboundMethods(unittest.TestCase):
     def test_unbound_method(self):
         self.assertTrue(self._callFUT(self.Dummy.run))
 
-    def test_unbound_method_without_getfullargspec(self):
-        with mock.patch(
-            'pyramid.util.inspect.getfullargspec',
-            side_effect=AssertionError('should not be called'),
-        ):
-            self.assertTrue(self._callFUT(self.Dummy.run))
+    @unittest.skipIf(
+        sys.version_info < (3, 14), 'deferred annotations require Python 3.14'
+    )
+    def test_unbound_method_with_unresolved_deferred_annotation(self):
+        class Dummy:
+            def run(self, request: Missing):  # noqa: F821
+                pass
+
+        self.assertTrue(self._callFUT(Dummy.run))
 
     def test_normal_func_unbound(self):
         def func():  # pragma: no cover
