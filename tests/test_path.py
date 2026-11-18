@@ -231,18 +231,6 @@ class TestRefFilename(unittest.TestCase):
         self.assertEqual(path, expected)
 
 
-class TestResourceFilename(unittest.TestCase):
-    def _callFUT(self, package, name):
-        from pyramid.path import resource_filename
-
-        return resource_filename(package, name)
-
-    def test_returns_path(self):
-        path = self._callFUT('tests', 'fixtures/minimal.txt')
-        expected = os.path.join(here, 'fixtures/minimal.txt')
-        self.assertEqual(path, expected)
-
-
 class TestResolver(unittest.TestCase):
     def _getTargetClass(self):
         from pyramid.path import Resolver

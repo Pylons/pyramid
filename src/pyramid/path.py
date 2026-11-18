@@ -111,33 +111,6 @@ def ref_filename(ref):
     return _exit_stack.enter_context(importlib.resources.as_file(ref))
 
 
-def resource_filename(package, name):
-    """Return a filename on the filesystem for the given resource.
-
-    .. note::
-
-        Instead of using this function directly, consider using Pyramid's asset
-        APIs as detailed in :ref: `accessing_assets`.
-
-    If the resource does not exist in the filesystem (e.g. in a zipped egg), it
-    will be extracted to a temporary directory and cleaned up when the
-    application exits.
-
-    This function is equivalent to the now-deprecated
-    ``pkg_resources.resource_filename``.
-
-    :param package:  The package containing the resource.
-    :type package: str
-    :param name:  The name of the resource within the package.
-    :type name: str
-    :return:  The filename on the filesystem.
-    :rtype:  str
-
-    """
-    ref = importlib.resources.files(package) / name
-    return str(ref_filename(ref))
-
-
 class _CALLER_PACKAGE:
     def __repr__(self):  # pragma: no cover (for docs)
         return 'pyramid.path.CALLER_PACKAGE'
