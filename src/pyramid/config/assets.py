@@ -231,9 +231,6 @@ class PackageAssetSource:
     def _base(self):
         return importlib.resources.files(self.pkg_name) / self.prefix
 
-    def get_path(self, resource_name):
-        return f'{self.prefix}{resource_name}'
-
     def get_spec(self, resource_name):
         if self.exists(resource_name):
             return f'{self.pkg_name}:{self.prefix}{resource_name}'
@@ -274,18 +271,14 @@ class FSAssetSource:
     def __init__(self, prefix):
         self.prefix = prefix
 
-    def get_path(self, resource_name):
-        if resource_name:
-            path = os.path.join(self.prefix, resource_name)
-        else:
-            path = self.prefix
-        return path
-
     def get_spec(self, resource_name):
         return self.get_filename(resource_name)
 
     def get_filename(self, resource_name):
-        path = self.get_path(resource_name)
+        if resource_name:
+            path = os.path.join(self.prefix, resource_name)
+        else:
+            path = self.prefix
         if os.path.exists(path):
             return path
 
