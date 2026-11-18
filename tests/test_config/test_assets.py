@@ -6,7 +6,7 @@ from pyramid.testing import cleanUp
 
 try:
     import pkg_resources
-except ImportError:
+except ImportError:  # pragma: no cover
     pkg_resources = None
 has_pkg_resources = pkg_resources is not None
 
@@ -540,7 +540,7 @@ class TestPackageOverrides(unittest.TestCase):
         klass = self._getTargetClass()
         if pkg_resources is True:
             pkg_resources = DummyPkgResources()
-        if pkg_resources and not has_pkg_resources:
+        if pkg_resources and not has_pkg_resources:  # pragma: no cover
             # Even though we're using a dummy pkg_resources implementation, if
             # pkg_resources doesn't exist then OverrideProvider won't exist and
             # the constructor will fail.
@@ -596,7 +596,7 @@ class TestPackageOverrides(unittest.TestCase):
     def test_ctor_registers_loader_type(self):
         try:
             from pyramid.config.assets import OverrideProvider
-        except ImportError:
+        except ImportError:  # pragma: no cover
             pytest.skip("`OverrideProvider` doesn't exist")
 
         dummy_pkg_resources = DummyPkgResources()
