@@ -424,23 +424,20 @@ class TestImportlibResourcesAssetDescriptor(unittest.TestCase):
 
     def test_abspath(self):
         inst = self._makeOne()
-        self.assertEqual(
-            inst.abspath(), os.path.join(here, 'fixtures/minimal.txt')
-        )
+        expected = str(pathlib.Path(here) / 'fixtures' / 'minimal.txt')
+        self.assertEqual(inst.abspath(), expected)
 
     def test_abspath_with_overrides(self):
         overrides = self._makeOverrides()
         inst = self._makeOne(overrides=overrides)
-        self.assertEqual(
-            inst.abspath(), os.path.join(here, 'fixtures/nonminimal.txt')
-        )
+        expected = str(pathlib.Path(here) / 'fixtures' / 'nonminimal.txt')
+        self.assertEqual(inst.abspath(), expected)
 
     def test_abspath_with_overrides_no_override(self):
         overrides = self._makeOverrides()
         inst = self._makeOne(path='fixtures/minimal.xml', overrides=overrides)
-        self.assertEqual(
-            inst.abspath(), os.path.join(here, 'fixtures/minimal.xml')
-        )
+        expected = str(pathlib.Path(here) / 'fixtures' / 'minimal.xml')
+        self.assertEqual(inst.abspath(), expected)
 
     def test_stream(self):
         from importlib.resources import files
