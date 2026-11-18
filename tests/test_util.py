@@ -4,6 +4,41 @@ import unittest
 from pyramid.util import bytes_, text_
 
 
+class TestDottedNameResolver(unittest.TestCase):
+    def _makeOne(self, *args):
+        from pyramid.util import DottedNameResolver
+
+        return DottedNameResolver(*args)
+
+    def test_resolve(self):
+        """
+        Test that basic resolver functionality works as expected.
+        """
+        import tests.test_util
+
+        resolver = self._makeOne()
+        result = resolver.resolve('tests.test_util')
+        self.assertEqual(result, tests.test_util)
+
+    def test_package_none(self):
+        """
+        Test that package defaults to ``None``, rather than new behavior of
+        ``caller_package``.
+        """
+        resolver = self._makeOne()
+        self.assertRaises(ValueError, resolver.resolve, '.test_util')
+
+    def test_package_explicit(self):
+        """
+        Test that package argument is honored.
+        """
+        import tests.test_util
+
+        resolver = self._makeOne('tests')
+        result = resolver.resolve('.test_util')
+        self.assertEqual(result, tests.test_util)
+
+
 class Test_InstancePropertyHelper(unittest.TestCase):
     def _makeOne(self):
         cls = self._getTargetClass()
