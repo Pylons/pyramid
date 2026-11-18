@@ -3,12 +3,11 @@ import json
 import mimetypes
 import os
 from os.path import exists, getmtime, getsize, isdir, join, normcase, normpath
-from pkg_resources import resource_exists, resource_filename, resource_isdir
 import warnings
 
 from pyramid.asset import abspath_from_asset_spec, resolve_asset_spec
 from pyramid.httpexceptions import HTTPMovedPermanently, HTTPNotFound
-from pyramid.path import caller_package
+from pyramid.path import PackageAssetDescriptor, caller_package
 from pyramid.response import FileResponse, _guess_type
 from pyramid.traversal import traversal_path_info
 
@@ -153,7 +152,7 @@ class static_view:
         # normalize asset spec or fs path into resource_path
         if self.package_name:  # package resource
             resource_path = '{}/{}'.format(self.docroot.rstrip('/'), path)
-            if resource_isdir(self.package_name, resource_path):
+            if PackageAssetDescriptor(self.package_name, resource_path).isdir():
                 if not request.path_url.endswith('/'):
                     raise self.add_slash_redirect(request)
                 resource_path = '{}/{}'.format(
@@ -178,8 +177,9 @@ class static_view:
 
         """
         if self.package_name:
-            if resource_exists(self.package_name, name):
-                return resource_filename(self.package_name, name)
+            desc = PackageAssetDescriptor(self.package_name, name)
+            if desc.exists():
+                return desc.abspath()
 
         elif exists(name):
             return name

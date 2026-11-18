@@ -13,15 +13,15 @@ if 0:
             import manuel.codeblock
             import manuel.ignore
             import manuel.testing
+            import importlib.metadata
             import os
-            import pkg_resources
 
             m = manuel.ignore.Manuel()
             m += manuel.codeblock.Manuel()
             m += manuel.capture.Manuel()
             docs = []
 
-            egg_path = pkg_resources.get_distribution('pyramid').location
+            egg_path = str(importlib.metadata.distribution('pyramid').locate_file('..'))
             path = os.path.join(egg_path, 'docs')
             for root, dirs, files in os.walk(path):
                 for ignore in ('.svn', '.build', '.hg', '.git', 'CVS'):

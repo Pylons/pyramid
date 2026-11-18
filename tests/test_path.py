@@ -339,34 +339,25 @@ class TestPkgResourcesAssetDescriptor(unittest.TestCase):
 
     def test_stream(self):
         inst = self._makeOne()
-        inst.pkg_resources = DummyPkgResource()
-        inst.pkg_resources.resource_stream = lambda x, y: f'{x}:{y}'
-        s = inst.stream()
-        self.assertEqual(s, '{}:{}'.format('tests', 'test_asset.py'))
+        with inst.stream() as s:
+            val = s.read()
+        self.assertTrue(b'asset' in val)
 
     def test_isdir(self):
         inst = self._makeOne()
-        inst.pkg_resources = DummyPkgResource()
-        inst.pkg_resources.resource_isdir = lambda x, y: f'{x}:{y}'
-        self.assertEqual(
-            inst.isdir(), '{}:{}'.format('tests', 'test_asset.py')
-        )
+        self.assertFalse(inst.isdir())
+        inst_dir = self._makeOne('tests', '')
+        self.assertTrue(inst_dir.isdir())
 
     def test_listdir(self):
-        inst = self._makeOne()
-        inst.pkg_resources = DummyPkgResource()
-        inst.pkg_resources.resource_listdir = lambda x, y: f'{x}:{y}'
-        self.assertEqual(
-            inst.listdir(), '{}:{}'.format('tests', 'test_asset.py')
-        )
+        inst_dir = self._makeOne('tests', '')
+        self.assertTrue('test_asset.py' in inst_dir.listdir())
 
     def test_exists(self):
         inst = self._makeOne()
-        inst.pkg_resources = DummyPkgResource()
-        inst.pkg_resources.resource_exists = lambda x, y: f'{x}:{y}'
-        self.assertEqual(
-            inst.exists(), '{}:{}'.format('tests', 'test_asset.py')
-        )
+        self.assertTrue(inst.exists())
+        inst_non = self._makeOne('tests', 'nonexistent_file_xyz.py')
+        self.assertFalse(inst_non.exists())
 
 
 class TestFSAssetDescriptor(unittest.TestCase):
