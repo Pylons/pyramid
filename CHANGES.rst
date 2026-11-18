@@ -4,8 +4,10 @@ unreleased
 Features
 --------
 
-- Add `Configurator.resolve_asset` and `Request.resolve_asset` methods.  See
-  https://github.com/Pylons/pyramid/pull/3815.
+- Add ``Configurator.resolve_asset`` and ``Request.resolve_asset`` methods.
+  See https://github.com/Pylons/pyramid/pull/3815.
+- Add asset specification support to ``pyramid.response.FileResponse``.  See
+  https://github.com/Pylons/pyramid/pull/3836.
 
 Bug Fixes
 ---------
