@@ -68,18 +68,19 @@ def caller_package(level=2, caller_module=caller_module):
     return sys.modules[package_name]
 
 
-def package_path(package):
+def package_path(package_or_module):
     # computing the abspath is actually kinda expensive so we memoize
     # the result
-    prefix = getattr(package, '__abspath__', None)
+    prefix = getattr(package_or_module, '__abspath__', None)
     if prefix is None:
+        package = package_of(package_or_module)
         pkg_ref = importlib.resources.files(package.__name__)
         prefix = str(ref_filename(pkg_ref))
         # resource_filename doesn't care whether we feed it a package
         # name or a module name within the package, the result
         # will be the same: a directory name to the package itself
         try:
-            package.__abspath__ = prefix
+            package_or_module.__abspath__ = prefix
         except Exception:
             # this is only an optimization, ignore any error
             pass

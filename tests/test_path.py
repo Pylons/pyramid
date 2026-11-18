@@ -141,16 +141,16 @@ class TestPackagePath(unittest.TestCase):
         self.assertEqual(result, module.package_path)
 
     def test_memoization_success(self):
-        from . import test_path
+        import tests
 
-        module = DummyPackageOrModule(test_path)
+        module = DummyPackageOrModule(tests)
         self._callFUT(module)
         self.assertEqual(module.__abspath__, module.package_path)
 
     def test_memoization_fail(self):
-        from . import test_path
+        import tests
 
-        module = DummyPackageOrModule(test_path, raise_exc=TypeError)
+        module = DummyPackageOrModule(tests, raise_exc=TypeError)
         result = self._callFUT(module)
         self.assertFalse(hasattr(module, '__abspath__'))
         self.assertEqual(result, module.package_path)
