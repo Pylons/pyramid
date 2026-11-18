@@ -11,7 +11,7 @@ from pyramid.threadlocal import get_current_registry
 
 try:
     import pkg_resources
-except ImportError:
+except ImportError:  # pragma: no cover
     pkg_resources = None
 
 
