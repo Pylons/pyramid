@@ -1,7 +1,10 @@
+import os
 import sys
 import unittest
 
 from pyramid.util import bytes_, text_
+
+here = os.path.abspath(os.path.dirname(__file__))
 
 
 class TestDottedNameResolver(unittest.TestCase):

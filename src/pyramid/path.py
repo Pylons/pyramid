@@ -1,6 +1,9 @@
+import atexit
+from contextlib import ExitStack
 import functools
 from importlib import import_module
 from importlib.machinery import SOURCE_SUFFIXES
+import importlib.resources
 import os
 import pkg_resources
 import sys
@@ -80,6 +83,32 @@ def package_path(package):
             # this is only an optimization, ignore any error
             pass
     return prefix
+
+
+_exit_stack = ExitStack()
+atexit.register(_exit_stack.close)
+
+
+@functools.lru_cache(maxsize=None)
+def ref_filename(ref):
+    """Return a filename on the filesystem for the given resource.
+
+    .. note::
+
+        Instead of using this function directly, consider using Pyramid's asset
+        APIs as detailed in :ref: `accessing_assets`.
+
+    If the resource does not exist in the filesystem (e.g. in a zipped egg), it
+    will be extracted to a temporary directory and cleaned up when the
+    application exits.
+
+    :param ref:  A reference pointing to the desired resource.
+    :type ref: importlib.resources.abc.Traversable
+    :return:  The filename on the filesystem.
+    :rtype:  ``pathlib.Path``
+
+    """
+    return _exit_stack.enter_context(importlib.resources.as_file(ref))
 
 
 class _CALLER_PACKAGE:
