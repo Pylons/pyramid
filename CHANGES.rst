@@ -8,6 +8,7 @@ Features
   See https://github.com/Pylons/pyramid/pull/3815.
 - Add asset specification support to ``pyramid.response.FileResponse``.  See
   https://github.com/Pylons/pyramid/pull/3836.
+- Add support for Python 3.15.
 
 Bug Fixes
 ---------
@@ -23,6 +24,7 @@ Bug Fixes
 Backward Incompatibilities
 --------------------------
 
+- Drop support for Python 3.10, which reached end-of-life in October 2026.
 - Replace ``pyramid.util.DottedNameResolver`` with a shim.  Users should use
   ``pyramid.path.DottedNameResolver`` instead.  See
   https://github.com/Pylons/pyramid/pull/3837.

@@ -51,7 +51,7 @@ In order to add a feature to Pyramid:
   (in `docs/`).
 
 - The feature must work fully on the following CPython versions:
-  3.10, 3.11, 3.12, 3.13 and 3.14 on both UNIX and Windows.
+  3.11, 3.12, 3.13, 3.14 and 3.15 on both UNIX and Windows.
 
 - The feature must work on the latest version of PyPy3.
 
@@ -87,9 +87,9 @@ Running Tests
 
     $ $TOX -e py
 
-  To run `tox` for Python 3.10 explicitly, you may use:
+  To run `tox` for Python 3.11 explicitly, you may use:
 
-    $ $TOX -e py310
+    $ $TOX -e py311
 
 - To run individual tests (i.e., during development), you can use `pytest`
   syntax as follows, where `$VENV` is an environment variable set to the path
@@ -110,7 +110,7 @@ Test Coverage
 -------------
 
 - The codebase *must* have 100% test statement coverage after each commit. You
-  can test coverage via `tox -e py310`.
+  can test coverage via `tox -e py314-cover,coverage`.
 
 
 Documentation Coverage and Building HTML Documentation

@@ -17,23 +17,17 @@ jobs:
             # See https://github.com/actions/runner-images
             matrix:
                 py:
-                    - "3.10"
                     - "3.11"
                     - "3.12"
                     - "3.13"
                     - "3.14"
-                    - "pypy-3.10"
+                    - "3.15"
+                    - "pypy-3.11"
                 os:
                     - "ubuntu-24.04" # x64
-                    - "windows-2022" # x64
+                    - "windows-2025" # x64
                     - "macos-15" # arm64
                     - "macos-15-intel" # x64
-                include:
-                    - os: "ubuntu-24.04"
-                      pytest-args: "--cov"
-                    - py: "pypy-3.10"
-                      toxenv: "pypy310"
-                      pytest-args: ""
 
         name: "Python: ${{ matrix.py }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
@@ -43,14 +37,8 @@ jobs:
               uses: astral-sh/setup-uv@v7
               with:
                   python-version: ${{ matrix.py }}
-            - name: Running tox with specific toxenv
-              if: ${{ matrix.toxenv != '' }}
-              env:
-                TOXENV: ${{ matrix.toxenv }}
-              run: uvx tox
             - name: Running tox for current python version
-              if: ${{ matrix.toxenv == '' }}
-              run: uvx tox -e py -- ${{ matrix.pytest-args }}
+              run: uvx --with tox-uv tox -e py
 
     coverage:
         runs-on: ubuntu-24.04
@@ -61,7 +49,7 @@ jobs:
               uses: astral-sh/setup-uv@v7
               with:
                   python-version: "3.14"
-            - run: uvx tox -e py314-cover,coverage
+            - run: uvx --with tox-uv tox -e py314-cover,coverage
     docs:
         runs-on: ubuntu-24.04
         name: Build the documentation
@@ -71,7 +59,7 @@ jobs:
               uses: astral-sh/setup-uv@v7
               with:
                   python-version: "3.14"
-            - run: uvx tox -e docs
+            - run: uvx --with tox-uv tox -e docs
     lint:
         runs-on: ubuntu-24.04
         name: Lint the package
@@ -81,4 +69,4 @@ jobs:
               uses: astral-sh/setup-uv@v7
               with:
                   python-version: "3.14"
-            - run: uvx tox -e lint
+            - run: uvx --with tox-uv tox -e lint
