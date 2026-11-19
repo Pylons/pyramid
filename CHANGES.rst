@@ -5,10 +5,11 @@ Features
 --------
 
 - Add ``Configurator.resolve_asset`` and ``Request.resolve_asset`` methods.
-  See https://github.com/Pylons/pyramid/pull/3815.
-- Add asset specification support to ``pyramid.response.FileResponse``.  See
-  https://github.com/Pylons/pyramid/pull/3836.
+  See https://github.com/Pylons/pyramid/pull/3815
+- Add asset specification support to ``pyramid.response.FileResponse``.
+  See https://github.com/Pylons/pyramid/pull/3836
 - Add support for Python 3.15.
+  See https://github.com/Pylons/pyramid/pull/3840
 
 Bug Fixes
 ---------
@@ -18,23 +19,24 @@ Bug Fixes
   which contradicts its own docstring: with a default always bound, the
   KeyError case it describes cannot arise.  It now reads ``pop(k, *args)``,
   matching ``dict.pop``.  Also correct the ``popitem`` docstring, which
-  referred to a key ``k`` that the method does not take.  See
-  https://github.com/Pylons/pyramid/issues/3237.
+  referred to a key ``k`` that the method does not take.
+  See https://github.com/Pylons/pyramid/issues/3237
 
 Backward Incompatibilities
 --------------------------
 
 - Drop support for Python 3.10, which reached end-of-life in October 2026.
+  See https://github.com/Pylons/pyramid/pull/3840
 - Replace ``pyramid.util.DottedNameResolver`` with a shim.  Users should use
-  ``pyramid.path.DottedNameResolver`` instead.  See
-  https://github.com/Pylons/pyramid/pull/3837.
+  ``pyramid.path.DottedNameResolver`` instead.
+  See https://github.com/Pylons/pyramid/pull/3837
 
 Deprecations
 ------------
 
 - Deprecate ``pyramid.util.DottedNameResolver`` in favor of
-  ``pyramid.path.DottedNameResolver``.  See
-  https://github.com/Pylons/pyramid/pull/3837.
+  ``pyramid.path.DottedNameResolver``.
+  See https://github.com/Pylons/pyramid/pull/3837
 
 Documentation Changes
 ---------------------
