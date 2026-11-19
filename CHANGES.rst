@@ -27,6 +27,8 @@ Backward Incompatibilities
 
 - Drop support for Python 3.10, which reached end-of-life in October 2026.
   See https://github.com/Pylons/pyramid/pull/3840
+- Drop testing on PyPy 3.11 in favor of PyPy 3.12.
+  See https://github.com/Pylons/pyramid/pull/3840
 - Replace ``pyramid.util.DottedNameResolver`` with a shim.  Users should use
   ``pyramid.path.DottedNameResolver`` instead.
   See https://github.com/Pylons/pyramid/pull/3837

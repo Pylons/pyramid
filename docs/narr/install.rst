@@ -21,11 +21,11 @@ the following sections.
 
 .. sidebar:: Python Versions
 
-    As of this writing, :app:`Pyramid` is tested against Python 3.11, 3.12, 3.13, 3.14, 3.15 and PyPy (matches CPython version 3.11).
+    As of this writing, :app:`Pyramid` is tested against Python 3.11, 3.12, 3.13, 3.14, 3.15 and PyPy (matches CPython version 3.12).
 
 :app:`Pyramid` is known to run on all popular Unix-like systems such as Linux,
 macOS, and FreeBSD, as well as on Windows platforms.  It is also known to
-run on :term:`PyPy` (7.3.20+).
+run on :term:`PyPy` (8.0.0+).
 
 :app:`Pyramid` installation does not require the compilation of any C code.
 However, some :app:`Pyramid` dependencies may attempt to build binary
