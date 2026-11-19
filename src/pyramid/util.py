@@ -660,7 +660,7 @@ def make_contextmanager(fn):
 
 
 def get_signature(fn):
-    return inspect.signature(fn, **_SIGNATURE_KWARGS)
+    return inspect.signature(fn, follow_wrapped=False, **_SIGNATURE_KWARGS)
 
 
 def _get_positional_parameters(sig):
@@ -676,9 +676,10 @@ def _get_positional_parameters(sig):
 
 
 def takes_one_arg(callee, attr=None, argname=None, allow_varargs=True):
-    if attr is None:
-        attr = '__call__'
-    if inspect.isroutine(callee) or inspect.isclass(callee):
+    isclass = inspect.isclass(callee)
+    if isclass:
+        fn = callee.__init__
+    elif inspect.isroutine(callee) or attr is None:
         fn = callee
     else:
         try:
@@ -691,6 +692,9 @@ def takes_one_arg(callee, attr=None, argname=None, allow_varargs=True):
     except (TypeError, ValueError):
         return False
     args = _get_positional_parameters(sig)
+    if isclass and not inspect.ismethod(fn):
+        # Unlike a bound method, an unbound __init__ still includes self.
+        args = args[1:]
 
     if not args:
         return False
