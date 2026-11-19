@@ -205,6 +205,19 @@ class TestPackageName(unittest.TestCase):
         result = self._callFUT(module)
         self.assertEqual(result, 'tests')
 
+    def test_it_toplevel_module(self):
+        import os
+
+        result = self._callFUT(os)
+        self.assertEqual(result, 'os')
+
+    def test_it_no_spec(self):
+        import types
+
+        module = types.ModuleType('foo.bar')
+        result = self._callFUT(module)
+        self.assertEqual(result, 'foo.bar')
+
     def test_it_None(self):
         result = self._callFUT(None)
         self.assertEqual(result, '__main__')
@@ -670,6 +683,7 @@ class DummyPackageOrModule:
             os.path.abspath(real_package_or_module.__file__)
         )
         self.__dict__['__file__'] = real_package_or_module.__file__
+        self.__dict__['__spec__'] = real_package_or_module.__spec__
 
     def __setattr__(self, key, val):
         if self.raise_exc is not None:
@@ -678,10 +692,13 @@ class DummyPackageOrModule:
 
 
 class DummyNamespacePackage:
-    """Has no __file__ attribute."""
+    """Has no __file__ attribute and a spec with no loader."""
 
     def __init__(self, real_package_or_module):
+        from importlib.machinery import ModuleSpec
+
         self.__name__ = real_package_or_module.__name__
+        self.__spec__ = ModuleSpec(self.__name__, None, is_package=True)
         import os
 
         self.package_path = os.path.dirname(
