@@ -5,8 +5,7 @@ import inspect
 import platform
 import sys
 import weakref
-
-from pyramid.path import DottedNameResolver as _DottedNameResolver
+from zope.deprecation import deprecated
 
 _marker = object()
 
@@ -27,11 +26,25 @@ if sys.version_info >= (3, 14):  # pragma: no cover
     _SIGNATURE_KWARGS['annotation_format'] = Format.FORWARDREF
 
 
-class DottedNameResolver(_DottedNameResolver):
-    def __init__(
-        self, package=None
-    ):  # default to package = None for bw compat
-        _DottedNameResolver.__init__(self, package)
+def DottedNameResolver(package=None):
+    """
+    .. deprecated:: 2.2
+
+        Please use :class:`pyramid.path.DottedNameResolver` instead.
+
+    """
+    from pyramid.path import DottedNameResolver as _DottedNameResolver
+
+    return _DottedNameResolver(package)
+
+
+deprecated(
+    'DottedNameResolver',
+    (
+        '`pyramid.util.DottedNameResolver` has been moved to '
+        '`pyramid.path.DottedNameResolver`.'
+    ),
+)
 
 
 def text_(s, encoding='latin-1', errors='strict'):

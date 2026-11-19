@@ -4,8 +4,10 @@ unreleased
 Features
 --------
 
-- Add `Configurator.resolve_asset` and `Request.resolve_asset` methods.  See
-  https://github.com/Pylons/pyramid/pull/3815.
+- Add ``Configurator.resolve_asset`` and ``Request.resolve_asset`` methods.
+  See https://github.com/Pylons/pyramid/pull/3815.
+- Add asset specification support to ``pyramid.response.FileResponse``.  See
+  https://github.com/Pylons/pyramid/pull/3836.
 
 Bug Fixes
 ---------
@@ -23,11 +25,24 @@ Bug Fixes
   referred to a key ``k`` that the method does not take.  See
   https://github.com/Pylons/pyramid/issues/3237.
 
+- Fix a ``TypeError`` that occurred when using
+  ``pyramid.authentication.RepozeWho1AuthenticationPolicy`` with debug logging enabled
+  and the ``authenticated_userid`` was ``None``.
+  See https://github.com/Pylons/pyramid/pull/3814
+
 Backward Incompatibilities
 --------------------------
 
+- Replace ``pyramid.util.DottedNameResolver`` with a shim.  Users should use
+  ``pyramid.path.DottedNameResolver`` instead.  See
+  https://github.com/Pylons/pyramid/pull/3837.
+
 Deprecations
 ------------
+
+- Deprecate ``pyramid.util.DottedNameResolver`` in favor of
+  ``pyramid.path.DottedNameResolver``.  See
+  https://github.com/Pylons/pyramid/pull/3837.
 
 Documentation Changes
 ---------------------
