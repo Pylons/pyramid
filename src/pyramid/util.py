@@ -1,3 +1,4 @@
+from collections import deque
 from contextlib import contextmanager
 import functools
 from hmac import compare_digest
@@ -443,6 +444,8 @@ class TopologicalSorter:
         self, default_before=LAST, default_after=None, first=FIRST, last=LAST
     ):
         self.names = []
+        # CWE-407 fix: shadow set for O(1) membership on self.names
+        self._names_set = set()
         self.req_before = set()
         self.req_after = set()
         self.name2before = {}
@@ -460,6 +463,7 @@ class TopologicalSorter:
     def remove(self, name):
         """Remove a node from the sort input"""
         self.names.remove(name)
+        self._names_set.discard(name)
         del self.name2val[name]
         after = self.name2after.pop(name, [])
         if after:
@@ -491,9 +495,11 @@ class TopologicalSorter:
            sorter.sorted() # will be {'c':3}, {'b':2}, {'a':1}
 
         """
-        if name in self.names:
+        # CWE-407 fix: O(1) set lookup instead of O(N) list scan
+        if name in self._names_set:
             self.remove(name)
         self.names.append(name)
+        self._names_set.add(name)
         self.name2val[name] = val
         if after is None and before is None:
             before = self.default_before
@@ -514,7 +520,10 @@ class TopologicalSorter:
     def sorted(self):
         """Returns the sort input values in topologically sorted order"""
         order = [(self.first, self.last)]
-        roots = []
+        # CWE-407 fix: deque for O(1) popleft/appendleft; roots_set for O(1)
+        # membership check and removal instead of O(N) list.remove()
+        roots = deque()
+        roots_set = set()
         graph = {}
         names = [self.first, self.last]
         names.extend(self.names)
@@ -525,20 +534,25 @@ class TopologicalSorter:
         def add_node(node):
             if node not in graph:
                 roots.append(node)
+                roots_set.add(node)
                 graph[node] = [0]  # 0 = number of arcs coming into this node
 
         def add_arc(fromnode, tonode):
             graph[fromnode].append(tonode)
             graph[tonode][0] += 1
-            if tonode in roots:
-                roots.remove(tonode)
+            if tonode in roots_set:
+                roots_set.discard(tonode)
 
         for name in names:
             add_node(name)
 
+        # CWE-407 fix: O(1) set lookup instead of O(N) list scan per edge
+        names_set = set(names)
         has_before, has_after = set(), set()
         for a, b in order:
-            if a in names and b in names:  # deal with missing dependencies
+            if (
+                a in names_set and b in names_set
+            ):  # deal with missing dependencies
                 add_arc(a, b)
                 has_before.add(a)
                 has_after.add(b)
@@ -562,8 +576,14 @@ class TopologicalSorter:
 
         sorted_names = []
 
-        while roots:
-            root = roots.pop(0)
+        while roots_set:
+            root = roots.popleft()
+            # skip nodes removed from roots_set by add_arc
+            while root not in roots_set and roots:
+                root = roots.popleft()
+            if root not in roots_set:  # pragma: no cover
+                break
+            roots_set.discard(root)
             sorted_names.append(root)
             children = graph[root][1:]
             for child in children:
@@ -571,7 +591,8 @@ class TopologicalSorter:
                 arcs -= 1
                 graph[child][0] = arcs
                 if arcs == 0:
-                    roots.insert(0, child)
+                    roots.appendleft(child)
+                    roots_set.add(child)
             del graph[root]
 
         if graph:
@@ -587,7 +608,8 @@ class TopologicalSorter:
         result = []
 
         for name in sorted_names:
-            if name in self.names:
+            # CWE-407 fix: O(1) set lookup instead of O(N) list scan
+            if name in self._names_set:
                 result.append((name, self.name2val[name]))
 
         return result
