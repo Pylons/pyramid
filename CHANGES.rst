@@ -20,6 +20,11 @@ Bug Fixes
   referred to a key ``k`` that the method does not take.  See
   https://github.com/Pylons/pyramid/issues/3237.
 
+- Fix a ``TypeError`` that occurred when using
+  ``pyramid.authentication.RepozeWho1AuthenticationPolicy`` with debug logging enabled
+  and the ``authenticated_userid`` was ``None``.
+  See https://github.com/Pylons/pyramid/pull/3814
+
 Backward Incompatibilities
 --------------------------
 
