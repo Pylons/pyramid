@@ -4,11 +4,11 @@ import functools
 from importlib import import_module
 import importlib.resources
 import os
-import pkg_resources
 import sys
+from zope.deprecation import deprecated
 from zope.interface import implementer
 
-from pyramid.interfaces import IAssetDescriptor
+from pyramid.interfaces import IAssetDescriptor, IPackageOverrides
 
 
 def caller_path(path, level=2):
@@ -131,8 +131,7 @@ class AssetResolver(Resolver):
 
     .. versionadded:: 1.3
 
-    The constructor accepts a single argument named ``package`` which may be
-    any of:
+    The constructor accepts an argument ``package`` which may be any of:
 
     - A fully qualified (not relative) dotted name to a module or package
 
@@ -174,7 +173,18 @@ class AssetResolver(Resolver):
     type was passed the string ``xml.dom``, and ``template.pt`` is supplied
     to the :meth:`~pyramid.path.AssetResolver.resolve` method, the resulting
     absolute asset spec would be ``xml.minidom:template.pt``.
+
+    :param package:  The package to use for relative asset specifications.
+    :type package:  ``str``, module, ``None``, or
+        :attr:`pyramid.path.CALLER_PACKAGE`
+    :param registry:  A registry instance, or ``None`` to use the current
+        registry.
+    :type registry:  :class:`pyramid.registry.Registry` or ``None``
     """
+
+    def __init__(self, package=CALLER_PACKAGE, registry=None):
+        super().__init__(package)
+        self.registry = registry
 
     def resolve(self, spec):
         """
@@ -218,7 +228,18 @@ class AssetResolver(Resolver):
                 raise ValueError(
                     f'relative spec {spec!r} irresolveable without package'
                 )
-        return PkgResourcesAssetDescriptor(package_name, path)
+
+        if self.registry is None:
+            # Lazy import to avoid circular dependency.
+            from pyramid.threadlocal import get_current_registry
+
+            registry = get_current_registry()
+        else:
+            registry = self.registry
+        overrides = registry.queryUtility(IPackageOverrides, package_name)
+        return ImportlibResourcesAssetDescriptor(
+            package_name, path, overrides=overrides
+        )
 
 
 class DottedNameResolver(Resolver):
@@ -404,32 +425,75 @@ class DottedNameResolver(Resolver):
 
 
 @implementer(IAssetDescriptor)
-class PkgResourcesAssetDescriptor:
-    pkg_resources = pkg_resources
-
-    def __init__(self, pkg_name, path):
+class ImportlibResourcesAssetDescriptor:
+    def __init__(self, pkg_name, path, overrides=None):
         self.pkg_name = pkg_name
         self.path = path
+        self.overrides = overrides
 
-    def absspec(self):
+    def _ref(self):
+        return importlib.resources.files(self.pkg_name) / self.path
+
+    def origspec(self):
         return f'{self.pkg_name}:{self.path}'
 
+    def absspec(self):
+        if self.overrides is not None:
+            spec = self.overrides.get_spec(self.path)
+            if spec is not None:
+                return spec
+        return self.origspec()
+
     def abspath(self):
-        return os.path.abspath(
-            self.pkg_resources.resource_filename(self.pkg_name, self.path)
-        )
+        if self.overrides is not None:
+            path = self.overrides.get_filename(self.path)
+            if path is not None:
+                return os.path.normpath(path)
+        return os.path.normpath(str(ref_filename(self._ref())))
 
     def stream(self):
-        return self.pkg_resources.resource_stream(self.pkg_name, self.path)
+        if self.overrides is not None:
+            stream = self.overrides.get_stream(self.path)
+            if stream is not None:
+                return stream
+        return self._ref().open('rb')
 
     def isdir(self):
-        return self.pkg_resources.resource_isdir(self.pkg_name, self.path)
+        if self.overrides is not None:
+            result = self.overrides.isdir(self.path)
+            if result is not None:
+                return result
+        return self._ref().is_dir()
 
     def listdir(self):
-        return self.pkg_resources.resource_listdir(self.pkg_name, self.path)
+        if self.overrides is not None:
+            results = self.overrides.listdir(self.path)
+            if results is not None:
+                return results
+        return [
+            str(item.relative_to(self._ref()))
+            for item in self._ref().iterdir()
+        ]
 
     def exists(self):
-        return self.pkg_resources.resource_exists(self.pkg_name, self.path)
+        if self.overrides is not None:
+            exists = self.overrides.has_resource(self.path)
+            if exists is not None:
+                return exists
+        return self._ref().exists()
+
+
+PkgResourcesAssetDescriptor = ImportlibResourcesAssetDescriptor  # bw compat
+
+
+deprecated(
+    'PkgResourcesAssetDescriptor',
+    (
+        'Due to `pkg_resources` deprecation and removal, '
+        '`pyramid.resolver.PkgResourcesAssetDescriptor` has been replaced '
+        'with `pyramid.resolver.ImportlibResourcesAssetDescriptor`.'
+    ),
+)
 
 
 @implementer(IAssetDescriptor)
@@ -437,8 +501,11 @@ class FSAssetDescriptor:
     def __init__(self, path):
         self.path = os.path.abspath(path)
 
+    def origspec(self):
+        return self.path
+
     def absspec(self):
-        raise NotImplementedError
+        return self.path
 
     def abspath(self):
         return self.path

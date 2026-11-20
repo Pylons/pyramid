@@ -388,12 +388,14 @@ class TestRequest(unittest.TestCase):
 
     def test_resolve_asset(self):
         request = self._makeOne()
+        request.registry = self.config.registry
         asset = request.resolve_asset('tests:fixtures/minimal.txt')
         self.assertEqual(asset.absspec(), 'tests:fixtures/minimal.txt')
 
     def test_resolve_asset_relative(self):
         # Relative to caller_package, which is `tests` for this test class.
         request = self._makeOne()
+        request.registry = self.config.registry
         asset = request.resolve_asset('fixtures/minimal.txt')
         self.assertEqual(asset.absspec(), 'tests:fixtures/minimal.txt')
 

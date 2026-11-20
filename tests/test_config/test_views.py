@@ -2577,6 +2577,7 @@ class TestViewsConfigurationMixin(unittest.TestCase):
         from pyramid.request import Request
 
         request = Request.blank('/static/minimal.txt')
+        request.registry = config.registry
         request.subpath = ('minimal.txt',)
         result = wrapped(None, request)
         self.assertEqual(result.status, '200 OK')
