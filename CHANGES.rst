@@ -50,6 +50,11 @@ Deprecations
   ``pyramid.path.DottedNameResolver``.
   See https://github.com/Pylons/pyramid/pull/3837
 
+- ``pyramid.session.PickleSerializer`` now emits a ``DeprecationWarning`` when
+  instantiated, since unpickling untrusted session data can lead to remote
+  code execution.
+  See https://github.com/Pylons/pyramid/pull/3809
+
 Documentation Changes
 ---------------------
 

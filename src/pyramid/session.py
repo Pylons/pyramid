@@ -2,6 +2,7 @@ import binascii
 import os
 import pickle
 import time
+import warnings
 from webob.cookies import JSONSerializer, SignedSerializer
 from zope.deprecation import deprecated
 from zope.interface import implementer
@@ -62,6 +63,13 @@ class PickleSerializer:
     """
 
     def __init__(self, protocol=pickle.HIGHEST_PROTOCOL):
+        warnings.warn(
+            'pyramid.session.PickleSerializer is deprecated and unsafe to use '
+            'with untrusted data, since unpickling can execute arbitrary '
+            'code. Use pyramid.session.JSONSerializer instead.',
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.protocol = protocol
 
     def loads(self, bstruct):

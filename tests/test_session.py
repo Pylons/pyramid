@@ -2,6 +2,7 @@ import base64
 import json
 import pickle
 import unittest
+import warnings
 
 from pyramid import testing
 
@@ -570,10 +571,26 @@ class TestPickleSerializer(unittest.TestCase):
     .. deprecated:: 2.0
     """
 
-    def _makeOne(self):
-        from pyramid.session import PickleSerializer
+    def _getTargetClass(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', DeprecationWarning)
+            from pyramid.session import PickleSerializer
 
-        return PickleSerializer()
+        return PickleSerializer
+
+    def _makeOne(self):
+        cls = self._getTargetClass()
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', DeprecationWarning)
+            return cls()
+
+    def test_ctor_warns(self):
+        cls = self._getTargetClass()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            cls()
+        self.assertEqual(len(w), 1)
+        self.assertIs(w[0].category, DeprecationWarning)
 
     def test_loads(self):
         # generated from dumping Dummy() using protocol=2
