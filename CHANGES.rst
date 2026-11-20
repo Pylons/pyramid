@@ -39,6 +39,12 @@ Backward Incompatibilities
   See https://github.com/Pylons/pyramid/pull/3840
 - Drop testing on PyPy 3.11 in favor of PyPy 3.12.
   See https://github.com/Pylons/pyramid/pull/3840
+- Assets are now loaded with ``importlib.resources`` instead of setuptools' ``pkg_resources``.
+  Unlike the setuptools implementation, Pyramid does not hook into the machinery of ``importlib.resources`` and direct usage of the ``importlib.resources`` APIs will not honor :ref:`asset overrides <overriding_assets_section>`.
+  Please use the new :ref:`asset APIs <accessing_assets>` for loading assets within your application.
+  See https://github.com/Pylons/pyramid/pull/3843
+- ``pyramid.path.PkgResourcesAssetDescriptor`` is now an alias of ``pyramid.path.ImportlibResourcesAssetDescriptor``.
+  See https://github.com/Pylons/pyramid/pull/3843
 - Replace ``pyramid.util.DottedNameResolver`` with a shim.  Users should use
   ``pyramid.path.DottedNameResolver`` instead.
   See https://github.com/Pylons/pyramid/pull/3837
@@ -49,6 +55,8 @@ Deprecations
 - Deprecate ``pyramid.util.DottedNameResolver`` in favor of
   ``pyramid.path.DottedNameResolver``.
   See https://github.com/Pylons/pyramid/pull/3837
+- Deprecate ``pyramid.path.PkgResourcesAssetDescriptor``.
+  See https://github.com/Pylons/pyramid/pull/3843
 
 Documentation Changes
 ---------------------
