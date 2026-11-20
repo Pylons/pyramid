@@ -1,3 +1,4 @@
+import functools
 import os
 import sys
 import unittest
@@ -1224,6 +1225,89 @@ class Test_takes_one_arg(unittest.TestCase):
         getattr(foo, '__annotations__', {}).update({'bar': 'baz'})
         self.assertTrue(self._callFUT(foo))
 
+    def test_wrapped_function_uses_wrapper_signature(self):
+        def view(request, db):  # pragma: no cover
+            pass
+
+        @functools.wraps(view)
+        def wrapper(request):  # pragma: no cover
+            return view(request, None)
+
+        self.assertTrue(self._callFUT(wrapper, argname='request'))
+
+    def test_wrapper_takes_context_and_request(self):
+        def view(request):  # pragma: no cover
+            pass
+
+        @functools.wraps(view)
+        def wrapper(context, request):  # pragma: no cover
+            return view(request)
+
+        self.assertFalse(self._callFUT(wrapper, argname='request'))
+
+    def test_requestonly_class_with_wrapped_init(self):
+        def inject_db(fn):
+            @functools.wraps(fn)
+            def wrapper(self, request):  # pragma: no cover
+                return fn(self, request, None)
+
+            return wrapper
+
+        class View:
+            @inject_db
+            def __init__(self, request, db):  # pragma: no cover
+                pass
+
+        self.assertTrue(self._callFUT(View, argname='request'))
+
+    def test_requestonly_class_with_metaclass_call(self):
+        class Meta(type):
+            def __call__(cls, *args, **kw):  # pragma: no cover
+                return super().__call__(*args, **kw)
+
+        class View(metaclass=Meta):
+            def __init__(self, request):  # pragma: no cover
+                pass
+
+        self.assertTrue(self._callFUT(View, argname='request'))
+
+    def test_requestonly_class_with_generic_new(self):
+        class View:
+            def __new__(cls, *args, **kw):  # pragma: no cover
+                return super().__new__(cls)
+
+            def __init__(self, request):  # pragma: no cover
+                pass
+
+        self.assertTrue(self._callFUT(View, argname='request'))
+
+    def test_requestonly_partial(self):
+        def view(context, request):  # pragma: no cover
+            pass
+
+        self.assertTrue(self._callFUT(functools.partial(view, None)))
+
+    def test_requestonly_partial_of_requestonly_function(self):
+        def view(request):  # pragma: no cover
+            pass
+
+        self.assertTrue(self._callFUT(functools.partial(view)))
+
+    def test_instance_missing_attr(self):
+        class View:
+            pass
+
+        self.assertFalse(self._callFUT(View(), attr='missing'))
+
+    @unittest.skipIf(
+        sys.version_info < (3, 14), 'deferred annotations require Python 3.14'
+    )
+    def test_function_with_unresolved_deferred_annotation(self):
+        def view(request: Missing):  # noqa: F821
+            pass  # pragma: no cover
+
+        self.assertTrue(self._callFUT(view))
+
 
 class TestSimpleSerializer(unittest.TestCase):
     def _makeOne(self):
@@ -1255,6 +1339,23 @@ class TestUnboundMethods(unittest.TestCase):
 
     def test_unbound_method(self):
         self.assertTrue(self._callFUT(self.Dummy.run))
+
+    def test_wrapped_unbound_method_uses_wrapper_signature(self):
+        @functools.wraps(self.Dummy.run)
+        def wrapper(*args, **kw):  # pragma: no cover
+            pass
+
+        self.assertFalse(self._callFUT(wrapper))
+
+    @unittest.skipIf(
+        sys.version_info < (3, 14), 'deferred annotations require Python 3.14'
+    )
+    def test_unbound_method_with_unresolved_deferred_annotation(self):
+        class Dummy:
+            def run(self, request: Missing):  # noqa: F821
+                pass  # pragma: no cover
+
+        self.assertTrue(self._callFUT(Dummy.run))
 
     def test_normal_func_unbound(self):
         def func():  # pragma: no cover
