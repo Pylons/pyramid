@@ -1,5 +1,4 @@
 import os
-import sys
 import unittest
 
 from . import dummy
@@ -448,15 +447,8 @@ class DummyEntryPoints:
     def __init__(self, entry_points):
         self._entry_points = entry_points
 
-    if sys.version_info >= (3, 10):
-
-        def select(self, **kw):
-            return iter(self._entry_points)
-
-    else:  # pragma no cover
-
-        def get(self, key):
-            return list(self._entry_points)
+    def select(self, **kw):
+        return iter(self._entry_points)
 
 
 class DummyEntryPoint:
