@@ -2,7 +2,6 @@ import atexit
 from contextlib import ExitStack
 import functools
 from importlib import import_module
-from importlib.machinery import SOURCE_SUFFIXES
 import importlib.resources
 import os
 import pkg_resources
@@ -10,8 +9,6 @@ import sys
 from zope.interface import implementer
 
 from pyramid.interfaces import IAssetDescriptor
-
-init_names = ['__init__%s' % x for x in SOURCE_SUFFIXES]
 
 
 def caller_path(path, level=2):
@@ -36,53 +33,32 @@ def package_name(pkg_or_module):
     name of the package itself."""
     if pkg_or_module is None or pkg_or_module.__name__ == '__main__':
         return '__main__'
-    pkg_name = pkg_or_module.__name__
-    pkg_filename = getattr(pkg_or_module, '__file__', None)
-    if pkg_filename is None:
-        # Namespace packages do not have __init__.py* files,
-        # and so have no __file__ attribute
-        return pkg_name
-    splitted = os.path.split(pkg_filename)
-    if splitted[-1] in init_names:
-        # it's a package
-        return pkg_name
-    return pkg_name.rsplit('.', 1)[0]
+    spec = getattr(pkg_or_module, '__spec__', None)
+    if spec is not None and spec.parent:
+        # For a package, ``parent`` is the package's own name.
+        return spec.parent
+    # Top-level module, or a module without a spec.
+    return pkg_or_module.__name__
 
 
 def package_of(pkg_or_module):
     """Return the package of a module or return the package itself"""
-    pkg_name = package_name(pkg_or_module)
-    __import__(pkg_name)
-    return sys.modules[pkg_name]
+    return import_module(package_name(pkg_or_module))
 
 
 def caller_package(level=2, caller_module=caller_module):
     # caller_module in arglist for tests
-    module = caller_module(level + 1)
-    f = getattr(module, '__file__', '')
-    if ('__init__.py' in f) or ('__init__$py' in f):  # empty at >>>
-        # Module is a package
-        return module
-    # Go up one level to get package
-    package_name = module.__name__.rsplit('.', 1)[0]
-    return sys.modules[package_name]
+    return package_of(caller_module(level + 1))
 
 
-def package_path(package):
-    # computing the abspath is actually kinda expensive so we memoize
-    # the result
-    prefix = getattr(package, '__abspath__', None)
-    if prefix is None:
-        prefix = pkg_resources.resource_filename(package.__name__, '')
-        # pkg_resources doesn't care whether we feed it a package
-        # name or a module name within the package, the result
-        # will be the same: a directory name to the package itself
-        try:
-            package.__abspath__ = prefix
-        except Exception:
-            # this is only an optimization, ignore any error
-            pass
-    return prefix
+def package_path(package_or_module):
+    return _package_path(package_name(package_or_module))
+
+
+@functools.lru_cache(maxsize=None)
+def _package_path(pkg_name):
+    pkg_ref = importlib.resources.files(pkg_name)
+    return str(ref_filename(pkg_ref))
 
 
 _exit_stack = ExitStack()
