@@ -40,6 +40,17 @@ jobs:
             - name: Running tox for current python version
               run: uvx --with tox-uv tox -e py
 
+    test-pkg-resources:
+        runs-on: ubuntu-24.04
+        name: "Python: 3.14 on ubuntu-24.04 with pkg_resources"
+        steps:
+            - uses: actions/checkout@v7
+            - name: Setup uv
+              uses: astral-sh/setup-uv@v7
+              with:
+                  python-version: "3.14"
+            - run: uvx tox -e py314-pkgresources
+
     coverage:
         runs-on: ubuntu-24.04
         name: Validate coverage

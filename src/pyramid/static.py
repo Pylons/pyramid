@@ -2,13 +2,11 @@ from functools import lru_cache
 import json
 import mimetypes
 import os
-from os.path import exists, getmtime, getsize, isdir, join, normcase, normpath
-from pkg_resources import resource_exists, resource_filename, resource_isdir
-import warnings
+from os.path import exists, getmtime, getsize
+import posixpath
 
-from pyramid.asset import abspath_from_asset_spec, resolve_asset_spec
 from pyramid.httpexceptions import HTTPMovedPermanently, HTTPNotFound
-from pyramid.path import caller_package
+from pyramid.path import AssetResolver, caller_package
 from pyramid.response import FileResponse, _guess_type
 from pyramid.traversal import traversal_path_info
 
@@ -89,27 +87,14 @@ class static_view:
         # package_name is for bw compat; it is preferred to pass in a
         # package-relative path as root_dir
         # (e.g. ``anotherpackage:foo/static``).
-        self.cache_max_age = cache_max_age
         if package_name is None:
             package_name = caller_package().__name__
-        package_name, docroot = resolve_asset_spec(root_dir, package_name)
-        if package_name:
-            try:
-                __import__(package_name)
-            except ImportError:
-                warnings.warn(
-                    f'A "pyramid.static.static_view" is being created with an'
-                    f' asset spec referencing a package "{package_name}" that'
-                    f' does not exist. This will break in the future.'
-                    f' If this is done to override an asset, you must adjust'
-                    f' this to override a location inside a real package.',
-                    DeprecationWarning,
-                    stacklevel=2,
-                )
-        self.use_subpath = use_subpath
         self.package_name = package_name
-        self.docroot = docroot
-        self.norm_docroot = normcase(normpath(docroot))
+        self.resolver = AssetResolver(self.package_name)
+        self.root_dir = root_dir
+
+        self.use_subpath = use_subpath
+        self.cache_max_age = cache_max_age
         self.index = index
         self.reload = reload
         self.content_encodings = _compile_content_encodings(content_encodings)
@@ -151,24 +136,13 @@ class static_view:
             raise HTTPNotFound('Out of bounds: %s' % request.url)
 
         # normalize asset spec or fs path into resource_path
-        if self.package_name:  # package resource
-            resource_path = '{}/{}'.format(self.docroot.rstrip('/'), path)
-            if resource_isdir(self.package_name, resource_path):
-                if not request.path_url.endswith('/'):
-                    raise self.add_slash_redirect(request)
-                resource_path = '{}/{}'.format(
-                    resource_path.rstrip('/'),
-                    self.index,
-                )
-
-        else:  # filesystem file
-            # os.path.normpath converts / to \ on windows
-            resource_path = normcase(normpath(join(self.norm_docroot, path)))
-            if isdir(resource_path):
-                if not request.path_url.endswith('/'):
-                    raise self.add_slash_redirect(request)
-                resource_path = join(resource_path, self.index)
-
+        resource_path = posixpath.join(self.root_dir, path)
+        asset = self.resolver.resolve(resource_path)
+        if asset.isdir():
+            if not request.path_url.endswith('/'):
+                raise self.add_slash_redirect(request)
+            resource_path = posixpath.join(resource_path, self.index)
+            return resource_path
         return resource_path
 
     def find_resource_path(self, name):
@@ -177,12 +151,9 @@ class static_view:
         exist.
 
         """
-        if self.package_name:
-            if resource_exists(self.package_name, name):
-                return resource_filename(self.package_name, name)
-
-        elif exists(name):
-            return name
+        asset = self.resolver.resolve(name)
+        if asset.exists():
+            return asset.abspath()
 
     def get_possible_files(self, resource_name):
         """Return a sorted list of ``(size, encoding, path)`` entries."""
@@ -395,8 +366,8 @@ class ManifestCacheBuster:
 
     def __init__(self, manifest_spec, reload=False):
         package_name = caller_package().__name__
-        self.manifest_path = abspath_from_asset_spec(
-            manifest_spec, package_name
+        self.manifest_path = (
+            AssetResolver(package_name).resolve(manifest_spec).abspath()
         )
         self.reload = reload
 
