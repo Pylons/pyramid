@@ -490,8 +490,8 @@ deprecated(
     'PkgResourcesAssetDescriptor',
     (
         'Due to `pkg_resources` deprecation and removal, '
-        '`pyramid.resolver.PkgResourcesAssetDescriptor` has been replaced '
-        'with `pyramid.resolver.ImportlibResourcesAssetDescriptor`.'
+        '`pyramid.path.PkgResourcesAssetDescriptor` has been replaced with '
+        '`pyramid.path.ImportlibResourcesAssetDescriptor`.'
     ),
 )
 
