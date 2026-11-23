@@ -87,10 +87,7 @@ class static_view:
         # package_name is for bw compat; it is preferred to pass in a
         # package-relative path as root_dir
         # (e.g. ``anotherpackage:foo/static``).
-        if package_name is None:
-            package_name = caller_package().__name__
-        self.package_name = package_name
-        self.resolver = AssetResolver(self.package_name)
+        self.resolver = AssetResolver(package_name or caller_package())
         self.root_dir = root_dir
 
         self.use_subpath = use_subpath
