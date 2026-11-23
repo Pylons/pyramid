@@ -2044,7 +2044,7 @@ class ViewsConfiguratorMixin:
            Added the ``content_encodings`` argument.
 
         """
-        spec = self.resolve_asset(path).absspec()
+        spec = self.resolve_asset(path).origspec()
         info = self._get_static_info()
         info.add(self, name, spec, **kw)
 

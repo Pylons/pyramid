@@ -758,7 +758,7 @@ class Configurator(
         the ``relative_spec`` is not a string, it is simply returned."""
         if not isinstance(relative_spec, str):
             return relative_spec
-        return self.resolve_asset(relative_spec).absspec()
+        return self.resolve_asset(relative_spec).origspec()
 
     absolute_resource_spec = absolute_asset_spec  # b/w compat forever
 
