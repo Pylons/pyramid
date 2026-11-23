@@ -2072,8 +2072,9 @@ class ViewsConfiguratorMixin:
         .. versionadded:: 1.6
 
         """
+        spec = self.resolve_asset(path).origspec()
         info = self._get_static_info()
-        info.add_cache_buster(self, path, cachebust, explicit=explicit)
+        info.add_cache_buster(self, spec, cachebust, explicit=explicit)
 
     def _get_static_info(self):
         info = self.registry.queryUtility(IStaticURLInfo)
