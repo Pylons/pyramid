@@ -11,6 +11,7 @@ from pyramid.exceptions import (
     ConfigurationExecutionError,
 )
 from pyramid.interfaces import IMultiView, IRequest, IResponse
+from pyramid.request import Request
 from pyramid.util import text_
 
 from . import IDummy, dummy_view
@@ -3850,6 +3851,13 @@ class Test_preserve_view_attrs(unittest.TestCase):
 
 
 class TestStaticURLInfo(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
+        self.registry = self.config.registry
+
+    def tearDown(self):
+        testing.tearDown()
+
     def _getTargetClass(self):
         from pyramid.config.views import StaticURLInfo
 
@@ -3859,8 +3867,8 @@ class TestStaticURLInfo(unittest.TestCase):
         return self._getTargetClass()()
 
     def _makeRequest(self):
-        request = DummyRequest()
-        request.registry = DummyRegistry()
+        request = Request.blank("/")
+        request.registry = self.config.registry
         return request
 
     def test_verifyClass(self):
@@ -3913,16 +3921,12 @@ class TestStaticURLInfo(unittest.TestCase):
     def test_generate_quoting(self):
         from pyramid.interfaces import IStaticURLInfo
 
-        config = testing.setUp()
-        try:
-            config.add_static_view('images', path='mypkg:templates')
-            request = testing.DummyRequest()
-            request.registry = config.registry
-            inst = config.registry.getUtility(IStaticURLInfo)
-            result = inst.generate('mypkg:templates/foo%2Fbar', request)
-            self.assertEqual(result, 'http://example.com/images/foo%252Fbar')
-        finally:
-            testing.tearDown()
+        self.config.add_static_view('images', path='mypkg:templates')
+        request = testing.DummyRequest()
+        request.registry = self.registry
+        inst = self.registry.getUtility(IStaticURLInfo)
+        result = inst.generate('mypkg:templates/foo%2Fbar', request)
+        self.assertEqual(result, 'http://example.com/images/foo%252Fbar')
 
     def test_generate_route_url(self):
         inst = self._makeOne()
@@ -4064,42 +4068,38 @@ class TestStaticURLInfo(unittest.TestCase):
         self.assertTrue(called[0])
 
     def test_generate_url_cachebust_with_overrides(self):
-        config = testing.setUp()
-        try:
-            request = testing.DummyRequest()
-            config.add_static_view(
-                'static', 'tests.test_config.pkgs.cachebust:path/'
-            )
-            config.override_asset(
-                'tests.test_config.pkgs.cachebust:path/',
-                'tests.test_config.pkgs.cachebust:override/',
-            )
+        request = self._makeRequest()
+        self.config.add_static_view(
+            'static', 'tests.test_config.pkgs.cachebust:path/'
+        )
+        self.config.override_asset(
+            'tests.test_config.pkgs.cachebust:path/',
+            'tests.test_config.pkgs.cachebust:override/',
+        )
 
-            def cb(val):
-                def cb_(request, subpath, kw):
-                    kw['_query'] = {'x': val}
-                    return subpath, kw
+        def cb(val):
+            def cb_(request, subpath, kw):
+                kw['_query'] = {'x': val}
+                return subpath, kw
 
-                return cb_
+            return cb_
 
-            config.add_cache_buster(
-                'tests.test_config.pkgs.cachebust:path/', cb('foo')
-            )
-            result = request.static_url(
-                'tests.test_config.pkgs.cachebust:path/foo.png'
-            )
-            self.assertEqual(result, 'http://example.com/static/foo.png?x=foo')
-            config.add_cache_buster(
-                'tests.test_config.pkgs.cachebust:override/',
-                cb('bar'),
-                explicit=True,
-            )
-            result = request.static_url(
-                'tests.test_config.pkgs.cachebust:path/foo.png'
-            )
-            self.assertEqual(result, 'http://example.com/static/foo.png?x=bar')
-        finally:
-            testing.tearDown()
+        self.config.add_cache_buster(
+            'tests.test_config.pkgs.cachebust:path/', cb('foo')
+        )
+        result = request.static_url(
+            'tests.test_config.pkgs.cachebust:path/foo.png'
+        )
+        self.assertEqual(result, 'http://localhost/static/foo.png?x=foo')
+        self.config.add_cache_buster(
+            'tests.test_config.pkgs.cachebust:override/',
+            cb('bar'),
+            explicit=True,
+        )
+        result = request.static_url(
+            'tests.test_config.pkgs.cachebust:path/foo.png'
+        )
+        self.assertEqual(result, 'http://localhost/static/foo.png?x=bar')
 
     def test_add_already_exists(self):
         config = DummyConfig()
@@ -4311,9 +4311,6 @@ class DummyRegistry:
         self.settings = {
             'pyramid.reload_assets': False,
         }
-
-    def queryUtility(self, type_or_iface, name=None, default=None):
-        return self.utility or default
 
 
 @implementer(IResponse)
