@@ -45,8 +45,7 @@ class Test_static_view_use_subpath_False(unittest.TestCase):
 
     def test_ctor_defaultargs(self):
         inst = self._makeOne('package:resource_name')
-        self.assertEqual(inst.package_name, 'package')
-        self.assertEqual(inst.docroot, 'resource_name')
+        self.assertEqual(inst.root_dir, 'package:resource_name')
         self.assertEqual(inst.cache_max_age, 3600)
         self.assertEqual(inst.index, 'index.html')
         self.assertEqual(inst.reload, False)
@@ -279,8 +278,7 @@ class Test_static_view_use_subpath_True(unittest.TestCase):
 
     def test_ctor_defaultargs(self):
         inst = self._makeOne('package:resource_name')
-        self.assertEqual(inst.package_name, 'package')
-        self.assertEqual(inst.docroot, 'resource_name')
+        self.assertEqual(inst.root_dir, 'package:resource_name')
         self.assertEqual(inst.cache_max_age, 3600)
         self.assertEqual(inst.index, 'index.html')
         self.assertEqual(inst.reload, False)
