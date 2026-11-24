@@ -1,6 +1,6 @@
 import os
 
-from pyramid.path import AssetResolver, package_name, package_path
+from pyramid.path import AssetResolver
 
 
 def resolve_asset_spec(spec, pname='__main__'):
@@ -22,13 +22,11 @@ def asset_spec_from_abspath(abspath, package):
     absolute path."""
     if getattr(package, '__name__', None) == '__main__':
         return abspath
-    pp = package_path(package) + os.path.sep
+    resolver = AssetResolver(package)
+    pp = resolver.resolve('').abspath() + os.path.sep
     if abspath.startswith(pp):
         relpath = abspath[len(pp) :]
-        return '{}:{}'.format(
-            package_name(package),
-            relpath.replace(os.path.sep, '/'),
-        )
+        return resolver.resolve(relpath).absspec()
     return abspath
 
 
