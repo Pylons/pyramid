@@ -45,10 +45,11 @@ def asset_spec_from_abspath(abspath, package):
 
     .. deprecated:: 2.2
 
-        There is no replacement.  Accessing package contents via file paths
-        is discouraged, as the package may not exist in the filesystem and
-        need to be unpacked to a temporary directory.  Consider whether the
-        new :ref:`asset APIs <accessing_assets>` can meet your needs.
+        Accessing package contents via file paths is discouraged, as the
+        package may not exist in the filesystem and need to be unpacked to a
+        temporary directory.  There is no direct replacement; consider
+        whether the new :ref:`asset APIs <accessing_assets>` can meet your
+        needs.
     """
     if getattr(package, '__name__', None) == '__main__':
         return abspath
@@ -63,10 +64,10 @@ def asset_spec_from_abspath(abspath, package):
 deprecated(
     'asset_spec_from_abspath',
     (
-        'There is no replacement.  Accessing package contents via file paths '
-        'is discouraged, as the package may not exist in the filesystem and '
-        'need to be unpacked to a temporary directory.  Consider whether the '
-        'new asset APIs can meet your needs.'
+        'Accessing package contents via file paths is discouraged, as the '
+        'package may not exist in the filesystem and need to be unpacked to a '
+        'temporary directory.  There is no direct replacement; consider '
+        'whether the new asset APIs can meet your needs.'
     ),
 )
 
