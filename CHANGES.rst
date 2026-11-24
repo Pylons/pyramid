@@ -54,6 +54,20 @@ Backward Incompatibilities
 - Replace ``pyramid.util.DottedNameResolver`` with a shim.  Users should use
   ``pyramid.path.DottedNameResolver`` instead.
   See https://github.com/Pylons/pyramid/pull/3837
+- Remove ``pyramid.path.caller_path``.
+  See https://github.com/Pylons/pyramid/pull/3849
+- Remove ``pyramid.path.package_path``.
+  See https://github.com/Pylons/pyramid/pull/3849
+- Deprecate ``pyramid.asset.resolve_asset_spec``.
+  Use the new :ref:`asset APIs <accessing_assets>` instead, which accept asset specifications directly and can make parsing specification strings unnecessary in many cases.
+  See https://github.com/Pylons/pyramid/pull/3849
+- Deprecate ``pyramid.asset.asset_spec_from_abspath``.
+  Accessing package contents via file paths is discouraged, as the package may not exist in the filesystem and need to be unpacked to a temporary directory.
+  There is no direct replacement; consider whether the new :ref:`asset APIs <accessing_assets>` can meet your needs.
+  See https://github.com/Pylons/pyramid/pull/3849
+- Deprecate ``pyramid.asset.abspath_from_asset_spec``.
+  Use :meth:`pyramid.interfaces.IAssetDescriptor.abspath` via the new :ref:`asset APIs <accessing_assets>` instead, e.g., ``request.resolve_asset(spec).abspath()``.
+  See https://github.com/Pylons/pyramid/pull/3849
 
 Deprecations
 ------------
