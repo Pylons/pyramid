@@ -11,14 +11,6 @@ from zope.interface import implementer
 from pyramid.interfaces import IAssetDescriptor, IPackageOverrides
 
 
-def caller_path(path, level=2):
-    if not os.path.isabs(path):
-        module = caller_module(level + 1)
-        prefix = package_path(module)
-        path = os.path.join(prefix, path)
-    return path
-
-
 def caller_module(level=2, sys=sys):
     module_globals = sys._getframe(level).f_globals
     module_name = module_globals.get('__name__') or '__main__'

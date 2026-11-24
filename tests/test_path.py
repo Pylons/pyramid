@@ -7,24 +7,6 @@ from pyramid import testing
 here = os.path.abspath(os.path.dirname(__file__))
 
 
-class TestCallerPath(unittest.TestCase):
-    def _callFUT(self, path, level=2):
-        from pyramid.path import caller_path
-
-        return caller_path(path, level)
-
-    def test_isabs(self):
-        path = os.path.abspath('/a/b/c')
-        result = self._callFUT(path)
-        self.assertEqual(result, path)
-
-    def test_pkgrelative(self):
-        import os
-
-        result = self._callFUT('a/b/c')
-        self.assertEqual(result, os.path.join(here, 'a/b/c'))
-
-
 class TestCallerModule(unittest.TestCase):
     def _callFUT(self, *arg, **kw):
         from pyramid.path import caller_module
