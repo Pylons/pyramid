@@ -68,6 +68,9 @@ Backward Incompatibilities
 - Deprecate ``pyramid.asset.abspath_from_asset_spec``.
   Use :meth:`pyramid.interfaces.IAssetDescriptor.abspath` via the new :ref:`asset APIs <accessing_assets>` instead, e.g., ``request.resolve_asset(spec).abspath()``.
   See https://github.com/Pylons/pyramid/pull/3849
+- Deprecate ``pyramid.resource``.
+  This has been a non-API backwards compatibility shim since Pyramid 1.0; importing it will now trigger a warning.
+  See https://github.com/Pylons/pyramid/pull/3849
 
 Deprecations
 ------------

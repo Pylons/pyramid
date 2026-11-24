@@ -6,7 +6,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 class Test_resolve_asset_spec(unittest.TestCase):
     def _callFUT(self, spec, package_name='__main__'):
-        from pyramid.resource import resolve_asset_spec
+        from pyramid.asset import resolve_asset_spec
 
         return resolve_asset_spec(spec, package_name)
 
@@ -48,7 +48,7 @@ class Test_resolve_asset_spec(unittest.TestCase):
 
 class Test_abspath_from_asset_spec(unittest.TestCase):
     def _callFUT(self, spec, pname='__main__'):
-        from pyramid.resource import abspath_from_asset_spec
+        from pyramid.asset import abspath_from_asset_spec
 
         return abspath_from_asset_spec(spec, pname)
 
