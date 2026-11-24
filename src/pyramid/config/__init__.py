@@ -5,7 +5,6 @@ import threading
 import venusian
 from webob.exc import WSGIHTTPException as WebobWSGIHTTPException
 
-from pyramid.asset import resolve_asset_spec
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config.actions import (
     ActionConfiguratorMixin,
@@ -449,12 +448,6 @@ class Configurator(
         for inc in includes:
             self.include(inc)
 
-    def _make_spec(self, path_or_spec):
-        package, filename = resolve_asset_spec(path_or_spec, self.package_name)
-        if package is None:
-            return filename  # absolute filename
-        return f'{package}:{filename}'
-
     def _fix_registry(self):
         """Fix up a ZCA component registry that is not a
         pyramid.registry.Registry by adding analogues of ``has_listeners``,
@@ -765,7 +758,7 @@ class Configurator(
         the ``relative_spec`` is not a string, it is simply returned."""
         if not isinstance(relative_spec, str):
             return relative_spec
-        return self._make_spec(relative_spec)
+        return self.resolve_asset(relative_spec).origspec()
 
     absolute_resource_spec = absolute_asset_spec  # b/w compat forever
 
