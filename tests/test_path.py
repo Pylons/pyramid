@@ -80,43 +80,6 @@ class TestCallerPackage(unittest.TestCase):
         self.assertEqual(result, tests)
 
 
-class TestPackagePath(unittest.TestCase):
-    def setUp(self):
-        from pyramid.path import _package_path
-
-        _package_path.cache_clear()
-
-    def _callFUT(self, package):
-        from pyramid.path import package_path
-
-        return package_path(package)
-
-    def test_it_package(self):
-        import tests
-
-        package = DummyPackageOrModule(tests)
-        result = self._callFUT(package)
-        self.assertEqual(result, package.package_path)
-
-    def test_it_module(self):
-        from . import test_path
-
-        module = DummyPackageOrModule(test_path)
-        result = self._callFUT(module)
-        self.assertEqual(result, module.package_path)
-
-    def test_cached(self):
-        from pyramid.path import _package_path
-        import tests
-        import tests.test_path
-
-        first = self._callFUT(tests)
-        second = self._callFUT(tests.test_path)  # same package
-        self.assertEqual(first, second)
-        info = _package_path.cache_info()
-        self.assertEqual((info.misses, info.hits), (1, 1))
-
-
 class TestPackageOf(unittest.TestCase):
     def _callFUT(self, package):
         from pyramid.path import package_of

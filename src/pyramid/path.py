@@ -43,16 +43,6 @@ def caller_package(level=2, caller_module=caller_module):
     return package_of(caller_module(level + 1))
 
 
-def package_path(package_or_module):
-    return _package_path(package_name(package_or_module))
-
-
-@functools.lru_cache(maxsize=None)
-def _package_path(pkg_name):
-    pkg_ref = importlib.resources.files(pkg_name)
-    return str(ref_filename(pkg_ref))
-
-
 _exit_stack = ExitStack()
 atexit.register(_exit_stack.close)
 
