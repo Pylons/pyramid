@@ -136,6 +136,80 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
         self.assertEqual(mapper.generate('root', {}), '/')
         self.assertEqual(mapper.generate('path', {}), '/path')
 
+    def test_route_prefix_assignment_is_normalized(self):
+        config = self._makeOne()
+        config.route_prefix = '//root//'
+        self.assertEqual(config.route_prefix, 'root/')
+        config.route_prefix = '/root'
+        self.assertEqual(config.route_prefix, 'root')
+        config.route_prefix = '/'
+        self.assertEqual(config.route_prefix, None)
+
+    def test_ctor_route_prefix_is_normalized(self):
+        config = self._makeOne(route_prefix='/root/')
+        self.assertEqual(config.route_prefix, 'root/')
+
+    def test_route_prefix_context_keeps_trailing_slash(self):
+        config = self._makeOne()
+        with config.route_prefix_context('/root/'):
+            self.assertEqual(config.route_prefix, 'root/')
+            with config.route_prefix_context('/nested'):
+                self.assertEqual(config.route_prefix, 'root/nested')
+                with config.route_prefix_context('/'):
+                    self.assertEqual(config.route_prefix, 'root/nested/')
+                with config.route_prefix_context(None):
+                    self.assertEqual(config.route_prefix, 'root/nested')
+            with config.route_prefix_context(''):
+                self.assertEqual(config.route_prefix, 'root/')
+            self.assertEqual(config.route_prefix, 'root/')
+        self.assertEqual(config.route_prefix, None)
+
+    def test_route_prefix_context_slash_only(self):
+        config = self._makeOne()
+        with config.route_prefix_context('/'):
+            self.assertEqual(config.route_prefix, None)
+
+    def test_add_route_inherit_slash_from_included_route_prefix(self):
+        config = self._makeOne(autocommit=True)
+
+        def include(config):
+            config.add_route('name', '', inherit_slash=True)
+
+        config.include(include, route_prefix='/root/')
+        self._assertRoute(config, 'name', 'root/')
+
+    def test_add_route_inherit_no_slash_from_included_route_prefix(self):
+        config = self._makeOne(autocommit=True)
+
+        def include(config):
+            config.add_route('name', '', inherit_slash=True)
+
+        config.include(include, route_prefix='/root')
+        self._assertRoute(config, 'name', 'root')
+
+    def test_add_route_inherit_slash_from_route_prefix_context(self):
+        # the example from the ``inherit_slash`` docs on ``add_route``:
+        # "if the route prefix were ``/users/``, then the resulting route
+        # pattern would be ``users/``"
+        config = self._makeOne(autocommit=True)
+        with config.route_prefix_context('/users/'):
+            config.add_route('users', '', inherit_slash=True)
+        self._assertRoute(config, 'users', 'users/')
+
+    def test_add_route_inherit_slash_from_include_matches_request(self):
+        from webtest import TestApp
+
+        from pyramid.response import Response
+
+        def includeme(config):
+            config.add_route('users', '', inherit_slash=True)
+            config.add_view(lambda r: Response('ok'), route_name='users')
+
+        config = self._makeOne()
+        config.include(includeme, route_prefix='/users/')
+        app = TestApp(config.make_wsgi_app())
+        app.get('/users/', status=200)
+
     def test_add_route_discriminator(self):
         config = self._makeOne()
         config.add_route('name', 'path')
@@ -412,3 +486,23 @@ class DummyAccept:
             if match in offers:
                 results.append((match, 1.0))
         return results
+
+
+class Test_normalize_route_prefix(unittest.TestCase):
+    def _callFUT(self, route_prefix):
+        from pyramid.config.routes import normalize_route_prefix
+
+        return normalize_route_prefix(route_prefix)
+
+    def test_empty(self):
+        for value in (None, '', '/', '//'):
+            self.assertEqual(self._callFUT(value), None)
+
+    def test_strips_leading_slashes(self):
+        self.assertEqual(self._callFUT('root'), 'root')
+        self.assertEqual(self._callFUT('/root'), 'root')
+        self.assertEqual(self._callFUT('//root/nested'), 'root/nested')
+
+    def test_keeps_one_trailing_slash(self):
+        self.assertEqual(self._callFUT('root/'), 'root/')
+        self.assertEqual(self._callFUT('/root//'), 'root/')

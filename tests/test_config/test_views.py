@@ -4159,6 +4159,15 @@ class TestStaticURLInfo(unittest.TestCase):
         self.assertEqual(inst.registrations, expected)
         self.assertEqual(config.route_args, ('__/abc/view/', 'view/*subpath'))
 
+    def test_add_viewname_with_route_prefix_trailing_slash(self):
+        config = DummyConfig()
+        config.route_prefix = 'abc/'
+        inst = self._makeOne()
+        inst.add(config, 'view', 'anotherpackage:path')
+        expected = [(None, 'anotherpackage:path/', '__abc/view/')]
+        self.assertEqual(inst.registrations, expected)
+        self.assertEqual(config.route_args, ('__abc/view/', 'view/*subpath'))
+
     def test_add_viewname_with_permission(self):
         config = DummyConfig()
         inst = self._makeOne()

@@ -2245,7 +2245,8 @@ class StaticURLInfo:
             # pattern, plus any extras passed to us via add_static_view
             pattern = "%s*subpath" % name  # name already ends with slash
             if config.route_prefix:
-                route_name = f'__{config.route_prefix}/{name}'
+                route_prefix = config.route_prefix.rstrip('/')
+                route_name = f'__{route_prefix}/{name}'
             else:
                 route_name = '__%s' % name
             config.add_route(route_name, pattern, **extra)
