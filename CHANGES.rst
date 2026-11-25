@@ -47,6 +47,16 @@ Bug Fixes
 Backward Incompatibilities
 --------------------------
 
+- Leading slashes are now removed from route patterns by
+  ``config.add_route``, such that patterns are always relative to the
+  application root. For example, ``config.add_route('idea', '/ideas/{idea}')``
+  now reports a pattern of ``ideas/{idea}`` via ``IRoute.pattern``,
+  introspection, and ``proutes``, and a pattern of ``/`` is reported as ``''``.
+  A leading slash is always implied when matching, so matching and URL
+  generation are unchanged. Code that inspects route patterns and expects them
+  to start with a slash may need to be updated.
+  See https://github.com/Pylons/pyramid/pull/3851
+
 - Drop support for Python 3.10, which reached end-of-life in October 2026.
   See https://github.com/Pylons/pyramid/pull/3840
 
