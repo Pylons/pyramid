@@ -3,8 +3,8 @@ import sys
 import textwrap
 
 from pyramid.interfaces import ITweens
-from pyramid.paster import bootstrap, setup_logging
-from pyramid.scripts.common import parse_vars
+from pyramid.paster import bootstrap
+from pyramid.scripts.common import get_config_loader, parse_vars
 from pyramid.tweens import INGRESS, MAIN
 
 
@@ -51,7 +51,7 @@ class PTweensCommand:
 
     stdout = sys.stdout
     bootstrap = staticmethod(bootstrap)  # testing
-    setup_logging = staticmethod(setup_logging)  # testing
+    get_config_loader = staticmethod(get_config_loader)  # testing
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
@@ -83,7 +83,8 @@ class PTweensCommand:
         config_uri = self.args.config_uri
         config_vars = parse_vars(self.args.config_vars)
         config_vars.setdefault('__script__', self.script_name)
-        self.setup_logging(config_uri, global_conf=config_vars)
+        loader = self.get_config_loader(config_uri, exit_on_error=True)
+        loader.setup_logging(config_vars)
         env = self.bootstrap(config_uri, options=config_vars)
         registry = env['registry']
         tweens = self._get_tweens(registry)

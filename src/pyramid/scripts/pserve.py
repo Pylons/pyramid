@@ -187,7 +187,7 @@ class PServeCommand:
         app_spec = self.args.config_uri
         app_name = self.args.app_name
 
-        loader = self._get_config_loader(config_uri)
+        loader = self._get_config_loader(config_uri, exit_on_error=True)
 
         # setup logging only in the worker process incase the logging config
         # opens files which should not be opened by multiple processes at once
@@ -206,7 +206,9 @@ class PServeCommand:
 
         server_loader = loader
         if server_spec != app_spec:
-            server_loader = self.get_config_loader(server_spec)
+            server_loader = self._get_config_loader(
+                server_spec, exit_on_error=True
+            )
 
         # do not open the browser on each reload so check hupper first
         if self.args.browser and not hupper.is_active():

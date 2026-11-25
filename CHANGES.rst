@@ -44,6 +44,16 @@ Bug Fixes
   and the ``authenticated_userid`` was ``None``.
   See https://github.com/Pylons/pyramid/pull/3814
 
+- The ``pserve``, ``prequest``, ``proutes``, ``pshell``, ``ptweens`` and
+  ``pviews`` scripts now print an error message and exit with status ``1``,
+  instead of printing a traceback, when the config file does not exist or the
+  config URI cannot be loaded by ``plaster``.
+  See https://github.com/Pylons/pyramid/pull/3766
+
+- Fix an ``AttributeError`` in ``pserve`` when the server is loaded from a
+  different config URI than the app, such as when using ``--server``.
+  See https://github.com/Pylons/pyramid/pull/3766
+
 Backward Incompatibilities
 --------------------------
 

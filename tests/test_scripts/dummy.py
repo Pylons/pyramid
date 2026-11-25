@@ -154,12 +154,6 @@ class DummyBootstrap:
         }
 
 
-class dummy_setup_logging:
-    def __call__(self, config_uri, global_conf):
-        self.config_uri = config_uri
-        self.defaults = global_conf
-
-
 class DummyLoader:
     def __init__(
         self, settings=None, app_settings=None, app=None, server=None
@@ -174,7 +168,7 @@ class DummyLoader:
         self.server = server
         self.calls = []
 
-    def __call__(self, uri):
+    def __call__(self, uri, *, exit_on_error=False):
         import plaster
 
         self.uri = plaster.parse_uri(uri)
