@@ -228,7 +228,9 @@ class Configurator(
 
     If ``route_prefix`` is passed, all routes added with
     :meth:`pyramid.config.Configurator.add_route` will have the specified path
-    prepended to their pattern.
+    prepended to their pattern. Leading slashes are removed from the
+    ``route_prefix``, and a trailing slash, if supplied, is kept such that it
+    may be inherited by routes added with ``inherit_slash=True``.
 
     If ``introspection`` is passed, it must be a boolean value.  If it's
     ``True``, introspection values during actions will be kept for use

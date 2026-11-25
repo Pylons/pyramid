@@ -17,7 +17,38 @@ from pyramid.urldispatch import RoutesMapper
 from pyramid.util import as_sorted_tuple, is_nonstr_iter
 
 
+def normalize_route_prefix(route_prefix):
+    """
+    Normalize a :term:`route prefix`.
+
+    Leading slashes are removed, such that the prefix is relative to the
+    application root like a route pattern. A trailing slash is kept, if one
+    was supplied, such that it may be inherited by routes added with
+    ``inherit_slash=True``; repeated trailing slashes are collapsed into one.
+    An empty prefix, or one made up only of slashes, becomes ``None``.
+
+    """
+    if not route_prefix:
+        return None
+    stripped = route_prefix.strip('/')
+    if not stripped:
+        return None
+    if route_prefix.endswith('/'):
+        return stripped + '/'
+    return stripped
+
+
 class RoutesConfiguratorMixin:
+    _route_prefix = None
+
+    @property
+    def route_prefix(self):
+        return self._route_prefix
+
+    @route_prefix.setter
+    def route_prefix(self, route_prefix):
+        self._route_prefix = normalize_route_prefix(route_prefix)
+
     @action_method
     def add_route(
         self,
@@ -589,7 +620,11 @@ class RoutesConfiguratorMixin:
         When the context exits, the ``route_prefix`` is reset to the original.
 
         ``route_prefix`` is a string suitable to be used as a route prefix,
-        or ``None``.
+        or ``None``. It is appended to any existing route prefix. Leading
+        slashes are removed, and a trailing slash on ``route_prefix``, if
+        supplied, is kept such that it may be inherited by routes added with
+        ``inherit_slash=True``. An empty or ``None`` ``route_prefix`` leaves
+        the existing route prefix unchanged.
 
         Example Usage:
 
@@ -601,24 +636,26 @@ class RoutesConfiguratorMixin:
 
         .. versionadded:: 1.10
 
+        .. versionchanged:: 2.2
+
+           A trailing slash on ``route_prefix`` is kept instead of removed,
+           so that it is inherited by routes added with
+           ``inherit_slash=True``. Previously, such routes never ended in a
+           slash when the prefix was set through this method or
+           :meth:`pyramid.config.Configurator.include`.
+
         """
         original_route_prefix = self.route_prefix
 
-        if route_prefix is None:
-            route_prefix = ''
-
-        old_route_prefix = self.route_prefix
-        if old_route_prefix is None:
-            old_route_prefix = ''
-
-        route_prefix = '{}/{}'.format(
-            old_route_prefix.rstrip('/'), route_prefix.lstrip('/')
-        )
-
-        route_prefix = route_prefix.strip('/')
-
-        if not route_prefix:
-            route_prefix = None
+        if route_prefix:
+            # the trailing slash, if any, is inherited from the new prefix
+            route_prefix = (
+                (original_route_prefix or '').rstrip('/')
+                + '/'
+                + route_prefix.lstrip('/')
+            )
+        else:
+            route_prefix = original_route_prefix
 
         self.begin()
         try:
