@@ -16,6 +16,13 @@ Features
 - Add support for Python 3.15.
   See https://github.com/Pylons/pyramid/pull/3840
 
+- Speed up configuration conflict resolution during ``config.commit()`` and
+  ``config.make_wsgi_app()``. Actions are no longer removed from the pending
+  list one at a time, which was quadratic in the number of actions and slowed
+  startup noticeably for applications with thousands of routes and views.
+  Thanks to Russell Ballestrini for the original patch.
+  See https://github.com/Pylons/pyramid/pull/NNNN
+
 Bug Fixes
 ---------
 

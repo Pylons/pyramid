@@ -339,6 +339,12 @@ class ConflictResolverState:
         # actions left over from a previous iteration
         self.remaining_actions = []
 
+        # ids of the actions in remaining_actions that have not been resolved
+        # yet, resolved actions are pruned from remaining_actions at the start
+        # of the next call to resolveConflicts instead of being removed from
+        # the list one at a time
+        self.remaining_action_ids = set()
+
         # after executing an action we memoize its order to avoid any new
         # actions sending us backward
         self.min_order = None
@@ -374,9 +380,14 @@ def resolveConflicts(actions, state=None):
     if state is None:
         state = ConflictResolverState()
 
-    # pick up where we left off last time, but track the new actions as well
-    state.remaining_actions.extend(normalize_actions(actions))
-    actions = state.remaining_actions
+    # pick up where we left off last time, dropping anything that was resolved
+    # by the previous call, but track the new actions as well
+    new_actions = normalize_actions(actions)
+    pending_ids = state.remaining_action_ids
+    actions = [a for a in state.remaining_actions if id(a) in pending_ids]
+    actions.extend(new_actions)
+    pending_ids.update(id(a) for a in new_actions)
+    state.remaining_actions = actions
 
     def orderandpos(v):
         n, v = v
@@ -487,7 +498,7 @@ def resolveConflicts(actions, state=None):
             # do not memoize the order until we resolve an action inside it
             state.min_order = action['order']
             state.start = i + 1
-            state.remaining_actions.remove(action)
+            state.remaining_action_ids.discard(id(action))
             state.resolved_ainfos[action['discriminator']] = (i, action)
             yield action
 

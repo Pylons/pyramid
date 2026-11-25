@@ -1032,6 +1032,94 @@ class Test_resolveConflicts(unittest.TestCase):
         )
         self.assertRaises(ConfigurationConflictError, list, result)
 
+    def _makeAction(self, discriminator, order=0, includepath=(), info=None):
+        return {
+            'discriminator': discriminator,
+            'callable': None,
+            'args': (),
+            'kw': {},
+            'includepath': includepath,
+            'info': info,
+            'order': order,
+            'introspectables': (),
+        }
+
+    def test_resume_with_state_does_not_repeat_resolved_actions(self):
+        from pyramid.config.actions import (
+            ConflictResolverState,
+            resolveConflicts,
+        )
+
+        state = ConflictResolverState()
+        a = self._makeAction('a')
+        b = self._makeAction('b')
+        self.assertEqual(list(resolveConflicts([a, b], state)), [a, b])
+
+        c = self._makeAction('c')
+        self.assertEqual(list(resolveConflicts([c], state)), [c])
+        self.assertEqual(list(resolveConflicts([], state)), [])
+
+    def test_resume_with_state_after_partial_iteration(self):
+        # mirrors ActionState.execute_actions, which abandons the current
+        # iterator and resolves again when an action adds new actions
+        from pyramid.config.actions import (
+            ConflictResolverState,
+            resolveConflicts,
+        )
+
+        state = ConflictResolverState()
+        a = self._makeAction('a', order=0)
+        b = self._makeAction('b', order=10)
+        it = resolveConflicts([a, b], state)
+        self.assertIs(next(it), a)
+
+        c = self._makeAction('c', order=10)
+        self.assertEqual(list(resolveConflicts([c], state)), [b, c])
+        self.assertEqual(list(resolveConflicts([], state)), [])
+
+    def test_resume_with_state_conflicts_with_resolved_action(self):
+        from pyramid.config.actions import (
+            ConflictResolverState,
+            resolveConflicts,
+        )
+
+        state = ConflictResolverState()
+        a = self._makeAction('x', includepath=('a',), info='first')
+        self.assertEqual(list(resolveConflicts([a], state)), [a])
+
+        b = self._makeAction('x', includepath=('b',), info='second')
+        result = resolveConflicts([b], state)
+        self.assertRaises(ConfigurationConflictError, list, result)
+
+    def test_resume_with_state_overridden_by_resolved_action(self):
+        from pyramid.config.actions import (
+            ConflictResolverState,
+            resolveConflicts,
+        )
+
+        state = ConflictResolverState()
+        a = self._makeAction('x', includepath=('a',))
+        self.assertEqual(list(resolveConflicts([a], state)), [a])
+
+        b = self._makeAction('x', includepath=('a', 'b'))
+        self.assertEqual(list(resolveConflicts([b], state)), [])
+
+    def test_resume_with_state_equal_actions(self):
+        # distinct but equal action dicts must each be resolved exactly once
+        from pyramid.config.actions import (
+            ConflictResolverState,
+            resolveConflicts,
+        )
+
+        state = ConflictResolverState()
+        a1 = self._makeAction(None)
+        a2 = self._makeAction(None)
+        result = list(resolveConflicts([a1, a2], state))
+        self.assertEqual(len(result), 2)
+        self.assertIs(result[0], a1)
+        self.assertIs(result[1], a2)
+        self.assertEqual(list(resolveConflicts([], state)), [])
+
 
 class TestActionInfo(unittest.TestCase):
     def _getTargetClass(self):
