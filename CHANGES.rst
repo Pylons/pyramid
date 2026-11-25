@@ -21,7 +21,7 @@ Features
   list one at a time, which was quadratic in the number of actions and slowed
   startup noticeably for applications with thousands of routes and views.
   Thanks to Russell Ballestrini for the original patch.
-  See https://github.com/Pylons/pyramid/pull/NNNN
+  See https://github.com/Pylons/pyramid/pull/3850
 
 Bug Fixes
 ---------
