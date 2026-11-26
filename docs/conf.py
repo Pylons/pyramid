@@ -128,6 +128,9 @@ if book:
 
 # Options for HTML output
 # -----------------------
+# RTD no longer sets the canonical URL automatically, point it at "latest"
+html_baseurl = 'https://docs.pylonsproject.org/projects/pyramid/en/latest/'
+
 # enable pylons_sphinx_latesturl when this branch is no longer "latest"
 # pylons_sphinx_latesturl_base = (
 #     'https://docs.pylonsproject.org/projects/pyramid/en/latest/')
