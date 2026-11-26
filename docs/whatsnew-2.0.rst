@@ -17,6 +17,7 @@ The following bug fix releases were made since then. Bug fix releases also inclu
 
 - :ref:`changes_2.0.1`
 - :ref:`changes_2.0.2`
+- :ref:`changes_2.0.3`
 
 Feature Additions
 -----------------
