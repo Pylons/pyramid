@@ -1,3 +1,12 @@
+unreleased
+==========
+
+Bug Fixes
+---------
+
+- Constrain ``setuptools < 82``. Pyramid 2.0 depends on ``pkg_resources``,
+  which was removed in setuptools 82.
+
 .. _changes_2.0.2:
 
 2.0.2 (2023-08-25)
