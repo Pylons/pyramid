@@ -12,7 +12,7 @@ class TestPTweensCommand(unittest.TestCase):
     def _makeOne(self):
         cmd = self._getTargetClass()([])
         cmd.bootstrap = dummy.DummyBootstrap()
-        cmd.setup_logging = dummy.dummy_setup_logging()
+        cmd.get_config_loader = dummy.DummyLoader()
         cmd.args.config_uri = '/foo/bar/myapp.ini#myapp'
         return cmd
 

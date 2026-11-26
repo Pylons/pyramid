@@ -3,9 +3,9 @@ import sys
 import textwrap
 
 from pyramid.interfaces import IMultiView
-from pyramid.paster import bootstrap, setup_logging
+from pyramid.paster import bootstrap
 from pyramid.request import Request
-from pyramid.scripts.common import parse_vars
+from pyramid.scripts.common import get_config_loader, parse_vars
 from pyramid.view import _find_views
 
 
@@ -58,7 +58,7 @@ class PViewsCommand:
     )
 
     bootstrap = staticmethod(bootstrap)  # testing
-    setup_logging = staticmethod(setup_logging)  # testing
+    get_config_loader = staticmethod(get_config_loader)  # testing
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
@@ -252,7 +252,8 @@ class PViewsCommand:
         config_vars.setdefault('__script__', self.script_name)
         url = self.args.url
 
-        self.setup_logging(config_uri, global_conf=config_vars)
+        loader = self.get_config_loader(config_uri, exit_on_error=True)
+        loader.setup_logging(config_vars)
 
         if not url.startswith('/'):
             url = '/%s' % url
