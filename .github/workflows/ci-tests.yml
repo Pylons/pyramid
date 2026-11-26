@@ -79,7 +79,7 @@ jobs:
             - name: Setup uv
               uses: astral-sh/setup-uv@v7
               with:
-                  python-version: "3.8"
+                  python-version: "3.11"
             - run: uvx --with tox-uv tox -e docs
     lint:
         runs-on: ubuntu-24.04
