@@ -126,6 +126,9 @@ if book:
 
 # Options for HTML output
 # -----------------------
+# point canonical URLs at "latest" when this branch is no longer "latest"
+html_baseurl = 'https://docs.pylonsproject.org/projects/pyramid/en/latest/'
+
 # enable pylons_sphinx_latesturl when this branch is no longer "latest"
 pylons_sphinx_latesturl_base = (
     'https://docs.pylonsproject.org/projects/pyramid/en/latest/')
