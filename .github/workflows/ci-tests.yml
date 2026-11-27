@@ -61,7 +61,7 @@ jobs:
               uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
               with:
                   python-version: "3.14"
-            - run: uvx tox -e py314-pkgresources
+            - run: uvx --with tox-uv tox -e py314-pkgresources
 
     coverage:
         runs-on: ubuntu-24.04
