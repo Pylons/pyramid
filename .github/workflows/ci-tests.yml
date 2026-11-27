@@ -11,6 +11,14 @@ on:
     # Build pull requests
     pull_request:
 
+# Drop all GITHUB_TOKEN permissions so ci-tests cannot modify the repo.
+# Checkout still works because the repo is public.
+permissions: {}
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
 jobs:
     test:
         strategy:
@@ -32,9 +40,11 @@ jobs:
         name: "Python: ${{ matrix.py }} on ${{ matrix.os }}"
         runs-on: ${{ matrix.os }}
         steps:
-            - uses: actions/checkout@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
             - name: Setup uv
-              uses: astral-sh/setup-uv@v7
+              uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
               with:
                   python-version: ${{ matrix.py }}
             - name: Running tox for current python version
@@ -44,9 +54,11 @@ jobs:
         runs-on: ubuntu-24.04
         name: "Python: 3.14 on ubuntu-24.04 with pkg_resources"
         steps:
-            - uses: actions/checkout@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
             - name: Setup uv
-              uses: astral-sh/setup-uv@v7
+              uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
               with:
                   python-version: "3.14"
             - run: uvx tox -e py314-pkgresources
@@ -55,9 +67,11 @@ jobs:
         runs-on: ubuntu-24.04
         name: Validate coverage
         steps:
-            - uses: actions/checkout@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
             - name: Setup uv
-              uses: astral-sh/setup-uv@v7
+              uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
               with:
                   python-version: "3.14"
             - run: uvx --with tox-uv tox -e py314-cover,coverage
@@ -65,9 +79,11 @@ jobs:
         runs-on: ubuntu-24.04
         name: Build the documentation
         steps:
-            - uses: actions/checkout@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
             - name: Setup uv
-              uses: astral-sh/setup-uv@v7
+              uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
               with:
                   python-version: "3.14"
             - run: uvx --with tox-uv tox -e docs
@@ -75,9 +91,11 @@ jobs:
         runs-on: ubuntu-24.04
         name: Lint the package
         steps:
-            - uses: actions/checkout@v7
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
             - name: Setup uv
-              uses: astral-sh/setup-uv@v7
+              uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
               with:
                   python-version: "3.14"
             - run: uvx --with tox-uv tox -e lint
