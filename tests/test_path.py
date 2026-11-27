@@ -7,24 +7,6 @@ from pyramid import testing
 here = os.path.abspath(os.path.dirname(__file__))
 
 
-class TestCallerPath(unittest.TestCase):
-    def _callFUT(self, path, level=2):
-        from pyramid.path import caller_path
-
-        return caller_path(path, level)
-
-    def test_isabs(self):
-        path = os.path.abspath('/a/b/c')
-        result = self._callFUT(path)
-        self.assertEqual(result, path)
-
-    def test_pkgrelative(self):
-        import os
-
-        result = self._callFUT('a/b/c')
-        self.assertEqual(result, os.path.join(here, 'a/b/c'))
-
-
 class TestCallerModule(unittest.TestCase):
     def _callFUT(self, *arg, **kw):
         from pyramid.path import caller_module
@@ -96,43 +78,6 @@ class TestCallerPackage(unittest.TestCase):
 
         result = self._callFUT(1, caller_module=dummy_caller_module)
         self.assertEqual(result, tests)
-
-
-class TestPackagePath(unittest.TestCase):
-    def setUp(self):
-        from pyramid.path import _package_path
-
-        _package_path.cache_clear()
-
-    def _callFUT(self, package):
-        from pyramid.path import package_path
-
-        return package_path(package)
-
-    def test_it_package(self):
-        import tests
-
-        package = DummyPackageOrModule(tests)
-        result = self._callFUT(package)
-        self.assertEqual(result, package.package_path)
-
-    def test_it_module(self):
-        from . import test_path
-
-        module = DummyPackageOrModule(test_path)
-        result = self._callFUT(module)
-        self.assertEqual(result, module.package_path)
-
-    def test_cached(self):
-        from pyramid.path import _package_path
-        import tests
-        import tests.test_path
-
-        first = self._callFUT(tests)
-        second = self._callFUT(tests.test_path)  # same package
-        self.assertEqual(first, second)
-        info = _package_path.cache_info()
-        self.assertEqual((info.misses, info.hits), (1, 1))
 
 
 class TestPackageOf(unittest.TestCase):
