@@ -149,9 +149,9 @@ class RoutesConfiguratorMixin:
               with config.route_prefix_context('/users'):
                   config.add_route('users', '', inherit_slash=True)
 
-          In this example, the resulting route pattern will be ``/users``.
+          In this example, the resulting route pattern will be ``users``.
           Alternatively, if the route prefix were ``/users/``, then the
-          resulting route pattern would be ``/users/``.
+          resulting route pattern would be ``users/``.
 
           .. versionadded:: 2.0
 
@@ -164,6 +164,15 @@ class RoutesConfiguratorMixin:
           for information about the syntax of route patterns.  If the
           pattern doesn't match the current URL, route matching
           continues.
+
+          .. versionchanged:: 2.2
+
+             Leading slashes are removed from the pattern. A pattern such as
+             ``/ideas/{idea}`` is stored on the resulting
+             :class:`pyramid.interfaces.IRoute` as ``ideas/{idea}``, and a
+             pattern of ``/`` is stored as ``''``. A leading slash is always
+             implied when matching, so this does not change which requests
+             the route matches nor the URLs it generates.
 
           .. note::
 
@@ -410,13 +419,20 @@ class RoutesConfiguratorMixin:
             pregenerator = external_url_pregenerator
             static = True
 
-        elif self.route_prefix:
-            if pattern == '' and inherit_slash:
-                pattern = self.route_prefix
-            else:
-                pattern = (
-                    self.route_prefix.rstrip('/') + '/' + pattern.lstrip('/')
-                )
+        else:
+            if self.route_prefix:
+                if pattern == '' and inherit_slash:
+                    pattern = self.route_prefix
+                else:
+                    pattern = (
+                        self.route_prefix.rstrip('/')
+                        + '/'
+                        + pattern.lstrip('/')
+                    )
+
+            # normalize the pattern to be relative to the application root,
+            # without a leading slash, which is implied when matching
+            pattern = pattern.lstrip('/')
 
         mapper = self.get_routes_mapper()
 

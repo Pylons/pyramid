@@ -79,6 +79,63 @@ class RoutesConfiguratorMixinTests(unittest.TestCase):
         config.add_route('name', '/')
         self._assertRoute(config, 'name', 'root/')
 
+    def test_add_route_strips_leading_slash(self):
+        config = self._makeOne(autocommit=True)
+        config.add_route('name', '/path')
+        self._assertRoute(config, 'name', 'path')
+
+    def test_add_route_strips_multiple_leading_slashes(self):
+        config = self._makeOne(autocommit=True)
+        config.add_route('name', '///path')
+        self._assertRoute(config, 'name', 'path')
+
+    def test_add_route_root_slash(self):
+        config = self._makeOne(autocommit=True)
+        config.add_route('name', '/')
+        self._assertRoute(config, 'name', '')
+
+    def test_add_route_with_empty_pattern(self):
+        config = self._makeOne(autocommit=True)
+        config.add_route('name', '')
+        self._assertRoute(config, 'name', '')
+
+    def test_add_route_with_slashed_route_prefix(self):
+        config = self._makeOne(autocommit=True)
+        config.route_prefix = '/root/'
+        config.add_route('name', '/path')
+        self._assertRoute(config, 'name', 'root/path')
+
+    def test_add_route_with_slashed_route_prefix_with_inherit_slash(self):
+        config = self._makeOne(autocommit=True)
+        config.route_prefix = '/root/'
+        config.add_route('name', '', inherit_slash=True)
+        self._assertRoute(config, 'name', 'root/')
+
+    def test_add_route_with_route_prefix_context_strips_leading_slash(self):
+        config = self._makeOne(autocommit=True)
+        with config.route_prefix_context('/root'):
+            with config.route_prefix_context('/nested'):
+                config.add_route('name', '/path')
+        self._assertRoute(config, 'name', 'root/nested/path')
+
+    def test_add_route_stripped_pattern_matches_same_paths(self):
+        from pyramid.request import Request
+
+        config = self._makeOne(autocommit=True)
+        config.add_route('root', '/')
+        config.add_route('path', '/path')
+        mapper = config.get_routes_mapper()
+        for path_info, name in (
+            ('', 'root'),
+            ('/', 'root'),
+            ('/path', 'path'),
+        ):
+            request = Request.blank('/')
+            request.path_info = path_info
+            self.assertEqual(mapper(request)['route'].name, name)
+        self.assertEqual(mapper.generate('root', {}), '/')
+        self.assertEqual(mapper.generate('path', {}), '/path')
+
     def test_add_route_discriminator(self):
         config = self._makeOne()
         config.add_route('name', 'path')

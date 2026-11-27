@@ -722,7 +722,7 @@ class Test_reentrant_action_functional(unittest.TestCase):
         route = routes[0]
         self.assertEqual(len(routes), 1)
         self.assertEqual(route.name, 'foo')
-        self.assertEqual(route.path, '/foo')
+        self.assertEqual(route.path, 'foo')
 
     def test_deferred_discriminator(self):
         # see https://github.com/Pylons/pyramid/issues/2697
